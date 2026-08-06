@@ -78,6 +78,14 @@ const TRANSLATIONS = {
     loc_ville_dept: "Ville · dept. {d}", loc_radius_title: "Rayon autour de {ville}",
     map_centered_on: "Carte centrée sur {loc}", map_empty: "Aucune sortie géolocalisée pour ces filtres.",
     map_see_detail: "Voir la fiche",
+    adult_sub_decouvrir: "Découvrir", adult_sub_creer: "Créer", adult_sub_mes: "Mes rencontres",
+    create_meetup_title: "Proposer une rencontre",
+    create_meetup_subtitle: "Partagez un moment entre adultes, d'autres parents pourront vous rejoindre.",
+    label_info: "Info complémentaire (optionnel)", placeholder_info: "Ex. Pendant que les enfants sont à l'école",
+    success_message_meetup: "Rencontre publiée ! Elle apparaît dans l'onglet Découvrir.",
+    my_meetups_title: "Mes rencontres",
+    my_meetups_subtitle: "Les rencontres que vous avez proposées ou rejointes.",
+    my_meetups_empty: "Vous n'avez pas encore de rencontre. Rejoignez-en une dans Découvrir, ou proposez la vôtre dans Créer !",
   },
   en: {
     tab_enfants: "Kids", tab_ados: "Teens", tab_adultes: "Adults", tab_creer: "Create",
@@ -131,6 +139,14 @@ const TRANSLATIONS = {
     loc_ville_dept: "City · dept. {d}", loc_radius_title: "Radius around {ville}",
     map_centered_on: "Map centred on {loc}", map_empty: "No located outing for these filters.",
     map_see_detail: "See details",
+    adult_sub_decouvrir: "Discover", adult_sub_creer: "Create", adult_sub_mes: "My meetups",
+    create_meetup_title: "Propose a meetup",
+    create_meetup_subtitle: "Share a moment between adults, other parents can join you.",
+    label_info: "Extra info (optional)", placeholder_info: "E.g. While the kids are at school",
+    success_message_meetup: "Meetup published! It now appears in the Discover tab.",
+    my_meetups_title: "My meetups",
+    my_meetups_subtitle: "The meetups you've proposed or joined.",
+    my_meetups_empty: "No meetups yet. Join one in Discover, or propose your own in Create!",
   },
   es: {
     tab_enfants: "Niños", tab_ados: "Adolescentes", tab_adultes: "Adultos", tab_creer: "Crear",
@@ -184,6 +200,14 @@ const TRANSLATIONS = {
     loc_ville_dept: "Ciudad · dpto. {d}", loc_radius_title: "Radio alrededor de {ville}",
     map_centered_on: "Mapa centrado en {loc}", map_empty: "Ninguna salida geolocalizada para estos filtros.",
     map_see_detail: "Ver la ficha",
+    adult_sub_decouvrir: "Descubrir", adult_sub_creer: "Crear", adult_sub_mes: "Mis encuentros",
+    create_meetup_title: "Proponer un encuentro",
+    create_meetup_subtitle: "Comparte un momento entre adultos, otros padres podrán unirse.",
+    label_info: "Info adicional (opcional)", placeholder_info: "Ej. Mientras los niños están en el colegio",
+    success_message_meetup: "¡Encuentro publicado! Aparece en la pestaña Descubrir.",
+    my_meetups_title: "Mis encuentros",
+    my_meetups_subtitle: "Los encuentros que has propuesto o a los que te has unido.",
+    my_meetups_empty: "Todavía no tienes encuentros. ¡Únete a uno en Descubrir, o propón el tuyo en Crear!",
   },
 };
 
@@ -1873,6 +1897,198 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
   );
 }
 
+// ---------- Créer / lister ses propres rencontres (adultes, sans validation mairie) ----------
+function CreateMeetup({ categories, onCreate }) {
+  const [form, setForm] = useState({
+    title: "", category: categories[0].id, lieu: "", date: "", places: 8, info: "", desc: "",
+  });
+  const [sent, setSent] = useState(false);
+
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  const submit = () => {
+    if (!form.title || !form.lieu || !form.date) return;
+    onCreate({ ...form, id: Date.now(), inscrits: 1, organisateur: t("you_organizer"), places: Number(form.places) || 1 });
+    setSent(true);
+    setTimeout(() => setSent(false), 2200);
+    setForm({ title: "", category: categories[0].id, lieu: "", date: "", places: 8, info: "", desc: "" });
+  };
+
+  const inputStyle = {
+    width: "100%", border: "2px solid #F0EADB", borderRadius: 14, padding: "12px 14px",
+    fontFamily: "Nunito, sans-serif", fontSize: 14.5, color: COLORS.ink, outline: "none",
+    boxSizing: "border-box", background: "#fff",
+  };
+  const label = { fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5, color: "#6B6485", marginBottom: 6, display: "block", textTransform: "uppercase", letterSpacing: 0.4 };
+
+  return (
+    <div style={{ maxWidth: 560, margin: "0 auto" }}>
+      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
+        {t("create_meetup_title")}
+      </h1>
+      <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 18px" }}>
+        {t("create_meetup_subtitle")}
+      </p>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div>
+          <label style={label}>{t("label_titre")}</label>
+          <input style={inputStyle} placeholder={t("placeholder_titre")} value={form.title} onChange={set("title")} />
+        </div>
+
+        <div>
+          <label style={label}>{t("label_categorie")}</label>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {categories.map((c) => (
+              <Chip key={c.id} active={form.category === c.id} onClick={() => setForm({ ...form, category: c.id })} color={c.color}>
+                {c.label}
+              </Chip>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div>
+            <label style={label}>{t("label_lieu")}</label>
+            <input style={inputStyle} placeholder={t("placeholder_lieu")} value={form.lieu} onChange={set("lieu")} />
+          </div>
+          <div>
+            <label style={label}>{t("label_date")}</label>
+            <input style={inputStyle} placeholder={t("placeholder_date")} value={form.date} onChange={set("date")} />
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div>
+            <label style={label}>{t("label_info")}</label>
+            <input style={inputStyle} placeholder={t("placeholder_info")} value={form.info} onChange={set("info")} />
+          </div>
+          <div>
+            <label style={label}>{t("label_places")}</label>
+            <input type="number" min={1} style={inputStyle} value={form.places} onChange={set("places")} />
+          </div>
+        </div>
+
+        <div>
+          <label style={label}>{t("label_description")}</label>
+          <textarea rows={3} style={{ ...inputStyle, resize: "vertical", fontFamily: "Nunito, sans-serif" }}
+            placeholder={t("placeholder_description")} value={form.desc} onChange={set("desc")} />
+        </div>
+
+        <PillButton color={COLORS.grass} textColor="#fff" onClick={submit} style={{ marginTop: 6 }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+            <PlusCircle size={18} /> {t("btn_publier")}
+          </span>
+        </PillButton>
+
+        {sent && (
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8, background: "#EAF8ED",
+            color: COLORS.grass, fontFamily: "Nunito, sans-serif", fontWeight: 800,
+            fontSize: 13.5, padding: "10px 14px", borderRadius: 12,
+          }}>
+            <Check size={16} /> {t("success_message_meetup")}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function MyMeetups({ items, joined, categories, onOpen }) {
+  const mine = items.filter((it) => joined.includes(it.id));
+  return (
+    <div>
+      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
+        {t("my_meetups_title")}
+      </h1>
+      <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 18px" }}>
+        {t("my_meetups_subtitle")}
+      </p>
+
+      {mine.length === 0 ? (
+        <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 20, padding: 20, textAlign: "center" }}>
+          <p style={{ fontFamily: "Nunito, sans-serif", color: "#9A93AF", fontSize: 14, margin: 0 }}>
+            {t("my_meetups_empty")}
+          </p>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {mine.map((item) => {
+            const meta = metaFrom(categories, item.category);
+            const Icon = meta.icon;
+            return (
+              <div key={item.id} onClick={() => onOpen(item)} style={{
+                background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: 14,
+                display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
+              }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: "50%", border: `2px dashed ${meta.color}`,
+                  background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                }}>
+                  <Icon size={18} color={meta.color} strokeWidth={2.4} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15, color: COLORS.ink }}>{item.title}</div>
+                  <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485" }}>{item.date} · {lieuAvecVille(item)}</div>
+                </div>
+                <ChevronRight size={18} color="#C7C0AE" />
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Section "Adultes" avec sa propre sous-navigation Découvrir / Créer / Mes rencontres —
+// entièrement indépendante de la validation mairie (réservée aux sorties Enfants/Ados).
+function AdultSection({ items, favorites, joined, onToggleFav, onOpen, onCreate, location }) {
+  const [sub, setSub] = useState("decouvrir");
+  const subTabs = [
+    { id: "decouvrir", label: t("adult_sub_decouvrir"), icon: Compass },
+    { id: "creer", label: t("adult_sub_creer"), icon: PlusCircle },
+    { id: "mes", label: t("adult_sub_mes"), icon: BookMarked },
+  ];
+  return (
+    <div>
+      <div style={{ display: "inline-flex", background: "#F0EADB", borderRadius: 14, padding: 4, marginBottom: 18, flexWrap: "wrap" }}>
+        {subTabs.map((s) => (
+          <button
+            key={s.id}
+            onClick={() => setSub(s.id)}
+            style={{
+              display: "flex", alignItems: "center", gap: 6, border: "none", cursor: "pointer",
+              background: sub === s.id ? COLORS.ink : "transparent",
+              color: sub === s.id ? "#fff" : "#6B6485",
+              padding: "8px 14px", borderRadius: 12, fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
+            }}
+          >
+            <s.icon size={14} /> {s.label}
+          </button>
+        ))}
+      </div>
+
+      {sub === "decouvrir" && (
+        <CommunityExplorer
+          title={t("community_adult_title")}
+          subtitle={t("community_adult_subtitle")}
+          categories={ADULT_CATEGORIES}
+          items={items}
+          favorites={favorites}
+          onToggleFav={onToggleFav}
+          onOpen={onOpen}
+          emptyText={t("community_empty")}
+          location={location}
+        />
+      )}
+      {sub === "creer" && <CreateMeetup categories={ADULT_CATEGORIES} onCreate={onCreate} />}
+      {sub === "mes" && <MyMeetups items={items} joined={joined} categories={ADULT_CATEGORIES} onOpen={onOpen} />}
+    </div>
+  );
+}
+
 // ---------- Root ----------
 export default function RecreApp() {
   const [parentValidated, setParentValidated] = useState(false);
@@ -1918,6 +2134,13 @@ export default function RecreApp() {
     setJoinedFn((j) => [...j, id]);
     setItemsFn((items) => items.map((it) => it.id === id ? { ...it, inscrits: it.inscrits + 1 } : it));
     setSelectedCommunity((s) => s && s.item.id === id ? { ...s, item: { ...s.item, inscrits: s.item.inscrits + 1 } } : s);
+  };
+
+  // Créer une rencontre adulte l'ajoute à la liste ET vous y inscrit automatiquement,
+  // pour qu'elle apparaisse dans "Mes rencontres" — aucune validation mairie requise ici.
+  const createAdultMeetup = (item) => {
+    setAdultItems((items) => [item, ...items]);
+    setJoinedAdult((j) => [...j, item.id]);
   };
 
   const TABS_ALL = [
@@ -1989,15 +2212,13 @@ export default function RecreApp() {
         {tab === "creer" && parentValidated && <CreateActivity onCreate={createActivity} />}
         {tab === "mes-sorties" && parentValidated && <MyOutings joined={joined} activities={activities} />}
         {tab === "adultes" && (
-          <CommunityExplorer
-            title={t("community_adult_title")}
-            subtitle={t("community_adult_subtitle")}
-            categories={ADULT_CATEGORIES}
+          <AdultSection
             items={adultItems}
             favorites={favAdult}
+            joined={joinedAdult}
             onToggleFav={(id) => toggleFavCommunity("adult", id)}
             onOpen={(item) => setSelectedCommunity({ item, kind: "adult" })}
-            emptyText={t("community_empty")}
+            onCreate={createAdultMeetup}
             location={location}
           />
         )}
