@@ -2061,10 +2061,10 @@ function ViewToggle({ view, onChange }) {
         display: "flex", alignItems: "center", gap: 6, border: "none", cursor: "pointer",
         background: view === id ? COLORS.ink : "transparent",
         color: view === id ? "#fff" : "#6B6485",
-        padding: "8px 14px", borderRadius: 12, fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
+        padding: "9px 15px", borderRadius: 12, fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13.5,
       }}
     >
-      <Icon size={14} /> {label}
+      <Icon size={16} /> {label}
     </button>
   );
   return (
@@ -3567,9 +3567,9 @@ export default function RecreApp() {
                 background: "none", border: "none", cursor: "pointer", flex: "1 0 56px",
               }}
             >
-              <t.icon size={22} className="pika-tab-icon" color={active ? COLORS.coral : "#B7AF98"} strokeWidth={active ? 2.6 : 2} />
+              <t.icon size={26} className="pika-tab-icon" color={active ? COLORS.coral : "#B7AF98"} strokeWidth={active ? 2.6 : 2} />
               <span className="pika-tab-label" style={{
-                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 10.5,
+                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13,
                 color: active ? COLORS.coral : "#B7AF98",
               }}>
                 {t.label}
@@ -3609,15 +3609,15 @@ export default function RecreApp() {
           .mobile-nav { display: none !important; }
         }
         @media (max-width: 400px) {
-          .mobile-nav { padding: 8px 2px 12px !important; gap: 0 !important; }
-          .pika-tab-btn { flex: 1 0 40px !important; }
-          .pika-tab-icon { width: 18px !important; height: 18px !important; }
-          .pika-tab-label { font-size: 8.5px !important; }
+          .mobile-nav { padding: 8px 4px 14px !important; gap: 2px !important; }
+          .pika-tab-btn { flex: 1 0 60px !important; }
+          .pika-tab-icon { width: 24px !important; height: 24px !important; }
+          .pika-tab-label { font-size: 11.5px !important; }
           .pika-header-row { padding: 12px 12px !important; }
           .pika-header-right { gap: 6px !important; }
-          .pika-header-action { width: 30px !important; height: 30px !important; }
-          .pika-header-action-icon { width: 14px !important; height: 14px !important; }
-          .pika-location-label { max-width: 90px !important; }
+          .pika-header-action { width: 36px !important; height: 36px !important; }
+          .pika-header-action-icon { width: 17px !important; height: 17px !important; }
+          .pika-location-label { max-width: 90px !important; font-size: 12px !important; }
         }
       `}</style>
     </div>
