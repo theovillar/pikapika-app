@@ -1462,18 +1462,21 @@ function ParticipantsRow({ participants, max = 5 }) {
 // sinon elle vient de la catégorie (comportement précédent, utilisé pour les ados).
 function participantName(p) { return typeof p === "string" ? p : p.name; }
 
-function PlainAvatar({ participant, color, size = 26, overlap = false, genderMode = false }) {
+function PlainAvatar({ participant, color, size, overlap = false, genderMode = false }) {
   const name = participantName(participant);
   const avatarColor = genderMode && participant?.genre ? genreColor(participant.genre) : color;
   const label = genderMode && participant?.genre ? `${name} (${adultGenreLabel(participant.genre)})` : name;
+  // Sans taille explicite : suit la variable CSS --pika-avatar-size (réduite sur petit écran via media query)
+  const dim = size !== undefined ? `${size}px` : "var(--pika-avatar-size, 26px)";
+  const fontSize = size !== undefined ? size * 0.42 : "calc(var(--pika-avatar-size, 26px) * 0.42)";
   return (
     <div
       title={label}
       style={{
-        width: size, height: size, borderRadius: "50%", background: avatarColor,
+        width: dim, height: dim, borderRadius: "50%", background: avatarColor,
         display: "flex", alignItems: "center", justifyContent: "center",
         color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800,
-        fontSize: size * 0.42, border: "2px solid #fff",
+        fontSize, border: "2px solid #fff",
         marginLeft: overlap ? -8 : 0, flexShrink: 0,
       }}
     >
@@ -2570,12 +2573,17 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
         <Icon size={15} color={meta.color} strokeWidth={2.4} />
       </div>
 
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ flex: 1, minWidth: "15ch" }}>
         <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: COLORS.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
           {item.title}
         </div>
-        <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#8A8399", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-          {item.time ? item.time : displayDate(item)} · {lieuAvecVille(item)}
+        <div style={{ display: "flex", alignItems: "baseline", gap: 4, fontSize: 11.5, whiteSpace: "nowrap", overflow: "hidden" }}>
+          <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, color: COLORS.ink, flexShrink: 0 }}>
+            {item.time ? item.time : displayDate(item)}
+          </span>
+          <span style={{ fontFamily: "Nunito, sans-serif", color: "#8A8399", overflow: "hidden", textOverflow: "ellipsis" }}>
+            · {lieuAvecVille(item)}
+          </span>
         </div>
       </div>
 
@@ -3122,6 +3130,10 @@ export default function RecreApp() {
         * { box-sizing: border-box; }
         input:focus, textarea:focus { border-color: ${COLORS.sky} !important; }
         ::placeholder { color: #C7C0AE; }
+        :root { --pika-avatar-size: 26px; }
+        @media (max-width: 480px) {
+          :root { --pika-avatar-size: 20px; }
+        }
       `}</style>
 
       {/* Top bar (desktop) / logo (mobile) */}
