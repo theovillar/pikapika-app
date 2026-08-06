@@ -2529,11 +2529,11 @@ function LocationFilter({ location, onChange }) {
 
       {open && (
         <>
-          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 55 }} />
+          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 9998 }} />
           <div style={{
             position: "absolute", top: "calc(100% + 6px)", right: 0, background: "#fff",
             border: "2px solid #F0EADB", borderRadius: 16, padding: 12, width: 280,
-            boxShadow: "0 12px 28px rgba(43,37,96,0.14)", zIndex: 56,
+            boxShadow: "0 12px 28px rgba(43,37,96,0.14)", zIndex: 9999,
           }}>
             <input
               autoFocus
@@ -2630,7 +2630,7 @@ function DetailModal({ activity, onClose, joined, onJoin }) {
       onClick={onClose}
       style={{
         position: "fixed", inset: 0, background: "rgba(43,37,96,0.45)",
-        display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 50,
+        display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 9999,
       }}
     >
       <div
@@ -2984,7 +2984,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
   const full = item.inscrits >= item.places && !isJoined;
 
   return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.45)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 50 }}>
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.45)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 9999 }}>
       <div onClick={(e) => e.stopPropagation()} style={{ background: COLORS.cloud, width: "100%", maxWidth: 520, borderRadius: "26px 26px 0 0", padding: 24, maxHeight: "85vh", overflowY: "auto", boxSizing: "border-box" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
           <div style={{
@@ -3501,13 +3501,14 @@ export default function RecreApp() {
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
+              className="pika-tab-btn"
               style={{
                 display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
                 background: "none", border: "none", cursor: "pointer", flex: "1 0 56px",
               }}
             >
-              <t.icon size={22} color={active ? COLORS.coral : "#B7AF98"} strokeWidth={active ? 2.6 : 2} />
-              <span style={{
+              <t.icon size={22} className="pika-tab-icon" color={active ? COLORS.coral : "#B7AF98"} strokeWidth={active ? 2.6 : 2} />
+              <span className="pika-tab-label" style={{
                 fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 10.5,
                 color: active ? COLORS.coral : "#B7AF98",
               }}>
@@ -3546,6 +3547,12 @@ export default function RecreApp() {
         @media (min-width: 768px) {
           .desktop-nav { display: flex !important; }
           .mobile-nav { display: none !important; }
+        }
+        @media (max-width: 400px) {
+          .mobile-nav { padding: 8px 2px 12px !important; gap: 0 !important; }
+          .pika-tab-btn { flex: 1 0 40px !important; }
+          .pika-tab-icon { width: 18px !important; height: 18px !important; }
+          .pika-tab-label { font-size: 8.5px !important; }
         }
       `}</style>
     </div>
