@@ -78,6 +78,7 @@ const TRANSLATIONS = {
     join_label_adult: "Rejoindre ce moment", join_label_teen: "Rejoindre cette rencontre", join_label_senior: "Rejoindre ce moment",
     community_senior_title: "Rencontres entre aînés",
     community_senior_subtitle: "Des moments conviviaux entre retraités du quartier, à leur rythme.",
+    community_kids_title: "Sorties enfants", community_kids_subtitle: "Des sorties à partager avec vos enfants près de chez vous.",
     loc_placeholder: "Ville, code postal, département…", loc_all_france: "Toute la France",
     loc_no_result: 'Aucun résultat pour "{q}"', loc_dept: "Département", loc_ville: "Ville",
     loc_ville_dept: "Ville · dept. {d}", loc_radius_title: "Rayon autour de {ville}",
@@ -150,6 +151,7 @@ const TRANSLATIONS = {
     join_label_adult: "Join this meetup", join_label_teen: "Join this meetup", join_label_senior: "Join this meetup",
     community_senior_title: "Meetups between seniors",
     community_senior_subtitle: "Friendly moments between retirees in the neighbourhood, at their own pace.",
+    community_kids_title: "Kids outings", community_kids_subtitle: "Outings to share with your kids near you.",
     loc_placeholder: "City, postcode, department…", loc_all_france: "All of France",
     loc_no_result: 'No result for "{q}"', loc_dept: "Department", loc_ville: "City",
     loc_ville_dept: "City · dept. {d}", loc_radius_title: "Radius around {ville}",
@@ -222,6 +224,7 @@ const TRANSLATIONS = {
     join_label_adult: "Unirme a este encuentro", join_label_teen: "Unirme a este encuentro", join_label_senior: "Unirme a este encuentro",
     community_senior_title: "Encuentros entre mayores",
     community_senior_subtitle: "Momentos agradables entre jubilados del barrio, a su propio ritmo.",
+    community_kids_title: "Salidas infantiles", community_kids_subtitle: "Salidas para compartir con tus hijos cerca de ti.",
     loc_placeholder: "Ciudad, código postal, departamento…", loc_all_france: "Toda Francia",
     loc_no_result: 'Sin resultados para "{q}"', loc_dept: "Departamento", loc_ville: "Ciudad",
     loc_ville_dept: "Ciudad · dpto. {d}", loc_radius_title: "Radio alrededor de {ville}",
@@ -470,7 +473,7 @@ const INITIAL_ACTIVITIES = [
     category: "nature",
     ville: "grenoble",
     lieu: "Parc de la Cascade",
-    date: "Sam. 9 août · 10h00",
+    offsetDays: 0, time: "10h00",
     age: "4-8 ans",
     places: 6,
     inscrits: 4,
@@ -487,7 +490,7 @@ const INITIAL_ACTIVITIES = [
     category: "creatif",
     ville: "varces",
     lieu: "Chez Camille (jardin)",
-    date: "Dim. 10 août · 14h30",
+    offsetDays: 1, time: "14h30",
     age: "2-5 ans",
     places: 8,
     inscrits: 6,
@@ -505,7 +508,7 @@ const INITIAL_ACTIVITIES = [
     category: "musique",
     ville: "chambery",
     lieu: "Square des Tilleuls",
-    date: "Mer. 13 août · 16h00",
+    offsetDays: 4, time: "16h00",
     age: "1-4 ans",
     places: 10,
     inscrits: 3,
@@ -521,7 +524,7 @@ const INITIAL_ACTIVITIES = [
     category: "jeux",
     ville: "annecy",
     lieu: "Salle des fêtes",
-    date: "Sam. 16 août · 15h00",
+    offsetDays: 7, time: "15h00",
     age: "5-10 ans",
     places: 12,
     inscrits: 9,
@@ -539,7 +542,7 @@ const INITIAL_ACTIVITIES = [
     category: "sport",
     ville: "valence",
     lieu: "Piste cyclable du Lac",
-    date: "Dim. 17 août · 10h00",
+    offsetDays: 8, time: "10h00",
     age: "4-7 ans",
     places: 5,
     inscrits: 5,
@@ -1343,7 +1346,7 @@ const TEEN_MEETUPS = [
     category: "jeuxvideo",
     ville: "valence",
     lieu: "Médiathèque - espace jeunesse",
-    date: "Mer. 13 août · 14h00",
+    offsetDays: 2, time: "14h00",
     info: "12-15 ans · encadré par l'équipe jeunesse",
     places: 12,
     inscrits: 8,
@@ -1357,7 +1360,7 @@ const TEEN_MEETUPS = [
     category: "sport",
     ville: "vif",
     lieu: "City stade du parc",
-    date: "Sam. 16 août · 15h00",
+    offsetDays: 5, time: "15h00",
     info: "13-17 ans · coaché par un éducateur sportif",
     places: 14,
     inscrits: 9,
@@ -1371,7 +1374,7 @@ const TEEN_MEETUPS = [
     category: "cinema",
     ville: "lyon",
     lieu: "MJC du centre",
-    date: "Dim. 17 août · 16h30",
+    offsetDays: 6, time: "16h30",
     info: "14-17 ans · animé par la MJC",
     places: 20,
     inscrits: 13,
@@ -1385,7 +1388,7 @@ const TEEN_MEETUPS = [
     category: "creatif",
     ville: "chambery",
     lieu: "Médiathèque - espace jeunesse",
-    date: "Mar. 19 août · 14h00",
+    offsetDays: 9, time: "14h00",
     info: "11-14 ans · matériel fourni",
     places: 10,
     inscrits: 6,
@@ -1399,7 +1402,7 @@ const TEEN_MEETUPS = [
     category: "musique",
     ville: "annecy",
     lieu: "Conservatoire municipal",
-    date: "Ven. 22 août · 17h00",
+    offsetDays: 12, time: "17h00",
     info: "12-17 ans · encadré par un professeur",
     places: 10,
     inscrits: 5,
@@ -1861,7 +1864,7 @@ function ActivityCard({ activity, onOpen, favorite, onToggleFav }) {
 
       <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 5 }}>
         <Row icon={<MapPin size={14} color={COLORS.ink} />} text={lieuAvecVille(activity)} />
-        <Row icon={<CalendarDays size={14} color={COLORS.ink} />} text={activity.date} />
+        <Row icon={<CalendarDays size={14} color={COLORS.ink} />} text={displayDate(activity)} />
       </div>
 
       <ParticipantsRow participants={activity.participants} />
@@ -2152,19 +2155,27 @@ function Explorer({ activities, favorites, onToggleFav, onOpen, location }) {
 }
 
 function CreateActivity({ onCreate }) {
+  const todayISO = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({
-    title: "", category: "nature", lieu: "", date: "", age: "", places: 6, desc: "",
+    title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "",
   });
   const [sent, setSent] = useState(false);
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
   const submit = () => {
-    if (!form.title || !form.lieu || !form.date) return;
-    onCreate({ ...form, id: Date.now(), inscrits: 1, organisateur: t("you_organizer"), places: Number(form.places) || 1 });
+    if (!form.title || !form.lieu || !form.dateStr) return;
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const picked = new Date(form.dateStr + "T00:00:00");
+    const offsetDays = Math.max(0, Math.round((picked - today) / 86400000));
+    onCreate({
+      title: form.title, category: form.category, lieu: form.lieu, age: form.age, desc: form.desc,
+      offsetDays, time: form.timeStr.replace(":", "h"),
+      id: Date.now(), inscrits: 1, organisateur: t("you_organizer"), places: Number(form.places) || 1,
+    });
     setSent(true);
     setTimeout(() => setSent(false), 2200);
-    setForm({ title: "", category: "nature", lieu: "", date: "", age: "", places: 6, desc: "" });
+    setForm({ title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "" });
   };
 
   const inputStyle = {
@@ -2205,9 +2216,16 @@ function CreateActivity({ onCreate }) {
             <label style={label}>{t("label_lieu")}</label>
             <input style={inputStyle} placeholder={t("placeholder_lieu")} value={form.lieu} onChange={set("lieu")} />
           </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
             <label style={label}>{t("label_date")}</label>
-            <input style={inputStyle} placeholder={t("placeholder_date")} value={form.date} onChange={set("date")} />
+            <input type="date" min={todayISO} style={inputStyle} value={form.dateStr} onChange={set("dateStr")} />
+          </div>
+          <div>
+            <label style={label}>{t("label_heure")}</label>
+            <input type="time" style={inputStyle} value={form.timeStr} onChange={set("timeStr")} />
           </div>
         </div>
 
@@ -2295,7 +2313,7 @@ function MyOutings({ joined, activities }) {
             <Stamp category={a.category} size={40} rotate={0} />
             <div style={{ flex: 1 }}>
               <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15, color: COLORS.ink }}>{a.title}</div>
-              <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485" }}>{a.date} · {a.lieu}</div>
+              <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485" }}>{displayDate(a)} · {a.lieu}</div>
             </div>
           </div>
         ))}
@@ -2514,14 +2532,15 @@ function LocationFilter({ location, onChange }) {
     <div style={{ position: "relative" }}>
       <button
         onClick={() => setOpen((o) => !o)}
+        className="pika-location-btn"
         style={{
           display: "flex", alignItems: "center", gap: 6, background: "#fff",
           border: "2px solid #F0EADB", borderRadius: 999, padding: "7px 12px 7px 10px",
-          cursor: "pointer", fontFamily: "Nunito, sans-serif",
+          cursor: "pointer", fontFamily: "Nunito, sans-serif", maxWidth: "100%", overflow: "hidden",
         }}
       >
-        <MapPin size={15} color={COLORS.coral} />
-        <span style={{ fontWeight: 800, fontSize: 12.5, color: COLORS.ink, whiteSpace: "nowrap" }}>
+        <MapPin size={15} color={COLORS.coral} style={{ flexShrink: 0 }} />
+        <span className="pika-location-label" style={{ fontWeight: 800, fontSize: 12.5, color: COLORS.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
           {locationLabel(location)}
         </span>
         <ChevronDown size={14} color="#B7AF98" />
@@ -2659,7 +2678,7 @@ function DetailModal({ activity, onClose, joined, onJoin }) {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
           <Row icon={<MapPin size={15} color={COLORS.ink} />} text={lieuAvecVille(activity)} />
-          <Row icon={<CalendarDays size={15} color={COLORS.ink} />} text={activity.date} />
+          <Row icon={<CalendarDays size={15} color={COLORS.ink} />} text={displayDate(activity)} />
           <Row icon={<Users size={15} color={COLORS.ink} />} text={t("detail_participants", { a: activity.inscrits, b: activity.places, org: activity.organisateur })} />
         </div>
 
@@ -3351,15 +3370,19 @@ export default function RecreApp() {
     { id: "ados", label: t("tab_ados"), icon: Gamepad2, kidsOnly: true },
     { id: "adultes", label: t("tab_adultes"), icon: Coffee },
     { id: "aine", label: t("tab_aine"), icon: Flower2 },
+  ];
+  const TABS = TABS_ALL.filter((tb) => !tb.kidsOnly || parentValidated);
+  // Ces trois-là ne sont plus dans la barre du bas : ils vivent en icônes dans l'en-tête,
+  // pour laisser la barre du bas uniquement aux 4 catégories d'âge (plus lisible sur petit écran).
+  const HEADER_ACTIONS = [
     { id: "creer", label: t("tab_creer"), icon: PlusCircle },
     { id: "mes-sorties", label: t("tab_mes_sorties"), icon: BookMarked },
     { id: "profil", label: t("tab_profil"), icon: UserCircle2 },
   ];
-  const TABS = TABS_ALL.filter((tb) => !tb.kidsOnly || parentValidated);
 
   // Si le parent n'est plus validé (démo) alors qu'il est sur un onglet enfants, on le repositionne
   useEffect(() => {
-    const stillVisible = TABS.some((tb) => tb.id === tab);
+    const stillVisible = TABS.some((tb) => tb.id === tab) || HEADER_ACTIONS.some((a) => a.id === tab);
     if (!stillVisible) setTab("profil");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parentValidated]);
@@ -3378,9 +3401,9 @@ export default function RecreApp() {
       `}</style>
 
       {/* Top bar (desktop) / logo (mobile) */}
-      <div style={{
+      <div className="pika-header-row" style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "18px 20px", maxWidth: 960, margin: "0 auto",
+        padding: "18px 20px", maxWidth: 960, margin: "0 auto", flexWrap: "wrap", gap: 10,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <PikaMascot size={32} />
@@ -3389,8 +3412,8 @@ export default function RecreApp() {
           </span>
         </div>
 
-        {/* Desktop nav + sélecteur de ville */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        {/* Desktop nav + sélecteur de ville + actions d'en-tête (Créer / Mes sorties / Profil) */}
+        <div className="pika-header-right" style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div className="desktop-nav" style={{ display: "none", gap: 6 }}>
             {TABS.map((tb) => (
               <button
@@ -3407,6 +3430,30 @@ export default function RecreApp() {
               </button>
             ))}
           </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            {HEADER_ACTIONS.map((a) => {
+              const active = tab === a.id;
+              return (
+                <button
+                  key={a.id}
+                  onClick={() => setTab(a.id)}
+                  aria-label={a.label}
+                  title={a.label}
+                  className="pika-header-action"
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    width: 36, height: 36, borderRadius: "50%", border: "none", cursor: "pointer",
+                    background: active ? COLORS.ink : "#fff",
+                    boxShadow: active ? "none" : "0 0 0 2px #F0EADB inset", flexShrink: 0,
+                  }}
+                >
+                  <a.icon size={17} className="pika-header-action-icon" color={active ? "#fff" : COLORS.ink} />
+                </button>
+              );
+            })}
+          </div>
+
           <LocationFilter location={location} onChange={setLocation} />
         </div>
       </div>
@@ -3415,7 +3462,19 @@ export default function RecreApp() {
         maxWidth: 960, margin: "0 auto", padding: "0 20px 110px",
       }}>
         {tab === "explorer" && parentValidated && (
-          <Explorer activities={activities} favorites={favorites} onToggleFav={toggleFav} onOpen={setSelected} location={location} />
+          <CommunityExplorer
+            title={t("community_kids_title")}
+            subtitle={t("community_kids_subtitle")}
+            categories={CATEGORIES}
+            items={activities}
+            favorites={favorites}
+            onToggleFav={toggleFav}
+            onOpen={setSelected}
+            emptyText={t("empty_kids")}
+            location={location}
+            layout="days"
+            genderMode
+          />
         )}
         {tab === "creer" && (
           <CreatePage
@@ -3475,6 +3534,7 @@ export default function RecreApp() {
             onOpen={(item) => setSelectedCommunity({ item, kind: "teen" })}
             emptyText={t("community_empty")}
             location={location}
+            layout="days"
           />
         )}
         {tab === "profil" && (
@@ -3553,6 +3613,11 @@ export default function RecreApp() {
           .pika-tab-btn { flex: 1 0 40px !important; }
           .pika-tab-icon { width: 18px !important; height: 18px !important; }
           .pika-tab-label { font-size: 8.5px !important; }
+          .pika-header-row { padding: 12px 12px !important; }
+          .pika-header-right { gap: 6px !important; }
+          .pika-header-action { width: 30px !important; height: 30px !important; }
+          .pika-header-action-icon { width: 14px !important; height: 14px !important; }
+          .pika-location-label { max-width: 90px !important; }
         }
       `}</style>
     </div>
