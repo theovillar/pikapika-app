@@ -3567,10 +3567,10 @@ export default function RecreApp() {
                 background: "none", border: "none", cursor: "pointer", flex: "1 0 56px",
               }}
             >
-              <t.icon size={26} className="pika-tab-icon" color={active ? COLORS.coral : "#B7AF98"} strokeWidth={active ? 2.6 : 2} />
+              <t.icon size={26} className="pika-tab-icon" color={active ? COLORS.coral : "#6B6485"} strokeWidth={active ? 2.6 : 2.2} />
               <span className="pika-tab-label" style={{
-                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13,
-                color: active ? COLORS.coral : "#B7AF98",
+                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 14.5,
+                color: active ? COLORS.coral : COLORS.ink,
               }}>
                 {t.label}
               </span>
@@ -3612,7 +3612,7 @@ export default function RecreApp() {
           .mobile-nav { padding: 8px 4px 14px !important; gap: 2px !important; }
           .pika-tab-btn { flex: 1 0 60px !important; }
           .pika-tab-icon { width: 24px !important; height: 24px !important; }
-          .pika-tab-label { font-size: 11.5px !important; }
+          .pika-tab-label { font-size: 13px !important; }
           .pika-header-row { padding: 12px 12px !important; }
           .pika-header-right { gap: 6px !important; }
           .pika-header-action { width: 36px !important; height: 36px !important; }
