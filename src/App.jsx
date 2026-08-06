@@ -59,9 +59,9 @@ const TRANSLATIONS = {
     profile_children: "Mes enfants", profile_add_child: "+ Ajouter un enfant",
     profile_preferences: "Préférences", profile_years: "ans",
     val_validated_title: "Identité validée par la mairie",
-    val_validated_text: "Vous avez accès aux sorties enfants : Enfants, Créer une sortie et Mes sorties.",
+    val_validated_text: "Vous avez accès aux sorties enfants et ados : Enfants, Ados, Créer une sortie et Mes sorties. Les sorties Adultes restent accessibles à tous, sans validation.",
     val_pending_title: "Validation de la mairie en attente",
-    val_pending_text: "Pour la sécurité des enfants, l'accès aux sorties enfants (Enfants, Créer, Mes sorties) n'est ouvert qu'aux parents dont l'identité a été vérifiée par la mairie de leur commune. Vous recevrez une notification dès que ce sera fait.",
+    val_pending_text: "Pour la sécurité des enfants, l'accès aux sorties enfants et ados (Enfants, Ados, Créer, Mes sorties) n'est ouvert qu'aux parents dont l'identité a été vérifiée par la mairie de leur commune. Les sorties Adultes restent accessibles sans validation. Vous recevrez une notification dès que ce sera fait.",
     val_demo_on: "Simuler : repasser en attente (démo)", val_demo_off: "Simuler : validation par la mairie (démo)",
     detail_participants: "{a}/{b} participants · organisé par {org}",
     detail_registered_children: "Enfants déjà inscrits", legend_girl: "Fille", legend_boy: "Garçon",
@@ -112,9 +112,9 @@ const TRANSLATIONS = {
     profile_children: "My kids", profile_add_child: "+ Add a child",
     profile_preferences: "Preferences", profile_years: "y.o.",
     val_validated_title: "Identity verified by the town hall",
-    val_validated_text: "You have access to kids outings: Kids, Create an outing and My outings.",
+    val_validated_text: "You have access to kids and teens outings: Kids, Teens, Create an outing and My outings. Adults outings remain open to everyone, no verification needed.",
     val_pending_title: "Town hall verification pending",
-    val_pending_text: "For children's safety, access to kids outings (Kids, Create, My outings) is only open to parents whose identity has been verified by their town hall. You'll be notified as soon as it's done.",
+    val_pending_text: "For children's safety, access to kids and teens outings (Kids, Teens, Create, My outings) is only open to parents whose identity has been verified by their town hall. Adults outings remain open without verification. You'll be notified as soon as it's done.",
     val_demo_on: "Simulate: back to pending (demo)", val_demo_off: "Simulate: town hall verification (demo)",
     detail_participants: "{a}/{b} participants · hosted by {org}",
     detail_registered_children: "Already registered kids", legend_girl: "Girl", legend_boy: "Boy",
@@ -165,9 +165,9 @@ const TRANSLATIONS = {
     profile_children: "Mis hijos", profile_add_child: "+ Añadir un hijo/a",
     profile_preferences: "Preferencias", profile_years: "años",
     val_validated_title: "Identidad validada por el ayuntamiento",
-    val_validated_text: "Tienes acceso a las salidas infantiles: Niños, Crear una salida y Mis salidas.",
+    val_validated_text: "Tienes acceso a las salidas de niños y adolescentes: Niños, Adolescentes, Crear una salida y Mis salidas. Las salidas de Adultos siguen abiertas a todos, sin validación.",
     val_pending_title: "Validación del ayuntamiento pendiente",
-    val_pending_text: "Por la seguridad de los niños, el acceso a las salidas infantiles (Niños, Crear, Mis salidas) solo está abierto a los padres cuya identidad haya sido verificada por su ayuntamiento. Recibirás una notificación en cuanto se haga.",
+    val_pending_text: "Por la seguridad de los niños, el acceso a las salidas de niños y adolescentes (Niños, Adolescentes, Crear, Mis salidas) solo está abierto a los padres cuya identidad haya sido verificada por su ayuntamiento. Las salidas de Adultos siguen abiertas sin validación. Recibirás una notificación en cuanto se haga.",
     val_demo_on: "Simular: volver a pendiente (demo)", val_demo_off: "Simular: validación del ayuntamiento (demo)",
     detail_participants: "{a}/{b} participantes · organizado por {org}",
     detail_registered_children: "Niños ya inscritos", legend_girl: "Niña", legend_boy: "Niño",
@@ -1922,7 +1922,7 @@ export default function RecreApp() {
 
   const TABS_ALL = [
     { id: "explorer", label: t("tab_enfants"), icon: Compass, kidsOnly: true },
-    { id: "ados", label: t("tab_ados"), icon: Gamepad2 },
+    { id: "ados", label: t("tab_ados"), icon: Gamepad2, kidsOnly: true },
     { id: "adultes", label: t("tab_adultes"), icon: Coffee },
     { id: "creer", label: t("tab_creer"), icon: PlusCircle, kidsOnly: true },
     { id: "mes-sorties", label: t("tab_mes_sorties"), icon: BookMarked, kidsOnly: true },
@@ -2001,7 +2001,7 @@ export default function RecreApp() {
             location={location}
           />
         )}
-        {tab === "ados" && (
+        {tab === "ados" && parentValidated && (
           <CommunityExplorer
             title={t("community_teen_title")}
             subtitle={t("community_teen_subtitle")}
