@@ -27,7 +27,7 @@ const LANG = detectLang();
 
 const TRANSLATIONS = {
   fr: {
-    tab_enfants: "Enfants", tab_ados: "Ados", tab_adultes: "Adultes", tab_creer: "Créer sortie",
+    tab_enfants: "Enfants", tab_ados: "Ados", tab_adultes: "Adultes", tab_creer: "Créer",
     tab_mes_sorties: "Mes sorties", tab_profil: "Profil",
     tab_creer_adulte: "Créer rencontre", tab_mes_adultes: "Mes rencontres",
     greeting: "Bonjour {name} 👋",
@@ -79,6 +79,9 @@ const TRANSLATIONS = {
     loc_ville_dept: "Ville · dept. {d}", loc_radius_title: "Rayon autour de {ville}",
     map_centered_on: "Carte centrée sur {loc}", map_empty: "Aucune sortie géolocalisée pour ces filtres.",
     map_see_detail: "Voir la fiche",
+    create_toggle_child: "Sortie enfant", create_toggle_adult: "Rencontre adulte",
+    note_needs_validation: "Vous pourrez aussi proposer des sorties enfants une fois votre identité validée par la mairie (voir Profil).",
+    section_kids_outings: "Sorties enfants", section_adult_meetups: "Rencontres adultes",
     adult_sub_decouvrir: "Découvrir", adult_sub_creer: "Créer", adult_sub_mes: "Mes rencontres",
     create_meetup_title: "Proposer une rencontre",
     create_meetup_subtitle: "Partagez un moment entre adultes, d'autres parents pourront vous rejoindre.",
@@ -89,7 +92,7 @@ const TRANSLATIONS = {
     my_meetups_empty: "Vous n'avez pas encore de rencontre. Rejoignez-en une dans Découvrir, ou proposez la vôtre dans Créer !",
   },
   en: {
-    tab_enfants: "Kids", tab_ados: "Teens", tab_adultes: "Adults", tab_creer: "Create outing",
+    tab_enfants: "Kids", tab_ados: "Teens", tab_adultes: "Adults", tab_creer: "Create",
     tab_mes_sorties: "My outings", tab_profil: "Profile",
     tab_creer_adulte: "Create meetup", tab_mes_adultes: "My meetups",
     greeting: "Hi {name} 👋",
@@ -141,6 +144,9 @@ const TRANSLATIONS = {
     loc_ville_dept: "City · dept. {d}", loc_radius_title: "Radius around {ville}",
     map_centered_on: "Map centred on {loc}", map_empty: "No located outing for these filters.",
     map_see_detail: "See details",
+    create_toggle_child: "Kids outing", create_toggle_adult: "Adult meetup",
+    note_needs_validation: "You'll also be able to propose kids outings once your identity is verified by the town hall (see Profile).",
+    section_kids_outings: "Kids outings", section_adult_meetups: "Adult meetups",
     adult_sub_decouvrir: "Discover", adult_sub_creer: "Create", adult_sub_mes: "My meetups",
     create_meetup_title: "Propose a meetup",
     create_meetup_subtitle: "Share a moment between adults, other parents can join you.",
@@ -151,7 +157,7 @@ const TRANSLATIONS = {
     my_meetups_empty: "No meetups yet. Join one in Discover, or propose your own in Create!",
   },
   es: {
-    tab_enfants: "Niños", tab_ados: "Adolescentes", tab_adultes: "Adultos", tab_creer: "Crear salida",
+    tab_enfants: "Niños", tab_ados: "Adolescentes", tab_adultes: "Adultos", tab_creer: "Crear",
     tab_mes_sorties: "Mis salidas", tab_profil: "Perfil",
     tab_creer_adulte: "Crear encuentro", tab_mes_adultes: "Mis encuentros",
     greeting: "Hola {name} 👋",
@@ -203,6 +209,9 @@ const TRANSLATIONS = {
     loc_ville_dept: "Ciudad · dpto. {d}", loc_radius_title: "Radio alrededor de {ville}",
     map_centered_on: "Mapa centrado en {loc}", map_empty: "Ninguna salida geolocalizada para estos filtros.",
     map_see_detail: "Ver la ficha",
+    create_toggle_child: "Salida infantil", create_toggle_adult: "Encuentro de adultos",
+    note_needs_validation: "También podrás proponer salidas infantiles una vez que tu identidad sea validada por el ayuntamiento (ver Perfil).",
+    section_kids_outings: "Salidas infantiles", section_adult_meetups: "Encuentros de adultos",
     adult_sub_decouvrir: "Descubrir", adult_sub_creer: "Crear", adult_sub_mes: "Mis encuentros",
     create_meetup_title: "Proponer un encuentro",
     create_meetup_subtitle: "Comparte un momento entre adultos, otros padres podrán unirse.",
@@ -2047,6 +2056,68 @@ function MyMeetups({ items, joined, categories, onOpen }) {
 
 // Section "Adultes" avec sa propre sous-navigation Découvrir / Créer / Mes rencontres —
 // entièrement indépendante de la validation mairie (réservée aux sorties Enfants/Ados).
+// Onglet "Créer" fusionné : sortie enfant (si validé par la mairie) ou rencontre adulte (toujours).
+// Pas d'onglet séparé pour les adultes — tout passe par les mêmes onglets Créer / Mes sorties.
+function CreatePage({ parentValidated, onCreateKid, onCreateAdult }) {
+  const [kind, setKind] = useState(parentValidated ? "enfant" : "adulte");
+
+  return (
+    <div style={{ maxWidth: 560, margin: "0 auto" }}>
+      {parentValidated && (
+        <div style={{ display: "inline-flex", background: "#F0EADB", borderRadius: 14, padding: 4, marginBottom: 18 }}>
+          {[
+            { id: "enfant", label: t("create_toggle_child") },
+            { id: "adulte", label: t("create_toggle_adult") },
+          ].map((opt) => (
+            <button
+              key={opt.id}
+              onClick={() => setKind(opt.id)}
+              style={{
+                border: "none", cursor: "pointer",
+                background: kind === opt.id ? COLORS.ink : "transparent",
+                color: kind === opt.id ? "#fff" : "#6B6485",
+                padding: "8px 16px", borderRadius: 12, fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
+              }}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {kind === "enfant" && parentValidated ? (
+        <CreateActivity onCreate={onCreateKid} />
+      ) : (
+        <>
+          <CreateMeetup categories={ADULT_CATEGORIES} onCreate={onCreateAdult} />
+          {!parentValidated && (
+            <p style={{
+              fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF",
+              textAlign: "center", marginTop: 16,
+            }}>
+              {t("note_needs_validation")}
+            </p>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+// Onglet "Mes sorties" fusionné : passeport enfants (si validé) + rencontres adultes (toujours).
+function MesSortiesPage({ parentValidated, joined, activities, adultItems, joinedAdult, onOpenAdult }) {
+  return (
+    <div>
+      {parentValidated && (
+        <div style={{ marginBottom: 30, paddingBottom: 26, borderBottom: "2px solid #F0EADB" }}>
+          <MyOutings joined={joined} activities={activities} />
+        </div>
+      )}
+      <MyMeetups items={adultItems} joined={joinedAdult} categories={ADULT_CATEGORIES} onOpen={onOpenAdult} />
+    </div>
+  );
+}
+
 // ---------- Root ----------
 export default function RecreApp() {
   const [parentValidated, setParentValidated] = useState(false);
@@ -2105,10 +2176,8 @@ export default function RecreApp() {
     { id: "explorer", label: t("tab_enfants"), icon: Compass, kidsOnly: true },
     { id: "ados", label: t("tab_ados"), icon: Gamepad2, kidsOnly: true },
     { id: "adultes", label: t("tab_adultes"), icon: Coffee },
-    { id: "creer", label: t("tab_creer"), icon: PlusCircle, kidsOnly: true },
-    { id: "mes-sorties", label: t("tab_mes_sorties"), icon: BookMarked, kidsOnly: true },
-    { id: "creer-adulte", label: t("tab_creer_adulte"), icon: PlusCircle },
-    { id: "mes-adultes", label: t("tab_mes_adultes"), icon: BookMarked },
+    { id: "creer", label: t("tab_creer"), icon: PlusCircle },
+    { id: "mes-sorties", label: t("tab_mes_sorties"), icon: BookMarked },
     { id: "profil", label: t("tab_profil"), icon: UserCircle2 },
   ];
   const TABS = TABS_ALL.filter((tb) => !tb.kidsOnly || parentValidated);
@@ -2169,8 +2238,23 @@ export default function RecreApp() {
         {tab === "explorer" && parentValidated && (
           <Explorer activities={activities} favorites={favorites} onToggleFav={toggleFav} onOpen={setSelected} location={location} />
         )}
-        {tab === "creer" && parentValidated && <CreateActivity onCreate={createActivity} />}
-        {tab === "mes-sorties" && parentValidated && <MyOutings joined={joined} activities={activities} />}
+        {tab === "creer" && (
+          <CreatePage
+            parentValidated={parentValidated}
+            onCreateKid={createActivity}
+            onCreateAdult={createAdultMeetup}
+          />
+        )}
+        {tab === "mes-sorties" && (
+          <MesSortiesPage
+            parentValidated={parentValidated}
+            joined={joined}
+            activities={activities}
+            adultItems={adultItems}
+            joinedAdult={joinedAdult}
+            onOpenAdult={(item) => setSelectedCommunity({ item, kind: "adult" })}
+          />
+        )}
         {tab === "adultes" && (
           <CommunityExplorer
             title={t("community_adult_title")}
@@ -2183,11 +2267,6 @@ export default function RecreApp() {
             emptyText={t("community_empty")}
             location={location}
           />
-        )}
-        {tab === "creer-adulte" && <CreateMeetup categories={ADULT_CATEGORIES} onCreate={createAdultMeetup} />}
-        {tab === "mes-adultes" && (
-          <MyMeetups items={adultItems} joined={joinedAdult} categories={ADULT_CATEGORIES}
-            onOpen={(item) => setSelectedCommunity({ item, kind: "adult" })} />
         )}
         {tab === "ados" && parentValidated && (
           <CommunityExplorer
