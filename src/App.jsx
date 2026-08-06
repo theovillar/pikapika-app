@@ -3,7 +3,8 @@ import {
   Compass, PlusCircle, BookMarked, UserCircle2, Search, MapPin,
   CalendarDays, Users, X, ChevronRight, Sparkles, Heart, Check,
   Baby, Trees, Palette, Music4, Puzzle, Bike, Coffee, Dumbbell,
-  Landmark, Gamepad2, Film, Clock, ShieldCheck, Lock, ChevronDown, List, Map
+  Landmark, Gamepad2, Film, Clock, ShieldCheck, Lock, ChevronDown, List, Map,
+  Footprints, BookOpen, Flower2
 } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup, Circle, CircleMarker, useMap } from "react-leaflet";
 import L from "leaflet";
@@ -27,7 +28,7 @@ const LANG = detectLang();
 
 const TRANSLATIONS = {
   fr: {
-    tab_enfants: "Enfants", tab_ados: "Ados", tab_adultes: "Adultes", tab_creer: "Créer",
+    tab_enfants: "Enfants", tab_ados: "Jeune", tab_adultes: "Adultes", tab_aine: "Ainé", tab_creer: "Créer",
     tab_mes_sorties: "Mes sorties", tab_profil: "Profil",
     tab_creer_adulte: "Créer rencontre", tab_mes_adultes: "Mes rencontres",
     greeting: "Bonjour {name} 👋",
@@ -41,6 +42,7 @@ const TRANSLATIONS = {
     cat_nature: "Nature", cat_creatif: "Créatif", cat_musique: "Musique", cat_jeux: "Jeux", cat_sport: "Sport",
     cat_cafe: "Café / Brunch", cat_culture: "Sorties culture", cat_bienetre: "Bien-être", cat_jeuxsociete: "Jeux de société",
     cat_jeuxvideo: "Jeux vidéo", cat_cinema: "Ciné / Sorties",
+    cat_marche: "Marche santé", cat_ateliers: "Ateliers", cat_jardinage: "Jardinage",
     create_title: "Proposer une sortie",
     create_subtitle: "Partagez une activité, d'autres parents pourront rejoindre avec leurs enfants.",
     label_titre: "Titre de la sortie", placeholder_titre: "Ex. Balade contée au parc",
@@ -60,9 +62,9 @@ const TRANSLATIONS = {
     profile_children: "Mes enfants", profile_add_child: "+ Ajouter un enfant",
     profile_preferences: "Préférences", profile_years: "ans",
     val_validated_title: "Identité validée par la mairie",
-    val_validated_text: "Vous avez accès aux sorties enfants et ados : Enfants, Ados, Créer une sortie et Mes sorties. Les sorties Adultes restent accessibles à tous, sans validation.",
+    val_validated_text: "Vous avez accès aux sorties enfants et jeune : Enfants, Jeune, Créer une sortie et Mes sorties. Les sorties Adultes et Ainé restent accessibles à tous, sans validation.",
     val_pending_title: "Validation de la mairie en attente",
-    val_pending_text: "Pour la sécurité des enfants, l'accès aux sorties enfants et ados (Enfants, Ados, Créer, Mes sorties) n'est ouvert qu'aux parents dont l'identité a été vérifiée par la mairie de leur commune. Les sorties Adultes restent accessibles sans validation. Vous recevrez une notification dès que ce sera fait.",
+    val_pending_text: "Pour la sécurité des enfants, l'accès aux sorties enfants et jeune (Enfants, Jeune, Créer, Mes sorties) n'est ouvert qu'aux parents dont l'identité a été vérifiée par la mairie de leur commune. Les sorties Adultes et Ainé restent accessibles sans validation. Vous recevrez une notification dès que ce sera fait.",
     val_demo_on: "Simuler : repasser en attente (démo)", val_demo_off: "Simuler : validation par la mairie (démo)",
     detail_participants: "{a}/{b} participants · organisé par {org}",
     detail_registered_children: "Enfants déjà inscrits", legend_girl: "Fille", legend_boy: "Garçon",
@@ -70,10 +72,12 @@ const TRANSLATIONS = {
     detail_already_registered: "Déjà inscrit(e)s",
     community_adult_title: "Rencontres entre parents",
     community_adult_subtitle: "Des moments entre adultes, sans les enfants, pour se connaître entre parents du quartier.",
-    community_teen_title: "Rencontres entre ados",
-    community_teen_subtitle: "Des activités entre ados, toujours encadrées par une association, une MJC ou un professeur.",
+    community_teen_title: "Rencontres entre jeunes",
+    community_teen_subtitle: "Des activités entre jeunes, toujours encadrées par une association, une MJC ou un professeur.",
     community_empty: "Aucune rencontre ne correspond. Essayez une autre recherche !",
-    join_label_adult: "Rejoindre ce moment", join_label_teen: "Rejoindre cette rencontre",
+    join_label_adult: "Rejoindre ce moment", join_label_teen: "Rejoindre cette rencontre", join_label_senior: "Rejoindre ce moment",
+    community_senior_title: "Rencontres entre aînés",
+    community_senior_subtitle: "Des moments conviviaux entre retraités du quartier, à leur rythme.",
     loc_placeholder: "Ville, code postal, département…", loc_all_france: "Toute la France",
     loc_no_result: 'Aucun résultat pour "{q}"', loc_dept: "Département", loc_ville: "Ville",
     loc_ville_dept: "Ville · dept. {d}", loc_radius_title: "Rayon autour de {ville}",
@@ -96,7 +100,7 @@ const TRANSLATIONS = {
     my_meetups_empty: "Vous n'avez pas encore de rencontre. Rejoignez-en une dans Découvrir, ou proposez la vôtre dans Créer !",
   },
   en: {
-    tab_enfants: "Kids", tab_ados: "Teens", tab_adultes: "Adults", tab_creer: "Create",
+    tab_enfants: "Kids", tab_ados: "Youth", tab_adultes: "Adults", tab_aine: "Seniors", tab_creer: "Create",
     tab_mes_sorties: "My outings", tab_profil: "Profile",
     tab_creer_adulte: "Create meetup", tab_mes_adultes: "My meetups",
     greeting: "Hi {name} 👋",
@@ -110,6 +114,7 @@ const TRANSLATIONS = {
     cat_nature: "Nature", cat_creatif: "Creative", cat_musique: "Music", cat_jeux: "Games", cat_sport: "Sport",
     cat_cafe: "Coffee / Brunch", cat_culture: "Culture outings", cat_bienetre: "Wellness", cat_jeuxsociete: "Board games",
     cat_jeuxvideo: "Video games", cat_cinema: "Movies / Outings",
+    cat_marche: "Health walk", cat_ateliers: "Workshops", cat_jardinage: "Gardening",
     create_title: "Propose an outing",
     create_subtitle: "Share an activity, other parents can join with their kids.",
     label_titre: "Outing title", placeholder_titre: "E.g. Storytelling walk in the park",
@@ -129,9 +134,9 @@ const TRANSLATIONS = {
     profile_children: "My kids", profile_add_child: "+ Add a child",
     profile_preferences: "Preferences", profile_years: "y.o.",
     val_validated_title: "Identity verified by the town hall",
-    val_validated_text: "You have access to kids and teens outings: Kids, Teens, Create an outing and My outings. Adults outings remain open to everyone, no verification needed.",
+    val_validated_text: "You have access to kids and youth outings: Kids, Youth, Create an outing and My outings. Adults and Seniors outings remain open to everyone, no verification needed.",
     val_pending_title: "Town hall verification pending",
-    val_pending_text: "For children's safety, access to kids and teens outings (Kids, Teens, Create, My outings) is only open to parents whose identity has been verified by their town hall. Adults outings remain open without verification. You'll be notified as soon as it's done.",
+    val_pending_text: "For children's safety, access to kids and youth outings (Kids, Youth, Create, My outings) is only open to parents whose identity has been verified by their town hall. Adults and Seniors outings remain open without verification. You'll be notified as soon as it's done.",
     val_demo_on: "Simulate: back to pending (demo)", val_demo_off: "Simulate: town hall verification (demo)",
     detail_participants: "{a}/{b} participants · hosted by {org}",
     detail_registered_children: "Already registered kids", legend_girl: "Girl", legend_boy: "Boy",
@@ -139,10 +144,12 @@ const TRANSLATIONS = {
     detail_already_registered: "Already registered",
     community_adult_title: "Meetups between parents",
     community_adult_subtitle: "Moments between adults, without the kids, to meet other parents nearby.",
-    community_teen_title: "Meetups between teens",
-    community_teen_subtitle: "Teen activities, always supervised by an association, a youth club or a teacher.",
+    community_teen_title: "Meetups between young people",
+    community_teen_subtitle: "Youth activities, always supervised by an association, a youth club or a teacher.",
     community_empty: "No meetup matches. Try another search!",
-    join_label_adult: "Join this meetup", join_label_teen: "Join this meetup",
+    join_label_adult: "Join this meetup", join_label_teen: "Join this meetup", join_label_senior: "Join this meetup",
+    community_senior_title: "Meetups between seniors",
+    community_senior_subtitle: "Friendly moments between retirees in the neighbourhood, at their own pace.",
     loc_placeholder: "City, postcode, department…", loc_all_france: "All of France",
     loc_no_result: 'No result for "{q}"', loc_dept: "Department", loc_ville: "City",
     loc_ville_dept: "City · dept. {d}", loc_radius_title: "Radius around {ville}",
@@ -165,7 +172,7 @@ const TRANSLATIONS = {
     my_meetups_empty: "No meetups yet. Join one in Discover, or propose your own in Create!",
   },
   es: {
-    tab_enfants: "Niños", tab_ados: "Adolescentes", tab_adultes: "Adultos", tab_creer: "Crear",
+    tab_enfants: "Niños", tab_ados: "Jóvenes", tab_adultes: "Adultos", tab_aine: "Mayores", tab_creer: "Crear",
     tab_mes_sorties: "Mis salidas", tab_profil: "Perfil",
     tab_creer_adulte: "Crear encuentro", tab_mes_adultes: "Mis encuentros",
     greeting: "Hola {name} 👋",
@@ -179,6 +186,7 @@ const TRANSLATIONS = {
     cat_nature: "Naturaleza", cat_creatif: "Creativo", cat_musique: "Música", cat_jeux: "Juegos", cat_sport: "Deporte",
     cat_cafe: "Café / Brunch", cat_culture: "Salidas culturales", cat_bienetre: "Bienestar", cat_jeuxsociete: "Juegos de mesa",
     cat_jeuxvideo: "Videojuegos", cat_cinema: "Cine / Salidas",
+    cat_marche: "Marcha saludable", cat_ateliers: "Talleres", cat_jardinage: "Jardinería",
     create_title: "Proponer una salida",
     create_subtitle: "Comparte una actividad, otros padres podrán unirse con sus hijos.",
     label_titre: "Título de la salida", placeholder_titre: "Ej. Paseo cuentacuentos en el parque",
@@ -198,9 +206,9 @@ const TRANSLATIONS = {
     profile_children: "Mis hijos", profile_add_child: "+ Añadir un hijo/a",
     profile_preferences: "Preferencias", profile_years: "años",
     val_validated_title: "Identidad validada por el ayuntamiento",
-    val_validated_text: "Tienes acceso a las salidas de niños y adolescentes: Niños, Adolescentes, Crear una salida y Mis salidas. Las salidas de Adultos siguen abiertas a todos, sin validación.",
+    val_validated_text: "Tienes acceso a las salidas de niños y jóvenes: Niños, Jóvenes, Crear una salida y Mis salidas. Las salidas de Adultos y Mayores siguen abiertas a todos, sin validación.",
     val_pending_title: "Validación del ayuntamiento pendiente",
-    val_pending_text: "Por la seguridad de los niños, el acceso a las salidas de niños y adolescentes (Niños, Adolescentes, Crear, Mis salidas) solo está abierto a los padres cuya identidad haya sido verificada por su ayuntamiento. Las salidas de Adultos siguen abiertas sin validación. Recibirás una notificación en cuanto se haga.",
+    val_pending_text: "Por la seguridad de los niños, el acceso a las salidas de niños y jóvenes (Niños, Jóvenes, Crear, Mis salidas) solo está abierto a los padres cuya identidad haya sido verificada por su ayuntamiento. Las salidas de Adultos y Mayores siguen abiertas sin validación. Recibirás una notificación en cuanto se haga.",
     val_demo_on: "Simular: volver a pendiente (demo)", val_demo_off: "Simular: validación del ayuntamiento (demo)",
     detail_participants: "{a}/{b} participantes · organizado por {org}",
     detail_registered_children: "Niños ya inscritos", legend_girl: "Niña", legend_boy: "Niño",
@@ -208,10 +216,12 @@ const TRANSLATIONS = {
     detail_already_registered: "Ya inscritos",
     community_adult_title: "Encuentros entre padres",
     community_adult_subtitle: "Momentos entre adultos, sin los niños, para conocer a otros padres del barrio.",
-    community_teen_title: "Encuentros entre adolescentes",
-    community_teen_subtitle: "Actividades entre adolescentes, siempre supervisadas por una asociación, un centro juvenil o un profesor.",
+    community_teen_title: "Encuentros entre jóvenes",
+    community_teen_subtitle: "Actividades entre jóvenes, siempre supervisadas por una asociación, un centro juvenil o un profesor.",
     community_empty: "Ningún encuentro coincide. ¡Prueba otra búsqueda!",
-    join_label_adult: "Unirme a este encuentro", join_label_teen: "Unirme a este encuentro",
+    join_label_adult: "Unirme a este encuentro", join_label_teen: "Unirme a este encuentro", join_label_senior: "Unirme a este encuentro",
+    community_senior_title: "Encuentros entre mayores",
+    community_senior_subtitle: "Momentos agradables entre jubilados del barrio, a su propio ritmo.",
     loc_placeholder: "Ciudad, código postal, departamento…", loc_all_france: "Toda Francia",
     loc_no_result: 'Sin resultados para "{q}"', loc_dept: "Departamento", loc_ville: "Ciudad",
     loc_ville_dept: "Ciudad · dpto. {d}", loc_radius_title: "Radio alrededor de {ville}",
@@ -440,6 +450,14 @@ const TEEN_CATEGORIES = [
   { id: "musique", label: t("cat_musique"), icon: Music4, color: COLORS.coral },
   { id: "cinema", label: t("cat_cinema"), icon: Film, color: COLORS.sky },
   { id: "creatif", label: t("cat_creatif"), icon: Palette, color: COLORS.sun },
+];
+
+const SENIOR_CATEGORIES = [
+  { id: "cafe", label: t("cat_cafe"), icon: Coffee, color: COLORS.sun },
+  { id: "marche", label: t("cat_marche"), icon: Footprints, color: COLORS.grass },
+  { id: "ateliers", label: t("cat_ateliers"), icon: BookOpen, color: COLORS.sky },
+  { id: "culture", label: t("cat_culture"), icon: Landmark, color: COLORS.grape },
+  { id: "jardinage", label: t("cat_jardinage"), icon: Flower2, color: COLORS.coral },
 ];
 
 const metaFrom = (categories, id) => categories.find((c) => c.id === id) || categories[0];
@@ -1388,6 +1406,217 @@ const TEEN_MEETUPS = [
     organisateur: "Conservatoire",
     desc: "Séance ouverte pour découvrir ou rejoindre le groupe des ados du conservatoire, encadrée par un professeur.",
     participants: ["Gabriel", "Anna", "Ethan", "Juliette", "Oscar"],
+  },
+];
+
+const SENIOR_MEETUPS = [
+  {
+    id: 301,
+    title: "Petit-déjeuner convivial",
+    category: "cafe",
+    ville: "grenoble",
+    lieu: "Foyer des aînés",
+    offsetDays: 25, time: "9h00",
+    info: "Encadré par un bénévole de l'association",
+    places: 7,
+    inscrits: 6,
+    organisateur: "Danielle M.",
+    desc: "Un moment convivial entre retraités pour échanger, papoter et faire connaissance, autour d'un café.",
+    participants: [{ name: "Gérard", genre: "H" }, { name: "Bernadette", genre: "F" }, { name: "Danielle", genre: "F" }],
+  },
+  {
+    id: 302,
+    title: "Marche santé matinale",
+    category: "marche",
+    ville: "varces",
+    lieu: "City stade",
+    offsetDays: 27, time: "9h00",
+    places: 15,
+    inscrits: 3,
+    organisateur: "Yvette W.",
+    desc: "Une marche à allure tranquille, accessible à tous, pour se maintenir en forme en bonne compagnie.",
+    participants: [{ name: "Claude", genre: "H" }, { name: "Bernard", genre: "H" }, { name: "Bernard", genre: "H" }, { name: "Michel", genre: "H" }, { name: "Françoise", genre: "F" }, { name: "Claude", genre: "H" }, { name: "Suzanne", genre: "F" }],
+  },
+  {
+    id: 303,
+    title: "Initiation smartphone et tablette",
+    category: "ateliers",
+    ville: "vif",
+    lieu: "Médiathèque centrale",
+    offsetDays: 37, time: "10h30",
+    info: "Encadré par un bénévole de l'association",
+    places: 11,
+    inscrits: 3,
+    organisateur: "Michel C.",
+    desc: "Un atelier animé par un bénévole, dans une ambiance détendue, pour apprendre à son rythme.",
+    participants: [{ name: "Alain", genre: "H" }, { name: "Daniel", genre: "H" }, { name: "Alain", genre: "H" }],
+  },
+  {
+    id: 304,
+    title: "Ciné-club de l'après-midi",
+    category: "culture",
+    ville: "lyon",
+    lieu: "Centre culturel",
+    offsetDays: 23, time: "14h00",
+    info: "Accessible à tous, rythme tranquille",
+    places: 9,
+    inscrits: 4,
+    organisateur: "Alain H.",
+    desc: "On se retrouve pour visiter ensemble puis prendre un verre juste à côté et discuter tranquillement.",
+    participants: [{ name: "Yvette", genre: "F" }, { name: "Marcel", genre: "H" }, { name: "Nicole", genre: "F" }, { name: "Robert", genre: "H" }, { name: "Michel", genre: "H" }, { name: "Michel", genre: "H" }, { name: "Daniel", genre: "H" }],
+  },
+  {
+    id: 305,
+    title: "Atelier jardinage partagé",
+    category: "jardinage",
+    ville: "chambery",
+    lieu: "Jardin partagé",
+    offsetDays: 35, time: "14h30",
+    info: "Encadré par un bénévole de l'association",
+    places: 11,
+    inscrits: 7,
+    organisateur: "André R.",
+    desc: "Un moment convivial au grand air, pour jardiner ensemble et échanger conseils et boutures.",
+    participants: [{ name: "Suzanne", genre: "F" }, { name: "Colette", genre: "F" }, { name: "Annie", genre: "F" }, { name: "Ginette", genre: "F" }, { name: "Henri", genre: "H" }, { name: "Henri", genre: "H" }, { name: "André", genre: "H" }, { name: "Pierre", genre: "H" }, { name: "Bernard", genre: "H" }],
+  },
+  {
+    id: 306,
+    title: "Café-discussion du matin",
+    category: "cafe",
+    ville: "annecy",
+    lieu: "Café des Arts",
+    offsetDays: 10, time: "9h30",
+    info: "Venez comme vous êtes",
+    places: 13,
+    inscrits: 2,
+    organisateur: "Bernadette K.",
+    desc: "Un moment convivial entre retraités pour échanger, papoter et faire connaissance, autour d'un café.",
+    participants: [{ name: "Bernadette", genre: "F" }, { name: "Alain", genre: "H" }, { name: "Yvette", genre: "F" }, { name: "Colette", genre: "F" }, { name: "Jacques", genre: "H" }, { name: "Michèle", genre: "F" }, { name: "Bernadette", genre: "F" }, { name: "Henri", genre: "H" }],
+  },
+  {
+    id: 307,
+    title: "Promenade en bord de rivière",
+    category: "marche",
+    ville: "valence",
+    lieu: "Parc des Tilleuls",
+    offsetDays: 9, time: "9h30",
+    info: "Accessible à tous, rythme tranquille",
+    places: 8,
+    inscrits: 3,
+    organisateur: "Yvette H.",
+    desc: "Une marche à allure tranquille, accessible à tous, pour se maintenir en forme en bonne compagnie.",
+    participants: [{ name: "Michel", genre: "H" }, { name: "Jacqueline", genre: "F" }, { name: "Michèle", genre: "F" }, { name: "Nicole", genre: "F" }, { name: "Françoise", genre: "F" }, { name: "Roger", genre: "H" }],
+  },
+  {
+    id: 308,
+    title: "Café numérique entre seniors",
+    category: "ateliers",
+    ville: "paris",
+    lieu: "Médiathèque centrale",
+    offsetDays: 29, time: "15h00",
+    info: "Chacun amène quelque chose à partager",
+    places: 12,
+    inscrits: 8,
+    organisateur: "Denise D.",
+    desc: "Un atelier animé par un bénévole, dans une ambiance détendue, pour apprendre à son rythme.",
+    participants: [{ name: "Danielle", genre: "F" }, { name: "Danielle", genre: "F" }, { name: "Monique", genre: "F" }, { name: "Jacqueline", genre: "F" }, { name: "Nicole", genre: "F" }, { name: "Monique", genre: "F" }, { name: "Claude", genre: "H" }, { name: "Suzanne", genre: "F" }],
+  },
+  {
+    id: 309,
+    title: "Sortie théâtre entre aînés",
+    category: "culture",
+    ville: "grenoble",
+    lieu: "Cinéma Le Rex",
+    offsetDays: 24, time: "10h00",
+    info: "Ouvert à tous les retraités du quartier",
+    places: 16,
+    inscrits: 6,
+    organisateur: "Ginette V.",
+    desc: "On se retrouve pour visiter ensemble puis prendre un verre juste à côté et discuter tranquillement.",
+    participants: [{ name: "Suzanne", genre: "F" }, { name: "Yvette", genre: "F" }, { name: "Colette", genre: "F" }, { name: "Monique", genre: "F" }, { name: "Marcel", genre: "H" }, { name: "Suzanne", genre: "F" }],
+  },
+  {
+    id: 310,
+    title: "Après-midi au jardin communal",
+    category: "jardinage",
+    ville: "varces",
+    lieu: "Square des Tilleuls",
+    offsetDays: 1, time: "10h30",
+    info: "Accessible à tous, rythme tranquille",
+    places: 14,
+    inscrits: 7,
+    organisateur: "Colette T.",
+    desc: "Un moment convivial au grand air, pour jardiner ensemble et échanger conseils et boutures.",
+    participants: [{ name: "Henri", genre: "H" }, { name: "Marcel", genre: "H" }, { name: "Roger", genre: "H" }, { name: "Françoise", genre: "F" }, { name: "Danielle", genre: "F" }, { name: "Serge", genre: "H" }, { name: "Henri", genre: "H" }, { name: "Denise", genre: "F" }, { name: "Serge", genre: "H" }],
+  },
+  {
+    id: 311,
+    title: "Brunch entre retraités",
+    category: "cafe",
+    ville: "vif",
+    lieu: "Foyer des aînés",
+    offsetDays: 25, time: "10h30",
+    info: "Accessible à tous, rythme tranquille",
+    places: 9,
+    inscrits: 9,
+    organisateur: "Ginette A.",
+    desc: "Un moment convivial entre retraités pour échanger, papoter et faire connaissance, autour d'un café.",
+    participants: [{ name: "Colette", genre: "F" }, { name: "Nicole", genre: "F" }, { name: "Alain", genre: "H" }, { name: "Marcel", genre: "H" }, { name: "Jean", genre: "H" }, { name: "Monique", genre: "F" }, { name: "Danielle", genre: "F" }, { name: "Yvette", genre: "F" }, { name: "Pierre", genre: "H" }],
+  },
+  {
+    id: 312,
+    title: "Sortie marche entre voisins",
+    category: "marche",
+    ville: "lyon",
+    lieu: "Bords du canal",
+    offsetDays: 30, time: "14h30",
+    info: "Chacun amène quelque chose à partager",
+    places: 18,
+    inscrits: 4,
+    organisateur: "Marcel D.",
+    desc: "Une marche à allure tranquille, accessible à tous, pour se maintenir en forme en bonne compagnie.",
+    participants: [{ name: "Gérard", genre: "H" }, { name: "Françoise", genre: "F" }, { name: "Annie", genre: "F" }, { name: "Denise", genre: "F" }, { name: "Marcel", genre: "H" }, { name: "Bernadette", genre: "F" }, { name: "Robert", genre: "H" }, { name: "Michel", genre: "H" }, { name: "Bernard", genre: "H" }],
+  },
+  {
+    id: 313,
+    title: "Initiation smartphone et tablette",
+    category: "ateliers",
+    ville: "chambery",
+    lieu: "Maison des associations",
+    offsetDays: 29, time: "10h00",
+    places: 15,
+    inscrits: 15,
+    organisateur: "André R.",
+    desc: "Un atelier animé par un bénévole, dans une ambiance détendue, pour apprendre à son rythme.",
+    participants: [{ name: "Michèle", genre: "F" }, { name: "Jacqueline", genre: "F" }, { name: "Marcel", genre: "H" }, { name: "Roger", genre: "H" }, { name: "Michel", genre: "H" }],
+  },
+  {
+    id: 314,
+    title: "Après-midi musée",
+    category: "culture",
+    ville: "annecy",
+    lieu: "Théâtre municipal",
+    offsetDays: 13, time: "9h00",
+    info: "Venez comme vous êtes",
+    places: 10,
+    inscrits: 5,
+    organisateur: "Nicole S.",
+    desc: "On se retrouve pour visiter ensemble puis prendre un verre juste à côté et discuter tranquillement.",
+    participants: [{ name: "André", genre: "H" }, { name: "Jacques", genre: "H" }, { name: "Christiane", genre: "F" }, { name: "Pierre", genre: "H" }, { name: "Nicole", genre: "F" }, { name: "Roger", genre: "H" }, { name: "Christiane", genre: "F" }, { name: "Michel", genre: "H" }, { name: "Roger", genre: "H" }],
+  },
+  {
+    id: 315,
+    title: "Entretien du jardin partagé",
+    category: "jardinage",
+    ville: "valence",
+    lieu: "Jardin partagé",
+    offsetDays: 28, time: "10h00",
+    info: "Venez comme vous êtes",
+    places: 15,
+    inscrits: 2,
+    organisateur: "Claude E.",
+    desc: "Un moment convivial au grand air, pour jardiner ensemble et échanger conseils et boutures.",
+    participants: [{ name: "Ginette", genre: "F" }, { name: "Jacqueline", genre: "F" }, { name: "Michèle", genre: "F" }, { name: "Alain", genre: "H" }],
   },
 ];
 
@@ -2577,12 +2806,15 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
         <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: COLORS.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
           {item.title}
         </div>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 4, fontSize: 11.5, whiteSpace: "nowrap", overflow: "hidden" }}>
-          <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, color: COLORS.ink, flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, whiteSpace: "nowrap", overflow: "hidden", marginTop: 3 }}>
+          <span style={{
+            fontFamily: "Nunito, sans-serif", fontWeight: 800, color: COLORS.ink, flexShrink: 0,
+            background: COLORS.sun, padding: "2px 7px", borderRadius: 8, fontSize: 11.5,
+          }}>
             {item.time ? item.time : displayDate(item)}
           </span>
           <span style={{ fontFamily: "Nunito, sans-serif", color: "#8A8399", overflow: "hidden", textOverflow: "ellipsis" }}>
-            · {lieuAvecVille(item)}
+            {lieuAvecVille(item)}
           </span>
         </div>
       </div>
@@ -3063,11 +3295,14 @@ export default function RecreApp() {
 
   const [adultItems, setAdultItems] = useState(ADULT_MEETUPS);
   const [teenItems, setTeenItems] = useState(TEEN_MEETUPS);
+  const [seniorItems, setSeniorItems] = useState(SENIOR_MEETUPS);
   const [favAdult, setFavAdult] = useState([]);
   const [favTeen, setFavTeen] = useState([]);
+  const [favSenior, setFavSenior] = useState([]);
   const [joinedAdult, setJoinedAdult] = useState([]);
   const [joinedTeen, setJoinedTeen] = useState([]);
-  const [selectedCommunity, setSelectedCommunity] = useState(null); // { item, kind: "adult" | "teen" }
+  const [joinedSenior, setJoinedSenior] = useState([]);
+  const [selectedCommunity, setSelectedCommunity] = useState(null); // { item, kind: "adult" | "teen" | "senior" }
   const [location, setLocation] = useState(null);
 
   const toggleFav = (id) =>
@@ -3086,16 +3321,21 @@ export default function RecreApp() {
 
   const createActivity = (a) => setActivities((acts) => [a, ...acts]);
 
+  const communitySetters = {
+    adult: { setFav: setFavAdult, setJoined: setJoinedAdult, setItems: setAdultItems },
+    teen: { setFav: setFavTeen, setJoined: setJoinedTeen, setItems: setTeenItems },
+    senior: { setFav: setFavSenior, setJoined: setJoinedSenior, setItems: setSeniorItems },
+  };
+
   const toggleFavCommunity = (kind, id) => {
-    const setFav = kind === "adult" ? setFavAdult : setFavTeen;
+    const { setFav } = communitySetters[kind];
     setFav((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id]));
   };
 
   const joinCommunity = (kind, id) => {
-    const setJoinedFn = kind === "adult" ? setJoinedAdult : setJoinedTeen;
-    const setItemsFn = kind === "adult" ? setAdultItems : setTeenItems;
-    setJoinedFn((j) => [...j, id]);
-    setItemsFn((items) => items.map((it) => it.id === id ? { ...it, inscrits: it.inscrits + 1 } : it));
+    const { setJoined, setItems } = communitySetters[kind];
+    setJoined((j) => [...j, id]);
+    setItems((items) => items.map((it) => it.id === id ? { ...it, inscrits: it.inscrits + 1 } : it));
     setSelectedCommunity((s) => s && s.item.id === id ? { ...s, item: { ...s.item, inscrits: s.item.inscrits + 1 } } : s);
   };
 
@@ -3110,6 +3350,7 @@ export default function RecreApp() {
     { id: "explorer", label: t("tab_enfants"), icon: Compass, kidsOnly: true },
     { id: "ados", label: t("tab_ados"), icon: Gamepad2, kidsOnly: true },
     { id: "adultes", label: t("tab_adultes"), icon: Coffee },
+    { id: "aine", label: t("tab_aine"), icon: Flower2 },
     { id: "creer", label: t("tab_creer"), icon: PlusCircle },
     { id: "mes-sorties", label: t("tab_mes_sorties"), icon: BookMarked },
     { id: "profil", label: t("tab_profil"), icon: UserCircle2 },
@@ -3208,6 +3449,21 @@ export default function RecreApp() {
             genderMode
           />
         )}
+        {tab === "aine" && (
+          <CommunityExplorer
+            title={t("community_senior_title")}
+            subtitle={t("community_senior_subtitle")}
+            categories={SENIOR_CATEGORIES}
+            items={seniorItems}
+            favorites={favSenior}
+            onToggleFav={(id) => toggleFavCommunity("senior", id)}
+            onOpen={(item) => setSelectedCommunity({ item, kind: "senior" })}
+            emptyText={t("community_empty")}
+            location={location}
+            layout="days"
+            genderMode
+          />
+        )}
         {tab === "ados" && parentValidated && (
           <CommunityExplorer
             title={t("community_teen_title")}
@@ -3266,12 +3522,24 @@ export default function RecreApp() {
 
       <CommunityDetailModal
         item={selectedCommunity?.item}
-        categories={selectedCommunity?.kind === "teen" ? TEEN_CATEGORIES : ADULT_CATEGORIES}
+        categories={
+          selectedCommunity?.kind === "teen" ? TEEN_CATEGORIES
+          : selectedCommunity?.kind === "senior" ? SENIOR_CATEGORIES
+          : ADULT_CATEGORIES
+        }
         onClose={() => setSelectedCommunity(null)}
-        joined={selectedCommunity?.kind === "teen" ? joinedTeen : joinedAdult}
+        joined={
+          selectedCommunity?.kind === "teen" ? joinedTeen
+          : selectedCommunity?.kind === "senior" ? joinedSenior
+          : joinedAdult
+        }
         onJoin={(id) => joinCommunity(selectedCommunity?.kind, id)}
-        joinLabel={selectedCommunity?.kind === "teen" ? t("join_label_teen") : t("join_label_adult")}
-        genderMode={selectedCommunity?.kind === "adult"}
+        joinLabel={
+          selectedCommunity?.kind === "teen" ? t("join_label_teen")
+          : selectedCommunity?.kind === "senior" ? t("join_label_senior")
+          : t("join_label_adult")
+        }
+        genderMode={selectedCommunity?.kind === "adult" || selectedCommunity?.kind === "senior"}
       />
 
       <style>{`
