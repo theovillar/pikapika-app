@@ -27,8 +27,9 @@ const LANG = detectLang();
 
 const TRANSLATIONS = {
   fr: {
-    tab_enfants: "Enfants", tab_ados: "Ados", tab_adultes: "Adultes", tab_creer: "Créer",
+    tab_enfants: "Enfants", tab_ados: "Ados", tab_adultes: "Adultes", tab_creer: "Créer sortie",
     tab_mes_sorties: "Mes sorties", tab_profil: "Profil",
+    tab_creer_adulte: "Créer rencontre", tab_mes_adultes: "Mes rencontres",
     greeting: "Bonjour {name} 👋",
     explorer_subtitle: "{n} sortie(s) à partager avec vos enfants près de chez vous",
     search_placeholder: "Chercher une sortie, un lieu…",
@@ -88,8 +89,9 @@ const TRANSLATIONS = {
     my_meetups_empty: "Vous n'avez pas encore de rencontre. Rejoignez-en une dans Découvrir, ou proposez la vôtre dans Créer !",
   },
   en: {
-    tab_enfants: "Kids", tab_ados: "Teens", tab_adultes: "Adults", tab_creer: "Create",
+    tab_enfants: "Kids", tab_ados: "Teens", tab_adultes: "Adults", tab_creer: "Create outing",
     tab_mes_sorties: "My outings", tab_profil: "Profile",
+    tab_creer_adulte: "Create meetup", tab_mes_adultes: "My meetups",
     greeting: "Hi {name} 👋",
     explorer_subtitle: "{n} outing(s) to share with your kids near you",
     search_placeholder: "Search an outing, a place…",
@@ -149,8 +151,9 @@ const TRANSLATIONS = {
     my_meetups_empty: "No meetups yet. Join one in Discover, or propose your own in Create!",
   },
   es: {
-    tab_enfants: "Niños", tab_ados: "Adolescentes", tab_adultes: "Adultos", tab_creer: "Crear",
+    tab_enfants: "Niños", tab_ados: "Adolescentes", tab_adultes: "Adultos", tab_creer: "Crear salida",
     tab_mes_sorties: "Mis salidas", tab_profil: "Perfil",
+    tab_creer_adulte: "Crear encuentro", tab_mes_adultes: "Mis encuentros",
     greeting: "Hola {name} 👋",
     explorer_subtitle: "{n} salida(s) para compartir con tus hijos cerca de ti",
     search_placeholder: "Buscar una salida, un lugar…",
@@ -2044,51 +2047,6 @@ function MyMeetups({ items, joined, categories, onOpen }) {
 
 // Section "Adultes" avec sa propre sous-navigation Découvrir / Créer / Mes rencontres —
 // entièrement indépendante de la validation mairie (réservée aux sorties Enfants/Ados).
-function AdultSection({ items, favorites, joined, onToggleFav, onOpen, onCreate, location }) {
-  const [sub, setSub] = useState("decouvrir");
-  const subTabs = [
-    { id: "decouvrir", label: t("adult_sub_decouvrir"), icon: Compass },
-    { id: "creer", label: t("adult_sub_creer"), icon: PlusCircle },
-    { id: "mes", label: t("adult_sub_mes"), icon: BookMarked },
-  ];
-  return (
-    <div>
-      <div style={{ display: "inline-flex", background: "#F0EADB", borderRadius: 14, padding: 4, marginBottom: 18, flexWrap: "wrap" }}>
-        {subTabs.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => setSub(s.id)}
-            style={{
-              display: "flex", alignItems: "center", gap: 6, border: "none", cursor: "pointer",
-              background: sub === s.id ? COLORS.ink : "transparent",
-              color: sub === s.id ? "#fff" : "#6B6485",
-              padding: "8px 14px", borderRadius: 12, fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
-            }}
-          >
-            <s.icon size={14} /> {s.label}
-          </button>
-        ))}
-      </div>
-
-      {sub === "decouvrir" && (
-        <CommunityExplorer
-          title={t("community_adult_title")}
-          subtitle={t("community_adult_subtitle")}
-          categories={ADULT_CATEGORIES}
-          items={items}
-          favorites={favorites}
-          onToggleFav={onToggleFav}
-          onOpen={onOpen}
-          emptyText={t("community_empty")}
-          location={location}
-        />
-      )}
-      {sub === "creer" && <CreateMeetup categories={ADULT_CATEGORIES} onCreate={onCreate} />}
-      {sub === "mes" && <MyMeetups items={items} joined={joined} categories={ADULT_CATEGORIES} onOpen={onOpen} />}
-    </div>
-  );
-}
-
 // ---------- Root ----------
 export default function RecreApp() {
   const [parentValidated, setParentValidated] = useState(false);
@@ -2149,6 +2107,8 @@ export default function RecreApp() {
     { id: "adultes", label: t("tab_adultes"), icon: Coffee },
     { id: "creer", label: t("tab_creer"), icon: PlusCircle, kidsOnly: true },
     { id: "mes-sorties", label: t("tab_mes_sorties"), icon: BookMarked, kidsOnly: true },
+    { id: "creer-adulte", label: t("tab_creer_adulte"), icon: PlusCircle },
+    { id: "mes-adultes", label: t("tab_mes_adultes"), icon: BookMarked },
     { id: "profil", label: t("tab_profil"), icon: UserCircle2 },
   ];
   const TABS = TABS_ALL.filter((tb) => !tb.kidsOnly || parentValidated);
@@ -2212,15 +2172,22 @@ export default function RecreApp() {
         {tab === "creer" && parentValidated && <CreateActivity onCreate={createActivity} />}
         {tab === "mes-sorties" && parentValidated && <MyOutings joined={joined} activities={activities} />}
         {tab === "adultes" && (
-          <AdultSection
+          <CommunityExplorer
+            title={t("community_adult_title")}
+            subtitle={t("community_adult_subtitle")}
+            categories={ADULT_CATEGORIES}
             items={adultItems}
             favorites={favAdult}
-            joined={joinedAdult}
             onToggleFav={(id) => toggleFavCommunity("adult", id)}
             onOpen={(item) => setSelectedCommunity({ item, kind: "adult" })}
-            onCreate={createAdultMeetup}
+            emptyText={t("community_empty")}
             location={location}
           />
+        )}
+        {tab === "creer-adulte" && <CreateMeetup categories={ADULT_CATEGORIES} onCreate={createAdultMeetup} />}
+        {tab === "mes-adultes" && (
+          <MyMeetups items={adultItems} joined={joinedAdult} categories={ADULT_CATEGORIES}
+            onOpen={(item) => setSelectedCommunity({ item, kind: "adult" })} />
         )}
         {tab === "ados" && parentValidated && (
           <CommunityExplorer
