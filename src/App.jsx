@@ -45,7 +45,7 @@ const TRANSLATIONS = {
     create_subtitle: "Partagez une activité, d'autres parents pourront rejoindre avec leurs enfants.",
     label_titre: "Titre de la sortie", placeholder_titre: "Ex. Balade contée au parc",
     label_categorie: "Catégorie", label_lieu: "Lieu", placeholder_lieu: "Parc, adresse…",
-    label_date: "Date & heure", placeholder_date: "Sam. 9 août · 10h",
+    label_date: "Date & heure", placeholder_date: "Sam. 9 août · 10h", label_heure: "Heure",
     label_age: "Âge conseillé", placeholder_age: "Ex. 4-8 ans",
     label_places: "Places disponibles", label_description: "Description",
     placeholder_description: "Que va-t-on faire ? Quoi apporter ?",
@@ -79,6 +79,10 @@ const TRANSLATIONS = {
     loc_ville_dept: "Ville · dept. {d}", loc_radius_title: "Rayon autour de {ville}",
     map_centered_on: "Carte centrée sur {loc}", map_empty: "Aucune sortie géolocalisée pour ces filtres.",
     map_see_detail: "Voir la fiche",
+    day_today: "Aujourd'hui", day_tomorrow: "Demain", day_after_tomorrow: "Après-demain",
+    day_after_after_tomorrow: "Après-après-demain",
+    legend_femme: "Femme", legend_homme: "Homme",
+    accordion_empty: "Aucune rencontre ce jour-là.",
     create_toggle_child: "Sortie enfant", create_toggle_adult: "Rencontre adulte",
     note_needs_validation: "Vous pourrez aussi proposer des sorties enfants une fois votre identité validée par la mairie (voir Profil).",
     section_kids_outings: "Sorties enfants", section_adult_meetups: "Rencontres adultes",
@@ -110,7 +114,7 @@ const TRANSLATIONS = {
     create_subtitle: "Share an activity, other parents can join with their kids.",
     label_titre: "Outing title", placeholder_titre: "E.g. Storytelling walk in the park",
     label_categorie: "Category", label_lieu: "Location", placeholder_lieu: "Park, address…",
-    label_date: "Date & time", placeholder_date: "Sat. Aug 9 · 10am",
+    label_date: "Date & time", placeholder_date: "Sat. Aug 9 · 10am", label_heure: "Time",
     label_age: "Recommended age", placeholder_age: "E.g. 4-8 years",
     label_places: "Available spots", label_description: "Description",
     placeholder_description: "What will you do? What to bring?",
@@ -144,6 +148,10 @@ const TRANSLATIONS = {
     loc_ville_dept: "City · dept. {d}", loc_radius_title: "Radius around {ville}",
     map_centered_on: "Map centred on {loc}", map_empty: "No located outing for these filters.",
     map_see_detail: "See details",
+    day_today: "Today", day_tomorrow: "Tomorrow", day_after_tomorrow: "Day after tomorrow",
+    day_after_after_tomorrow: "In 3 days",
+    legend_femme: "Woman", legend_homme: "Man",
+    accordion_empty: "No meetup that day.",
     create_toggle_child: "Kids outing", create_toggle_adult: "Adult meetup",
     note_needs_validation: "You'll also be able to propose kids outings once your identity is verified by the town hall (see Profile).",
     section_kids_outings: "Kids outings", section_adult_meetups: "Adult meetups",
@@ -175,7 +183,7 @@ const TRANSLATIONS = {
     create_subtitle: "Comparte una actividad, otros padres podrán unirse con sus hijos.",
     label_titre: "Título de la salida", placeholder_titre: "Ej. Paseo cuentacuentos en el parque",
     label_categorie: "Categoría", label_lieu: "Lugar", placeholder_lieu: "Parque, dirección…",
-    label_date: "Fecha y hora", placeholder_date: "Sáb. 9 ago · 10h",
+    label_date: "Fecha y hora", placeholder_date: "Sáb. 9 ago · 10h", label_heure: "Hora",
     label_age: "Edad recomendada", placeholder_age: "Ej. 4-8 años",
     label_places: "Plazas disponibles", label_description: "Descripción",
     placeholder_description: "¿Qué vais a hacer? ¿Qué traer?",
@@ -209,6 +217,10 @@ const TRANSLATIONS = {
     loc_ville_dept: "Ciudad · dpto. {d}", loc_radius_title: "Radio alrededor de {ville}",
     map_centered_on: "Mapa centrado en {loc}", map_empty: "Ninguna salida geolocalizada para estos filtros.",
     map_see_detail: "Ver la ficha",
+    day_today: "Hoy", day_tomorrow: "Mañana", day_after_tomorrow: "Pasado mañana",
+    day_after_after_tomorrow: "En 3 días",
+    legend_femme: "Mujer", legend_homme: "Hombre",
+    accordion_empty: "Ningún encuentro ese día.",
     create_toggle_child: "Salida infantil", create_toggle_adult: "Encuentro de adultos",
     note_needs_validation: "También podrás proponer salidas infantiles una vez que tu identidad sea validada por el ayuntamiento (ver Perfil).",
     section_kids_outings: "Salidas infantiles", section_adult_meetups: "Encuentros de adultos",
@@ -246,6 +258,27 @@ const COLORS = {
 
 const genreColor = (genre) => (genre === "F" ? COLORS.girl : COLORS.boy);
 const genreLabel = (genre) => (genre === "F" ? "Fille" : "Garçon");
+// Même palette que pour les enfants (couleur cohérente, indépendante de la catégorie de l'annonce),
+// mais avec un libellé adapté aux adultes.
+const adultGenreLabel = (genre) => (genre === "F" ? t("legend_femme") : t("legend_homme"));
+
+// Libellé de jour relatif à aujourd'hui (Aujourd'hui, Demain, Après-demain, puis "jeudi 6 septembre"…)
+function relativeDayLabel(offsetDays) {
+  if (offsetDays === 0) return t("day_today");
+  if (offsetDays === 1) return t("day_tomorrow");
+  if (offsetDays === 2) return t("day_after_tomorrow");
+  if (offsetDays === 3) return t("day_after_after_tomorrow");
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  const locale = LANG === "fr" ? "fr-FR" : LANG === "es" ? "es-ES" : "en-US";
+  const label = d.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" });
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+// Affiche soit une date relative calculée (rencontres adultes), soit la date libre existante (ados, sorties enfants)
+function displayDate(item) {
+  return item.offsetDays !== undefined ? `${relativeDayLabel(item.offsetDays)} · ${item.time}` : item.date;
+}
 
 const CATEGORIES = [
   { id: "nature", label: t("cat_nature"), icon: Trees, color: COLORS.grass },
@@ -513,13 +546,16 @@ const ADULT_MEETUPS = [
     category: "cafe",
     ville: "paris",
     lieu: "Café Le Marronnier",
-    date: "Mar. 12 août · 9h00",
+    offsetDays: 0, time: "9h00",
     info: "Pendant que les enfants sont à l'école",
     places: 10,
     inscrits: 6,
     organisateur: "Sophie L.",
     desc: "Un moment convivial entre parents pour souffler, échanger des bons plans et faire connaissance, autour d'un café.",
-    participants: ["Sophie", "Karim", "Elodie", "Marc", "Fanny", "Julien"],
+    participants: [
+      { name: "Sophie", genre: "F" }, { name: "Karim", genre: "H" }, { name: "Elodie", genre: "F" },
+      { name: "Marc", genre: "H" }, { name: "Fanny", genre: "F" }, { name: "Julien", genre: "H" },
+    ],
   },
   {
     id: 102,
@@ -527,13 +563,16 @@ const ADULT_MEETUPS = [
     category: "sport",
     ville: "grenoble",
     lieu: "Bords du canal",
-    date: "Jeu. 14 août · 19h00",
+    offsetDays: 1, time: "19h00",
     info: "Tous niveaux bienvenus",
     places: 12,
     inscrits: 5,
     organisateur: "Marc D.",
     desc: "Une sortie running à allure tranquille pour décompresser après le boulot, suivie d'un étirement collectif.",
-    participants: ["Marc", "Alice", "Yasmine", "Paul", "Claire"],
+    participants: [
+      { name: "Marc", genre: "H" }, { name: "Alice", genre: "F" }, { name: "Yasmine", genre: "F" },
+      { name: "Paul", genre: "H" }, { name: "Claire", genre: "F" },
+    ],
   },
   {
     id: 103,
@@ -541,13 +580,15 @@ const ADULT_MEETUPS = [
     category: "culture",
     ville: "lyon",
     lieu: "Médiathèque centrale",
-    date: "Sam. 16 août · 11h00",
+    offsetDays: 2, time: "11h00",
     info: "Visite libre, échange ensuite",
     places: 8,
     inscrits: 3,
     organisateur: "Elodie F.",
     desc: "On se retrouve pour visiter l'exposition puis prendre un verre juste à côté et discuter de tout et de rien.",
-    participants: ["Elodie", "Nadia", "Vincent"],
+    participants: [
+      { name: "Elodie", genre: "F" }, { name: "Nadia", genre: "F" }, { name: "Vincent", genre: "H" },
+    ],
   },
   {
     id: 104,
@@ -555,13 +596,16 @@ const ADULT_MEETUPS = [
     category: "bienetre",
     ville: "chambery",
     lieu: "Parc des Tilleuls",
-    date: "Dim. 17 août · 9h30",
+    offsetDays: 5, time: "9h30",
     info: "Tapis non fourni",
     places: 15,
     inscrits: 11,
     organisateur: "Claire B.",
     desc: "Une heure de yoga doux animée par une pratiquante du quartier, ouverte à tous les niveaux.",
-    participants: ["Claire", "Julien", "Fanny", "Karim", "Sophie", "Paul", "Nadia"],
+    participants: [
+      { name: "Claire", genre: "F" }, { name: "Julien", genre: "H" }, { name: "Fanny", genre: "F" },
+      { name: "Karim", genre: "H" }, { name: "Sophie", genre: "F" }, { name: "Paul", genre: "H" }, { name: "Nadia", genre: "F" },
+    ],
   },
   {
     id: 105,
@@ -569,13 +613,15 @@ const ADULT_MEETUPS = [
     category: "jeux",
     ville: "annecy",
     lieu: "Chez Julien",
-    date: "Ven. 22 août · 20h00",
+    offsetDays: 12, time: "20h00",
     info: "Chacun amène un jeu ou une boisson",
     places: 8,
     inscrits: 4,
     organisateur: "Julien P.",
     desc: "Une soirée détente entre parents, sans les enfants, autour de jeux de société et d'un apéro partagé.",
-    participants: ["Julien", "Marc", "Alice", "Vincent"],
+    participants: [
+      { name: "Julien", genre: "H" }, { name: "Marc", genre: "H" }, { name: "Alice", genre: "F" }, { name: "Vincent", genre: "H" },
+    ],
   },
 ];
 
@@ -718,12 +764,20 @@ function ParticipantsRow({ participants, max = 5 }) {
   );
 }
 
-function PlainAvatar({ name, color, size = 26, overlap = false }) {
+// Accepte un participant sous forme de chaîne ("Julien") ou d'objet { name, genre }.
+// En mode genderMode, la couleur vient du genre (constante quelle que soit l'annonce) ;
+// sinon elle vient de la catégorie (comportement précédent, utilisé pour les ados).
+function participantName(p) { return typeof p === "string" ? p : p.name; }
+
+function PlainAvatar({ participant, color, size = 26, overlap = false, genderMode = false }) {
+  const name = participantName(participant);
+  const avatarColor = genderMode && participant?.genre ? genreColor(participant.genre) : color;
+  const label = genderMode && participant?.genre ? `${name} (${adultGenreLabel(participant.genre)})` : name;
   return (
     <div
-      title={name}
+      title={label}
       style={{
-        width: size, height: size, borderRadius: "50%", background: color,
+        width: size, height: size, borderRadius: "50%", background: avatarColor,
         display: "flex", alignItems: "center", justifyContent: "center",
         color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800,
         fontSize: size * 0.42, border: "2px solid #fff",
@@ -735,14 +789,14 @@ function PlainAvatar({ name, color, size = 26, overlap = false }) {
   );
 }
 
-function PlainParticipantsRow({ names, color, max = 5 }) {
+function PlainParticipantsRow({ names, color, max = 5, genderMode = false }) {
   if (!names || names.length === 0) return null;
   const shown = names.slice(0, max);
   const extra = names.length - shown.length;
   return (
     <div style={{ display: "flex", alignItems: "center", marginTop: 2 }}>
-      {shown.map((n, i) => (
-        <PlainAvatar key={i} name={n} color={color} overlap={i > 0} />
+      {shown.map((p, i) => (
+        <PlainAvatar key={i} participant={p} color={color} overlap={i > 0} genderMode={genderMode} />
       ))}
       {extra > 0 && (
         <div style={{
@@ -1696,7 +1750,7 @@ function DetailModal({ activity, onClose, joined, onJoin }) {
 }
 
 // ---------- Community meetups (adultes / ados) ----------
-function CommunityCard({ item, categories, onOpen, favorite, onToggleFav }) {
+function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, genderMode = false }) {
   const meta = metaFrom(categories, item.category);
   const Icon = meta.icon;
   const full = item.inscrits >= item.places;
@@ -1748,11 +1802,11 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav }) {
 
       <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 5 }}>
         <Row icon={<MapPin size={14} color={COLORS.ink} />} text={lieuAvecVille(item)} />
-        <Row icon={<CalendarDays size={14} color={COLORS.ink} />} text={item.date} />
+        <Row icon={<CalendarDays size={14} color={COLORS.ink} />} text={displayDate(item)} />
         {item.info && <Row icon={<Users size={14} color={COLORS.ink} />} text={item.info} />}
       </div>
 
-      <PlainParticipantsRow names={item.participants} color={meta.color} />
+      <PlainParticipantsRow names={item.participants} color={meta.color} genderMode={genderMode} />
 
       <div style={{ marginTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -1767,7 +1821,119 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav }) {
   );
 }
 
-function CommunityExplorer({ title, subtitle, categories, items, favorites, onToggleFav, onOpen, emptyText, location }) {
+// Ligne fine (quasi une seule ligne) pour une rencontre, utilisée dans l'affichage groupé par jour.
+function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, genderMode }) {
+  const meta = metaFrom(categories, item.category);
+  const Icon = meta.icon;
+  const full = item.inscrits >= item.places;
+  return (
+    <div
+      onClick={() => onOpen(item)}
+      style={{
+        display: "flex", alignItems: "center", gap: 10, background: "#fff",
+        border: "2px solid #F0EADB", borderRadius: 14, padding: "9px 12px", cursor: "pointer",
+      }}
+    >
+      <div style={{
+        width: 34, height: 34, borderRadius: "50%", border: `2px dashed ${meta.color}`,
+        background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+      }}>
+        <Icon size={15} color={meta.color} strokeWidth={2.4} />
+      </div>
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: COLORS.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {item.title}
+        </div>
+        <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#8A8399", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {item.time ? item.time : displayDate(item)} · {lieuAvecVille(item)}
+        </div>
+      </div>
+
+      <PlainParticipantsRow names={item.participants?.slice(0, 3)} color={meta.color} max={3} genderMode={genderMode} />
+
+      <span style={{
+        fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11, flexShrink: 0,
+        color: full ? COLORS.coral : COLORS.grass,
+      }}>
+        {full ? t("card_full") : `${item.places - item.inscrits}`}
+      </span>
+
+      <button
+        onClick={(e) => { e.stopPropagation(); onToggleFav(item.id); }}
+        style={{ background: "transparent", border: "none", cursor: "pointer", padding: 2, flexShrink: 0 }}
+        aria-label={t("fav_aria")}
+      >
+        <Heart size={16} color={favorite ? COLORS.coral : "#D8D2C2"} fill={favorite ? COLORS.coral : "none"} strokeWidth={2.2} />
+      </button>
+    </div>
+  );
+}
+
+// Regroupe les rencontres par jour (Aujourd'hui, Demain, Après-demain, puis "jeudi 6 septembre"…)
+// et les affiche comme une liste de sections dépliables.
+function DayAccordion({ items, categories, onOpen, favorites, onToggleFav, genderMode }) {
+  const groups = useMemo(() => {
+    const byOffset = {};
+    items.forEach((it) => {
+      const key = it.offsetDays !== undefined ? it.offsetDays : "autre";
+      if (!byOffset[key]) byOffset[key] = [];
+      byOffset[key].push(it);
+    });
+    const keys = Object.keys(byOffset).sort((a, b) => {
+      if (a === "autre") return 1;
+      if (b === "autre") return -1;
+      return Number(a) - Number(b);
+    });
+    return keys.map((k) => ({
+      key: k,
+      label: k === "autre" ? item_autre_label() : relativeDayLabel(Number(k)),
+      items: byOffset[k],
+    }));
+  }, [items]);
+
+  const [closed, setClosed] = useState({});
+  const toggle = (key) => setClosed((c) => ({ ...c, [key]: !c[key] }));
+
+  if (groups.length === 0) return null;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {groups.map((g) => (
+        <div key={g.key}>
+          <button
+            onClick={() => toggle(g.key)}
+            style={{
+              display: "flex", alignItems: "center", gap: 8, width: "100%", background: "none",
+              border: "none", cursor: "pointer", padding: "4px 2px 8px",
+            }}
+          >
+            <ChevronDown size={15} color="#B7AF98" style={{ transform: closed[g.key] ? "rotate(-90deg)" : "none", transition: "transform .15s ease" }} />
+            <span style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15.5, color: COLORS.ink, textTransform: "capitalize" }}>
+              {g.label}
+            </span>
+            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, color: "#B7AF98" }}>
+              · {g.items.length}
+            </span>
+          </button>
+          {!closed[g.key] && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {g.items.map((item) => (
+                <NarrowMeetupRow
+                  key={item.id} item={item} categories={categories} onOpen={onOpen}
+                  favorite={favorites.includes(item.id)} onToggleFav={onToggleFav} genderMode={genderMode}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+function item_autre_label() { return t("chip_all"); }
+
+function CommunityExplorer({ title, subtitle, categories, items, favorites, onToggleFav, onOpen, emptyText, location, layout = "grid", genderMode = false }) {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState("tous");
   const [view, setView] = useState("liste");
@@ -1816,11 +1982,19 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
 
       {view === "carte" ? (
         <MapView items={filtered} categories={categories} onOpen={onOpen} location={location} />
+      ) : layout === "days" ? (
+        filtered.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "40px 0", color: "#9A93AF", fontFamily: "Nunito, sans-serif" }}>
+            {emptyText}
+          </div>
+        ) : (
+          <DayAccordion items={filtered} categories={categories} onOpen={onOpen} favorites={favorites} onToggleFav={onToggleFav} genderMode={genderMode} />
+        )
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(270px, 1fr))", gap: 14 }}>
           {filtered.map((item) => (
             <CommunityCard key={item.id} item={item} categories={categories} onOpen={onOpen}
-              favorite={favorites.includes(item.id)} onToggleFav={onToggleFav} />
+              favorite={favorites.includes(item.id)} onToggleFav={onToggleFav} genderMode={genderMode} />
           ))}
           {filtered.length === 0 && (
             <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px 0", color: "#9A93AF", fontFamily: "Nunito, sans-serif" }}>
@@ -1833,7 +2007,7 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
   );
 }
 
-function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinLabel }) {
+function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinLabel, genderMode = false }) {
   if (!item) return null;
   const meta = metaFrom(categories, item.category);
   const Icon = meta.icon;
@@ -1865,7 +2039,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
           <Row icon={<MapPin size={15} color={COLORS.ink} />} text={lieuAvecVille(item)} />
-          <Row icon={<CalendarDays size={15} color={COLORS.ink} />} text={item.date} />
+          <Row icon={<CalendarDays size={15} color={COLORS.ink} />} text={displayDate(item)} />
           <Row icon={<Users size={15} color={COLORS.ink} />} text={t("detail_participants", { a: item.inscrits, b: item.places, org: item.organisateur })} />
           {item.info && <Row icon={<Sparkles size={15} color={COLORS.ink} />} text={item.info} />}
         </div>
@@ -1876,12 +2050,20 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
 
         {item.participants && item.participants.length > 0 && (
           <div style={{ marginBottom: 20 }}>
-            <SectionLabel>{t("detail_already_registered")}</SectionLabel>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+              <SectionLabel>{t("detail_already_registered")}</SectionLabel>
+              {genderMode && (
+                <div style={{ display: "flex", gap: 12 }}>
+                  <Legend color={COLORS.girl} label={t("legend_femme")} />
+                  <Legend color={COLORS.boy} label={t("legend_homme")} />
+                </div>
+              )}
+            </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {item.participants.map((n, i) => (
+              {item.participants.map((p, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <PlainAvatar name={n} color={meta.color} size={30} />
-                  <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: COLORS.ink }}>{n}</span>
+                  <PlainAvatar participant={p} color={meta.color} size={30} genderMode={genderMode} />
+                  <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: COLORS.ink }}>{participantName(p)}</span>
                 </div>
               ))}
             </div>
@@ -1911,19 +2093,27 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
 
 // ---------- Créer / lister ses propres rencontres (adultes, sans validation mairie) ----------
 function CreateMeetup({ categories, onCreate }) {
+  const todayISO = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({
-    title: "", category: categories[0].id, lieu: "", date: "", places: 8, info: "", desc: "",
+    title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "",
   });
   const [sent, setSent] = useState(false);
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
   const submit = () => {
-    if (!form.title || !form.lieu || !form.date) return;
-    onCreate({ ...form, id: Date.now(), inscrits: 1, organisateur: t("you_organizer"), places: Number(form.places) || 1 });
+    if (!form.title || !form.lieu || !form.dateStr) return;
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const picked = new Date(form.dateStr + "T00:00:00");
+    const offsetDays = Math.max(0, Math.round((picked - today) / 86400000));
+    onCreate({
+      title: form.title, category: form.category, lieu: form.lieu, info: form.info, desc: form.desc,
+      offsetDays, time: form.timeStr.replace(":", "h"),
+      id: Date.now(), inscrits: 1, organisateur: t("you_organizer"), places: Number(form.places) || 1,
+    });
     setSent(true);
     setTimeout(() => setSent(false), 2200);
-    setForm({ title: "", category: categories[0].id, lieu: "", date: "", places: 8, info: "", desc: "" });
+    setForm({ title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "" });
   };
 
   const inputStyle = {
@@ -1964,9 +2154,16 @@ function CreateMeetup({ categories, onCreate }) {
             <label style={label}>{t("label_lieu")}</label>
             <input style={inputStyle} placeholder={t("placeholder_lieu")} value={form.lieu} onChange={set("lieu")} />
           </div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
             <label style={label}>{t("label_date")}</label>
-            <input style={inputStyle} placeholder={t("placeholder_date")} value={form.date} onChange={set("date")} />
+            <input type="date" min={todayISO} style={inputStyle} value={form.dateStr} onChange={set("dateStr")} />
+          </div>
+          <div>
+            <label style={label}>{t("label_heure")}</label>
+            <input type="time" style={inputStyle} value={form.timeStr} onChange={set("timeStr")} />
           </div>
         </div>
 
@@ -2042,7 +2239,7 @@ function MyMeetups({ items, joined, categories, onOpen }) {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15, color: COLORS.ink }}>{item.title}</div>
-                  <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485" }}>{item.date} · {lieuAvecVille(item)}</div>
+                  <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485" }}>{displayDate(item)} · {lieuAvecVille(item)}</div>
                 </div>
                 <ChevronRight size={18} color="#C7C0AE" />
               </div>
@@ -2266,6 +2463,8 @@ export default function RecreApp() {
             onOpen={(item) => setSelectedCommunity({ item, kind: "adult" })}
             emptyText={t("community_empty")}
             location={location}
+            layout="days"
+            genderMode
           />
         )}
         {tab === "ados" && parentValidated && (
@@ -2331,6 +2530,7 @@ export default function RecreApp() {
         joined={selectedCommunity?.kind === "teen" ? joinedTeen : joinedAdult}
         onJoin={(id) => joinCommunity(selectedCommunity?.kind, id)}
         joinLabel={selectedCommunity?.kind === "teen" ? t("join_label_teen") : t("join_label_adult")}
+        genderMode={selectedCommunity?.kind === "adult"}
       />
 
       <style>{`
