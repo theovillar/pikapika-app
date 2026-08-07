@@ -1379,6 +1379,25 @@ const ADULT_MEETUPS = [
     desc: "Une soirée détente entre parents, sans les enfants, autour de jeux et d'un apéro partagé.",
     participants: [{ name: "Charlotte", genre: "F" }, { name: "Alexandre", genre: "H" }, { name: "Julie", genre: "F" }, { name: "Claire", genre: "F" }, { name: "Guillaume", genre: "H" }, { name: "Yasmine", genre: "F" }, { name: "Rachid", genre: "H" }, { name: "Marc", genre: "H" }],
   },
+  {
+    id: 160,
+    title: "Café des générations : parents et aînés du quartier",
+    category: "cafe",
+    ville: "grenoble",
+    lieu: "Foyer des aînés",
+    offsetDays: 5, time: "10h00",
+    info: "Ouvert aux parents et aux retraités du quartier",
+    places: 16,
+    inscrits: 7,
+    organisateur: "Foyer des aînés",
+    intergen: true,
+    intergenNote: "Sortie intergénérationnelle · ouverte aux parents et aux aînés du quartier",
+    desc: "Un café convivial où parents et retraités du quartier se retrouvent pour échanger, sans thème imposé — juste l'envie de se connaître entre générations.",
+    participants: [
+      { name: "Sophie", genre: "F" }, { name: "Bernard", genre: "H" }, { name: "Karim", genre: "H" },
+      { name: "Jacqueline", genre: "F" }, { name: "Fanny", genre: "F" }, { name: "Robert", genre: "H" },
+    ],
+  },
 ];
 
 const TEEN_MEETUPS = [
@@ -1715,6 +1734,25 @@ const SENIOR_MEETUPS = [
     participants: [
       { name: "Danielle", genre: "F" }, { name: "Gérard", genre: "H" }, { name: "Françoise", genre: "F" },
       { name: "Michel", genre: "H" }, { name: "Simone", genre: "F" },
+    ],
+  },
+  {
+    id: 318,
+    title: "Café des générations : aînés et parents du quartier",
+    category: "cafe",
+    ville: "grenoble",
+    lieu: "Foyer des aînés",
+    offsetDays: 5, time: "10h00",
+    info: "Ouvert aux retraités et aux parents du quartier",
+    places: 16,
+    inscrits: 6,
+    organisateur: "Foyer des aînés",
+    intergen: true,
+    intergenNote: "Sortie intergénérationnelle · ouverte aux parents et aux aînés du quartier",
+    desc: "Un café convivial où retraités et parents du quartier se retrouvent pour échanger, sans thème imposé — juste l'envie de se connaître entre générations.",
+    participants: [
+      { name: "Jacqueline", genre: "F" }, { name: "Robert", genre: "H" }, { name: "Monique", genre: "F" },
+      { name: "André", genre: "H" }, { name: "Colette", genre: "F" },
     ],
   },
 ];
