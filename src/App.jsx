@@ -4,7 +4,7 @@ import {
   CalendarDays, Users, X, ChevronRight, Sparkles, Heart, Check,
   Baby, Trees, Palette, Music4, Puzzle, Bike, Coffee, Dumbbell,
   Landmark, Gamepad2, Film, Clock, ShieldCheck, Lock, ChevronDown, List, Map,
-  Footprints, BookOpen, Flower2
+  Footprints, BookOpen, Flower2, PartyPopper, HeartHandshake, Trophy
 } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup, Circle, CircleMarker, useMap } from "react-leaflet";
 import L from "leaflet";
@@ -43,6 +43,7 @@ const TRANSLATIONS = {
     cat_cafe: "Café / Brunch", cat_culture: "Sorties culture", cat_bienetre: "Bien-être", cat_jeuxsociete: "Jeux de société",
     cat_jeuxvideo: "Jeux vidéo", cat_cinema: "Ciné / Sorties",
     cat_marche: "Marche santé", cat_ateliers: "Ateliers", cat_jardinage: "Jardinage",
+    cat_mairie: "Mairie", cat_solidaire: "Solidaire", cat_fete: "Fête de quartier",
     create_title: "Proposer une sortie",
     create_subtitle: "Partagez une activité, d'autres parents pourront rejoindre avec leurs enfants.",
     label_titre: "Titre de la sortie", placeholder_titre: "Ex. Balade contée au parc",
@@ -79,6 +80,9 @@ const TRANSLATIONS = {
     community_senior_title: "Rencontres entre aînés",
     community_senior_subtitle: "Des moments conviviaux entre retraités du quartier, à leur rythme.",
     community_kids_title: "Sorties enfants", community_kids_subtitle: "Des sorties à partager avec vos enfants près de chez vous.",
+    tab_associations: "Assos", community_asso_title: "Associations & Mairie",
+    community_asso_subtitle: "Événements organisés par la mairie et les associations de votre commune.",
+    join_label_asso: "Je participe",
     loc_placeholder: "Ville, code postal, département…", loc_all_france: "Toute la France",
     loc_no_result: 'Aucun résultat pour "{q}"', loc_dept: "Département", loc_ville: "Ville",
     loc_ville_dept: "Ville · dept. {d}", loc_radius_title: "Rayon autour de {ville}",
@@ -116,6 +120,7 @@ const TRANSLATIONS = {
     cat_cafe: "Coffee / Brunch", cat_culture: "Culture outings", cat_bienetre: "Wellness", cat_jeuxsociete: "Board games",
     cat_jeuxvideo: "Video games", cat_cinema: "Movies / Outings",
     cat_marche: "Health walk", cat_ateliers: "Workshops", cat_jardinage: "Gardening",
+    cat_mairie: "Town hall", cat_solidaire: "Solidarity", cat_fete: "Neighbourhood fair",
     create_title: "Propose an outing",
     create_subtitle: "Share an activity, other parents can join with their kids.",
     label_titre: "Outing title", placeholder_titre: "E.g. Storytelling walk in the park",
@@ -152,6 +157,9 @@ const TRANSLATIONS = {
     community_senior_title: "Meetups between seniors",
     community_senior_subtitle: "Friendly moments between retirees in the neighbourhood, at their own pace.",
     community_kids_title: "Kids outings", community_kids_subtitle: "Outings to share with your kids near you.",
+    tab_associations: "Community", community_asso_title: "Town Hall & Associations",
+    community_asso_subtitle: "Events organised by the town hall and local associations.",
+    join_label_asso: "I'm in",
     loc_placeholder: "City, postcode, department…", loc_all_france: "All of France",
     loc_no_result: 'No result for "{q}"', loc_dept: "Department", loc_ville: "City",
     loc_ville_dept: "City · dept. {d}", loc_radius_title: "Radius around {ville}",
@@ -189,6 +197,7 @@ const TRANSLATIONS = {
     cat_cafe: "Café / Brunch", cat_culture: "Salidas culturales", cat_bienetre: "Bienestar", cat_jeuxsociete: "Juegos de mesa",
     cat_jeuxvideo: "Videojuegos", cat_cinema: "Cine / Salidas",
     cat_marche: "Marcha saludable", cat_ateliers: "Talleres", cat_jardinage: "Jardinería",
+    cat_mairie: "Ayuntamiento", cat_solidaire: "Solidaridad", cat_fete: "Fiesta de barrio",
     create_title: "Proponer una salida",
     create_subtitle: "Comparte una actividad, otros padres podrán unirse con sus hijos.",
     label_titre: "Título de la salida", placeholder_titre: "Ej. Paseo cuentacuentos en el parque",
@@ -225,6 +234,9 @@ const TRANSLATIONS = {
     community_senior_title: "Encuentros entre mayores",
     community_senior_subtitle: "Momentos agradables entre jubilados del barrio, a su propio ritmo.",
     community_kids_title: "Salidas infantiles", community_kids_subtitle: "Salidas para compartir con tus hijos cerca de ti.",
+    tab_associations: "Asociaciones", community_asso_title: "Ayuntamiento y asociaciones",
+    community_asso_subtitle: "Eventos organizados por el ayuntamiento y las asociaciones locales.",
+    join_label_asso: "Participo",
     loc_placeholder: "Ciudad, código postal, departamento…", loc_all_france: "Toda Francia",
     loc_no_result: 'Sin resultados para "{q}"', loc_dept: "Departamento", loc_ville: "Ciudad",
     loc_ville_dept: "Ciudad · dpto. {d}", loc_radius_title: "Radio alrededor de {ville}",
@@ -461,6 +473,14 @@ const SENIOR_CATEGORIES = [
   { id: "ateliers", label: t("cat_ateliers"), icon: BookOpen, color: COLORS.sky },
   { id: "culture", label: t("cat_culture"), icon: Landmark, color: COLORS.grape },
   { id: "jardinage", label: t("cat_jardinage"), icon: Flower2, color: COLORS.coral },
+];
+
+const ASSO_CATEGORIES = [
+  { id: "mairie", label: t("cat_mairie"), icon: Landmark, color: COLORS.ink },
+  { id: "sport", label: t("cat_sport"), icon: Trophy, color: COLORS.grass },
+  { id: "culture", label: t("cat_culture"), icon: Palette, color: COLORS.grape },
+  { id: "solidaire", label: t("cat_solidaire"), icon: HeartHandshake, color: COLORS.coral },
+  { id: "fete", label: t("cat_fete"), icon: PartyPopper, color: COLORS.sun },
 ];
 
 const metaFrom = (categories, id) => categories.find((c) => c.id === id) || categories[0];
@@ -1620,6 +1640,261 @@ const SENIOR_MEETUPS = [
     organisateur: "Claude E.",
     desc: "Un moment convivial au grand air, pour jardiner ensemble et échanger conseils et boutures.",
     participants: [{ name: "Ginette", genre: "F" }, { name: "Jacqueline", genre: "F" }, { name: "Michèle", genre: "F" }, { name: "Alain", genre: "H" }],
+  },
+];
+
+
+const ASSO_EVENTS = [
+  {
+    id: 401,
+    title: "Cérémonie commémorative",
+    category: "mairie",
+    ville: "grenoble",
+    lieu: "Place de la mairie",
+    offsetDays: 26, time: "20h30",
+    info: "Ouvert à tous, sans inscription",
+    places: 56,
+    inscrits: 35,
+    organisateur: "Cabinet du maire",
+    desc: "Un rendez-vous organisé par la mairie, ouvert à tous les habitants de la commune, sans inscription préalable.",
+    participants: [{ name: "Paul", genre: "H" }, { name: "Sarah", genre: "F" }, { name: "Jacqueline", genre: "F" }, { name: "Léa", genre: "F" }, { name: "Françoise", genre: "F" }, { name: "Karim", genre: "H" }, { name: "Bernard", genre: "H" }, { name: "Claire", genre: "F" }, { name: "Bernard", genre: "H" }, { name: "Paul", genre: "H" }, { name: "Monique", genre: "F" }],
+  },
+  {
+    id: 402,
+    title: "Gala de fin de saison",
+    category: "sport",
+    ville: "varces",
+    lieu: "City stade",
+    offsetDays: 9, time: "10h00",
+    info: "Entrée libre et gratuite",
+    places: 35,
+    inscrits: 30,
+    organisateur: "AS Varces",
+    desc: "Une journée sportive organisée par le club local, ouverte à tous, petits et grands, licenciés ou non.",
+    participants: [{ name: "Nadia", genre: "F" }, { name: "Françoise", genre: "F" }, { name: "Jacqueline", genre: "F" }, { name: "Sophie", genre: "F" }, { name: "Sophie", genre: "F" }, { name: "Léa", genre: "F" }, { name: "Robert", genre: "H" }, { name: "Marion", genre: "F" }, { name: "Thomas", genre: "H" }, { name: "Françoise", genre: "F" }, { name: "Thomas", genre: "H" }],
+  },
+  {
+    id: 403,
+    title: "Exposition des artistes locaux",
+    category: "culture",
+    ville: "vif",
+    lieu: "Théâtre municipal",
+    offsetDays: 32, time: "16h00",
+    info: "Accessible aux personnes à mobilité réduite",
+    places: 60,
+    inscrits: 36,
+    organisateur: "Les Amis du Patrimoine",
+    desc: "Un temps fort culturel organisé avec les associations du territoire, gratuit et ouvert à tous.",
+    participants: [{ name: "Monique", genre: "F" }, { name: "Marion", genre: "F" }, { name: "Monique", genre: "F" }, { name: "Paul", genre: "H" }, { name: "Léa", genre: "F" }, { name: "Léa", genre: "F" }, { name: "Françoise", genre: "F" }, { name: "Marc", genre: "H" }],
+  },
+  {
+    id: 404,
+    title: "Vide-grenier solidaire",
+    category: "solidaire",
+    ville: "lyon",
+    lieu: "Centre social",
+    offsetDays: 15, time: "10h00",
+    info: "Ouvert à tous, sans inscription",
+    places: 41,
+    inscrits: 9,
+    organisateur: "Croix-Rouge locale",
+    desc: "Une action solidaire portée par une association du quartier, toute aide ou présence est bienvenue.",
+    participants: [{ name: "Jacqueline", genre: "F" }, { name: "Karim", genre: "H" }, { name: "Françoise", genre: "F" }, { name: "Hugo", genre: "H" }, { name: "Nadia", genre: "F" }, { name: "Claire", genre: "F" }, { name: "Karim", genre: "H" }, { name: "Monique", genre: "F" }, { name: "Claire", genre: "F" }, { name: "Vincent", genre: "H" }],
+  },
+  {
+    id: 405,
+    title: "Fête de quartier",
+    category: "fete",
+    ville: "chambery",
+    lieu: "Parc municipal",
+    offsetDays: 16, time: "20h30",
+    info: "Accessible aux personnes à mobilité réduite",
+    places: 57,
+    inscrits: 7,
+    organisateur: "Comité des fêtes de Chambéry",
+    desc: "Un rendez-vous convivial et festif ouvert à tous les habitants, petits et grands.",
+    participants: [{ name: "Monique", genre: "F" }, { name: "Michel", genre: "H" }, { name: "Vincent", genre: "H" }, { name: "Françoise", genre: "F" }, { name: "Paul", genre: "H" }, { name: "Vincent", genre: "H" }, { name: "Sophie", genre: "F" }],
+  },
+  {
+    id: 406,
+    title: "Réunion publique de quartier",
+    category: "mairie",
+    ville: "annecy",
+    lieu: "Salle du conseil",
+    offsetDays: 38, time: "16h00",
+    info: "Accessible aux personnes à mobilité réduite",
+    places: 82,
+    inscrits: 79,
+    organisateur: "Service culture de la ville",
+    desc: "Un rendez-vous organisé par la mairie, ouvert à tous les habitants de la commune, sans inscription préalable.",
+    participants: [{ name: "Léa", genre: "F" }, { name: "Jacqueline", genre: "F" }, { name: "Françoise", genre: "F" }, { name: "Bernard", genre: "H" }, { name: "Nadia", genre: "F" }, { name: "Hugo", genre: "H" }, { name: "Claire", genre: "F" }, { name: "Michel", genre: "H" }],
+  },
+  {
+    id: 407,
+    title: "Forum des associations sportives",
+    category: "sport",
+    ville: "valence",
+    lieu: "Gymnase du centre",
+    offsetDays: 25, time: "10h00",
+    places: 43,
+    inscrits: 6,
+    organisateur: "AS Valence",
+    desc: "Une journée sportive organisée par le club local, ouverte à tous, petits et grands, licenciés ou non.",
+    participants: [{ name: "Robert", genre: "H" }, { name: "Julien", genre: "H" }, { name: "Sarah", genre: "F" }, { name: "Thomas", genre: "H" }, { name: "Sophie", genre: "F" }, { name: "Michel", genre: "H" }, { name: "Claire", genre: "F" }, { name: "Sarah", genre: "F" }, { name: "Hugo", genre: "H" }, { name: "Bernard", genre: "H" }, { name: "Bernard", genre: "H" }],
+  },
+  {
+    id: 408,
+    title: "Lecture publique au jardin",
+    category: "culture",
+    ville: "paris",
+    lieu: "Jardin public",
+    offsetDays: 25, time: "20h00",
+    info: "Buvette et restauration sur place",
+    places: 42,
+    inscrits: 19,
+    organisateur: "Service culturel municipal",
+    desc: "Un temps fort culturel organisé avec les associations du territoire, gratuit et ouvert à tous.",
+    participants: [{ name: "Karim", genre: "H" }, { name: "Camille", genre: "F" }, { name: "Julien", genre: "H" }, { name: "Paul", genre: "H" }, { name: "Léa", genre: "F" }, { name: "Léa", genre: "F" }, { name: "Léa", genre: "F" }, { name: "Paul", genre: "H" }, { name: "Léa", genre: "F" }],
+  },
+  {
+    id: 409,
+    title: "Journée don du sang",
+    category: "solidaire",
+    ville: "grenoble",
+    lieu: "Centre social",
+    offsetDays: 4, time: "20h00",
+    info: "Buvette et restauration sur place",
+    places: 61,
+    inscrits: 17,
+    organisateur: "Les Restos du Cœur",
+    desc: "Une action solidaire portée par une association du quartier, toute aide ou présence est bienvenue.",
+    participants: [{ name: "Claire", genre: "F" }, { name: "Monique", genre: "F" }, { name: "Vincent", genre: "H" }, { name: "Bernard", genre: "H" }, { name: "Vincent", genre: "H" }],
+  },
+  {
+    id: 410,
+    title: "Fête foraine annuelle",
+    category: "fete",
+    ville: "varces",
+    lieu: "Esplanade",
+    offsetDays: 24, time: "16h00",
+    info: "Entrée libre et gratuite",
+    places: 29,
+    inscrits: 12,
+    organisateur: "Mairie de Varces",
+    desc: "Un rendez-vous convivial et festif ouvert à tous les habitants, petits et grands.",
+    participants: [{ name: "Bernard", genre: "H" }, { name: "Léa", genre: "F" }, { name: "Thomas", genre: "H" }, { name: "Sophie", genre: "F" }],
+  },
+  {
+    id: 411,
+    title: "Inauguration du nouveau parc",
+    category: "mairie",
+    ville: "vif",
+    lieu: "Place de la mairie",
+    offsetDays: 31, time: "11h00",
+    info: "Entrée libre et gratuite",
+    places: 100,
+    inscrits: 88,
+    organisateur: "Service culture de la ville",
+    desc: "Un rendez-vous organisé par la mairie, ouvert à tous les habitants de la commune, sans inscription préalable.",
+    participants: [{ name: "Marion", genre: "F" }, { name: "Léa", genre: "F" }, { name: "Vincent", genre: "H" }, { name: "Hugo", genre: "H" }],
+  },
+  {
+    id: 412,
+    title: "Gala de fin de saison",
+    category: "sport",
+    ville: "lyon",
+    lieu: "Boulodrome municipal",
+    offsetDays: 15, time: "18h00",
+    info: "Buvette et restauration sur place",
+    places: 83,
+    inscrits: 54,
+    organisateur: "Office municipal des sports",
+    desc: "Une journée sportive organisée par le club local, ouverte à tous, petits et grands, licenciés ou non.",
+    participants: [{ name: "Bernard", genre: "H" }, { name: "Sophie", genre: "F" }, { name: "Claire", genre: "F" }, { name: "Robert", genre: "H" }, { name: "Robert", genre: "H" }, { name: "Hugo", genre: "H" }, { name: "Vincent", genre: "H" }, { name: "Michel", genre: "H" }, { name: "Karim", genre: "H" }, { name: "Marc", genre: "H" }],
+  },
+  {
+    id: 413,
+    title: "Nuit des musées",
+    category: "culture",
+    ville: "chambery",
+    lieu: "Conservatoire",
+    offsetDays: 12, time: "14h00",
+    info: "Buvette et restauration sur place",
+    places: 30,
+    inscrits: 5,
+    organisateur: "Association culturelle locale",
+    desc: "Un temps fort culturel organisé avec les associations du territoire, gratuit et ouvert à tous.",
+    participants: [{ name: "Françoise", genre: "F" }, { name: "Paul", genre: "H" }, { name: "Léa", genre: "F" }, { name: "Thomas", genre: "H" }, { name: "Claire", genre: "F" }, { name: "Claire", genre: "F" }, { name: "Camille", genre: "F" }, { name: "Thomas", genre: "H" }, { name: "Robert", genre: "H" }, { name: "Sophie", genre: "F" }, { name: "Nadia", genre: "F" }, { name: "Sarah", genre: "F" }],
+  },
+  {
+    id: 414,
+    title: "Journée don du sang",
+    category: "solidaire",
+    ville: "annecy",
+    lieu: "Place du marché",
+    offsetDays: 38, time: "18h00",
+    info: "Ouvert à tous, sans inscription",
+    places: 109,
+    inscrits: 62,
+    organisateur: "Comité de quartier",
+    desc: "Une action solidaire portée par une association du quartier, toute aide ou présence est bienvenue.",
+    participants: [{ name: "Michel", genre: "H" }, { name: "Camille", genre: "F" }, { name: "Nadia", genre: "F" }, { name: "Marc", genre: "H" }],
+  },
+  {
+    id: 415,
+    title: "Marché de Noël",
+    category: "fete",
+    ville: "valence",
+    lieu: "Square des Tilleuls",
+    offsetDays: 50, time: "16h00",
+    info: "Buvette et restauration sur place",
+    places: 87,
+    inscrits: 11,
+    organisateur: "Mairie de Valence",
+    desc: "Un rendez-vous convivial et festif ouvert à tous les habitants, petits et grands.",
+    participants: [{ name: "Sarah", genre: "F" }, { name: "Léa", genre: "F" }, { name: "Hugo", genre: "H" }, { name: "Bernard", genre: "H" }, { name: "Robert", genre: "H" }, { name: "Sophie", genre: "F" }, { name: "Marion", genre: "F" }],
+  },
+  {
+    id: 416,
+    title: "Permanence des élus",
+    category: "mairie",
+    ville: "paris",
+    lieu: "Salle des mariages",
+    offsetDays: 39, time: "18h00",
+    info: "Ouvert à tous, sans inscription",
+    places: 80,
+    inscrits: 48,
+    organisateur: "Cabinet du maire",
+    desc: "Un rendez-vous organisé par la mairie, ouvert à tous les habitants de la commune, sans inscription préalable.",
+    participants: [{ name: "Camille", genre: "F" }, { name: "Jacqueline", genre: "F" }, { name: "Robert", genre: "H" }, { name: "Michel", genre: "H" }, { name: "Karim", genre: "H" }, { name: "Nadia", genre: "F" }, { name: "Jacqueline", genre: "F" }, { name: "Julien", genre: "H" }],
+  },
+  {
+    id: 417,
+    title: "Gala de fin de saison",
+    category: "sport",
+    ville: "grenoble",
+    lieu: "Complexe sportif",
+    offsetDays: 2, time: "10h00",
+    info: "Animation prévue en cas de pluie",
+    places: 49,
+    inscrits: 27,
+    organisateur: "Comité des fêtes",
+    desc: "Une journée sportive organisée par le club local, ouverte à tous, petits et grands, licenciés ou non.",
+    participants: [{ name: "Sophie", genre: "F" }, { name: "Paul", genre: "H" }, { name: "Nadia", genre: "F" }, { name: "Karim", genre: "H" }, { name: "Marc", genre: "H" }, { name: "Michel", genre: "H" }, { name: "Nadia", genre: "F" }, { name: "Françoise", genre: "F" }],
+  },
+  {
+    id: 418,
+    title: "Lecture publique au jardin",
+    category: "culture",
+    ville: "varces",
+    lieu: "Centre culturel",
+    offsetDays: 43, time: "9h00",
+    info: "Animation prévue en cas de pluie",
+    places: 47,
+    inscrits: 46,
+    organisateur: "Les Amis du Patrimoine",
+    desc: "Un temps fort culturel organisé avec les associations du territoire, gratuit et ouvert à tous.",
+    participants: [{ name: "Robert", genre: "H" }, { name: "Thomas", genre: "H" }, { name: "Marion", genre: "F" }, { name: "Marc", genre: "H" }, { name: "Nadia", genre: "F" }, { name: "Camille", genre: "F" }, { name: "Thomas", genre: "H" }, { name: "Michel", genre: "H" }, { name: "Sarah", genre: "F" }, { name: "Thomas", genre: "H" }, { name: "Sarah", genre: "F" }, { name: "Vincent", genre: "H" }],
   },
 ];
 
@@ -3315,13 +3590,16 @@ export default function RecreApp() {
   const [adultItems, setAdultItems] = useState(ADULT_MEETUPS);
   const [teenItems, setTeenItems] = useState(TEEN_MEETUPS);
   const [seniorItems, setSeniorItems] = useState(SENIOR_MEETUPS);
+  const [assoItems, setAssoItems] = useState(ASSO_EVENTS);
   const [favAdult, setFavAdult] = useState([]);
   const [favTeen, setFavTeen] = useState([]);
   const [favSenior, setFavSenior] = useState([]);
+  const [favAsso, setFavAsso] = useState([]);
   const [joinedAdult, setJoinedAdult] = useState([]);
   const [joinedTeen, setJoinedTeen] = useState([]);
   const [joinedSenior, setJoinedSenior] = useState([]);
-  const [selectedCommunity, setSelectedCommunity] = useState(null); // { item, kind: "adult" | "teen" | "senior" }
+  const [joinedAsso, setJoinedAsso] = useState([]);
+  const [selectedCommunity, setSelectedCommunity] = useState(null); // { item, kind: "adult" | "teen" | "senior" | "asso" }
   const [location, setLocation] = useState(null);
 
   const toggleFav = (id) =>
@@ -3344,6 +3622,7 @@ export default function RecreApp() {
     adult: { setFav: setFavAdult, setJoined: setJoinedAdult, setItems: setAdultItems },
     teen: { setFav: setFavTeen, setJoined: setJoinedTeen, setItems: setTeenItems },
     senior: { setFav: setFavSenior, setJoined: setJoinedSenior, setItems: setSeniorItems },
+    asso: { setFav: setFavAsso, setJoined: setJoinedAsso, setItems: setAssoItems },
   };
 
   const toggleFavCommunity = (kind, id) => {
@@ -3370,6 +3649,7 @@ export default function RecreApp() {
     { id: "ados", label: t("tab_ados"), icon: Gamepad2, kidsOnly: true },
     { id: "adultes", label: t("tab_adultes"), icon: Coffee },
     { id: "aine", label: t("tab_aine"), icon: Flower2 },
+    { id: "asso", label: t("tab_associations"), icon: Landmark },
   ];
   const TABS = TABS_ALL.filter((tb) => !tb.kidsOnly || parentValidated);
   // Ces trois-là ne sont plus dans la barre du bas : ils vivent en icônes dans l'en-tête,
@@ -3523,6 +3803,20 @@ export default function RecreApp() {
             genderMode
           />
         )}
+        {tab === "asso" && (
+          <CommunityExplorer
+            title={t("community_asso_title")}
+            subtitle={t("community_asso_subtitle")}
+            categories={ASSO_CATEGORIES}
+            items={assoItems}
+            favorites={favAsso}
+            onToggleFav={(id) => toggleFavCommunity("asso", id)}
+            onOpen={(item) => setSelectedCommunity({ item, kind: "asso" })}
+            emptyText={t("community_empty")}
+            location={location}
+            layout="days"
+          />
+        )}
         {tab === "ados" && parentValidated && (
           <CommunityExplorer
             title={t("community_teen_title")}
@@ -3581,27 +3875,26 @@ export default function RecreApp() {
 
       <DetailModal activity={selected} onClose={() => setSelected(null)} joined={joined} onJoin={join} />
 
-      <CommunityDetailModal
-        item={selectedCommunity?.item}
-        categories={
-          selectedCommunity?.kind === "teen" ? TEEN_CATEGORIES
-          : selectedCommunity?.kind === "senior" ? SENIOR_CATEGORIES
-          : ADULT_CATEGORIES
-        }
-        onClose={() => setSelectedCommunity(null)}
-        joined={
-          selectedCommunity?.kind === "teen" ? joinedTeen
-          : selectedCommunity?.kind === "senior" ? joinedSenior
-          : joinedAdult
-        }
-        onJoin={(id) => joinCommunity(selectedCommunity?.kind, id)}
-        joinLabel={
-          selectedCommunity?.kind === "teen" ? t("join_label_teen")
-          : selectedCommunity?.kind === "senior" ? t("join_label_senior")
-          : t("join_label_adult")
-        }
-        genderMode={selectedCommunity?.kind === "adult" || selectedCommunity?.kind === "senior"}
-      />
+      {(() => {
+        const kindMeta = {
+          adult: { categories: ADULT_CATEGORIES, joined: joinedAdult, joinLabel: t("join_label_adult"), genderMode: true },
+          teen: { categories: TEEN_CATEGORIES, joined: joinedTeen, joinLabel: t("join_label_teen"), genderMode: false },
+          senior: { categories: SENIOR_CATEGORIES, joined: joinedSenior, joinLabel: t("join_label_senior"), genderMode: true },
+          asso: { categories: ASSO_CATEGORIES, joined: joinedAsso, joinLabel: t("join_label_asso"), genderMode: false },
+        };
+        const meta = kindMeta[selectedCommunity?.kind] || kindMeta.adult;
+        return (
+          <CommunityDetailModal
+            item={selectedCommunity?.item}
+            categories={meta.categories}
+            onClose={() => setSelectedCommunity(null)}
+            joined={meta.joined}
+            onJoin={(id) => joinCommunity(selectedCommunity?.kind, id)}
+            joinLabel={meta.joinLabel}
+            genderMode={meta.genderMode}
+          />
+        );
+      })()}
 
       <style>{`
         @media (min-width: 768px) {
