@@ -83,6 +83,7 @@ const TRANSLATIONS = {
     tab_associations: "Commune", community_asso_title: "Associations & Mairie",
     community_asso_subtitle: "Événements organisés par la mairie et les associations de votre commune.",
     join_label_asso: "Je participe",
+    chip_intergen: "Intergénérationnel", intergen_badge: "Intergénérationnel",
     loc_placeholder: "Ville, code postal, département…", loc_all_france: "Toute la France",
     loc_no_result: 'Aucun résultat pour "{q}"', loc_dept: "Département", loc_ville: "Ville",
     loc_ville_dept: "Ville · dept. {d}", loc_radius_title: "Rayon autour de {ville}",
@@ -160,6 +161,7 @@ const TRANSLATIONS = {
     tab_associations: "Community", community_asso_title: "Town Hall & Associations",
     community_asso_subtitle: "Events organised by the town hall and local associations.",
     join_label_asso: "I'm in",
+    chip_intergen: "Intergenerational", intergen_badge: "Intergenerational",
     loc_placeholder: "City, postcode, department…", loc_all_france: "All of France",
     loc_no_result: 'No result for "{q}"', loc_dept: "Department", loc_ville: "City",
     loc_ville_dept: "City · dept. {d}", loc_radius_title: "Radius around {ville}",
@@ -237,6 +239,7 @@ const TRANSLATIONS = {
     tab_associations: "Comunidad", community_asso_title: "Ayuntamiento y asociaciones",
     community_asso_subtitle: "Eventos organizados por el ayuntamiento y las asociaciones locales.",
     join_label_asso: "Participo",
+    chip_intergen: "Intergeneracional", intergen_badge: "Intergeneracional",
     loc_placeholder: "Ciudad, código postal, departamento…", loc_all_france: "Toda Francia",
     loc_no_result: 'Sin resultados para "{q}"', loc_dept: "Departamento", loc_ville: "Ciudad",
     loc_ville_dept: "Ciudad · dpto. {d}", loc_radius_title: "Radio alrededor de {ville}",
@@ -571,6 +574,25 @@ const INITIAL_ACTIVITIES = [
     participants: [
       { name: "Thomas", genre: "G" }, { name: "Juliette", genre: "F" }, { name: "Oscar", genre: "G" },
       { name: "Manon", genre: "F" }, { name: "Paul", genre: "G" },
+    ],
+  },
+  {
+    id: 6,
+    title: "Après-midi contes avec les aînés du quartier",
+    category: "creatif",
+    ville: "grenoble",
+    lieu: "Médiathèque - espace jeunesse",
+    offsetDays: 6, time: "15h00",
+    age: "3-8 ans",
+    places: 15,
+    inscrits: 8,
+    organisateur: "Médiathèque",
+    intergen: true,
+    intergenNote: "Sortie intergénérationnelle · ouverte aux enfants et aux aînés du quartier",
+    desc: "Des aînés du quartier viennent raconter des histoires et légendes locales aux enfants, dans une ambiance chaleureuse. Un moment de transmission entre générations.",
+    participants: [
+      { name: "Léo", genre: "G" }, { name: "Mila", genre: "F" }, { name: "Sacha", genre: "G" },
+      { name: "Iris", genre: "F" }, { name: "Noé", genre: "G" },
     ],
   },
 ];
@@ -1430,6 +1452,22 @@ const TEEN_MEETUPS = [
     desc: "Séance ouverte pour découvrir ou rejoindre le groupe des ados du conservatoire, encadrée par un professeur.",
     participants: ["Gabriel", "Anna", "Ethan", "Juliette", "Oscar"],
   },
+  {
+    id: 206,
+    title: "Coup de pouce numérique pour les aînés",
+    category: "creatif",
+    ville: "vif",
+    lieu: "Foyer des aînés",
+    offsetDays: 3, time: "14h00",
+    info: "12-17 ans · en binôme avec les aînés du quartier",
+    places: 10,
+    inscrits: 5,
+    organisateur: "Espace jeunesse",
+    intergen: true,
+    intergenNote: "Sortie intergénérationnelle · ouverte aux jeunes et aux aînés du quartier",
+    desc: "Viens aider des aînés du quartier à prendre en main leur smartphone ou leur tablette, dans une ambiance détendue et sans jugement.",
+    participants: ["Lina", "Malo", "Yanis", "Chloé"],
+  },
 ];
 
 const SENIOR_MEETUPS = [
@@ -1640,6 +1678,44 @@ const SENIOR_MEETUPS = [
     organisateur: "Claude E.",
     desc: "Un moment convivial au grand air, pour jardiner ensemble et échanger conseils et boutures.",
     participants: [{ name: "Ginette", genre: "F" }, { name: "Jacqueline", genre: "F" }, { name: "Michèle", genre: "F" }, { name: "Alain", genre: "H" }],
+  },
+  {
+    id: 316,
+    title: "Racontage d'histoires aux enfants de la médiathèque",
+    category: "ateliers",
+    ville: "grenoble",
+    lieu: "Médiathèque - espace jeunesse",
+    offsetDays: 6, time: "15h00",
+    info: "En binôme avec les enfants du quartier",
+    places: 15,
+    inscrits: 6,
+    organisateur: "Médiathèque",
+    intergen: true,
+    intergenNote: "Sortie intergénérationnelle · ouverte aux enfants et aux aînés du quartier",
+    desc: "Racontez vos histoires et légendes locales aux enfants du quartier, dans une ambiance chaleureuse. Un moment de transmission entre générations.",
+    participants: [
+      { name: "Jacqueline", genre: "F" }, { name: "Bernard", genre: "H" }, { name: "Monique", genre: "F" },
+      { name: "Robert", genre: "H" }, { name: "Colette", genre: "F" }, { name: "André", genre: "H" },
+    ],
+  },
+  {
+    id: 317,
+    title: "Initiation smartphone avec les jeunes du quartier",
+    category: "ateliers",
+    ville: "vif",
+    lieu: "Foyer des aînés",
+    offsetDays: 3, time: "14h00",
+    info: "Encadré par des jeunes bénévoles du quartier",
+    places: 10,
+    inscrits: 5,
+    organisateur: "Espace jeunesse",
+    intergen: true,
+    intergenNote: "Sortie intergénérationnelle · ouverte aux jeunes et aux aînés du quartier",
+    desc: "Des jeunes du quartier viennent aider les aînés à prendre en main leur smartphone ou leur tablette, dans une ambiance détendue et sans jugement.",
+    participants: [
+      { name: "Danielle", genre: "F" }, { name: "Gérard", genre: "H" }, { name: "Françoise", genre: "F" },
+      { name: "Michel", genre: "H" }, { name: "Simone", genre: "F" },
+    ],
   },
 ];
 
@@ -2951,6 +3027,18 @@ function DetailModal({ activity, onClose, joined, onJoin }) {
           {activity.title}
         </h2>
 
+        {activity.intergen && (
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8, background: "#FFF4DD",
+            border: `2px solid ${COLORS.sun}`, borderRadius: 14, padding: "10px 12px", marginBottom: 14,
+          }}>
+            <span style={{ fontSize: 18 }}>🤝</span>
+            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: COLORS.ink }}>
+              {activity.intergenNote || t("intergen_badge")}
+            </span>
+          </div>
+        )}
+
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
           <Row icon={<MapPin size={15} color={COLORS.ink} />} text={lieuAvecVille(activity)} />
           <Row icon={<CalendarDays size={15} color={COLORS.ink} />} text={displayDate(activity)} />
@@ -3038,9 +3126,20 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
         <div style={{
           width: 46, height: 46, borderRadius: "50%", border: `2px dashed ${meta.color}`,
           background: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
-          transform: "rotate(-8deg)", boxShadow: "0 2px 6px rgba(43,37,96,0.12)", flexShrink: 0,
+          transform: "rotate(-8deg)", boxShadow: "0 2px 6px rgba(43,37,96,0.12)", flexShrink: 0, position: "relative",
         }}>
           <Icon size={20} color={meta.color} strokeWidth={2.4} />
+          {item.intergen && (
+            <span
+              title={t("intergen_badge")}
+              style={{
+                position: "absolute", top: -6, right: -6, fontSize: 14, lineHeight: 1,
+                background: "#fff", borderRadius: "50%", boxShadow: "0 1px 3px rgba(43,37,96,0.3)",
+              }}
+            >
+              🤝
+            </span>
+          )}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
@@ -3092,8 +3191,20 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
       <div style={{
         width: 34, height: 34, borderRadius: "50%", border: `2px dashed ${meta.color}`,
         background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+        position: "relative",
       }}>
         <Icon size={15} color={meta.color} strokeWidth={2.4} />
+        {item.intergen && (
+          <span
+            title={t("intergen_badge")}
+            style={{
+              position: "absolute", top: -4, right: -4, fontSize: 11, lineHeight: 1,
+              background: "#fff", borderRadius: "50%", boxShadow: "0 1px 3px rgba(43,37,96,0.3)",
+            }}
+          >
+            🤝
+          </span>
+        )}
       </div>
 
       <div style={{ flex: 1, minWidth: "15ch" }}>
@@ -3203,12 +3314,13 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
 
   const filtered = useMemo(() => {
     return items.filter((a) => {
-      const matchCat = cat === "tous" || a.category === cat;
+      const matchCat = cat === "tous" || (cat === "intergen" ? a.intergen : a.category === cat);
       const matchLoc = matchLocation(a.ville, location);
       const matchQuery = a.title.toLowerCase().includes(query.toLowerCase()) || a.lieu.toLowerCase().includes(query.toLowerCase());
       return matchCat && matchLoc && matchQuery;
     });
   }, [items, query, cat, location]);
+  const hasIntergen = items.some((a) => a.intergen);
 
   return (
     <div>
@@ -3236,6 +3348,11 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
 
       <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 6, marginBottom: 10 }}>
         <Chip active={cat === "tous"} onClick={() => setCat("tous")} color={COLORS.ink}>{t("chip_all")}</Chip>
+        {hasIntergen && (
+          <Chip active={cat === "intergen"} onClick={() => setCat("intergen")} color={COLORS.coral}>
+            🤝 {t("chip_intergen")}
+          </Chip>
+        )}
         {categories.map((c) => (
           <Chip key={c.id} active={cat === c.id} onClick={() => setCat(c.id)} color={c.color}>{c.label}</Chip>
         ))}
@@ -3299,6 +3416,18 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
         <h2 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 22, color: COLORS.ink, margin: "0 0 12px" }}>
           {item.title}
         </h2>
+
+        {item.intergen && (
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8, background: "#FFF4DD",
+            border: `2px solid ${COLORS.sun}`, borderRadius: 14, padding: "10px 12px", marginBottom: 14,
+          }}>
+            <span style={{ fontSize: 18 }}>🤝</span>
+            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: COLORS.ink }}>
+              {item.intergenNote || t("intergen_badge")}
+            </span>
+          </div>
+        )}
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
           <Row icon={<MapPin size={15} color={COLORS.ink} />} text={lieuAvecVille(item)} />
