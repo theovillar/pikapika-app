@@ -4731,6 +4731,7 @@ export default function RecreApp() {
             emptyText={t("community_empty")}
             location={location}
             layout="days"
+            genderMode
           />
         )}
         {tab === "mairie" && pika.role === "mairie" && (
@@ -4812,7 +4813,7 @@ export default function RecreApp() {
           adult: { categories: ADULT_CATEGORIES, joined: joinedAdult, joinLabel: t("join_label_adult"), genderMode: true },
           teen: { categories: TEEN_CATEGORIES, joined: joinedTeen, joinLabel: t("join_label_teen"), genderMode: true, genderLabels: { f: t("legend_girl"), m: t("legend_boy") } },
           senior: { categories: SENIOR_CATEGORIES, joined: joinedSenior, joinLabel: t("join_label_senior"), genderMode: true },
-          asso: { categories: ASSO_CATEGORIES, joined: joinedAsso, joinLabel: t("join_label_asso"), genderMode: false },
+          asso: { categories: ASSO_CATEGORIES, joined: joinedAsso, joinLabel: t("join_label_asso"), genderMode: true },
         };
         const meta = kindMeta[selectedCommunity?.kind] || kindMeta.adult;
         return (
