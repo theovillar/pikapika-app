@@ -2116,13 +2116,13 @@ function Stamp({ category, size = 46, rotate = -8 }) {
   );
 }
 
-function Avatar({ name, genre, size = 26, overlap = false }) {
-  const color = genreColor(genre);
+function Avatar({ name, genre, size = 26, overlap = false, genderMode = true, color }) {
+  const finalColor = genderMode ? genreColor(genre) : (color || COLORS.grape);
   return (
     <div
-      title={`${name} (${genreLabel(genre)})`}
+      title={genderMode ? `${name} (${genreLabel(genre)})` : name}
       style={{
-        width: size, height: size, borderRadius: "50%", background: color,
+        width: size, height: size, borderRadius: "50%", background: finalColor,
         display: "flex", alignItems: "center", justifyContent: "center",
         color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800,
         fontSize: size * 0.42, border: "2px solid #fff",
@@ -3301,17 +3301,11 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport }) {
 
         {activity.participants && activity.participants.length > 0 && (
           <div style={{ marginBottom: 20 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-              <SectionLabel>{t("detail_registered_children")}</SectionLabel>
-              <div style={{ display: "flex", gap: 12 }}>
-                <Legend color={COLORS.girl} label={t("legend_girl")} />
-                <Legend color={COLORS.boy} label={t("legend_boy")} />
-              </div>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <SectionLabel>{t("detail_registered_children")}</SectionLabel>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 10 }}>
               {activity.participants.map((p, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <Avatar name={p.name} genre={p.genre} size={30} />
+                  <Avatar name={p.name} genderMode={false} size={30} />
                   <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: COLORS.ink }}>
                     {p.name}
                   </span>
@@ -4656,7 +4650,6 @@ export default function RecreApp() {
             emptyText={t("empty_kids")}
             location={location}
             layout="days"
-            genderMode
           />
         )}
         {tab === "creer" && (
