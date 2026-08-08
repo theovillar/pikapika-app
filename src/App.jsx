@@ -3290,7 +3290,7 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport }) {
         )}
 
         <div style={{ marginBottom: 14 }}>
-          <OrganiserBadge name={activity.organisateur} genre={activity.organisateurGenre} size={16} />
+          <OrganiserBadge name={activity.organisateur} genre={activity.organisateurGenre} size={20} />
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
@@ -3426,7 +3426,7 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
       </div>
 
       <div style={{ marginTop: 8 }}>
-        <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={13} />
+        <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={16} />
       </div>
 
       <PlainParticipantsRow names={item.participants} color={meta.color} genderMode={genderMode} />
@@ -3493,7 +3493,7 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
         </div>
         {item.organisateur && (
           <div style={{ marginTop: 3 }}>
-            <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={12} />
+            <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={15} />
           </div>
         )}
       </div>
@@ -3704,7 +3704,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
         )}
 
         <div style={{ marginBottom: 14 }}>
-          <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={16} />
+          <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={20} />
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
