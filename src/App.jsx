@@ -68,7 +68,7 @@ const TRANSLATIONS = {
     val_pending_title: "Validation de la mairie en attente",
     val_pending_text: "Pour la sécurité des enfants, l'accès aux sorties enfants et jeune (Enfants, Jeune, Créer, Mes sorties) n'est ouvert qu'aux parents dont l'identité a été vérifiée par la mairie de leur commune. Les sorties Adultes et Ainé restent accessibles sans validation. Vous recevrez une notification dès que ce sera fait.",
     val_demo_on: "Simuler : repasser en attente (démo)", val_demo_off: "Simuler : validation par la mairie (démo)",
-    detail_participants: "{a}/{b} participants · organisé par {org}",
+    detail_participants: "{a}/{b} participants",
     detail_registered_children: "Enfants déjà inscrits", legend_girl: "Fille", legend_boy: "Garçon",
     detail_joined: "Vous participez", detail_join_kids: "Rejoindre avec mon enfant",
     detail_already_registered: "Déjà inscrit(e)s",
@@ -172,7 +172,7 @@ const TRANSLATIONS = {
     val_pending_title: "Town hall verification pending",
     val_pending_text: "For children's safety, access to kids and youth outings (Kids, Youth, Create, My outings) is only open to parents whose identity has been verified by their town hall. Adults and Seniors outings remain open without verification. You'll be notified as soon as it's done.",
     val_demo_on: "Simulate: back to pending (demo)", val_demo_off: "Simulate: town hall verification (demo)",
-    detail_participants: "{a}/{b} participants · hosted by {org}",
+    detail_participants: "{a}/{b} participants",
     detail_registered_children: "Already registered kids", legend_girl: "Girl", legend_boy: "Boy",
     detail_joined: "You're in", detail_join_kids: "Join with my child",
     detail_already_registered: "Already registered",
@@ -276,7 +276,7 @@ const TRANSLATIONS = {
     val_pending_title: "Validación del ayuntamiento pendiente",
     val_pending_text: "Por la seguridad de los niños, el acceso a las salidas de niños y jóvenes (Niños, Jóvenes, Crear, Mis salidas) solo está abierto a los padres cuya identidad haya sido verificada por su ayuntamiento. Las salidas de Adultos y Mayores siguen abiertas sin validación. Recibirás una notificación en cuanto se haga.",
     val_demo_on: "Simular: volver a pendiente (demo)", val_demo_off: "Simular: validación del ayuntamiento (demo)",
-    detail_participants: "{a}/{b} participantes · organizado por {org}",
+    detail_participants: "{a}/{b} participantes",
     detail_registered_children: "Niños ya inscritos", legend_girl: "Niña", legend_boy: "Niño",
     detail_joined: "Estás participando", detail_join_kids: "Unirme con mi hijo/a",
     detail_already_registered: "Ya inscritos",
@@ -2162,6 +2162,27 @@ function ParticipantsRow({ participants, max = 5 }) {
 // sinon elle vient de la catégorie (comportement précédent, utilisé pour les ados).
 function participantName(p) { return typeof p === "string" ? p : p.name; }
 
+// Met en avant le pseudo de l'organisateur, coloré par genre quand il est connu
+// (les comptes association/institutions n'ont pas de genre : couleur neutre).
+function OrganiserBadge({ name, genre, size = 14 }) {
+  if (!name) return null;
+  const color = genre ? genreColor(genre) : COLORS.ink;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+      <div style={{
+        width: size + 8, height: size + 8, borderRadius: "50%", background: color,
+        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+        color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: size * 0.6,
+      }}>
+        {name.charAt(0).toUpperCase()}
+      </div>
+      <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: size, color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+        {t("by_organiser", { org: name })}
+      </span>
+    </div>
+  );
+}
+
 function PlainAvatar({ participant, color, size, overlap = false, genderMode = false }) {
   const name = participantName(participant);
   const avatarColor = genderMode && participant?.genre ? genreColor(participant.genre) : color;
@@ -3268,10 +3289,14 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport }) {
           </div>
         )}
 
+        <div style={{ marginBottom: 14 }}>
+          <OrganiserBadge name={activity.organisateur} genre={activity.organisateurGenre} size={16} />
+        </div>
+
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
           <Row icon={<MapPin size={15} color={COLORS.ink} />} text={lieuAvecVille(activity)} />
           <Row icon={<CalendarDays size={15} color={COLORS.ink} />} text={displayDate(activity)} />
-          <Row icon={<Users size={15} color={COLORS.ink} />} text={t("detail_participants", { a: activity.inscrits, b: activity.places, org: activity.organisateur })} />
+          <Row icon={<Users size={15} color={COLORS.ink} />} text={t("detail_participants", { a: activity.inscrits, b: activity.places })} />
         </div>
 
         <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 14.5, color: "#5C5578", lineHeight: 1.6, marginBottom: 20 }}>
@@ -3398,11 +3423,10 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
         <Row icon={<MapPin size={14} color={COLORS.ink} />} text={lieuAvecVille(item)} />
         <Row icon={<CalendarDays size={14} color={COLORS.ink} />} text={displayDate(item)} />
         {item.info && <Row icon={<Users size={14} color={COLORS.ink} />} text={item.info} />}
-        {item.organisateur && (
-          <div style={{ fontSize: 11, color: "#B7AF98", fontFamily: "Nunito, sans-serif", fontWeight: 700 }}>
-            {t("by_organiser", { org: item.organisateur })}
-          </div>
-        )}
+      </div>
+
+      <div style={{ marginTop: 8 }}>
+        <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={13} />
       </div>
 
       <PlainParticipantsRow names={item.participants} color={meta.color} genderMode={genderMode} />
@@ -3468,8 +3492,8 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
           </span>
         </div>
         {item.organisateur && (
-          <div style={{ fontSize: 10.5, color: "#B7AF98", fontFamily: "Nunito, sans-serif", fontWeight: 700, marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-            {t("by_organiser", { org: item.organisateur })}
+          <div style={{ marginTop: 3 }}>
+            <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={12} />
           </div>
         )}
       </div>
@@ -3679,10 +3703,14 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
           </div>
         )}
 
+        <div style={{ marginBottom: 14 }}>
+          <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={16} />
+        </div>
+
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
           <Row icon={<MapPin size={15} color={COLORS.ink} />} text={lieuAvecVille(item)} />
           <Row icon={<CalendarDays size={15} color={COLORS.ink} />} text={displayDate(item)} />
-          <Row icon={<Users size={15} color={COLORS.ink} />} text={t("detail_participants", { a: item.inscrits, b: item.places, org: item.organisateur })} />
+          <Row icon={<Users size={15} color={COLORS.ink} />} text={t("detail_participants", { a: item.inscrits, b: item.places })} />
           {item.info && <Row icon={<Sparkles size={15} color={COLORS.ink} />} text={item.info} />}
         </div>
 
@@ -3971,6 +3999,7 @@ function AuthScreen({ onClose }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [genre, setGenre] = useState("F");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -3991,8 +4020,11 @@ function AuthScreen({ onClose }) {
           options: { data: { display_name: name } },
         });
         if (err) throw err;
-        if (accountType === "association" && data?.user?.id) {
-          await supabase.from("profiles").update({ role: "association", association_name: name }).eq("id", data.user.id);
+        if (data?.user?.id) {
+          const patch = accountType === "association"
+            ? { role: "association", association_name: name }
+            : { genre };
+          await supabase.from("profiles").update(patch).eq("id", data.user.id);
         }
       } else {
         const { error: err } = await supabase.auth.signInWithPassword({ email, password });
@@ -4045,6 +4077,28 @@ function AuthScreen({ onClose }) {
             placeholder={accountType === "association" ? t("auth_association_name") : t("auth_name")}
             value={name} onChange={(e) => setName(e.target.value)}
           />
+        )}
+        {mode === "signup" && accountType === "parent" && (
+          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+            {[
+              { id: "F", label: t("legend_femme") },
+              { id: "H", label: t("legend_homme") },
+            ].map((opt) => (
+              <button
+                key={opt.id}
+                onClick={() => setGenre(opt.id)}
+                style={{
+                  flex: 1, border: `2px solid ${genre === opt.id ? genreColor(opt.id) : "#F0EADB"}`,
+                  background: genre === opt.id ? genreColor(opt.id) : "#fff",
+                  color: genre === opt.id ? "#fff" : COLORS.ink,
+                  borderRadius: 12, padding: "9px 8px", fontFamily: "Nunito, sans-serif",
+                  fontWeight: 800, fontSize: 12.5, cursor: "pointer",
+                }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         )}
         <input style={inputStyle} type="email" placeholder={t("auth_email")} value={email} onChange={(e) => setEmail(e.target.value)} />
         <input style={inputStyle} type="password" placeholder={t("auth_password")} value={password} onChange={(e) => setPassword(e.target.value)} />
@@ -4191,7 +4245,7 @@ function MairieDashboard({ pendingParents, pendingAssociations, reports, onValid
 function usePikapikaData() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [profile, setProfile] = useState({ displayName: "", parentValidated: false, role: "parent", associationValidated: false });
+  const [profile, setProfile] = useState({ displayName: "", parentValidated: false, role: "parent", associationValidated: false, genre: null });
   const [kids, setKids] = useState([]);
   const [rows, setRows] = useState([]);
   const [regByActivity, setRegByActivity] = useState({});
@@ -4249,6 +4303,7 @@ function usePikapikaData() {
           parentValidated: profRes.data.parent_validated,
           role: profRes.data.role || "parent",
           associationValidated: profRes.data.association_validated,
+          genre: profRes.data.genre,
         });
       }
       setKids(kidsRes.data || []);
@@ -4286,7 +4341,7 @@ function usePikapikaData() {
       id: row.id, title: row.title, category: row.category, ville: row.ville, lieu: row.lieu,
       offsetDays, time, age: row.age, info: row.info, places: row.places,
       inscrits: (row.demo_inscrits || 0) + (regByActivity[row.id] || 0),
-      organisateur: row.organisateur, desc: row.description,
+      organisateur: row.organisateur, organisateurGenre: row.organisateur_genre, desc: row.description,
       intergen: row.intergen, intergenNote: row.intergen_note,
       participants: row.demo_participants || [],
       createdBy: row.created_by,
@@ -4337,7 +4392,7 @@ function usePikapikaData() {
     const newRow = {
       id: Date.now(), space, title: form.title, category: form.category, ville: null, lieu: form.lieu,
       starts_at, age: form.age || null, info: form.info || null, places: form.places,
-      demo_inscrits: 0, organisateur: profile.displayName || t("you_organizer"),
+      demo_inscrits: 0, organisateur: profile.displayName || t("you_organizer"), organisateur_genre: profile.genre || null,
       description: form.desc || "", intergen: false, intergen_note: null,
       demo_participants: [], created_by: user.id,
     };
