@@ -1492,7 +1492,11 @@ const TEEN_MEETUPS = [
     inscrits: 8,
     organisateur: "Espace jeunesse",
     desc: "Petit tournoi amical sur consoles mises à disposition, animé par l'équipe de la médiathèque.",
-    participants: ["Lucas", "Nina", "Yanis", "Camille", "Théo", "Sarah", "Enzo", "Léa"],
+    participants: [
+      { name: "Lucas", genre: "G" }, { name: "Nina", genre: "F" }, { name: "Yanis", genre: "G" },
+      { name: "Camille", genre: "F" }, { name: "Théo", genre: "G" }, { name: "Sarah", genre: "F" },
+      { name: "Enzo", genre: "G" }, { name: "Léa", genre: "F" },
+    ],
   },
   {
     id: 202,
@@ -1506,7 +1510,11 @@ const TEEN_MEETUPS = [
     inscrits: 9,
     organisateur: "Service jeunesse de la ville",
     desc: "Session basket 3x3 encadrée par un éducateur sportif municipal, tous niveaux bienvenus.",
-    participants: ["Rayan", "Chloé", "Maxime", "Lina", "Noa", "Jules", "Inès", "Sacha", "Tom"],
+    participants: [
+      { name: "Rayan", genre: "G" }, { name: "Chloé", genre: "F" }, { name: "Maxime", genre: "G" },
+      { name: "Lina", genre: "F" }, { name: "Noa", genre: "G" }, { name: "Jules", genre: "G" },
+      { name: "Inès", genre: "F" }, { name: "Sacha", genre: "G" }, { name: "Tom", genre: "G" },
+    ],
   },
   {
     id: 203,
@@ -1520,7 +1528,11 @@ const TEEN_MEETUPS = [
     inscrits: 13,
     organisateur: "MJC",
     desc: "Projection suivie d'un débat animé par l'équipe de la MJC, autour d'un film choisi par les ados eux-mêmes.",
-    participants: ["Manon", "Adam", "Zoé", "Nathan", "Jade", "Hugo", "Chloé"],
+    participants: [
+      { name: "Manon", genre: "F" }, { name: "Adam", genre: "G" }, { name: "Zoé", genre: "F" },
+      { name: "Nathan", genre: "G" }, { name: "Jade", genre: "F" }, { name: "Hugo", genre: "G" },
+      { name: "Chloé", genre: "F" },
+    ],
   },
   {
     id: 204,
@@ -1534,7 +1546,10 @@ const TEEN_MEETUPS = [
     inscrits: 6,
     organisateur: "Espace jeunesse",
     desc: "Initiation au dessin de BD et manga avec une illustratrice invitée, tout matériel fourni sur place.",
-    participants: ["Emma", "Léon", "Alice", "Nathan", "Rose", "Malo"],
+    participants: [
+      { name: "Emma", genre: "F" }, { name: "Léon", genre: "G" }, { name: "Alice", genre: "F" },
+      { name: "Nathan", genre: "G" }, { name: "Rose", genre: "F" }, { name: "Malo", genre: "G" },
+    ],
   },
   {
     id: 205,
@@ -1548,7 +1563,10 @@ const TEEN_MEETUPS = [
     inscrits: 5,
     organisateur: "Conservatoire",
     desc: "Séance ouverte pour découvrir ou rejoindre le groupe des ados du conservatoire, encadrée par un professeur.",
-    participants: ["Gabriel", "Anna", "Ethan", "Juliette", "Oscar"],
+    participants: [
+      { name: "Gabriel", genre: "G" }, { name: "Anna", genre: "F" }, { name: "Ethan", genre: "G" },
+      { name: "Juliette", genre: "F" }, { name: "Oscar", genre: "G" },
+    ],
   },
   {
     id: 206,
@@ -1564,7 +1582,9 @@ const TEEN_MEETUPS = [
     intergen: true,
     intergenNote: "Sortie intergénérationnelle · ouverte aux jeunes et aux aînés du quartier",
     desc: "Viens aider des aînés du quartier à prendre en main leur smartphone ou leur tablette, dans une ambiance détendue et sans jugement.",
-    participants: ["Lina", "Malo", "Yanis", "Chloé"],
+    participants: [
+      { name: "Lina", genre: "F" }, { name: "Malo", genre: "G" }, { name: "Yanis", genre: "G" }, { name: "Chloé", genre: "F" },
+    ],
   },
 ];
 
@@ -3651,7 +3671,7 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
   );
 }
 
-function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinLabel, genderMode = false, onReport }) {
+function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinLabel, genderMode = false, onReport, genderLabels }) {
   if (!item) return null;
   const meta = metaFrom(categories, item.category);
   const Icon = meta.icon;
@@ -3714,8 +3734,8 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
               <SectionLabel>{t("detail_already_registered")}</SectionLabel>
               {genderMode && (
                 <div style={{ display: "flex", gap: 12 }}>
-                  <Legend color={COLORS.girl} label={t("legend_femme")} />
-                  <Legend color={COLORS.boy} label={t("legend_homme")} />
+                  <Legend color={COLORS.girl} label={genderLabels?.f || t("legend_femme")} />
+                  <Legend color={COLORS.boy} label={genderLabels?.m || t("legend_homme")} />
                 </div>
               )}
             </div>
@@ -4735,6 +4755,7 @@ export default function RecreApp() {
             emptyText={t("community_empty")}
             location={location}
             layout="days"
+            genderMode
           />
         )}
         {tab === "profil" && (
@@ -4789,7 +4810,7 @@ export default function RecreApp() {
       {(() => {
         const kindMeta = {
           adult: { categories: ADULT_CATEGORIES, joined: joinedAdult, joinLabel: t("join_label_adult"), genderMode: true },
-          teen: { categories: TEEN_CATEGORIES, joined: joinedTeen, joinLabel: t("join_label_teen"), genderMode: false },
+          teen: { categories: TEEN_CATEGORIES, joined: joinedTeen, joinLabel: t("join_label_teen"), genderMode: true, genderLabels: { f: t("legend_girl"), m: t("legend_boy") } },
           senior: { categories: SENIOR_CATEGORIES, joined: joinedSenior, joinLabel: t("join_label_senior"), genderMode: true },
           asso: { categories: ASSO_CATEGORIES, joined: joinedAsso, joinLabel: t("join_label_asso"), genderMode: false },
         };
@@ -4803,6 +4824,7 @@ export default function RecreApp() {
             onJoin={(id) => joinCommunity(selectedCommunity?.kind, id)}
             joinLabel={meta.joinLabel}
             genderMode={meta.genderMode}
+            genderLabels={meta.genderLabels}
             onReport={openReport}
           />
         );
