@@ -93,6 +93,24 @@ const TRANSLATIONS = {
     auth_switch_to_login: "Déjà un compte ? Connectez-vous",
     auth_error_generic: "Une erreur est survenue. Vérifiez vos informations et réessayez.",
     auth_loading: "Chargement…",
+    account_type_parent: "Parent", account_type_association: "Association",
+    auth_association_name: "Nom de l'association",
+    auth_association_note: "Votre compte sera activé après validation par la mairie.",
+    report_btn: "Signaler", report_title: "Signaler cette annonce",
+    report_reason_label: "Raison du signalement", report_details_label: "Détails (optionnel)",
+    report_details_placeholder: "Expliquez ce qui vous a alerté…",
+    report_reason_inapproprie: "Comportement inapproprié", report_reason_contenu: "Contenu inadapté",
+    report_reason_securite: "Sécurité des enfants", report_reason_spam: "Spam / faux compte",
+    report_reason_autre: "Autre", report_submit: "Envoyer le signalement",
+    report_sent: "Signalement envoyé, merci — la mairie va l'examiner.",
+    login_required_title: "Connexion nécessaire",
+    login_required_text: "Créez un compte ou connectez-vous pour rejoindre ou proposer une sortie.",
+    tab_mairie: "Mairie", mairie_title: "Espace mairie",
+    mairie_pending_parents: "Parents en attente de validation", mairie_pending_assos: "Associations en attente de validation",
+    mairie_reports: "Signalements", mairie_validate: "Valider", mairie_no_pending: "Rien en attente pour le moment.",
+    mairie_report_status_pending: "En attente", mairie_report_status_reviewed: "Traité", mairie_report_status_dismissed: "Classé",
+    mairie_mark_reviewed: "Marquer traité", mairie_dismiss: "Classer sans suite",
+    by_organiser: "Par {org}",
     loc_placeholder: "Ville, code postal, département…", loc_all_france: "Toute la France",
     loc_no_result: 'Aucun résultat pour "{q}"', loc_dept: "Département", loc_ville: "Ville",
     loc_ville_dept: "Ville · dept. {d}", loc_radius_title: "Rayon autour de {ville}",
@@ -179,6 +197,24 @@ const TRANSLATIONS = {
     auth_switch_to_login: "Already have an account? Sign in",
     auth_error_generic: "Something went wrong. Check your details and try again.",
     auth_loading: "Loading…",
+    account_type_parent: "Parent", account_type_association: "Association",
+    auth_association_name: "Association name",
+    auth_association_note: "Your account will be activated after town hall validation.",
+    report_btn: "Report", report_title: "Report this listing",
+    report_reason_label: "Reason for report", report_details_label: "Details (optional)",
+    report_details_placeholder: "Explain what concerned you…",
+    report_reason_inapproprie: "Inappropriate behaviour", report_reason_contenu: "Unsuitable content",
+    report_reason_securite: "Child safety", report_reason_spam: "Spam / fake account",
+    report_reason_autre: "Other", report_submit: "Send report",
+    report_sent: "Report sent, thank you — the town hall will review it.",
+    login_required_title: "Sign in required",
+    login_required_text: "Create an account or sign in to join or propose an outing.",
+    tab_mairie: "Town Hall", mairie_title: "Town hall dashboard",
+    mairie_pending_parents: "Parents pending validation", mairie_pending_assos: "Associations pending validation",
+    mairie_reports: "Reports", mairie_validate: "Validate", mairie_no_pending: "Nothing pending right now.",
+    mairie_report_status_pending: "Pending", mairie_report_status_reviewed: "Reviewed", mairie_report_status_dismissed: "Dismissed",
+    mairie_mark_reviewed: "Mark reviewed", mairie_dismiss: "Dismiss",
+    by_organiser: "By {org}",
     loc_placeholder: "City, postcode, department…", loc_all_france: "All of France",
     loc_no_result: 'No result for "{q}"', loc_dept: "Department", loc_ville: "City",
     loc_ville_dept: "City · dept. {d}", loc_radius_title: "Radius around {ville}",
@@ -265,6 +301,24 @@ const TRANSLATIONS = {
     auth_switch_to_login: "¿Ya tienes cuenta? Inicia sesión",
     auth_error_generic: "Algo salió mal. Comprueba tus datos e inténtalo de nuevo.",
     auth_loading: "Cargando…",
+    account_type_parent: "Padre/Madre", account_type_association: "Asociación",
+    auth_association_name: "Nombre de la asociación",
+    auth_association_note: "Tu cuenta se activará tras la validación del ayuntamiento.",
+    report_btn: "Denunciar", report_title: "Denunciar este anuncio",
+    report_reason_label: "Motivo de la denuncia", report_details_label: "Detalles (opcional)",
+    report_details_placeholder: "Explica qué te preocupó…",
+    report_reason_inapproprie: "Comportamiento inapropiado", report_reason_contenu: "Contenido inadecuado",
+    report_reason_securite: "Seguridad infantil", report_reason_spam: "Spam / cuenta falsa",
+    report_reason_autre: "Otro", report_submit: "Enviar denuncia",
+    report_sent: "Denuncia enviada, gracias — el ayuntamiento la revisará.",
+    login_required_title: "Inicio de sesión necesario",
+    login_required_text: "Crea una cuenta o inicia sesión para unirte o proponer una salida.",
+    tab_mairie: "Ayuntamiento", mairie_title: "Panel del ayuntamiento",
+    mairie_pending_parents: "Padres pendientes de validación", mairie_pending_assos: "Asociaciones pendientes de validación",
+    mairie_reports: "Denuncias", mairie_validate: "Validar", mairie_no_pending: "Nada pendiente por ahora.",
+    mairie_report_status_pending: "Pendiente", mairie_report_status_reviewed: "Revisado", mairie_report_status_dismissed: "Descartado",
+    mairie_mark_reviewed: "Marcar revisado", mairie_dismiss: "Descartar",
+    by_organiser: "Por {org}",
     loc_placeholder: "Ciudad, código postal, departamento…", loc_all_france: "Toda Francia",
     loc_no_result: 'Sin resultados para "{q}"', loc_dept: "Departamento", loc_ville: "Ciudad",
     loc_ville_dept: "Ciudad · dpto. {d}", loc_radius_title: "Radio alrededor de {ville}",
@@ -3101,7 +3155,70 @@ function CityOption({ label, sub, active, onClick }) {
   );
 }
 
-function DetailModal({ activity, onClose, joined, onJoin }) {
+function ReportModal({ onClose, onSubmit }) {
+  const [reason, setReason] = useState("inapproprie");
+  const [details, setDetails] = useState("");
+  const [sent, setSent] = useState(false);
+
+  const REASONS = [
+    { id: "inapproprie", label: t("report_reason_inapproprie") },
+    { id: "contenu", label: t("report_reason_contenu") },
+    { id: "securite", label: t("report_reason_securite") },
+    { id: "spam", label: t("report_reason_spam") },
+    { id: "autre", label: t("report_reason_autre") },
+  ];
+
+  const submit = async () => {
+    const ok = await onSubmit({ reason, details });
+    if (ok) {
+      setSent(true);
+      setTimeout(onClose, 1800);
+    }
+  };
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ background: COLORS.cloud, borderRadius: 22, padding: 22, width: "100%", maxWidth: 380, position: "relative" }}>
+        <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "#fff", border: "none", borderRadius: "50%", width: 30, height: 30, cursor: "pointer" }}>
+          <X size={15} color={COLORS.ink} />
+        </button>
+        <h3 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 18, color: COLORS.ink, margin: "0 0 14px" }}>
+          {t("report_title")}
+        </h3>
+
+        {sent ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, background: "#EAF8ED", color: COLORS.grass, fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13.5, padding: "10px 14px", borderRadius: 12 }}>
+            <Check size={16} /> {t("report_sent")}
+          </div>
+        ) : (
+          <>
+            <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, color: "#6B6485", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.4 }}>
+              {t("report_reason_label")}
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
+              {REASONS.map((r) => (
+                <Chip key={r.id} active={reason === r.id} onClick={() => setReason(r.id)} color={COLORS.coral}>{r.label}</Chip>
+              ))}
+            </div>
+            <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, color: "#6B6485", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.4 }}>
+              {t("report_details_label")}
+            </div>
+            <textarea
+              rows={3} value={details} onChange={(e) => setDetails(e.target.value)}
+              placeholder={t("report_details_placeholder")}
+              style={{ width: "100%", border: "2px solid #F0EADB", borderRadius: 14, padding: "10px 12px", fontFamily: "Nunito, sans-serif", fontSize: 13.5, resize: "vertical", boxSizing: "border-box", marginBottom: 16 }}
+            />
+            <PillButton color={COLORS.coral} textColor="#fff" onClick={submit} style={{ width: "100%" }}>
+              {t("report_submit")}
+            </PillButton>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DetailModal({ activity, onClose, joined, onJoin, onReport }) {
   if (!activity) return null;
   const meta = catMeta(activity.category);
   const isJoined = joined.includes(activity.id);
@@ -3199,6 +3316,17 @@ function DetailModal({ activity, onClose, joined, onJoin }) {
             {full ? t("card_full") : t("detail_join_kids")}
           </PillButton>
         )}
+
+        <button
+          onClick={() => onReport(activity)}
+          style={{
+            display: "block", width: "100%", textAlign: "center", background: "none", border: "none",
+            color: "#B7AF98", fontWeight: 700, fontSize: 12, marginTop: 14, cursor: "pointer",
+            fontFamily: "Nunito, sans-serif",
+          }}
+        >
+          {t("report_btn")}
+        </button>
       </div>
     </div>
   );
@@ -3270,6 +3398,11 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
         <Row icon={<MapPin size={14} color={COLORS.ink} />} text={lieuAvecVille(item)} />
         <Row icon={<CalendarDays size={14} color={COLORS.ink} />} text={displayDate(item)} />
         {item.info && <Row icon={<Users size={14} color={COLORS.ink} />} text={item.info} />}
+        {item.organisateur && (
+          <div style={{ fontSize: 11, color: "#B7AF98", fontFamily: "Nunito, sans-serif", fontWeight: 700 }}>
+            {t("by_organiser", { org: item.organisateur })}
+          </div>
+        )}
       </div>
 
       <PlainParticipantsRow names={item.participants} color={meta.color} genderMode={genderMode} />
@@ -3334,6 +3467,11 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
             {lieuAvecVille(item)}
           </span>
         </div>
+        {item.organisateur && (
+          <div style={{ fontSize: 10.5, color: "#B7AF98", fontFamily: "Nunito, sans-serif", fontWeight: 700, marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            {t("by_organiser", { org: item.organisateur })}
+          </div>
+        )}
       </div>
 
       <PlainParticipantsRow names={item.participants} color={meta.color} max={8} genderMode={genderMode} />
@@ -3499,7 +3637,7 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
   );
 }
 
-function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinLabel, genderMode = false }) {
+function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinLabel, genderMode = false, onReport }) {
   if (!item) return null;
   const meta = metaFrom(categories, item.category);
   const Icon = meta.icon;
@@ -3590,6 +3728,17 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
             {full ? t("card_full") : joinLabel}
           </PillButton>
         )}
+
+        <button
+          onClick={() => onReport(item)}
+          style={{
+            display: "block", width: "100%", textAlign: "center", background: "none", border: "none",
+            color: "#B7AF98", fontWeight: 700, fontSize: 12, marginTop: 14, cursor: "pointer",
+            fontFamily: "Nunito, sans-serif",
+          }}
+        >
+          {t("report_btn")}
+        </button>
       </div>
     </div>
   );
@@ -3816,8 +3965,9 @@ function MesSortiesPage({ parentValidated, joined, activities, adultItems, joine
 }
 
 // ---------- Authentification ----------
-function AuthScreen({ onSignedIn }) {
+function AuthScreen({ onClose }) {
   const [mode, setMode] = useState("login"); // "login" | "signup"
+  const [accountType, setAccountType] = useState("parent"); // "parent" | "association"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -3836,11 +3986,14 @@ function AuthScreen({ onSignedIn }) {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error: err } = await supabase.auth.signUp({
+        const { data, error: err } = await supabase.auth.signUp({
           email, password,
           options: { data: { display_name: name } },
         });
         if (err) throw err;
+        if (accountType === "association" && data?.user?.id) {
+          await supabase.from("profiles").update({ role: "association", association_name: name }).eq("id", data.user.id);
+        }
       } else {
         const { error: err } = await supabase.auth.signInWithPassword({ email, password });
         if (err) throw err;
@@ -3853,14 +4006,8 @@ function AuthScreen({ onSignedIn }) {
     }
   };
 
-  return (
-    <div style={{
-      background: COLORS.cloud, minHeight: "100vh", display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "Nunito, sans-serif",
-    }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;700;800&display=swap');
-      `}</style>
+  const content = (
+    <>
       <PikaMascot size={56} rotate={-4} />
       <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "14px 0 4px", textAlign: "center" }}>
         {t("auth_title")}
@@ -3871,10 +4018,40 @@ function AuthScreen({ onSignedIn }) {
 
       <div style={{ width: "100%", maxWidth: 340 }}>
         {mode === "signup" && (
-          <input style={inputStyle} placeholder={t("auth_name")} value={name} onChange={(e) => setName(e.target.value)} />
+          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+            {[
+              { id: "parent", label: t("account_type_parent") },
+              { id: "association", label: t("account_type_association") },
+            ].map((opt) => (
+              <button
+                key={opt.id}
+                onClick={() => setAccountType(opt.id)}
+                style={{
+                  flex: 1, border: `2px solid ${accountType === opt.id ? COLORS.grass : "#F0EADB"}`,
+                  background: accountType === opt.id ? COLORS.grass : "#fff",
+                  color: accountType === opt.id ? "#fff" : COLORS.ink,
+                  borderRadius: 12, padding: "9px 8px", fontFamily: "Nunito, sans-serif",
+                  fontWeight: 800, fontSize: 12.5, cursor: "pointer",
+                }}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        )}
+        {mode === "signup" && (
+          <input
+            style={inputStyle}
+            placeholder={accountType === "association" ? t("auth_association_name") : t("auth_name")}
+            value={name} onChange={(e) => setName(e.target.value)}
+          />
         )}
         <input style={inputStyle} type="email" placeholder={t("auth_email")} value={email} onChange={(e) => setEmail(e.target.value)} />
         <input style={inputStyle} type="password" placeholder={t("auth_password")} value={password} onChange={(e) => setPassword(e.target.value)} />
+
+        {mode === "signup" && accountType === "association" && (
+          <p style={{ fontSize: 12, color: "#9A93AF", margin: "-4px 0 12px" }}>{t("auth_association_note")}</p>
+        )}
 
         {error && (
           <div style={{ color: COLORS.coral, fontSize: 12.5, fontWeight: 700, marginBottom: 12 }}>{error}</div>
@@ -3894,6 +4071,115 @@ function AuthScreen({ onSignedIn }) {
           {mode === "signup" ? t("auth_switch_to_login") : t("auth_switch_to_signup")}
         </button>
       </div>
+    </>
+  );
+
+  if (onClose) {
+    return (
+      <div onClick={onClose} style={{
+        position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999,
+        display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+      }}>
+        <div onClick={(e) => e.stopPropagation()} style={{
+          background: COLORS.cloud, borderRadius: 24, padding: "28px 24px", width: "100%", maxWidth: 380,
+          maxHeight: "90vh", overflowY: "auto", position: "relative", display: "flex", flexDirection: "column", alignItems: "center",
+        }}>
+          <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "#fff", border: "none", borderRadius: "50%", width: 30, height: 30, cursor: "pointer" }}>
+            <X size={15} color={COLORS.ink} />
+          </button>
+          {content}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{
+      background: COLORS.cloud, minHeight: "100vh", display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "Nunito, sans-serif",
+    }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;700;800&display=swap');
+      `}</style>
+      {content}
+    </div>
+  );
+}
+
+// ---------- Espace mairie ----------
+function MairieDashboard({ pendingParents, pendingAssociations, reports, onValidateParent, onValidateAssociation, onResolveReport }) {
+  const reasonLabel = (r) => t(`report_reason_${r}`) !== `report_reason_${r}` ? t(`report_reason_${r}`) : r;
+  const statusLabel = (s) => t(`mairie_report_status_${s}`);
+
+  return (
+    <div style={{ maxWidth: 640, margin: "0 auto" }}>
+      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 20px" }}>
+        {t("mairie_title")}
+      </h1>
+
+      <SectionLabel>{t("mairie_pending_parents")}</SectionLabel>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 26 }}>
+        {pendingParents.length === 0 && (
+          <p style={{ color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}>{t("mairie_no_pending")}</p>
+        )}
+        {pendingParents.map((p) => (
+          <div key={p.id} style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: COLORS.ink }}>{p.display_name}</span>
+            <PillButton color={COLORS.grass} textColor="#fff" onClick={() => onValidateParent(p.id)} style={{ padding: "7px 14px", fontSize: 12.5 }}>
+              {t("mairie_validate")}
+            </PillButton>
+          </div>
+        ))}
+      </div>
+
+      <SectionLabel>{t("mairie_pending_assos")}</SectionLabel>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 26 }}>
+        {pendingAssociations.length === 0 && (
+          <p style={{ color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}>{t("mairie_no_pending")}</p>
+        )}
+        {pendingAssociations.map((p) => (
+          <div key={p.id} style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: COLORS.ink }}>{p.association_name || p.display_name}</span>
+            <PillButton color={COLORS.grass} textColor="#fff" onClick={() => onValidateAssociation(p.id)} style={{ padding: "7px 14px", fontSize: 12.5 }}>
+              {t("mairie_validate")}
+            </PillButton>
+          </div>
+        ))}
+      </div>
+
+      <SectionLabel>{t("mairie_reports")}</SectionLabel>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {reports.length === 0 && (
+          <p style={{ color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}>{t("mairie_no_pending")}</p>
+        )}
+        {reports.map((r) => (
+          <div key={r.id} style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "14px 16px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+              <span style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: COLORS.ink }}>{reasonLabel(r.reason)}</span>
+              <span style={{
+                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11, padding: "3px 9px", borderRadius: 999,
+                background: r.status === "pending" ? "#FFF4DD" : r.status === "reviewed" ? "#EAF8ED" : "#EDEAF4",
+                color: r.status === "pending" ? COLORS.sun : r.status === "reviewed" ? COLORS.grass : "#9A93AF",
+              }}>
+                {statusLabel(r.status)}
+              </span>
+            </div>
+            {r.details && (
+              <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#5C5578", margin: "0 0 10px" }}>{r.details}</p>
+            )}
+            {r.status === "pending" && (
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => onResolveReport(r.id, "reviewed")} style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, background: COLORS.ink, color: "#fff", border: "none", borderRadius: 10, padding: "7px 12px", cursor: "pointer" }}>
+                  {t("mairie_mark_reviewed")}
+                </button>
+                <button onClick={() => onResolveReport(r.id, "dismissed")} style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, background: "transparent", color: "#9A93AF", border: "2px solid #F0EADB", borderRadius: 10, padding: "7px 12px", cursor: "pointer" }}>
+                  {t("mairie_dismiss")}
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -3905,13 +4191,16 @@ function AuthScreen({ onSignedIn }) {
 function usePikapikaData() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [profile, setProfile] = useState({ displayName: "", parentValidated: false });
+  const [profile, setProfile] = useState({ displayName: "", parentValidated: false, role: "parent", associationValidated: false });
   const [kids, setKids] = useState([]);
   const [rows, setRows] = useState([]);
   const [regByActivity, setRegByActivity] = useState({});
   const [myRegs, setMyRegs] = useState(new Set());
   const [myFavs, setMyFavs] = useState(new Set());
   const [dataLoading, setDataLoading] = useState(true);
+  const [pendingParents, setPendingParents] = useState([]);
+  const [pendingAssociations, setPendingAssociations] = useState([]);
+  const [reports, setReports] = useState([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -3924,32 +4213,68 @@ function usePikapikaData() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  // Les activités sont publiques : on les charge que la personne soit connectée ou non
+  // (Adultes/Aînés doivent être consultables sans compte, seule la création/inscription l'exige).
   useEffect(() => {
-    if (!user) { setDataLoading(false); return; }
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase.from("activities").select("*");
+      if (cancelled) return;
+      if (error) console.error("Erreur chargement activités :", error);
+      setRows(data || []);
+      const { data: regRows } = await supabase.from("registrations").select("activity_id");
+      if (cancelled) return;
+      const counts = {};
+      (regRows || []).forEach((r) => { counts[r.activity_id] = (counts[r.activity_id] || 0) + 1; });
+      setRegByActivity(counts);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (!user) { setDataLoading(false); setKids([]); setMyRegs(new Set()); setMyFavs(new Set()); return; }
     let cancelled = false;
     setDataLoading(true);
     (async () => {
-      const [profRes, kidsRes, actRes, allRegsRes, myRegsRes, favRes] = await Promise.all([
+      const [profRes, kidsRes, myRegsRes, favRes] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user.id).single(),
         supabase.from("kids").select("*").eq("parent_id", user.id),
-        supabase.from("activities").select("*"),
-        supabase.from("registrations").select("activity_id"),
         supabase.from("registrations").select("activity_id").eq("user_id", user.id),
         supabase.from("favorites").select("activity_id").eq("user_id", user.id),
       ]);
       if (cancelled) return;
-      if (profRes.data) setProfile({ displayName: profRes.data.display_name, parentValidated: profRes.data.parent_validated });
+      if (profRes.data) {
+        setProfile({
+          displayName: profRes.data.display_name,
+          parentValidated: profRes.data.parent_validated,
+          role: profRes.data.role || "parent",
+          associationValidated: profRes.data.association_validated,
+        });
+      }
       setKids(kidsRes.data || []);
-      setRows(actRes.data || []);
-      const counts = {};
-      (allRegsRes.data || []).forEach((r) => { counts[r.activity_id] = (counts[r.activity_id] || 0) + 1; });
-      setRegByActivity(counts);
       setMyRegs(new Set((myRegsRes.data || []).map((r) => r.activity_id)));
       setMyFavs(new Set((favRes.data || []).map((r) => r.activity_id)));
       setDataLoading(false);
     })();
     return () => { cancelled = true; };
   }, [user?.id]);
+
+  // Données réservées à la mairie : profils en attente de validation + signalements
+  const loadMairieData = async () => {
+    const [parentsRes, assosRes, reportsRes] = await Promise.all([
+      supabase.from("profiles").select("*").eq("role", "parent").eq("parent_validated", false),
+      supabase.from("profiles").select("*").eq("role", "association").eq("association_validated", false),
+      supabase.from("reports").select("*").order("created_at", { ascending: false }),
+    ]);
+    setPendingParents(parentsRes.data || []);
+    setPendingAssociations(assosRes.data || []);
+    setReports(reportsRes.data || []);
+  };
+
+  useEffect(() => {
+    if (user && profile.role === "mairie") loadMairieData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, profile.role]);
 
   const mapRow = (row) => {
     const start = new Date(row.starts_at);
@@ -3964,6 +4289,7 @@ function usePikapikaData() {
       organisateur: row.organisateur, desc: row.description,
       intergen: row.intergen, intergenNote: row.intergen_note,
       participants: row.demo_participants || [],
+      createdBy: row.created_by,
     };
   };
 
@@ -4037,9 +4363,34 @@ function usePikapikaData() {
     setKids((k) => [...k, data]);
   };
 
+  const submitReport = async ({ activityId, reportedUserId, reason, details }) => {
+    if (!user) return false;
+    const { error } = await supabase.from("reports").insert({
+      reporter_id: user.id, activity_id: activityId || null, reported_user_id: reportedUserId || null,
+      reason, details: details || null,
+    });
+    if (error) { console.error("Erreur signalement :", error); return false; }
+    return true;
+  };
+
+  // ---------- Actions réservées à la mairie ----------
+  const validateParent = async (profileId) => {
+    await supabase.from("profiles").update({ parent_validated: true }).eq("id", profileId);
+    setPendingParents((list) => list.filter((p) => p.id !== profileId));
+  };
+  const validateAssociation = async (profileId) => {
+    await supabase.from("profiles").update({ association_validated: true }).eq("id", profileId);
+    setPendingAssociations((list) => list.filter((p) => p.id !== profileId));
+  };
+  const resolveReport = async (reportId, status) => {
+    await supabase.from("reports").update({ status }).eq("id", reportId);
+    setReports((list) => list.map((r) => r.id === reportId ? { ...r, status } : r));
+  };
+
   return {
     user, authLoading, dataLoading,
     displayName: profile.displayName, email: user?.email || "", parentValidated: profile.parentValidated,
+    role: profile.role, associationValidated: profile.associationValidated,
     kids,
     activities, teenItems, adultItems, seniorItems, assoItems,
     favorites, favTeen, favAdult, favSenior, favAsso,
@@ -4052,6 +4403,9 @@ function usePikapikaData() {
     createAdultMeetup: (form) => insertActivity("adult", form),
     toggleParentValidated,
     addKid,
+    submitReport,
+    pendingParents, pendingAssociations, reports,
+    validateParent, validateAssociation, resolveReport,
     signOut: () => supabase.auth.signOut(),
   };
 }
@@ -4059,10 +4413,11 @@ function usePikapikaData() {
 // ---------- Root ----------
 export default function RecreApp() {
   const pika = usePikapikaData();
-  const [tab, setTab] = useState("profil");
+  const [tab, setTab] = useState(pika.user ? "profil" : "adultes");
   const [selected, setSelected] = useState(null);
   const [selectedCommunity, setSelectedCommunity] = useState(null); // { item, kind: "adult" | "teen" | "senior" | "asso" }
   const [location, setLocation] = useState(null);
+  const [authPrompt, setAuthPrompt] = useState(false);
 
   const {
     activities, teenItems, adultItems, seniorItems, assoItems,
@@ -4071,48 +4426,68 @@ export default function RecreApp() {
     parentValidated, kids, displayName, email,
   } = pika;
 
-  const toggleFav = pika.toggleFav;
+  // Ferme automatiquement la fenêtre de connexion dès qu'une session existe
+  useEffect(() => {
+    if (pika.user) setAuthPrompt(false);
+  }, [pika.user]);
+
+  // Action qui nécessite un compte : ouvre la fenêtre de connexion si besoin, sinon exécute directement
+  const requireAuth = (action) => (...args) => {
+    if (!pika.user) { setAuthPrompt(true); return; }
+    action(...args);
+  };
+
+  const toggleFav = requireAuth(pika.toggleFav);
 
   // Rejoindre une sortie enfant met aussi à jour l'aperçu ouvert (fiche détaillée), le temps
   // que le nombre d'inscrits recalculé depuis Supabase redescende dans le tableau `activities`.
-  const join = (id) => {
+  const join = requireAuth((id) => {
     pika.join(id);
     setSelected((s) => s && s.id === id ? { ...s, inscrits: s.inscrits + 1 } : s);
-  };
+  });
 
   const createActivity = pika.createActivity;
 
-  const toggleFavCommunity = (kind, id) => pika.toggleFavCommunity(kind, id);
+  const toggleFavCommunity = requireAuth((kind, id) => pika.toggleFavCommunity(kind, id));
 
-  const joinCommunity = (kind, id) => {
+  const joinCommunity = requireAuth((kind, id) => {
     pika.joinCommunity(kind, id);
     setSelectedCommunity((s) => s && s.item.id === id ? { ...s, item: { ...s.item, inscrits: s.item.inscrits + 1 } } : s);
-  };
+  });
 
   const createAdultMeetup = pika.createAdultMeetup;
 
+  const [reportTarget, setReportTarget] = useState(null); // { id, createdBy }
+  const openReport = requireAuth((item) => setReportTarget({ id: item.id, createdBy: item.createdBy }));
+
   const TABS_ALL = [
-    { id: "explorer", label: t("tab_enfants"), icon: Compass, kidsOnly: true },
-    { id: "ados", label: t("tab_ados"), icon: Gamepad2, kidsOnly: true },
+    { id: "explorer", label: t("tab_enfants"), icon: Compass, kidsOnly: true, authRequired: true },
+    { id: "ados", label: t("tab_ados"), icon: Gamepad2, kidsOnly: true, authRequired: true },
     { id: "adultes", label: t("tab_adultes"), icon: Coffee },
     { id: "aine", label: t("tab_aine"), icon: Flower2 },
-    { id: "asso", label: t("tab_associations"), icon: Landmark },
+    { id: "asso", label: t("tab_associations"), icon: Landmark, authRequired: true },
+    { id: "mairie", label: t("tab_mairie"), icon: ShieldCheck, mairieOnly: true },
   ];
-  const TABS = TABS_ALL.filter((tb) => !tb.kidsOnly || parentValidated);
+  const TABS = TABS_ALL.filter((tb) => {
+    if (tb.mairieOnly) return pika.role === "mairie";
+    if (tb.authRequired && !pika.user) return false;
+    if (tb.kidsOnly && !parentValidated) return false;
+    return true;
+  });
   // Ces trois-là ne sont plus dans la barre du bas : ils vivent en icônes dans l'en-tête,
-  // pour laisser la barre du bas uniquement aux 4 catégories d'âge (plus lisible sur petit écran).
-  const HEADER_ACTIONS = [
+  // pour laisser la barre du bas uniquement aux catégories d'âge (plus lisible sur petit écran).
+  const HEADER_ACTIONS = pika.user ? [
     { id: "creer", label: t("tab_creer"), icon: PlusCircle },
     { id: "mes-sorties", label: t("tab_mes_sorties"), icon: BookMarked },
     { id: "profil", label: t("tab_profil"), icon: UserCircle2 },
-  ];
+  ] : [];
 
-  // Si le parent n'est plus validé (démo) alors qu'il est sur un onglet enfants, on le repositionne
+  // Si le parent n'est plus validé (démo), ou si la session change, on repositionne si besoin
   useEffect(() => {
     const stillVisible = TABS.some((tb) => tb.id === tab) || HEADER_ACTIONS.some((a) => a.id === tab);
-    if (!stillVisible) setTab("profil");
+    if (!stillVisible) setTab(pika.user ? "profil" : "adultes");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parentValidated]);
+  }, [parentValidated, pika.user, pika.role]);
 
   if (pika.authLoading) {
     return (
@@ -4122,11 +4497,7 @@ export default function RecreApp() {
     );
   }
 
-  if (!pika.user) {
-    return <AuthScreen />;
-  }
-
-  if (pika.dataLoading) {
+  if (pika.user && pika.dataLoading) {
     return (
       <div style={{ background: COLORS.cloud, minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
         <PikaMascot size={48} />
@@ -4180,26 +4551,39 @@ export default function RecreApp() {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            {HEADER_ACTIONS.map((a) => {
-              const active = tab === a.id;
-              return (
-                <button
-                  key={a.id}
-                  onClick={() => setTab(a.id)}
-                  aria-label={a.label}
-                  title={a.label}
-                  className="pika-header-action"
-                  style={{
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    width: 36, height: 36, borderRadius: "50%", border: "none", cursor: "pointer",
-                    background: active ? COLORS.ink : "#fff",
-                    boxShadow: active ? "none" : "0 0 0 2px #F0EADB inset", flexShrink: 0,
-                  }}
-                >
-                  <a.icon size={17} className="pika-header-action-icon" color={active ? "#fff" : COLORS.ink} />
-                </button>
-              );
-            })}
+            {pika.user ? (
+              HEADER_ACTIONS.map((a) => {
+                const active = tab === a.id;
+                return (
+                  <button
+                    key={a.id}
+                    onClick={() => setTab(a.id)}
+                    aria-label={a.label}
+                    title={a.label}
+                    className="pika-header-action"
+                    style={{
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      width: 36, height: 36, borderRadius: "50%", border: "none", cursor: "pointer",
+                      background: active ? COLORS.ink : "#fff",
+                      boxShadow: active ? "none" : "0 0 0 2px #F0EADB inset", flexShrink: 0,
+                    }}
+                  >
+                    <a.icon size={17} className="pika-header-action-icon" color={active ? "#fff" : COLORS.ink} />
+                  </button>
+                );
+              })
+            ) : (
+              <button
+                onClick={() => setAuthPrompt(true)}
+                style={{
+                  background: COLORS.ink, color: "#fff", border: "none", borderRadius: 999,
+                  padding: "8px 14px", fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
+                  cursor: "pointer", whiteSpace: "nowrap",
+                }}
+              >
+                {t("auth_login_btn")}
+              </button>
+            )}
           </div>
 
           <LocationFilter location={location} onChange={setLocation} />
@@ -4285,6 +4669,16 @@ export default function RecreApp() {
             layout="days"
           />
         )}
+        {tab === "mairie" && pika.role === "mairie" && (
+          <MairieDashboard
+            pendingParents={pika.pendingParents}
+            pendingAssociations={pika.pendingAssociations}
+            reports={pika.reports}
+            onValidateParent={pika.validateParent}
+            onValidateAssociation={pika.validateAssociation}
+            onResolveReport={pika.resolveReport}
+          />
+        )}
         {tab === "ados" && parentValidated && (
           <CommunityExplorer
             title={t("community_teen_title")}
@@ -4346,7 +4740,7 @@ export default function RecreApp() {
         })}
       </div>
 
-      <DetailModal activity={selected} onClose={() => setSelected(null)} joined={joined} onJoin={join} />
+      <DetailModal activity={selected} onClose={() => setSelected(null)} joined={joined} onJoin={join} onReport={openReport} />
 
       {(() => {
         const kindMeta = {
@@ -4365,9 +4759,19 @@ export default function RecreApp() {
             onJoin={(id) => joinCommunity(selectedCommunity?.kind, id)}
             joinLabel={meta.joinLabel}
             genderMode={meta.genderMode}
+            onReport={openReport}
           />
         );
       })()}
+
+      {authPrompt && <AuthScreen onClose={() => setAuthPrompt(false)} />}
+
+      {reportTarget && (
+        <ReportModal
+          onClose={() => setReportTarget(null)}
+          onSubmit={({ reason, details }) => pika.submitReport({ activityId: reportTarget.id, reportedUserId: reportTarget.createdBy, reason, details })}
+        />
+      )}
 
       <style>{`
         @media (min-width: 768px) {
