@@ -86,7 +86,7 @@ const TRANSLATIONS = {
     join_label_asso: "Je participe",
     chip_intergen: "Intergénérationnel", intergen_badge: "Intergénérationnel",
     btn_sign_out: "Se déconnecter",
-    auth_title: "Bienvenue sur Pikapika", auth_subtitle: "Connectez-vous pour retrouver vos sorties.",
+    auth_title: "Bienvenue sur Orée", auth_subtitle: "Connectez-vous pour retrouver vos sorties.",
     auth_email: "Adresse email", auth_password: "Mot de passe", auth_name: "Votre prénom",
     auth_login_btn: "Se connecter", auth_signup_btn: "Créer mon compte",
     auth_switch_to_signup: "Pas encore de compte ? Inscrivez-vous",
@@ -190,7 +190,7 @@ const TRANSLATIONS = {
     join_label_asso: "I'm in",
     chip_intergen: "Intergenerational", intergen_badge: "Intergenerational",
     btn_sign_out: "Sign out",
-    auth_title: "Welcome to Pikapika", auth_subtitle: "Sign in to find your outings.",
+    auth_title: "Welcome to Orée", auth_subtitle: "Sign in to find your outings.",
     auth_email: "Email address", auth_password: "Password", auth_name: "Your first name",
     auth_login_btn: "Sign in", auth_signup_btn: "Create my account",
     auth_switch_to_signup: "No account yet? Sign up",
@@ -294,7 +294,7 @@ const TRANSLATIONS = {
     join_label_asso: "Participo",
     chip_intergen: "Intergeneracional", intergen_badge: "Intergeneracional",
     btn_sign_out: "Cerrar sesión",
-    auth_title: "Bienvenido/a a Pikapika", auth_subtitle: "Inicia sesión para encontrar tus salidas.",
+    auth_title: "Bienvenido/a a Orée", auth_subtitle: "Inicia sesión para encontrar tus salidas.",
     auth_email: "Correo electrónico", auth_password: "Contraseña", auth_name: "Tu nombre",
     auth_login_btn: "Iniciar sesión", auth_signup_btn: "Crear mi cuenta",
     auth_switch_to_signup: "¿Aún no tienes cuenta? Regístrate",
@@ -2972,21 +2972,17 @@ function SectionLabel({ children }) {
   );
 }
 
-// Mascotte originale pour "Pikapika" — une petite étincelle ronde et joyeuse.
-// Design volontairement différent de tout personnage existant : bosses arrondies
-// (pas d'oreilles pointues), pas de joues rouges, pas de queue en éclair.
-function PikaMascot({ size = 28, rotate = -6 }) {
+// Mascotte originale pour "Orée" — un soleil levant qui perce derrière une lisière
+// de collines/arbres arrondis, avec une petite feuille qui s'envole en accent.
+function OreeMascot({ size = 28, rotate = -6 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" style={{ transform: `rotate(${rotate}deg)`, flexShrink: 0 }}>
-      <circle cx="12" cy="11" r="5.5" fill={COLORS.sun} />
-      <circle cx="28" cy="11" r="5.5" fill={COLORS.sun} />
-      <circle cx="20" cy="23" r="15" fill={COLORS.sun} />
-      <circle cx="14.5" cy="21" r="3" fill={COLORS.ink} />
-      <circle cx="25.5" cy="21" r="3" fill={COLORS.ink} />
-      <circle cx="13.5" cy="20" r="1" fill="#fff" />
-      <circle cx="24.5" cy="20" r="1" fill="#fff" />
-      <path d="M15 27 Q20 30.5 25 27" stroke={COLORS.ink} strokeWidth="1.8" fill="none" strokeLinecap="round" />
-      <path d="M32 2 L34 7 L39 8.5 L34 10 L32 15 L30 10 L25 8.5 L30 7 Z" fill={COLORS.sky} />
+      <circle cx="20" cy="19" r="12" fill={COLORS.sun} />
+      <circle cx="7" cy="30" r="8" fill={COLORS.grass} />
+      <circle cx="18" cy="27" r="10" fill={COLORS.grass} />
+      <circle cx="30" cy="30" r="8" fill={COLORS.grass} />
+      <rect x="0" y="32" width="40" height="8" fill={COLORS.grass} />
+      <path d="M33 5 Q38 5 37 10 Q32 11 32 6 Q32 5 33 5 Z" fill={COLORS.sky} />
     </svg>
   );
 }
@@ -4040,7 +4036,7 @@ function AuthScreen({ onClose }) {
 
   const content = (
     <>
-      <PikaMascot size={56} rotate={-4} />
+      <OreeMascot size={56} rotate={-4} />
       <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "14px 0 4px", textAlign: "center" }}>
         {t("auth_title")}
       </h1>
@@ -4547,7 +4543,7 @@ export default function RecreApp() {
   if (pika.authLoading) {
     return (
       <div style={{ background: COLORS.cloud, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <PikaMascot size={48} />
+        <OreeMascot size={48} />
       </div>
     );
   }
@@ -4555,7 +4551,7 @@ export default function RecreApp() {
   if (pika.user && pika.dataLoading) {
     return (
       <div style={{ background: COLORS.cloud, minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
-        <PikaMascot size={48} />
+        <OreeMascot size={48} />
         <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#6B6485" }}>{t("auth_loading")}</span>
       </div>
     );
@@ -4580,9 +4576,9 @@ export default function RecreApp() {
         padding: "18px 20px", maxWidth: 960, margin: "0 auto", flexWrap: "wrap", gap: 10,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <PikaMascot size={32} />
+          <OreeMascot size={32} />
           <span style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink }}>
-            Pikapika
+            Orée
           </span>
         </div>
 
