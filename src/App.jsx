@@ -9,6 +9,7 @@ import {
 import { MapContainer, TileLayer, Marker, Popup, Circle, CircleMarker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { supabase } from "./lib/supabaseClient";
 
 // ---------- Internationalisation ----------
 // Langue déduite du navigateur (reflet du pays/de la région de la personne).
@@ -84,6 +85,14 @@ const TRANSLATIONS = {
     community_asso_subtitle: "Événements organisés par la mairie et les associations de votre commune.",
     join_label_asso: "Je participe",
     chip_intergen: "Intergénérationnel", intergen_badge: "Intergénérationnel",
+    btn_sign_out: "Se déconnecter",
+    auth_title: "Bienvenue sur Pikapika", auth_subtitle: "Connectez-vous pour retrouver vos sorties.",
+    auth_email: "Adresse email", auth_password: "Mot de passe", auth_name: "Votre prénom",
+    auth_login_btn: "Se connecter", auth_signup_btn: "Créer mon compte",
+    auth_switch_to_signup: "Pas encore de compte ? Inscrivez-vous",
+    auth_switch_to_login: "Déjà un compte ? Connectez-vous",
+    auth_error_generic: "Une erreur est survenue. Vérifiez vos informations et réessayez.",
+    auth_loading: "Chargement…",
     loc_placeholder: "Ville, code postal, département…", loc_all_france: "Toute la France",
     loc_no_result: 'Aucun résultat pour "{q}"', loc_dept: "Département", loc_ville: "Ville",
     loc_ville_dept: "Ville · dept. {d}", loc_radius_title: "Rayon autour de {ville}",
@@ -162,6 +171,14 @@ const TRANSLATIONS = {
     community_asso_subtitle: "Events organised by the town hall and local associations.",
     join_label_asso: "I'm in",
     chip_intergen: "Intergenerational", intergen_badge: "Intergenerational",
+    btn_sign_out: "Sign out",
+    auth_title: "Welcome to Pikapika", auth_subtitle: "Sign in to find your outings.",
+    auth_email: "Email address", auth_password: "Password", auth_name: "Your first name",
+    auth_login_btn: "Sign in", auth_signup_btn: "Create my account",
+    auth_switch_to_signup: "No account yet? Sign up",
+    auth_switch_to_login: "Already have an account? Sign in",
+    auth_error_generic: "Something went wrong. Check your details and try again.",
+    auth_loading: "Loading…",
     loc_placeholder: "City, postcode, department…", loc_all_france: "All of France",
     loc_no_result: 'No result for "{q}"', loc_dept: "Department", loc_ville: "City",
     loc_ville_dept: "City · dept. {d}", loc_radius_title: "Radius around {ville}",
@@ -240,6 +257,14 @@ const TRANSLATIONS = {
     community_asso_subtitle: "Eventos organizados por el ayuntamiento y las asociaciones locales.",
     join_label_asso: "Participo",
     chip_intergen: "Intergeneracional", intergen_badge: "Intergeneracional",
+    btn_sign_out: "Cerrar sesión",
+    auth_title: "Bienvenido/a a Pikapika", auth_subtitle: "Inicia sesión para encontrar tus salidas.",
+    auth_email: "Correo electrónico", auth_password: "Contraseña", auth_name: "Tu nombre",
+    auth_login_btn: "Iniciar sesión", auth_signup_btn: "Crear mi cuenta",
+    auth_switch_to_signup: "¿Aún no tienes cuenta? Regístrate",
+    auth_switch_to_login: "¿Ya tienes cuenta? Inicia sesión",
+    auth_error_generic: "Algo salió mal. Comprueba tus datos e inténtalo de nuevo.",
+    auth_loading: "Cargando…",
     loc_placeholder: "Ciudad, código postal, departamento…", loc_all_france: "Toda Francia",
     loc_no_result: 'Sin resultados para "{q}"', loc_dept: "Departamento", loc_ville: "Ciudad",
     loc_ville_dept: "Ciudad · dpto. {d}", loc_radius_title: "Radio alrededor de {ville}",
@@ -2554,13 +2579,9 @@ function CreateActivity({ onCreate }) {
 
   const submit = () => {
     if (!form.title || !form.lieu || !form.dateStr) return;
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const picked = new Date(form.dateStr + "T00:00:00");
-    const offsetDays = Math.max(0, Math.round((picked - today) / 86400000));
     onCreate({
       title: form.title, category: form.category, lieu: form.lieu, age: form.age, desc: form.desc,
-      offsetDays, time: form.timeStr.replace(":", "h"),
-      id: Date.now(), inscrits: 1, organisateur: t("you_organizer"), places: Number(form.places) || 1,
+      dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1,
     });
     setSent(true);
     setTimeout(() => setSent(false), 2200);
@@ -2711,7 +2732,18 @@ function MyOutings({ joined, activities }) {
   );
 }
 
-function Profile({ joinedCount, validated, onToggleDemo }) {
+function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onSignOut }) {
+  const [addingKid, setAddingKid] = useState(false);
+  const [kidName, setKidName] = useState("");
+  const [kidAge, setKidAge] = useState("");
+  const [kidGenre, setKidGenre] = useState("F");
+
+  const submitKid = () => {
+    if (!kidName.trim()) return;
+    onAddKid({ name: kidName.trim(), age: Number(kidAge) || null, genre: kidGenre });
+    setKidName(""); setKidAge(""); setKidGenre("F"); setAddingKid(false);
+  };
+
   return (
     <div style={{ maxWidth: 480, margin: "0 auto" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 22 }}>
@@ -2720,10 +2752,11 @@ function Profile({ joinedCount, validated, onToggleDemo }) {
           display: "flex", alignItems: "center", justifyContent: "center",
           fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: "#fff",
         }}>
-          S
+          {(displayName || "?").charAt(0).toUpperCase()}
         </div>
         <div>
-          <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink }}>Sarah Bertrand</div>
+          <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink }}>{displayName}</div>
+          <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF" }}>{email}</div>
           <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#6B6485" }}>{t("profile_outings_count", { n: joinedCount })}</div>
         </div>
       </div>
@@ -2732,8 +2765,8 @@ function Profile({ joinedCount, validated, onToggleDemo }) {
 
       <SectionLabel>{t("profile_children")}</SectionLabel>
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 22 }}>
-        {KIDS.map((k) => (
-          <div key={k.name} style={{
+        {kids.map((k) => (
+          <div key={k.id} style={{
             background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "12px 16px",
             display: "flex", alignItems: "center", gap: 12,
           }}>
@@ -2749,16 +2782,49 @@ function Profile({ joinedCount, validated, onToggleDemo }) {
             </div>
           </div>
         ))}
-        <button style={{
-          border: `2px dashed #D8D2C2`, background: "transparent", borderRadius: 16, padding: "12px 16px",
-          fontFamily: "Nunito, sans-serif", fontWeight: 800, color: "#9A93AF", cursor: "pointer", fontSize: 13.5,
-        }}>
-          {t("profile_add_child")}
-        </button>
+
+        {addingKid ? (
+          <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: 14, display: "flex", flexDirection: "column", gap: 8 }}>
+            <input
+              autoFocus value={kidName} onChange={(e) => setKidName(e.target.value)}
+              placeholder={t("placeholder_titre")}
+              style={{ border: "2px solid #F0EADB", borderRadius: 10, padding: "8px 10px", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}
+            />
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                type="number" min={0} value={kidAge} onChange={(e) => setKidAge(e.target.value)}
+                placeholder={t("profile_years")}
+                style={{ flex: 1, border: "2px solid #F0EADB", borderRadius: 10, padding: "8px 10px", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}
+              />
+              <select
+                value={kidGenre} onChange={(e) => setKidGenre(e.target.value)}
+                style={{ flex: 1, border: "2px solid #F0EADB", borderRadius: 10, padding: "8px 10px", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}
+              >
+                <option value="F">{t("legend_girl")}</option>
+                <option value="G">{t("legend_boy")}</option>
+              </select>
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <PillButton color={COLORS.grass} textColor="#fff" onClick={submitKid} style={{ flex: 1, padding: "8px 10px", fontSize: 13 }}>
+                {t("btn_publier")}
+              </PillButton>
+              <button onClick={() => setAddingKid(false)} style={{ background: "transparent", border: "none", color: "#9A93AF", cursor: "pointer", fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13 }}>
+                ✕
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button onClick={() => setAddingKid(true)} style={{
+            border: `2px dashed #D8D2C2`, background: "transparent", borderRadius: 16, padding: "12px 16px",
+            fontFamily: "Nunito, sans-serif", fontWeight: 800, color: "#9A93AF", cursor: "pointer", fontSize: 13.5,
+          }}>
+            {t("profile_add_child")}
+          </button>
+        )}
       </div>
 
       <SectionLabel>{t("profile_preferences")}</SectionLabel>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 26 }}>
         {CATEGORIES.map((c) => (
           <span key={c.id} style={{
             fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
@@ -2768,6 +2834,14 @@ function Profile({ joinedCount, validated, onToggleDemo }) {
           </span>
         ))}
       </div>
+
+      <button onClick={onSignOut} style={{
+        background: "transparent", border: "2px solid #F0EADB", borderRadius: 14,
+        padding: "10px 16px", cursor: "pointer", fontFamily: "Nunito, sans-serif",
+        fontWeight: 800, fontSize: 13, color: COLORS.coral, width: "100%",
+      }}>
+        {t("btn_sign_out")}
+      </button>
     </div>
   );
 }
@@ -3533,13 +3607,9 @@ function CreateMeetup({ categories, onCreate }) {
 
   const submit = () => {
     if (!form.title || !form.lieu || !form.dateStr) return;
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const picked = new Date(form.dateStr + "T00:00:00");
-    const offsetDays = Math.max(0, Math.round((picked - today) / 86400000));
     onCreate({
       title: form.title, category: form.category, lieu: form.lieu, info: form.info, desc: form.desc,
-      offsetDays, time: form.timeStr.replace(":", "h"),
-      id: Date.now(), inscrits: 1, organisateur: t("you_organizer"), places: Number(form.places) || 1,
+      dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1,
     });
     setSent(true);
     setTimeout(() => setSent(false), 2200);
@@ -3745,71 +3815,281 @@ function MesSortiesPage({ parentValidated, joined, activities, adultItems, joine
   );
 }
 
+// ---------- Authentification ----------
+function AuthScreen({ onSignedIn }) {
+  const [mode, setMode] = useState("login"); // "login" | "signup"
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const inputStyle = {
+    width: "100%", border: "2px solid #F0EADB", borderRadius: 14, padding: "12px 14px",
+    fontFamily: "Nunito, sans-serif", fontSize: 14.5, color: COLORS.ink, outline: "none",
+    boxSizing: "border-box", background: "#fff", marginBottom: 12,
+  };
+
+  const submit = async () => {
+    setError("");
+    if (!email || !password || (mode === "signup" && !name)) return;
+    setLoading(true);
+    try {
+      if (mode === "signup") {
+        const { error: err } = await supabase.auth.signUp({
+          email, password,
+          options: { data: { display_name: name } },
+        });
+        if (err) throw err;
+      } else {
+        const { error: err } = await supabase.auth.signInWithPassword({ email, password });
+        if (err) throw err;
+      }
+      // onAuthStateChange (écouté dans le hook parent) prendra le relais automatiquement
+    } catch (e) {
+      setError(e?.message || t("auth_error_generic"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{
+      background: COLORS.cloud, minHeight: "100vh", display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "Nunito, sans-serif",
+    }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;700;800&display=swap');
+      `}</style>
+      <PikaMascot size={56} rotate={-4} />
+      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "14px 0 4px", textAlign: "center" }}>
+        {t("auth_title")}
+      </h1>
+      <p style={{ color: "#6B6485", fontSize: 14, textAlign: "center", margin: "0 0 22px", maxWidth: 320 }}>
+        {t("auth_subtitle")}
+      </p>
+
+      <div style={{ width: "100%", maxWidth: 340 }}>
+        {mode === "signup" && (
+          <input style={inputStyle} placeholder={t("auth_name")} value={name} onChange={(e) => setName(e.target.value)} />
+        )}
+        <input style={inputStyle} type="email" placeholder={t("auth_email")} value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input style={inputStyle} type="password" placeholder={t("auth_password")} value={password} onChange={(e) => setPassword(e.target.value)} />
+
+        {error && (
+          <div style={{ color: COLORS.coral, fontSize: 12.5, fontWeight: 700, marginBottom: 12 }}>{error}</div>
+        )}
+
+        <PillButton color={COLORS.grass} textColor="#fff" onClick={submit} style={{ width: "100%", opacity: loading ? 0.6 : 1 }}>
+          {loading ? t("auth_loading") : mode === "signup" ? t("auth_signup_btn") : t("auth_login_btn")}
+        </PillButton>
+
+        <button
+          onClick={() => { setMode(mode === "signup" ? "login" : "signup"); setError(""); }}
+          style={{
+            display: "block", width: "100%", textAlign: "center", background: "none", border: "none",
+            color: "#6B6485", fontWeight: 700, fontSize: 13, marginTop: 16, cursor: "pointer",
+          }}
+        >
+          {mode === "signup" ? t("auth_switch_to_login") : t("auth_switch_to_signup")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ---------- Hook central : authentification + données + actions Supabase ----------
+// Tout ce qui parle à la base de données passe par ici. Le reste de l'app ne connaît
+// que les tableaux d'items déjà "mis en forme" (mêmes champs qu'avant : offsetDays/time,
+// participants, etc.) pour ne pas avoir à retoucher tous les composants d'affichage.
+function usePikapikaData() {
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [profile, setProfile] = useState({ displayName: "", parentValidated: false });
+  const [kids, setKids] = useState([]);
+  const [rows, setRows] = useState([]);
+  const [regByActivity, setRegByActivity] = useState({});
+  const [myRegs, setMyRegs] = useState(new Set());
+  const [myFavs, setMyFavs] = useState(new Set());
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user || null);
+      setAuthLoading(false);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!user) { setDataLoading(false); return; }
+    let cancelled = false;
+    setDataLoading(true);
+    (async () => {
+      const [profRes, kidsRes, actRes, allRegsRes, myRegsRes, favRes] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", user.id).single(),
+        supabase.from("kids").select("*").eq("parent_id", user.id),
+        supabase.from("activities").select("*"),
+        supabase.from("registrations").select("activity_id"),
+        supabase.from("registrations").select("activity_id").eq("user_id", user.id),
+        supabase.from("favorites").select("activity_id").eq("user_id", user.id),
+      ]);
+      if (cancelled) return;
+      if (profRes.data) setProfile({ displayName: profRes.data.display_name, parentValidated: profRes.data.parent_validated });
+      setKids(kidsRes.data || []);
+      setRows(actRes.data || []);
+      const counts = {};
+      (allRegsRes.data || []).forEach((r) => { counts[r.activity_id] = (counts[r.activity_id] || 0) + 1; });
+      setRegByActivity(counts);
+      setMyRegs(new Set((myRegsRes.data || []).map((r) => r.activity_id)));
+      setMyFavs(new Set((favRes.data || []).map((r) => r.activity_id)));
+      setDataLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [user?.id]);
+
+  const mapRow = (row) => {
+    const start = new Date(row.starts_at);
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const startDay = new Date(start); startDay.setHours(0, 0, 0, 0);
+    const offsetDays = Math.round((startDay - today) / 86400000);
+    const time = `${String(start.getHours()).padStart(2, "0")}h${String(start.getMinutes()).padStart(2, "0")}`;
+    return {
+      id: row.id, title: row.title, category: row.category, ville: row.ville, lieu: row.lieu,
+      offsetDays, time, age: row.age, info: row.info, places: row.places,
+      inscrits: (row.demo_inscrits || 0) + (regByActivity[row.id] || 0),
+      organisateur: row.organisateur, desc: row.description,
+      intergen: row.intergen, intergenNote: row.intergen_note,
+      participants: row.demo_participants || [],
+    };
+  };
+
+  const bySpace = (space) => rows.filter((r) => r.space === space).map(mapRow);
+  const activities = useMemo(() => bySpace("kids"), [rows, regByActivity]);
+  const teenItems = useMemo(() => bySpace("teen"), [rows, regByActivity]);
+  const adultItems = useMemo(() => bySpace("adult"), [rows, regByActivity]);
+  const seniorItems = useMemo(() => bySpace("senior"), [rows, regByActivity]);
+  const assoItems = useMemo(() => bySpace("asso"), [rows, regByActivity]);
+
+  const idsIn = (items, set) => items.filter((it) => set.has(it.id)).map((it) => it.id);
+  const favorites = useMemo(() => idsIn(activities, myFavs), [activities, myFavs]);
+  const favTeen = useMemo(() => idsIn(teenItems, myFavs), [teenItems, myFavs]);
+  const favAdult = useMemo(() => idsIn(adultItems, myFavs), [adultItems, myFavs]);
+  const favSenior = useMemo(() => idsIn(seniorItems, myFavs), [seniorItems, myFavs]);
+  const favAsso = useMemo(() => idsIn(assoItems, myFavs), [assoItems, myFavs]);
+  const joined = useMemo(() => idsIn(activities, myRegs), [activities, myRegs]);
+  const joinedTeen = useMemo(() => idsIn(teenItems, myRegs), [teenItems, myRegs]);
+  const joinedAdult = useMemo(() => idsIn(adultItems, myRegs), [adultItems, myRegs]);
+  const joinedSenior = useMemo(() => idsIn(seniorItems, myRegs), [seniorItems, myRegs]);
+  const joinedAsso = useMemo(() => idsIn(assoItems, myRegs), [assoItems, myRegs]);
+
+  const toggleFavGeneric = async (id) => {
+    if (!user) return;
+    if (myFavs.has(id)) {
+      setMyFavs((s) => { const n = new Set(s); n.delete(id); return n; });
+      await supabase.from("favorites").delete().eq("user_id", user.id).eq("activity_id", id);
+    } else {
+      setMyFavs((s) => new Set(s).add(id));
+      await supabase.from("favorites").insert({ user_id: user.id, activity_id: id });
+    }
+  };
+
+  const joinGeneric = async (id) => {
+    if (!user || myRegs.has(id)) return;
+    setMyRegs((s) => new Set(s).add(id));
+    setRegByActivity((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
+    const { error } = await supabase.from("registrations").insert({ user_id: user.id, activity_id: id });
+    if (error) console.error("Erreur inscription :", error);
+  };
+
+  const insertActivity = async (space, form) => {
+    if (!user) return null;
+    const starts_at = `${form.dateStr}T${form.timeStr}:00`;
+    const newRow = {
+      id: Date.now(), space, title: form.title, category: form.category, ville: null, lieu: form.lieu,
+      starts_at, age: form.age || null, info: form.info || null, places: form.places,
+      demo_inscrits: 0, organisateur: profile.displayName || t("you_organizer"),
+      description: form.desc || "", intergen: false, intergen_note: null,
+      demo_participants: [], created_by: user.id,
+    };
+    const { data, error } = await supabase.from("activities").insert(newRow).select().single();
+    if (error) { console.error("Erreur création :", error); return null; }
+    setRows((r) => [data, ...r]);
+    await joinGeneric(data.id);
+    return data.id;
+  };
+
+  const toggleParentValidated = async () => {
+    if (!user) return;
+    const next = !profile.parentValidated;
+    setProfile((p) => ({ ...p, parentValidated: next }));
+    const { error } = await supabase.from("profiles").update({ parent_validated: next }).eq("id", user.id);
+    if (error) console.error("Erreur validation :", error);
+  };
+
+  const addKid = async ({ name, age, genre }) => {
+    if (!user) return;
+    const { data, error } = await supabase.from("kids").insert({ parent_id: user.id, name, age, genre }).select().single();
+    if (error) { console.error("Erreur ajout enfant :", error); return; }
+    setKids((k) => [...k, data]);
+  };
+
+  return {
+    user, authLoading, dataLoading,
+    displayName: profile.displayName, email: user?.email || "", parentValidated: profile.parentValidated,
+    kids,
+    activities, teenItems, adultItems, seniorItems, assoItems,
+    favorites, favTeen, favAdult, favSenior, favAsso,
+    joined, joinedTeen, joinedAdult, joinedSenior, joinedAsso,
+    toggleFav: toggleFavGeneric,
+    join: joinGeneric,
+    toggleFavCommunity: (_kind, id) => toggleFavGeneric(id),
+    joinCommunity: (_kind, id) => joinGeneric(id),
+    createActivity: (form) => insertActivity("kids", form),
+    createAdultMeetup: (form) => insertActivity("adult", form),
+    toggleParentValidated,
+    addKid,
+    signOut: () => supabase.auth.signOut(),
+  };
+}
+
 // ---------- Root ----------
 export default function RecreApp() {
-  const [parentValidated, setParentValidated] = useState(false);
+  const pika = usePikapikaData();
   const [tab, setTab] = useState("profil");
-  const [activities, setActivities] = useState(INITIAL_ACTIVITIES);
-  const [favorites, setFavorites] = useState([]);
-  const [joined, setJoined] = useState([]);
   const [selected, setSelected] = useState(null);
-
-  const [adultItems, setAdultItems] = useState(ADULT_MEETUPS);
-  const [teenItems, setTeenItems] = useState(TEEN_MEETUPS);
-  const [seniorItems, setSeniorItems] = useState(SENIOR_MEETUPS);
-  const [assoItems, setAssoItems] = useState(ASSO_EVENTS);
-  const [favAdult, setFavAdult] = useState([]);
-  const [favTeen, setFavTeen] = useState([]);
-  const [favSenior, setFavSenior] = useState([]);
-  const [favAsso, setFavAsso] = useState([]);
-  const [joinedAdult, setJoinedAdult] = useState([]);
-  const [joinedTeen, setJoinedTeen] = useState([]);
-  const [joinedSenior, setJoinedSenior] = useState([]);
-  const [joinedAsso, setJoinedAsso] = useState([]);
   const [selectedCommunity, setSelectedCommunity] = useState(null); // { item, kind: "adult" | "teen" | "senior" | "asso" }
   const [location, setLocation] = useState(null);
 
-  const toggleFav = (id) =>
-    setFavorites((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id]));
+  const {
+    activities, teenItems, adultItems, seniorItems, assoItems,
+    favorites, favTeen, favAdult, favSenior, favAsso,
+    joined, joinedTeen, joinedAdult, joinedSenior, joinedAsso,
+    parentValidated, kids, displayName, email,
+  } = pika;
 
+  const toggleFav = pika.toggleFav;
+
+  // Rejoindre une sortie enfant met aussi à jour l'aperçu ouvert (fiche détaillée), le temps
+  // que le nombre d'inscrits recalculé depuis Supabase redescende dans le tableau `activities`.
   const join = (id) => {
-    setJoined((j) => [...j, id]);
-    const addKids = (a) => ({
-      ...a,
-      inscrits: a.inscrits + KIDS.length,
-      participants: [...(a.participants || []), ...KIDS.map((k) => ({ name: k.name, genre: k.genre }))],
-    });
-    setActivities((acts) => acts.map((a) => a.id === id ? addKids(a) : a));
-    setSelected((s) => s && s.id === id ? addKids(s) : s);
+    pika.join(id);
+    setSelected((s) => s && s.id === id ? { ...s, inscrits: s.inscrits + 1 } : s);
   };
 
-  const createActivity = (a) => setActivities((acts) => [a, ...acts]);
+  const createActivity = pika.createActivity;
 
-  const communitySetters = {
-    adult: { setFav: setFavAdult, setJoined: setJoinedAdult, setItems: setAdultItems },
-    teen: { setFav: setFavTeen, setJoined: setJoinedTeen, setItems: setTeenItems },
-    senior: { setFav: setFavSenior, setJoined: setJoinedSenior, setItems: setSeniorItems },
-    asso: { setFav: setFavAsso, setJoined: setJoinedAsso, setItems: setAssoItems },
-  };
-
-  const toggleFavCommunity = (kind, id) => {
-    const { setFav } = communitySetters[kind];
-    setFav((f) => (f.includes(id) ? f.filter((x) => x !== id) : [...f, id]));
-  };
+  const toggleFavCommunity = (kind, id) => pika.toggleFavCommunity(kind, id);
 
   const joinCommunity = (kind, id) => {
-    const { setJoined, setItems } = communitySetters[kind];
-    setJoined((j) => [...j, id]);
-    setItems((items) => items.map((it) => it.id === id ? { ...it, inscrits: it.inscrits + 1 } : it));
+    pika.joinCommunity(kind, id);
     setSelectedCommunity((s) => s && s.item.id === id ? { ...s, item: { ...s.item, inscrits: s.item.inscrits + 1 } } : s);
   };
 
-  // Créer une rencontre adulte l'ajoute à la liste ET vous y inscrit automatiquement,
-  // pour qu'elle apparaisse dans "Mes rencontres" — aucune validation mairie requise ici.
-  const createAdultMeetup = (item) => {
-    setAdultItems((items) => [item, ...items]);
-    setJoinedAdult((j) => [...j, item.id]);
-  };
+  const createAdultMeetup = pika.createAdultMeetup;
 
   const TABS_ALL = [
     { id: "explorer", label: t("tab_enfants"), icon: Compass, kidsOnly: true },
@@ -3833,6 +4113,27 @@ export default function RecreApp() {
     if (!stillVisible) setTab("profil");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parentValidated]);
+
+  if (pika.authLoading) {
+    return (
+      <div style={{ background: COLORS.cloud, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <PikaMascot size={48} />
+      </div>
+    );
+  }
+
+  if (!pika.user) {
+    return <AuthScreen />;
+  }
+
+  if (pika.dataLoading) {
+    return (
+      <div style={{ background: COLORS.cloud, minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
+        <PikaMascot size={48} />
+        <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#6B6485" }}>{t("auth_loading")}</span>
+      </div>
+    );
+  }
 
   return (
     <div style={{ background: COLORS.cloud, minHeight: "100vh", fontFamily: "Nunito, sans-serif" }}>
@@ -4002,7 +4303,12 @@ export default function RecreApp() {
           <Profile
             joinedCount={joined.length}
             validated={parentValidated}
-            onToggleDemo={() => setParentValidated((v) => !v)}
+            onToggleDemo={pika.toggleParentValidated}
+            displayName={displayName}
+            email={email}
+            kids={kids}
+            onAddKid={pika.addKid}
+            onSignOut={pika.signOut}
           />
         )}
       </div>
