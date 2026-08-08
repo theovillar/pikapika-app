@@ -84,7 +84,7 @@ const TRANSLATIONS = {
     tab_associations: "Commune", community_asso_title: "Associations & Mairie",
     community_asso_subtitle: "Événements organisés par la mairie et les associations de votre commune.",
     join_label_asso: "Je participe",
-    chip_intergen: "Intergénérationnel", intergen_badge: "Intergénérationnel",
+    chip_intergen: "Intergénérationnel", intergen_badge: "Intergénérationnel", chip_favorites: "Favoris",
     btn_sign_out: "Se déconnecter",
     auth_title: "Bienvenue sur Orée", auth_subtitle: "Connectez-vous pour retrouver vos sorties.",
     auth_email: "Adresse email", auth_password: "Mot de passe", auth_name: "Votre prénom",
@@ -188,7 +188,7 @@ const TRANSLATIONS = {
     tab_associations: "Community", community_asso_title: "Town Hall & Associations",
     community_asso_subtitle: "Events organised by the town hall and local associations.",
     join_label_asso: "I'm in",
-    chip_intergen: "Intergenerational", intergen_badge: "Intergenerational",
+    chip_intergen: "Intergenerational", intergen_badge: "Intergenerational", chip_favorites: "Favourites",
     btn_sign_out: "Sign out",
     auth_title: "Welcome to Orée", auth_subtitle: "Sign in to find your outings.",
     auth_email: "Email address", auth_password: "Password", auth_name: "Your first name",
@@ -292,7 +292,7 @@ const TRANSLATIONS = {
     tab_associations: "Comunidad", community_asso_title: "Ayuntamiento y asociaciones",
     community_asso_subtitle: "Eventos organizados por el ayuntamiento y las asociaciones locales.",
     join_label_asso: "Participo",
-    chip_intergen: "Intergeneracional", intergen_badge: "Intergeneracional",
+    chip_intergen: "Intergeneracional", intergen_badge: "Intergeneracional", chip_favorites: "Favoritos",
     btn_sign_out: "Cerrar sesión",
     auth_title: "Bienvenido/a a Orée", auth_subtitle: "Inicia sesión para encontrar tus salidas.",
     auth_email: "Correo electrónico", auth_password: "Contraseña", auth_name: "Tu nombre",
@@ -373,8 +373,6 @@ const adultGenreLabel = (genre) => (genre === "F" ? t("legend_femme") : t("legen
 function relativeDayLabel(offsetDays) {
   if (offsetDays === 0) return t("day_today");
   if (offsetDays === 1) return t("day_tomorrow");
-  if (offsetDays === 2) return t("day_after_tomorrow");
-  if (offsetDays === 3) return t("day_after_after_tomorrow");
   const d = new Date();
   d.setDate(d.getDate() + offsetDays);
   const locale = LANG === "fr" ? "fr-FR" : LANG === "es" ? "es-ES" : "en-US";
@@ -3594,16 +3592,18 @@ function item_autre_label() { return t("chip_all"); }
 function CommunityExplorer({ title, subtitle, categories, items, favorites, onToggleFav, onOpen, emptyText, location, layout = "grid", genderMode = false }) {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState("tous");
+  const [onlyFav, setOnlyFav] = useState(false);
   const [view, setView] = useState("liste");
 
   const filtered = useMemo(() => {
     return items.filter((a) => {
       const matchCat = cat === "tous" || (cat === "intergen" ? a.intergen : a.category === cat);
       const matchLoc = matchLocation(a.ville, location);
+      const matchFav = !onlyFav || favorites.includes(a.id);
       const matchQuery = a.title.toLowerCase().includes(query.toLowerCase()) || a.lieu.toLowerCase().includes(query.toLowerCase());
-      return matchCat && matchLoc && matchQuery;
+      return matchCat && matchLoc && matchFav && matchQuery;
     });
-  }, [items, query, cat, location]);
+  }, [items, query, cat, location, onlyFav, favorites]);
   const hasIntergen = items.some((a) => a.intergen);
 
   return (
@@ -3632,6 +3632,11 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
 
       <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 6, marginBottom: 10 }}>
         <Chip active={cat === "tous"} onClick={() => setCat("tous")} color={COLORS.ink}>{t("chip_all")}</Chip>
+        <Chip active={onlyFav} onClick={() => setOnlyFav((v) => !v)} color={COLORS.coral}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+            <Heart size={13} fill={onlyFav ? "#fff" : "none"} /> {t("chip_favorites")}
+          </span>
+        </Chip>
         {hasIntergen && (
           <Chip active={cat === "intergen"} onClick={() => setCat("intergen")} color={COLORS.coral}>
             🤝 {t("chip_intergen")}
