@@ -54,7 +54,7 @@ const TRANSLATIONS = {
     label_age: "Âge conseillé", placeholder_age: "Ex. 4-8 ans",
     label_places: "Places disponibles", label_description: "Description",
     placeholder_description: "Que va-t-on faire ? Quoi apporter ?",
-    label_prix: "Prix (optionnel)", placeholder_prix: "Ex. 5€ par enfant, laissez vide si gratuit",
+    label_payant: "Sortie payante ?", toggle_oui: "Oui", toggle_non: "Non",
     badge_payant: "Payant", badge_gratuit: "Gratuit",
     btn_publier: "Publier la sortie",
     success_message: "Sortie publiée ! Elle apparaît dans l'onglet Explorer.",
@@ -164,7 +164,7 @@ const TRANSLATIONS = {
     label_age: "Recommended age", placeholder_age: "E.g. 4-8 years",
     label_places: "Available spots", label_description: "Description",
     placeholder_description: "What will you do? What to bring?",
-    label_prix: "Price (optional)", placeholder_prix: "E.g. €5 per child, leave empty if free",
+    label_payant: "Is it a paid outing?", toggle_oui: "Yes", toggle_non: "No",
     badge_payant: "Paid", badge_gratuit: "Free",
     btn_publier: "Publish outing",
     success_message: "Outing published! It now appears in the Explore tab.",
@@ -274,7 +274,7 @@ const TRANSLATIONS = {
     label_age: "Edad recomendada", placeholder_age: "Ej. 4-8 años",
     label_places: "Plazas disponibles", label_description: "Descripción",
     placeholder_description: "¿Qué vais a hacer? ¿Qué traer?",
-    label_prix: "Precio (opcional)", placeholder_prix: "Ej. 5€ por niño, deja vacío si es gratis",
+    label_payant: "¿Es una salida de pago?", toggle_oui: "Sí", toggle_non: "No",
     badge_payant: "De pago", badge_gratuit: "Gratis",
     btn_publier: "Publicar salida",
     success_message: "¡Salida publicada! Aparece en la pestaña Explorar.",
@@ -2695,7 +2695,7 @@ function Explorer({ activities, favorites, onToggleFav, onOpen, location }) {
 function CreateActivity({ onCreate }) {
   const todayISO = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({
-    title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "", prix: "",
+    title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "", payant: false,
   });
   const [sent, setSent] = useState(false);
 
@@ -2705,11 +2705,11 @@ function CreateActivity({ onCreate }) {
     if (!form.title || !form.lieu || !form.dateStr) return;
     onCreate({
       title: form.title, category: form.category, lieu: form.lieu, age: form.age, desc: form.desc,
-      dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1, prix: form.prix || null,
+      dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1, payant: !!form.payant,
     });
     setSent(true);
     setTimeout(() => setSent(false), 2200);
-    setForm({ title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "", prix: "" });
+    setForm({ title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "", payant: false });
   };
 
   const inputStyle = {
@@ -2776,8 +2776,11 @@ function CreateActivity({ onCreate }) {
 
 
         <div>
-          <label style={label}>{t("label_prix")}</label>
-          <input style={inputStyle} placeholder={t("placeholder_prix")} value={form.prix} onChange={set("prix")} />
+          <label style={label}>{t("label_payant")}</label>
+          <div style={{ display: "flex", gap: 8 }}>
+            <Chip active={!form.payant} onClick={() => setForm({ ...form, payant: false })} color={COLORS.grass}>{t("toggle_non")}</Chip>
+            <Chip active={!!form.payant} onClick={() => setForm({ ...form, payant: true })} color={COLORS.coral}>{t("toggle_oui")}</Chip>
+          </div>
         </div>
         <div>
           <label style={label}>{t("label_description")}</label>
@@ -3448,7 +3451,7 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
 
         {activity.prix && (
           <div style={{ marginBottom: 12 }}>
-            <PriceBadge prix={activity.prix} size={12.5} />
+            <PriceBadge payant={activity.payant} size={14} />
           </div>
         )}
 
@@ -3597,7 +3600,7 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
             }}>
               {meta.label}
             </span>
-            <PriceBadge prix={item.prix} />
+            <PriceBadge payant={item.payant} size={13} />
           </div>
           <h3 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 18, color: COLORS.ink, margin: "0 34px 6px 0", lineHeight: 1.15 }}>
             {item.title}
@@ -3633,15 +3636,15 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
 // Ligne fine (quasi une seule ligne) pour une rencontre, utilisée dans l'affichage groupé par jour.
 // Petit badge "Payant" (avec le prix si connu) — rien n'est affiché si la sortie est gratuite,
 // pour ne pas surcharger visuellement la majorité des annonces (qui restent gratuites).
-function PriceBadge({ prix, size = 11 }) {
-  if (!prix) return null;
+function PriceBadge({ payant, size = 11 }) {
+  if (!payant) return null;
   return (
     <span style={{
-      display: "inline-flex", alignItems: "center", gap: 3, background: "#FFF0EC",
-      color: COLORS.coral, fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: size,
-      padding: "2px 7px", borderRadius: 999, whiteSpace: "nowrap", flexShrink: 0,
+      display: "inline-flex", alignItems: "center", gap: 3, background: COLORS.coral,
+      color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: size,
+      padding: "3px 9px", borderRadius: 999, whiteSpace: "nowrap", flexShrink: 0, letterSpacing: 0.3,
     }}>
-      <Tag size={size} /> {prix}
+      <Tag size={size} /> {t("badge_payant")}
     </span>
   );
 }
@@ -3691,7 +3694,7 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
           <span style={{ fontFamily: "Nunito, sans-serif", color: "#8A8399", overflow: "hidden", textOverflow: "ellipsis" }}>
             {lieuAvecVille(item)}
           </span>
-          <PriceBadge prix={item.prix} size={10.5} />
+          <PriceBadge payant={item.payant} size={12} />
         </div>
         {item.organisateur && (
           <div style={{ marginTop: 3 }}>
@@ -3903,7 +3906,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
 
         {item.prix && (
           <div style={{ marginBottom: 12 }}>
-            <PriceBadge prix={item.prix} size={12.5} />
+            <PriceBadge payant={item.payant} size={14} />
           </div>
         )}
 
@@ -4004,7 +4007,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
 function CreateMeetup({ categories, onCreate }) {
   const todayISO = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({
-    title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "", prix: "",
+    title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "", payant: false,
   });
   const [sent, setSent] = useState(false);
 
@@ -4014,11 +4017,11 @@ function CreateMeetup({ categories, onCreate }) {
     if (!form.title || !form.lieu || !form.dateStr) return;
     onCreate({
       title: form.title, category: form.category, lieu: form.lieu, info: form.info, desc: form.desc,
-      dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1, prix: form.prix || null,
+      dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1, payant: !!form.payant,
     });
     setSent(true);
     setTimeout(() => setSent(false), 2200);
-    setForm({ title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "", prix: "" });
+    setForm({ title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "", payant: false });
   };
 
   const inputStyle = {
@@ -4085,8 +4088,11 @@ function CreateMeetup({ categories, onCreate }) {
 
 
         <div>
-          <label style={label}>{t("label_prix")}</label>
-          <input style={inputStyle} placeholder={t("placeholder_prix")} value={form.prix} onChange={set("prix")} />
+          <label style={label}>{t("label_payant")}</label>
+          <div style={{ display: "flex", gap: 8 }}>
+            <Chip active={!form.payant} onClick={() => setForm({ ...form, payant: false })} color={COLORS.grass}>{t("toggle_non")}</Chip>
+            <Chip active={!!form.payant} onClick={() => setForm({ ...form, payant: true })} color={COLORS.coral}>{t("toggle_oui")}</Chip>
+          </div>
         </div>
         <div>
           <label style={label}>{t("label_description")}</label>
@@ -4605,7 +4611,7 @@ function usePikapikaData() {
       organisateur: row.organisateur, organisateurGenre: row.organisateur_genre, desc: row.description,
       intergen: row.intergen, intergenNote: row.intergen_note,
       participants: row.demo_participants || [],
-      createdBy: row.created_by, prix: row.prix,
+      createdBy: row.created_by, payant: row.payant,
     };
   };
 
@@ -4655,7 +4661,7 @@ function usePikapikaData() {
       starts_at, age: form.age || null, info: form.info || null, places: form.places,
       demo_inscrits: 0, organisateur: profile.displayName || t("you_organizer"), organisateur_genre: profile.genre || null,
       description: form.desc || "", intergen: false, intergen_note: null,
-      demo_participants: [], created_by: user.id, prix: form.prix || null,
+      demo_participants: [], created_by: user.id, payant: !!form.payant,
     };
     const { data, error } = await supabase.from("activities").insert(newRow).select().single();
     if (error) { console.error("Erreur création :", error); return null; }
