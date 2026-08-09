@@ -4,7 +4,8 @@ import {
   CalendarDays, Users, X, ChevronRight, Sparkles, Heart, Check,
   Baby, Trees, Palette, Music4, Puzzle, Bike, Coffee, Dumbbell,
   Landmark, Gamepad2, Film, Clock, ShieldCheck, Lock, ChevronDown, List, Map,
-  Footprints, BookOpen, Flower2, PartyPopper, HeartHandshake, Trophy
+  Footprints, BookOpen, Flower2, PartyPopper, HeartHandshake, Trophy, Eye, EyeOff, Share2, Link2,
+  Tag, ArrowLeft
 } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup, Circle, CircleMarker, useMap } from "react-leaflet";
 import L from "leaflet";
@@ -53,6 +54,8 @@ const TRANSLATIONS = {
     label_age: "Âge conseillé", placeholder_age: "Ex. 4-8 ans",
     label_places: "Places disponibles", label_description: "Description",
     placeholder_description: "Que va-t-on faire ? Quoi apporter ?",
+    label_prix: "Prix (optionnel)", placeholder_prix: "Ex. 5€ par enfant, laissez vide si gratuit",
+    badge_payant: "Payant", badge_gratuit: "Gratuit",
     btn_publier: "Publier la sortie",
     success_message: "Sortie publiée ! Elle apparaît dans l'onglet Explorer.",
     you_organizer: "Vous",
@@ -96,6 +99,10 @@ const TRANSLATIONS = {
     account_type_parent: "Parent", account_type_association: "Association",
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
+    auth_last_name: "Votre nom de famille", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
+    profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
+    share_btn: "Partager", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
+    share_whatsapp: "WhatsApp", share_message: "Regarde cette sortie sur Orée : {title}",
     report_btn: "Signaler", report_title: "Signaler cette annonce",
     report_reason_label: "Raison du signalement", report_details_label: "Détails (optionnel)",
     report_details_placeholder: "Expliquez ce qui vous a alerté…",
@@ -157,6 +164,8 @@ const TRANSLATIONS = {
     label_age: "Recommended age", placeholder_age: "E.g. 4-8 years",
     label_places: "Available spots", label_description: "Description",
     placeholder_description: "What will you do? What to bring?",
+    label_prix: "Price (optional)", placeholder_prix: "E.g. €5 per child, leave empty if free",
+    badge_payant: "Paid", badge_gratuit: "Free",
     btn_publier: "Publish outing",
     success_message: "Outing published! It now appears in the Explore tab.",
     you_organizer: "You",
@@ -200,6 +209,10 @@ const TRANSLATIONS = {
     account_type_parent: "Parent", account_type_association: "Association",
     auth_association_name: "Association name",
     auth_association_note: "Your account will be activated after town hall validation.",
+    auth_last_name: "Your last name", show_password: "Show password", hide_password: "Hide password",
+    profile_not_found: "This profile is not available.", member_since: "Member since {date}",
+    share_btn: "Share", share_copy_link: "Copy link", share_link_copied: "Link copied!",
+    share_whatsapp: "WhatsApp", share_message: "Check out this outing on Orée: {title}",
     report_btn: "Report", report_title: "Report this listing",
     report_reason_label: "Reason for report", report_details_label: "Details (optional)",
     report_details_placeholder: "Explain what concerned you…",
@@ -261,6 +274,8 @@ const TRANSLATIONS = {
     label_age: "Edad recomendada", placeholder_age: "Ej. 4-8 años",
     label_places: "Plazas disponibles", label_description: "Descripción",
     placeholder_description: "¿Qué vais a hacer? ¿Qué traer?",
+    label_prix: "Precio (opcional)", placeholder_prix: "Ej. 5€ por niño, deja vacío si es gratis",
+    badge_payant: "De pago", badge_gratuit: "Gratis",
     btn_publier: "Publicar salida",
     success_message: "¡Salida publicada! Aparece en la pestaña Explorar.",
     you_organizer: "Tú",
@@ -304,6 +319,10 @@ const TRANSLATIONS = {
     account_type_parent: "Padre/Madre", account_type_association: "Asociación",
     auth_association_name: "Nombre de la asociación",
     auth_association_note: "Tu cuenta se activará tras la validación del ayuntamiento.",
+    auth_last_name: "Tu apellido", show_password: "Mostrar contraseña", hide_password: "Ocultar contraseña",
+    profile_not_found: "Este perfil no está disponible.", member_since: "Miembro desde {date}",
+    share_btn: "Compartir", share_copy_link: "Copiar enlace", share_link_copied: "¡Enlace copiado!",
+    share_whatsapp: "WhatsApp", share_message: "Mira esta salida en Orée: {title}",
     report_btn: "Denunciar", report_title: "Denunciar este anuncio",
     report_reason_label: "Motivo de la denuncia", report_details_label: "Detalles (opcional)",
     report_details_placeholder: "Explica qué te preocupó…",
@@ -2182,11 +2201,12 @@ function participantName(p) { return typeof p === "string" ? p : p.name; }
 
 // Met en avant le pseudo de l'organisateur, coloré par genre quand il est connu
 // (les comptes association/institutions n'ont pas de genre : couleur neutre).
-function OrganiserBadge({ name, genre, size = 14 }) {
+function OrganiserBadge({ name, genre, size = 14, userId, onClick }) {
   if (!name) return null;
   const color = genre ? genreColor(genre) : COLORS.ink;
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+  const clickable = !!(userId && onClick);
+  const content = (
+    <>
       <div style={{
         width: size + 8, height: size + 8, borderRadius: "50%", background: color,
         display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
@@ -2194,11 +2214,22 @@ function OrganiserBadge({ name, genre, size = 14 }) {
       }}>
         {name.charAt(0).toUpperCase()}
       </div>
-      <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: size, color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+      <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: size, color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textDecoration: clickable ? "underline" : "none" }}>
         {t("by_organiser", { org: name })}
       </span>
-    </div>
+    </>
   );
+  if (clickable) {
+    return (
+      <button
+        onClick={(e) => { e.stopPropagation(); onClick(userId); }}
+        style={{ display: "flex", alignItems: "center", gap: 7, background: "none", border: "none", padding: 0, cursor: "pointer" }}
+      >
+        {content}
+      </button>
+    );
+  }
+  return <div style={{ display: "flex", alignItems: "center", gap: 7 }}>{content}</div>;
 }
 
 function PlainAvatar({ participant, color, size, overlap = false, genderMode = false }) {
@@ -2664,7 +2695,7 @@ function Explorer({ activities, favorites, onToggleFav, onOpen, location }) {
 function CreateActivity({ onCreate }) {
   const todayISO = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({
-    title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "",
+    title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "", prix: "",
   });
   const [sent, setSent] = useState(false);
 
@@ -2674,11 +2705,11 @@ function CreateActivity({ onCreate }) {
     if (!form.title || !form.lieu || !form.dateStr) return;
     onCreate({
       title: form.title, category: form.category, lieu: form.lieu, age: form.age, desc: form.desc,
-      dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1,
+      dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1, prix: form.prix || null,
     });
     setSent(true);
     setTimeout(() => setSent(false), 2200);
-    setForm({ title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "" });
+    setForm({ title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "", prix: "" });
   };
 
   const inputStyle = {
@@ -2743,6 +2774,11 @@ function CreateActivity({ onCreate }) {
           </div>
         </div>
 
+
+        <div>
+          <label style={label}>{t("label_prix")}</label>
+          <input style={inputStyle} placeholder={t("placeholder_prix")} value={form.prix} onChange={set("prix")} />
+        </div>
         <div>
           <label style={label}>{t("label_description")}</label>
           <textarea rows={3} style={{ ...inputStyle, resize: "vertical", fontFamily: "Nunito, sans-serif" }}
@@ -3190,6 +3226,125 @@ function CityOption({ label, sub, active, onClick }) {
   );
 }
 
+// Fiche publique minimale d'un utilisateur : juste ce qui est nécessaire pour savoir qui organise
+// (pseudo, genre, ancienneté) — jamais l'email ni d'autre donnée privée.
+function UserProfileModal({ userId, onClose }) {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(false);
+    supabase.from("profiles").select("display_name, genre, role, association_name, created_at").eq("id", userId).single()
+      .then(({ data, error: err }) => {
+        if (cancelled) return;
+        if (err || !data) { setError(true); } else { setProfile(data); }
+        setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [userId]);
+
+  const name = profile?.role === "association" ? (profile?.association_name || profile?.display_name) : profile?.display_name;
+  const color = profile?.genre ? genreColor(profile.genre) : COLORS.ink;
+  const memberSince = profile?.created_at ? new Date(profile.created_at).toLocaleDateString(
+    LANG === "fr" ? "fr-FR" : LANG === "es" ? "es-ES" : "en-US", { month: "long", year: "numeric" }
+  ) : null;
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ background: COLORS.cloud, borderRadius: 22, padding: 26, width: "100%", maxWidth: 340, position: "relative", textAlign: "center" }}>
+        <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "#fff", border: "none", borderRadius: "50%", width: 30, height: 30, cursor: "pointer" }}>
+          <X size={15} color={COLORS.ink} />
+        </button>
+
+        {loading && <p style={{ fontFamily: "Nunito, sans-serif", color: "#9A93AF" }}>{t("auth_loading")}</p>}
+        {!loading && error && <p style={{ fontFamily: "Nunito, sans-serif", color: "#9A93AF" }}>{t("profile_not_found")}</p>}
+        {!loading && !error && profile && (
+          <>
+            <div style={{
+              width: 64, height: 64, borderRadius: "50%", background: color, margin: "0 auto 14px",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 26, color: "#fff",
+            }}>
+              {(name || "?").charAt(0).toUpperCase()}
+            </div>
+            <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 19, color: COLORS.ink, marginBottom: 4 }}>
+              {name}
+            </div>
+            {profile.role === "association" && (
+              <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, color: COLORS.grape, textTransform: "uppercase", letterSpacing: 0.4, marginBottom: 6 }}>
+                {t("account_type_association")}
+              </div>
+            )}
+            {memberSince && (
+              <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#9A93AF" }}>
+                {t("member_since", { date: memberSince })}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ShareModal({ item, onClose }) {
+  const [copied, setCopied] = useState(false);
+  const url = `${window.location.origin}${window.location.pathname}?activity=${item.id}`;
+  const message = t("share_message", { title: item.title });
+  const canNativeShare = typeof navigator !== "undefined" && !!navigator.share;
+
+  const nativeShare = async () => {
+    try { await navigator.share({ title: item.title, text: message, url }); onClose(); } catch (e) { /* annulé par la personne, rien à faire */ }
+  };
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch (e) { /* clipboard indisponible, on ignore silencieusement */ }
+  };
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${message} ${url}`)}`;
+
+  const btnStyle = {
+    display: "flex", alignItems: "center", gap: 10, background: "#fff", border: "2px solid #F0EADB",
+    borderRadius: 14, padding: "12px 14px", cursor: "pointer", fontFamily: "Nunito, sans-serif",
+    fontWeight: 800, fontSize: 14, color: COLORS.ink, width: "100%", textAlign: "left",
+  };
+  const iconWrap = (bg) => ({ width: 32, height: 32, borderRadius: "50%", background: bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 });
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ background: COLORS.cloud, borderRadius: 22, padding: 22, width: "100%", maxWidth: 360, position: "relative" }}>
+        <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "#fff", border: "none", borderRadius: "50%", width: 30, height: 30, cursor: "pointer" }}>
+          <X size={15} color={COLORS.ink} />
+        </button>
+        <h3 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 18, color: COLORS.ink, margin: "0 0 16px" }}>
+          {t("share_btn")}
+        </h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {canNativeShare && (
+            <button onClick={nativeShare} style={{ ...btnStyle, background: COLORS.ink, color: "#fff", border: "none" }}>
+              <span style={iconWrap("rgba(255,255,255,0.15)")}><Share2 size={16} color="#fff" /></span>
+              {t("share_btn")}
+            </button>
+          )}
+          <button onClick={() => window.open(whatsappUrl, "_blank")} style={btnStyle}>
+            <span style={iconWrap("#25D366")}><Share2 size={16} color="#fff" /></span>
+            {t("share_whatsapp")}
+          </button>
+          <button onClick={copyLink} style={btnStyle}>
+            <span style={iconWrap(COLORS.sky)}><Link2 size={16} color="#fff" /></span>
+            {copied ? t("share_link_copied") : t("share_copy_link")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ReportModal({ onClose, onSubmit }) {
   const [reason, setReason] = useState("inapproprie");
   const [details, setDetails] = useState("");
@@ -3253,7 +3408,7 @@ function ReportModal({ onClose, onSubmit }) {
   );
 }
 
-function DetailModal({ activity, onClose, joined, onJoin, onReport }) {
+function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfile, onShare }) {
   if (!activity) return null;
   const meta = catMeta(activity.category);
   const isJoined = joined.includes(activity.id);
@@ -3291,6 +3446,12 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport }) {
           {activity.title}
         </h2>
 
+        {activity.prix && (
+          <div style={{ marginBottom: 12 }}>
+            <PriceBadge prix={activity.prix} size={12.5} />
+          </div>
+        )}
+
         {activity.intergen && (
           <div style={{
             display: "flex", alignItems: "center", gap: 8, background: "#FFF4DD",
@@ -3304,7 +3465,7 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport }) {
         )}
 
         <div style={{ marginBottom: 14 }}>
-          <OrganiserBadge name={activity.organisateur} genre={activity.organisateurGenre} size={20} />
+          <OrganiserBadge name={activity.organisateur} genre={activity.organisateurGenre} size={20} userId={activity.createdBy} onClick={onViewProfile} />
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
@@ -3351,10 +3512,22 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport }) {
         )}
 
         <button
+          onClick={() => onShare(activity)}
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%",
+            background: "#fff", border: "2px solid #F0EADB", borderRadius: 12, padding: "10px 14px",
+            color: COLORS.ink, fontWeight: 800, fontSize: 13, marginTop: 14, cursor: "pointer",
+            fontFamily: "Nunito, sans-serif",
+          }}
+        >
+          <Share2 size={15} /> {t("share_btn")}
+        </button>
+
+        <button
           onClick={() => onReport(activity)}
           style={{
             display: "block", width: "100%", textAlign: "center", background: "none", border: "none",
-            color: "#B7AF98", fontWeight: 700, fontSize: 12, marginTop: 14, cursor: "pointer",
+            color: "#B7AF98", fontWeight: 700, fontSize: 12, marginTop: 10, cursor: "pointer",
             fontFamily: "Nunito, sans-serif",
           }}
         >
@@ -3366,7 +3539,7 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport }) {
 }
 
 // ---------- Community meetups (adultes / ados) ----------
-function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, genderMode = false }) {
+function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, genderMode = false, onViewProfile }) {
   const meta = metaFrom(categories, item.category);
   const Icon = meta.icon;
   const full = item.inscrits >= item.places;
@@ -3416,10 +3589,15 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
-            fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: 0.6,
-            textTransform: "uppercase", color: meta.color, marginBottom: 2,
+            display: "flex", alignItems: "center", gap: 8, marginBottom: 2,
           }}>
-            {meta.label}
+            <span style={{
+              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11, letterSpacing: 0.6,
+              textTransform: "uppercase", color: meta.color,
+            }}>
+              {meta.label}
+            </span>
+            <PriceBadge prix={item.prix} />
           </div>
           <h3 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 18, color: COLORS.ink, margin: "0 34px 6px 0", lineHeight: 1.15 }}>
             {item.title}
@@ -3434,7 +3612,7 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
       </div>
 
       <div style={{ marginTop: 8 }}>
-        <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={16} />
+        <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={16} userId={item.createdBy} onClick={onViewProfile} />
       </div>
 
       <PlainParticipantsRow names={item.participants} color={meta.color} genderMode={genderMode} />
@@ -3453,7 +3631,22 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
 }
 
 // Ligne fine (quasi une seule ligne) pour une rencontre, utilisée dans l'affichage groupé par jour.
-function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, genderMode }) {
+// Petit badge "Payant" (avec le prix si connu) — rien n'est affiché si la sortie est gratuite,
+// pour ne pas surcharger visuellement la majorité des annonces (qui restent gratuites).
+function PriceBadge({ prix, size = 11 }) {
+  if (!prix) return null;
+  return (
+    <span style={{
+      display: "inline-flex", alignItems: "center", gap: 3, background: "#FFF0EC",
+      color: COLORS.coral, fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: size,
+      padding: "2px 7px", borderRadius: 999, whiteSpace: "nowrap", flexShrink: 0,
+    }}>
+      <Tag size={size} /> {prix}
+    </span>
+  );
+}
+
+function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, genderMode, onViewProfile }) {
   const meta = metaFrom(categories, item.category);
   const Icon = meta.icon;
   const full = item.inscrits >= item.places;
@@ -3498,10 +3691,11 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
           <span style={{ fontFamily: "Nunito, sans-serif", color: "#8A8399", overflow: "hidden", textOverflow: "ellipsis" }}>
             {lieuAvecVille(item)}
           </span>
+          <PriceBadge prix={item.prix} size={10.5} />
         </div>
         {item.organisateur && (
           <div style={{ marginTop: 3 }}>
-            <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={15} />
+            <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={15} userId={item.createdBy} onClick={onViewProfile} />
           </div>
         )}
       </div>
@@ -3528,7 +3722,7 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
 
 // Regroupe les rencontres par jour (Aujourd'hui, Demain, Après-demain, puis "jeudi 6 septembre"…)
 // et les affiche comme une liste de sections dépliables.
-function DayAccordion({ items, categories, onOpen, favorites, onToggleFav, genderMode }) {
+function DayAccordion({ items, categories, onOpen, favorites, onToggleFav, genderMode, onViewProfile }) {
   const groups = useMemo(() => {
     const byOffset = {};
     items.forEach((it) => {
@@ -3578,6 +3772,7 @@ function DayAccordion({ items, categories, onOpen, favorites, onToggleFav, gende
                 <NarrowMeetupRow
                   key={item.id} item={item} categories={categories} onOpen={onOpen}
                   favorite={favorites.includes(item.id)} onToggleFav={onToggleFav} genderMode={genderMode}
+                  onViewProfile={onViewProfile}
                 />
               ))}
             </div>
@@ -3589,7 +3784,7 @@ function DayAccordion({ items, categories, onOpen, favorites, onToggleFav, gende
 }
 function item_autre_label() { return t("chip_all"); }
 
-function CommunityExplorer({ title, subtitle, categories, items, favorites, onToggleFav, onOpen, emptyText, location, layout = "grid", genderMode = false }) {
+function CommunityExplorer({ title, subtitle, categories, items, favorites, onToggleFav, onOpen, emptyText, location, layout = "grid", genderMode = false, onViewProfile }) {
   const [query, setQuery] = useState("");
   const [cat, setCat] = useState("tous");
   const [onlyFav, setOnlyFav] = useState(false);
@@ -3657,13 +3852,13 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
             {emptyText}
           </div>
         ) : (
-          <DayAccordion items={filtered} categories={categories} onOpen={onOpen} favorites={favorites} onToggleFav={onToggleFav} genderMode={genderMode} />
+          <DayAccordion items={filtered} categories={categories} onOpen={onOpen} favorites={favorites} onToggleFav={onToggleFav} genderMode={genderMode} onViewProfile={onViewProfile} />
         )
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(270px, 1fr))", gap: 14 }}>
           {filtered.map((item) => (
             <CommunityCard key={item.id} item={item} categories={categories} onOpen={onOpen}
-              favorite={favorites.includes(item.id)} onToggleFav={onToggleFav} genderMode={genderMode} />
+              favorite={favorites.includes(item.id)} onToggleFav={onToggleFav} genderMode={genderMode} onViewProfile={onViewProfile} />
           ))}
           {filtered.length === 0 && (
             <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px 0", color: "#9A93AF", fontFamily: "Nunito, sans-serif" }}>
@@ -3676,7 +3871,7 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
   );
 }
 
-function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinLabel, genderMode = false, onReport, genderLabels }) {
+function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinLabel, genderMode = false, onReport, genderLabels, onViewProfile, onShare }) {
   if (!item) return null;
   const meta = metaFrom(categories, item.category);
   const Icon = meta.icon;
@@ -3706,6 +3901,12 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
           {item.title}
         </h2>
 
+        {item.prix && (
+          <div style={{ marginBottom: 12 }}>
+            <PriceBadge prix={item.prix} size={12.5} />
+          </div>
+        )}
+
         {item.intergen && (
           <div style={{
             display: "flex", alignItems: "center", gap: 8, background: "#FFF4DD",
@@ -3719,7 +3920,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
         )}
 
         <div style={{ marginBottom: 14 }}>
-          <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={20} />
+          <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={20} userId={item.createdBy} onClick={onViewProfile} />
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
@@ -3773,10 +3974,22 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
         )}
 
         <button
+          onClick={() => onShare(item)}
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%",
+            background: "#fff", border: "2px solid #F0EADB", borderRadius: 12, padding: "10px 14px",
+            color: COLORS.ink, fontWeight: 800, fontSize: 13, marginTop: 14, cursor: "pointer",
+            fontFamily: "Nunito, sans-serif",
+          }}
+        >
+          <Share2 size={15} /> {t("share_btn")}
+        </button>
+
+        <button
           onClick={() => onReport(item)}
           style={{
             display: "block", width: "100%", textAlign: "center", background: "none", border: "none",
-            color: "#B7AF98", fontWeight: 700, fontSize: 12, marginTop: 14, cursor: "pointer",
+            color: "#B7AF98", fontWeight: 700, fontSize: 12, marginTop: 10, cursor: "pointer",
             fontFamily: "Nunito, sans-serif",
           }}
         >
@@ -3791,7 +4004,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
 function CreateMeetup({ categories, onCreate }) {
   const todayISO = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({
-    title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "",
+    title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "", prix: "",
   });
   const [sent, setSent] = useState(false);
 
@@ -3801,11 +4014,11 @@ function CreateMeetup({ categories, onCreate }) {
     if (!form.title || !form.lieu || !form.dateStr) return;
     onCreate({
       title: form.title, category: form.category, lieu: form.lieu, info: form.info, desc: form.desc,
-      dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1,
+      dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1, prix: form.prix || null,
     });
     setSent(true);
     setTimeout(() => setSent(false), 2200);
-    setForm({ title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "" });
+    setForm({ title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "", prix: "" });
   };
 
   const inputStyle = {
@@ -3870,6 +4083,11 @@ function CreateMeetup({ categories, onCreate }) {
           </div>
         </div>
 
+
+        <div>
+          <label style={label}>{t("label_prix")}</label>
+          <input style={inputStyle} placeholder={t("placeholder_prix")} value={form.prix} onChange={set("prix")} />
+        </div>
         <div>
           <label style={label}>{t("label_description")}</label>
           <textarea rows={3} style={{ ...inputStyle, resize: "vertical", fontFamily: "Nunito, sans-serif" }}
@@ -4013,7 +4231,9 @@ function AuthScreen({ onClose }) {
   const [accountType, setAccountType] = useState("parent"); // "parent" | "association"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [genre, setGenre] = useState("F");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -4030,9 +4250,10 @@ function AuthScreen({ onClose }) {
     setLoading(true);
     try {
       if (mode === "signup") {
+        const fullName = accountType === "parent" && lastName ? `${name} ${lastName}` : name;
         const { data, error: err } = await supabase.auth.signUp({
           email, password,
-          options: { data: { display_name: name } },
+          options: { data: { display_name: fullName } },
         });
         if (err) throw err;
         if (data?.user?.id) {
@@ -4094,6 +4315,13 @@ function AuthScreen({ onClose }) {
           />
         )}
         {mode === "signup" && accountType === "parent" && (
+          <input
+            style={inputStyle}
+            placeholder={t("auth_last_name")}
+            value={lastName} onChange={(e) => setLastName(e.target.value)}
+          />
+        )}
+        {mode === "signup" && accountType === "parent" && (
           <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
             {[
               { id: "F", label: t("legend_femme") },
@@ -4116,7 +4344,25 @@ function AuthScreen({ onClose }) {
           </div>
         )}
         <input style={inputStyle} type="email" placeholder={t("auth_email")} value={email} onChange={(e) => setEmail(e.target.value)} />
-        <input style={inputStyle} type="password" placeholder={t("auth_password")} value={password} onChange={(e) => setPassword(e.target.value)} />
+        <div style={{ position: "relative" }}>
+          <input
+            style={{ ...inputStyle, paddingRight: 42 }}
+            type={showPassword ? "text" : "password"}
+            placeholder={t("auth_password")} value={password} onChange={(e) => setPassword(e.target.value)}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? t("hide_password") : t("show_password")}
+            style={{
+              position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)",
+              background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex",
+              marginTop: -6,
+            }}
+          >
+            {showPassword ? <EyeOff size={18} color="#9A93AF" /> : <Eye size={18} color="#9A93AF" />}
+          </button>
+        </div>
 
         {mode === "signup" && accountType === "association" && (
           <p style={{ fontSize: 12, color: "#9A93AF", margin: "-4px 0 12px" }}>{t("auth_association_note")}</p>
@@ -4359,7 +4605,7 @@ function usePikapikaData() {
       organisateur: row.organisateur, organisateurGenre: row.organisateur_genre, desc: row.description,
       intergen: row.intergen, intergenNote: row.intergen_note,
       participants: row.demo_participants || [],
-      createdBy: row.created_by,
+      createdBy: row.created_by, prix: row.prix,
     };
   };
 
@@ -4409,7 +4655,7 @@ function usePikapikaData() {
       starts_at, age: form.age || null, info: form.info || null, places: form.places,
       demo_inscrits: 0, organisateur: profile.displayName || t("you_organizer"), organisateur_genre: profile.genre || null,
       description: form.desc || "", intergen: false, intergen_note: null,
-      demo_participants: [], created_by: user.id,
+      demo_participants: [], created_by: user.id, prix: form.prix || null,
     };
     const { data, error } = await supabase.from("activities").insert(newRow).select().single();
     if (error) { console.error("Erreur création :", error); return null; }
@@ -4529,6 +4775,37 @@ export default function RecreApp() {
 
   const [reportTarget, setReportTarget] = useState(null); // { id, createdBy }
   const openReport = requireAuth((item) => setReportTarget({ id: item.id, createdBy: item.createdBy }));
+
+  const [viewingUserId, setViewingUserId] = useState(null);
+  const openUserProfile = requireAuth((userId) => setViewingUserId(userId));
+
+  const [shareTarget, setShareTarget] = useState(null);
+
+  // Ouvre automatiquement une annonce si on arrive via un lien partagé (?activity=ID)
+  const deepLinkDone = useRef(false);
+  useEffect(() => {
+    if (deepLinkDone.current) return;
+    const idParam = new URLSearchParams(window.location.search).get("activity");
+    if (!idParam) { deepLinkDone.current = true; return; }
+    const id = Number(idParam);
+    const spaces = [
+      { items: activities, tabId: "explorer", kind: null },
+      { items: teenItems, tabId: "ados", kind: "teen" },
+      { items: adultItems, tabId: "adultes", kind: "adult" },
+      { items: seniorItems, tabId: "aine", kind: "senior" },
+      { items: assoItems, tabId: "asso", kind: "asso" },
+    ];
+    for (const s of spaces) {
+      const found = s.items.find((it) => it.id === id);
+      if (found) {
+        setTab(s.tabId);
+        if (s.kind) setSelectedCommunity({ item: found, kind: s.kind });
+        else setSelected(found);
+        deepLinkDone.current = true;
+        break;
+      }
+    }
+  }, [activities, teenItems, adultItems, seniorItems, assoItems]);
 
   const TABS_ALL = [
     { id: "explorer", label: t("tab_enfants"), icon: Compass, kidsOnly: true, authRequired: true },
@@ -4675,6 +4952,7 @@ export default function RecreApp() {
             emptyText={t("empty_kids")}
             location={location}
             layout="days"
+          onViewProfile={openUserProfile}
           />
         )}
         {tab === "creer" && (
@@ -4707,6 +4985,7 @@ export default function RecreApp() {
             location={location}
             layout="days"
             genderMode
+          onViewProfile={openUserProfile}
           />
         )}
         {tab === "aine" && (
@@ -4722,6 +5001,7 @@ export default function RecreApp() {
             location={location}
             layout="days"
             genderMode
+          onViewProfile={openUserProfile}
           />
         )}
         {tab === "asso" && (
@@ -4737,6 +5017,7 @@ export default function RecreApp() {
             location={location}
             layout="days"
             genderMode
+          onViewProfile={openUserProfile}
           />
         )}
         {tab === "mairie" && pika.role === "mairie" && (
@@ -4762,6 +5043,7 @@ export default function RecreApp() {
             location={location}
             layout="days"
             genderMode
+          onViewProfile={openUserProfile}
           />
         )}
         {tab === "profil" && (
@@ -4811,7 +5093,7 @@ export default function RecreApp() {
         })}
       </div>
 
-      <DetailModal activity={selected} onClose={() => setSelected(null)} joined={joined} onJoin={join} onReport={openReport} />
+      <DetailModal activity={selected} onClose={() => setSelected(null)} joined={joined} onJoin={join} onReport={openReport} onViewProfile={openUserProfile} onShare={setShareTarget} />
 
       {(() => {
         const kindMeta = {
@@ -4832,11 +5114,17 @@ export default function RecreApp() {
             genderMode={meta.genderMode}
             genderLabels={meta.genderLabels}
             onReport={openReport}
+            onViewProfile={openUserProfile}
+            onShare={setShareTarget}
           />
         );
       })()}
 
       {authPrompt && <AuthScreen onClose={() => setAuthPrompt(false)} />}
+
+      {viewingUserId && <UserProfileModal userId={viewingUserId} onClose={() => setViewingUserId(null)} />}
+
+      {shareTarget && <ShareModal item={shareTarget} onClose={() => setShareTarget(null)} />}
 
       {reportTarget && (
         <ReportModal
