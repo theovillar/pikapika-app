@@ -2692,6 +2692,71 @@ function Explorer({ activities, favorites, onToggleFav, onOpen, location }) {
   );
 }
 
+// Champ d'adresse avec suggestions en direct, via l'API officielle et gratuite du gouvernement
+// (Base Adresse Nationale) — aide à saisir une adresse réelle et bien formée, sans obliger à la choisir.
+function AddressInput({ value, onChange, placeholder }) {
+  const [suggestions, setSuggestions] = useState([]);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!value || value.trim().length < 3 || typeof fetch === "undefined") { setSuggestions([]); return; }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(value)}&limit=5`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (cancelled || !data) return;
+          setSuggestions((data.features || []).map((f) => ({ label: f.properties.label, id: f.properties.id })));
+        })
+        .catch(() => { if (!cancelled) setSuggestions([]); });
+    }, 350);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [value]);
+
+  const inputStyle = {
+    width: "100%", border: "2px solid #F0EADB", borderRadius: 14, padding: "12px 14px",
+    fontFamily: "Nunito, sans-serif", fontSize: 14.5, color: COLORS.ink, outline: "none",
+    boxSizing: "border-box", background: "#fff",
+  };
+
+  return (
+    <div style={{ position: "relative" }}>
+      <input
+        style={inputStyle}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => { onChange(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+      />
+      {open && suggestions.length > 0 && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff",
+          border: "2px solid #F0EADB", borderRadius: 14, boxShadow: "0 10px 24px rgba(43,37,96,0.14)",
+          zIndex: 20, maxHeight: 220, overflowY: "auto",
+        }}>
+          {suggestions.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => { onChange(s.label); setSuggestions([]); setOpen(false); }}
+              style={{
+                display: "flex", alignItems: "center", gap: 8, width: "100%", textAlign: "left",
+                background: "transparent", border: "none", padding: "10px 12px", cursor: "pointer",
+                fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: COLORS.ink, borderBottom: "1px solid #F5F1E6",
+              }}
+            >
+              <MapPin size={14} color="#B7AF98" style={{ flexShrink: 0 }} />
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function CreateActivity({ onCreate }) {
   const todayISO = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({
@@ -2748,7 +2813,7 @@ function CreateActivity({ onCreate }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
             <label style={label}>{t("label_lieu")}</label>
-            <input style={inputStyle} placeholder={t("placeholder_lieu")} value={form.lieu} onChange={set("lieu")} />
+            <AddressInput value={form.lieu} onChange={(v) => setForm({ ...form, lieu: v })} placeholder={t("placeholder_lieu")} />
           </div>
         </div>
 
@@ -4060,7 +4125,7 @@ function CreateMeetup({ categories, onCreate }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
             <label style={label}>{t("label_lieu")}</label>
-            <input style={inputStyle} placeholder={t("placeholder_lieu")} value={form.lieu} onChange={set("lieu")} />
+            <AddressInput value={form.lieu} onChange={(v) => setForm({ ...form, lieu: v })} placeholder={t("placeholder_lieu")} />
           </div>
         </div>
 
