@@ -5,7 +5,7 @@ import {
   Baby, Trees, Palette, Music4, Puzzle, Bike, Coffee, Dumbbell,
   Landmark, Gamepad2, Film, Clock, ShieldCheck, Lock, ChevronDown, List, Map,
   Footprints, BookOpen, Flower2, PartyPopper, HeartHandshake, Trophy, Eye, EyeOff, Share2, Link2,
-  Tag, ArrowLeft
+  Tag, ArrowLeft, Camera
 } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup, Circle, CircleMarker, useMap } from "react-leaflet";
 import L from "leaflet";
@@ -101,6 +101,7 @@ const TRANSLATIONS = {
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
+    change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…",
     share_btn: "Partager", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
     share_whatsapp: "WhatsApp", share_message: "Regarde cette sortie sur Orée : {title}",
     report_btn: "Signaler", report_title: "Signaler cette annonce",
@@ -211,6 +212,7 @@ const TRANSLATIONS = {
     auth_association_note: "Your account will be activated after town hall validation.",
     auth_last_name: "Your last name", show_password: "Show password", hide_password: "Hide password",
     profile_not_found: "This profile is not available.", member_since: "Member since {date}",
+    change_photo: "Change photo", photo_uploading: "Uploading photo…",
     share_btn: "Share", share_copy_link: "Copy link", share_link_copied: "Link copied!",
     share_whatsapp: "WhatsApp", share_message: "Check out this outing on Orée: {title}",
     report_btn: "Report", report_title: "Report this listing",
@@ -321,6 +323,7 @@ const TRANSLATIONS = {
     auth_association_note: "Tu cuenta se activará tras la validación del ayuntamiento.",
     auth_last_name: "Tu apellido", show_password: "Mostrar contraseña", hide_password: "Ocultar contraseña",
     profile_not_found: "Este perfil no está disponible.", member_since: "Miembro desde {date}",
+    change_photo: "Cambiar foto", photo_uploading: "Subiendo foto…",
     share_btn: "Compartir", share_copy_link: "Copiar enlace", share_link_copied: "¡Enlace copiado!",
     share_whatsapp: "WhatsApp", share_message: "Mira esta salida en Orée: {title}",
     report_btn: "Denunciar", report_title: "Denunciar este anuncio",
@@ -505,6 +508,46 @@ const FR_DEPARTEMENTS = [
   ["94","Val-de-Marne"],["95","Val-d'Oise"],["971","Guadeloupe"],["972","Martinique"],
   ["973","Guyane"],["974","La Réunion"],["976","Mayotte"],
 ].map(([code, nom]) => ({ code, nom }));
+
+// Redimensionne et compresse une image côté navigateur, en réduisant la qualité JPEG
+// jusqu'à passer sous la limite demandée (1 Mo par défaut) — rien n'est envoyé en base
+// avant d'être déjà allégé.
+function compressImage(file, maxBytes = 1024 * 1024, maxDim = 800) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) { height = Math.round((height * maxDim) / width); width = maxDim; }
+          else { width = Math.round((width * maxDim) / height); height = maxDim; }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        let quality = 0.9;
+        const tryExport = () => {
+          canvas.toBlob((blob) => {
+            if (!blob) { reject(new Error("Échec de la compression")); return; }
+            if (blob.size > maxBytes && quality > 0.3) {
+              quality -= 0.1;
+              tryExport();
+            } else {
+              resolve(blob);
+            }
+          }, "image/jpeg", quality);
+        };
+        tryExport();
+      };
+      img.onerror = () => reject(new Error("Image illisible"));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => reject(new Error("Lecture du fichier impossible"));
+    reader.readAsDataURL(file);
+  });
+}
 
 function haversineKm(lat1, lon1, lat2, lon2) {
   const R = 6371;
@@ -2929,11 +2972,14 @@ function MyOutings({ joined, activities }) {
   );
 }
 
-function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onSignOut }) {
+function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onSignOut, avatarUrl, onUploadAvatar }) {
   const [addingKid, setAddingKid] = useState(false);
   const [kidName, setKidName] = useState("");
   const [kidAge, setKidAge] = useState("");
   const [kidGenre, setKidGenre] = useState("F");
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const fileInputRef = useRef(null);
 
   const submitKid = () => {
     if (!kidName.trim()) return;
@@ -2941,15 +2987,45 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
     setKidName(""); setKidAge(""); setKidGenre("F"); setAddingKid(false);
   };
 
+  const handlePhotoChange = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploadError("");
+    setUploading(true);
+    const { error } = await onUploadAvatar(file);
+    if (error) setUploadError(error);
+    setUploading(false);
+  };
+
   return (
     <div style={{ maxWidth: 480, margin: "0 auto" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 22 }}>
-        <div style={{
-          width: 64, height: 64, borderRadius: "50%", background: COLORS.sky,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: "#fff",
-        }}>
-          {(displayName || "?").charAt(0).toUpperCase()}
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: "50%", background: COLORS.sky,
+            display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
+            fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: "#fff",
+          }}>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              (displayName || "?").charAt(0).toUpperCase()
+            )}
+          </div>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            aria-label={t("change_photo")}
+            style={{
+              position: "absolute", bottom: -2, right: -2, width: 26, height: 26, borderRadius: "50%",
+              background: COLORS.ink, border: "2px solid #fff", display: "flex", alignItems: "center",
+              justifyContent: "center", cursor: uploading ? "default" : "pointer", opacity: uploading ? 0.6 : 1,
+            }}
+          >
+            <Camera size={13} color="#fff" />
+          </button>
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: "none" }} />
         </div>
         <div>
           <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink }}>{displayName}</div>
@@ -2957,6 +3033,13 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
           <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#6B6485" }}>{t("profile_outings_count", { n: joinedCount })}</div>
         </div>
       </div>
+
+      {uploading && (
+        <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", margin: "-14px 0 16px" }}>{t("photo_uploading")}</p>
+      )}
+      {uploadError && (
+        <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: COLORS.coral, margin: "-14px 0 16px" }}>{uploadError}</p>
+      )}
 
       <ValidationStatus validated={validated} onToggleDemo={onToggleDemo} />
 
@@ -3305,7 +3388,7 @@ function UserProfileModal({ userId, onClose }) {
     let cancelled = false;
     setLoading(true);
     setError(false);
-    supabase.from("profiles").select("display_name, genre, role, association_name, created_at").eq("id", userId).single()
+    supabase.from("profiles").select("display_name, genre, role, association_name, created_at, avatar_url").eq("id", userId).single()
       .then(({ data, error: err }) => {
         if (cancelled) return;
         if (err || !data) { setError(true); } else { setProfile(data); }
@@ -3333,10 +3416,14 @@ function UserProfileModal({ userId, onClose }) {
           <>
             <div style={{
               width: 64, height: 64, borderRadius: "50%", background: color, margin: "0 auto 14px",
-              display: "flex", alignItems: "center", justifyContent: "center",
+              display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
               fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 26, color: "#fff",
             }}>
-              {(name || "?").charAt(0).toUpperCase()}
+              {profile.avatar_url ? (
+                <img src={profile.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                (name || "?").charAt(0).toUpperCase()
+              )}
             </div>
             <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 19, color: COLORS.ink, marginBottom: 4 }}>
               {name}
@@ -4577,7 +4664,7 @@ function MairieDashboard({ pendingParents, pendingAssociations, reports, onValid
 function usePikapikaData() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [profile, setProfile] = useState({ displayName: "", parentValidated: false, role: "parent", associationValidated: false, genre: null });
+  const [profile, setProfile] = useState({ displayName: "", parentValidated: false, role: "parent", associationValidated: false, genre: null, avatarUrl: null });
   const [kids, setKids] = useState([]);
   const [rows, setRows] = useState([]);
   const [regByActivity, setRegByActivity] = useState({});
@@ -4636,6 +4723,7 @@ function usePikapikaData() {
           role: profRes.data.role || "parent",
           associationValidated: profRes.data.association_validated,
           genre: profRes.data.genre,
+          avatarUrl: profRes.data.avatar_url,
         });
       }
       setKids(kidsRes.data || []);
@@ -4750,6 +4838,27 @@ function usePikapikaData() {
     setKids((k) => [...k, data]);
   };
 
+  const uploadAvatar = async (file) => {
+    if (!user) return { error: t("auth_error_generic") };
+    try {
+      const blob = await compressImage(file, 1024 * 1024, 800);
+      const path = `${user.id}.jpg`;
+      const { error: uploadErr } = await supabase.storage.from("avatars").upload(path, blob, {
+        contentType: "image/jpeg", upsert: true,
+      });
+      if (uploadErr) throw uploadErr;
+      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+      // on ajoute un paramètre unique pour forcer le rechargement de l'image (le nom de fichier ne change pas)
+      const avatarUrl = `${pub.publicUrl}?t=${Date.now()}`;
+      await supabase.from("profiles").update({ avatar_url: avatarUrl }).eq("id", user.id);
+      setProfile((p) => ({ ...p, avatarUrl }));
+      return { error: null };
+    } catch (e) {
+      console.error("Erreur envoi photo :", e);
+      return { error: e?.message || t("auth_error_generic") };
+    }
+  };
+
   const submitReport = async ({ activityId, reportedUserId, reason, details }) => {
     if (!user) return false;
     const { error } = await supabase.from("reports").insert({
@@ -4777,7 +4886,7 @@ function usePikapikaData() {
   return {
     user, authLoading, dataLoading,
     displayName: profile.displayName, email: user?.email || "", parentValidated: profile.parentValidated,
-    role: profile.role, associationValidated: profile.associationValidated,
+    role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl,
     kids,
     activities, teenItems, adultItems, seniorItems, assoItems,
     favorites, favTeen, favAdult, favSenior, favAsso,
@@ -4790,6 +4899,7 @@ function usePikapikaData() {
     createAdultMeetup: (form) => insertActivity("adult", form),
     toggleParentValidated,
     addKid,
+    uploadAvatar,
     submitReport,
     pendingParents, pendingAssociations, reports,
     validateParent, validateAssociation, resolveReport,
@@ -5127,6 +5237,8 @@ export default function RecreApp() {
             kids={kids}
             onAddKid={pika.addKid}
             onSignOut={pika.signOut}
+            avatarUrl={pika.avatarUrl}
+            onUploadAvatar={pika.uploadAvatar}
           />
         )}
       </div>
