@@ -5,9 +5,10 @@ import {
   Baby, Trees, Palette, Music4, Puzzle, Bike, Coffee, Dumbbell,
   Landmark, Gamepad2, Film, Clock, ShieldCheck, Lock, ChevronDown, List, Map,
   Footprints, BookOpen, Flower2, PartyPopper, HeartHandshake, Trophy, Eye, EyeOff, Share2, Link2,
-  Tag, ArrowLeft, Camera
+  Tag, ArrowLeft, Camera, BarChart3
 } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup, Circle, CircleMarker, useMap } from "react-leaflet";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { supabase } from "./lib/supabaseClient";
@@ -118,6 +119,14 @@ const TRANSLATIONS = {
     mairie_reports: "Signalements", mairie_validate: "Valider", mairie_no_pending: "Rien en attente pour le moment.",
     mairie_report_status_pending: "En attente", mairie_report_status_reviewed: "Traité", mairie_report_status_dismissed: "Classé",
     mairie_mark_reviewed: "Marquer traité", mairie_dismiss: "Classer sans suite",
+    mairie_sub_validations: "Validations", mairie_sub_reports: "Signalements", mairie_sub_stats: "Statistiques",
+    stats_users: "Utilisateurs", stats_total_users: "Comptes créés",
+    stats_by_space: "Sorties proposées par catégorie",
+    stats_all_time_note: "Depuis le lancement, toutes sorties confondues (passées et à venir).",
+    stats_active_today: "Sorties actuellement proposées",
+    stats_active_today_note: "Total, toutes catégories confondues, sorties déjà passées exclues.",
+    stats_monthly_chart: "Sorties créées par mois (12 derniers mois)",
+    stats_outings_created: "sortie(s) créée(s)",
     by_organiser: "Par {org}",
     loc_placeholder: "Ville, code postal, département…", loc_all_france: "Toute la France",
     loc_no_result: 'Aucun résultat pour "{q}"', loc_dept: "Département", loc_ville: "Ville",
@@ -229,6 +238,14 @@ const TRANSLATIONS = {
     mairie_reports: "Reports", mairie_validate: "Validate", mairie_no_pending: "Nothing pending right now.",
     mairie_report_status_pending: "Pending", mairie_report_status_reviewed: "Reviewed", mairie_report_status_dismissed: "Dismissed",
     mairie_mark_reviewed: "Mark reviewed", mairie_dismiss: "Dismiss",
+    mairie_sub_validations: "Validations", mairie_sub_reports: "Reports", mairie_sub_stats: "Statistics",
+    stats_users: "Users", stats_total_users: "Accounts created",
+    stats_by_space: "Outings by category",
+    stats_all_time_note: "Since launch, all outings combined (past and upcoming).",
+    stats_active_today: "Currently proposed outings",
+    stats_active_today_note: "Total across all categories, past outings excluded.",
+    stats_monthly_chart: "Outings created per month (last 12 months)",
+    stats_outings_created: "outing(s) created",
     by_organiser: "By {org}",
     loc_placeholder: "City, postcode, department…", loc_all_france: "All of France",
     loc_no_result: 'No result for "{q}"', loc_dept: "Department", loc_ville: "City",
@@ -340,6 +357,14 @@ const TRANSLATIONS = {
     mairie_reports: "Denuncias", mairie_validate: "Validar", mairie_no_pending: "Nada pendiente por ahora.",
     mairie_report_status_pending: "Pendiente", mairie_report_status_reviewed: "Revisado", mairie_report_status_dismissed: "Descartado",
     mairie_mark_reviewed: "Marcar revisado", mairie_dismiss: "Descartar",
+    mairie_sub_validations: "Validaciones", mairie_sub_reports: "Denuncias", mairie_sub_stats: "Estadísticas",
+    stats_users: "Usuarios", stats_total_users: "Cuentas creadas",
+    stats_by_space: "Salidas por categoría",
+    stats_all_time_note: "Desde el lanzamiento, todas las salidas (pasadas y futuras).",
+    stats_active_today: "Salidas actualmente propuestas",
+    stats_active_today_note: "Total de todas las categorías, salidas pasadas excluidas.",
+    stats_monthly_chart: "Salidas creadas por mes (últimos 12 meses)",
+    stats_outings_created: "salida(s) creada(s)",
     by_organiser: "Por {org}",
     loc_placeholder: "Ciudad, código postal, departamento…", loc_all_france: "Toda Francia",
     loc_no_result: 'Sin resultados para "{q}"', loc_dept: "Departamento", loc_ville: "Ciudad",
@@ -4580,79 +4605,202 @@ function AuthScreen({ onClose }) {
 }
 
 // ---------- Espace mairie ----------
+const SPACE_LABELS = {
+  kids: "tab_enfants", teen: "tab_ados", adult: "tab_adultes", senior: "tab_aine", asso: "tab_associations",
+};
+
+function StatCard({ value, label, color }) {
+  return (
+    <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "16px 14px", textAlign: "center" }}>
+      <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 26, color: color || COLORS.ink }}>{value}</div>
+      <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 11.5, color: "#6B6485", marginTop: 2 }}>{label}</div>
+    </div>
+  );
+}
+
+function StatsSection({ allProfiles, allActivitiesRaw }) {
+  const stats = useMemo(() => {
+    const totalUsers = allProfiles.length;
+    const parents = allProfiles.filter((p) => p.role === "parent");
+    const femmes = parents.filter((p) => p.genre === "F").length;
+    const hommes = parents.filter((p) => p.genre === "H").length;
+
+    const now = new Date();
+    const spaceTotal = {}; const spaceActive = {};
+    allActivitiesRaw.forEach((a) => {
+      spaceTotal[a.space] = (spaceTotal[a.space] || 0) + 1;
+      if (new Date(a.starts_at) >= now) spaceActive[a.space] = (spaceActive[a.space] || 0) + 1;
+    });
+    const totalActiveToday = Object.values(spaceActive).reduce((s, n) => s + n, 0);
+
+    // 12 derniers mois, y compris le mois courant
+    const months = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      months.push({ key: `${d.getFullYear()}-${d.getMonth()}`, date: d, count: 0 });
+    }
+    allActivitiesRaw.forEach((a) => {
+      const d = new Date(a.created_at);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      const m = months.find((mo) => mo.key === key);
+      if (m) m.count += 1;
+    });
+    const locale = LANG === "fr" ? "fr-FR" : LANG === "es" ? "es-ES" : "en-US";
+    const monthlyData = months.map((m) => ({
+      label: m.date.toLocaleDateString(locale, { month: "short" }),
+      count: m.count,
+    }));
+
+    return { totalUsers, femmes, hommes, spaceTotal, spaceActive, totalActiveToday, monthlyData };
+  }, [allProfiles, allActivitiesRaw]);
+
+  return (
+    <div>
+      <SectionLabel>{t("stats_users")}</SectionLabel>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 26 }}>
+        <StatCard value={stats.totalUsers} label={t("stats_total_users")} />
+        <StatCard value={stats.femmes} label={t("legend_femme")} color={COLORS.girl} />
+        <StatCard value={stats.hommes} label={t("legend_homme")} color={COLORS.boy} />
+      </div>
+
+      <SectionLabel>{t("stats_by_space")}</SectionLabel>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap: 10, marginBottom: 10 }}>
+        {Object.entries(SPACE_LABELS).map(([space, labelKey]) => (
+          <StatCard key={space} value={stats.spaceTotal[space] || 0} label={t(labelKey)} />
+        ))}
+      </div>
+      <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 12, color: "#9A93AF", margin: "0 0 26px" }}>
+        {t("stats_all_time_note")}
+      </p>
+
+      <SectionLabel>{t("stats_active_today")}</SectionLabel>
+      <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "18px 16px", marginBottom: 26, textAlign: "center" }}>
+        <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 32, color: COLORS.grass }}>{stats.totalActiveToday}</div>
+        <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 12.5, color: "#6B6485", marginTop: 2 }}>{t("stats_active_today_note")}</div>
+      </div>
+
+      <SectionLabel>{t("stats_monthly_chart")}</SectionLabel>
+      <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "14px 8px 4px", height: 260 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={stats.monthlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#F0EADB" vertical={false} />
+            <XAxis dataKey="label" tick={{ fontFamily: "Nunito, sans-serif", fontSize: 11, fill: "#6B6485" }} axisLine={false} tickLine={false} />
+            <YAxis allowDecimals={false} tick={{ fontFamily: "Nunito, sans-serif", fontSize: 11, fill: "#6B6485" }} axisLine={false} tickLine={false} width={28} />
+            <Tooltip
+              contentStyle={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, borderRadius: 10, border: "2px solid #F0EADB" }}
+              labelStyle={{ fontWeight: 800, color: COLORS.ink }}
+              formatter={(value) => [value, t("stats_outings_created")]}
+            />
+            <Bar dataKey="count" fill={COLORS.sun} radius={[6, 6, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
+
 function MairieDashboard({ pendingParents, pendingAssociations, reports, onValidateParent, onValidateAssociation, onResolveReport }) {
+  const [sub, setSub] = useState("validations");
   const reasonLabel = (r) => t(`report_reason_${r}`) !== `report_reason_${r}` ? t(`report_reason_${r}`) : r;
   const statusLabel = (s) => t(`mairie_report_status_${s}`);
 
+  const subTabs = [
+    { id: "validations", label: t("mairie_sub_validations") },
+    { id: "reports", label: t("mairie_sub_reports") },
+  ];
+
   return (
     <div style={{ maxWidth: 640, margin: "0 auto" }}>
-      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 20px" }}>
+      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 16px" }}>
         {t("mairie_title")}
       </h1>
 
-      <SectionLabel>{t("mairie_pending_parents")}</SectionLabel>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 26 }}>
-        {pendingParents.length === 0 && (
-          <p style={{ color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}>{t("mairie_no_pending")}</p>
-        )}
-        {pendingParents.map((p) => (
-          <div key={p.id} style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: COLORS.ink }}>{p.display_name}</span>
-            <PillButton color={COLORS.grass} textColor="#fff" onClick={() => onValidateParent(p.id)} style={{ padding: "7px 14px", fontSize: 12.5 }}>
-              {t("mairie_validate")}
-            </PillButton>
-          </div>
+      <div style={{ display: "inline-flex", background: "#F0EADB", borderRadius: 14, padding: 4, marginBottom: 22, flexWrap: "wrap" }}>
+        {subTabs.map((s) => (
+          <button
+            key={s.id}
+            onClick={() => setSub(s.id)}
+            style={{
+              border: "none", cursor: "pointer",
+              background: sub === s.id ? COLORS.ink : "transparent",
+              color: sub === s.id ? "#fff" : "#6B6485",
+              padding: "8px 14px", borderRadius: 12, fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
+            }}
+          >
+            {s.label}
+          </button>
         ))}
       </div>
 
-      <SectionLabel>{t("mairie_pending_assos")}</SectionLabel>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 26 }}>
-        {pendingAssociations.length === 0 && (
-          <p style={{ color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}>{t("mairie_no_pending")}</p>
-        )}
-        {pendingAssociations.map((p) => (
-          <div key={p.id} style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: COLORS.ink }}>{p.association_name || p.display_name}</span>
-            <PillButton color={COLORS.grass} textColor="#fff" onClick={() => onValidateAssociation(p.id)} style={{ padding: "7px 14px", fontSize: 12.5 }}>
-              {t("mairie_validate")}
-            </PillButton>
-          </div>
-        ))}
-      </div>
-
-      <SectionLabel>{t("mairie_reports")}</SectionLabel>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {reports.length === 0 && (
-          <p style={{ color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}>{t("mairie_no_pending")}</p>
-        )}
-        {reports.map((r) => (
-          <div key={r.id} style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "14px 16px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-              <span style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: COLORS.ink }}>{reasonLabel(r.reason)}</span>
-              <span style={{
-                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11, padding: "3px 9px", borderRadius: 999,
-                background: r.status === "pending" ? "#FFF4DD" : r.status === "reviewed" ? "#EAF8ED" : "#EDEAF4",
-                color: r.status === "pending" ? COLORS.sun : r.status === "reviewed" ? COLORS.grass : "#9A93AF",
-              }}>
-                {statusLabel(r.status)}
-              </span>
-            </div>
-            {r.details && (
-              <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#5C5578", margin: "0 0 10px" }}>{r.details}</p>
+      {sub === "validations" && (
+        <>
+          <SectionLabel>{t("mairie_pending_parents")}</SectionLabel>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 26 }}>
+            {pendingParents.length === 0 && (
+              <p style={{ color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}>{t("mairie_no_pending")}</p>
             )}
-            {r.status === "pending" && (
-              <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => onResolveReport(r.id, "reviewed")} style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, background: COLORS.ink, color: "#fff", border: "none", borderRadius: 10, padding: "7px 12px", cursor: "pointer" }}>
-                  {t("mairie_mark_reviewed")}
-                </button>
-                <button onClick={() => onResolveReport(r.id, "dismissed")} style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, background: "transparent", color: "#9A93AF", border: "2px solid #F0EADB", borderRadius: 10, padding: "7px 12px", cursor: "pointer" }}>
-                  {t("mairie_dismiss")}
-                </button>
+            {pendingParents.map((p) => (
+              <div key={p.id} style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: COLORS.ink }}>{p.display_name}</span>
+                <PillButton color={COLORS.grass} textColor="#fff" onClick={() => onValidateParent(p.id)} style={{ padding: "7px 14px", fontSize: 12.5 }}>
+                  {t("mairie_validate")}
+                </PillButton>
               </div>
-            )}
+            ))}
           </div>
-        ))}
-      </div>
+
+          <SectionLabel>{t("mairie_pending_assos")}</SectionLabel>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {pendingAssociations.length === 0 && (
+              <p style={{ color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}>{t("mairie_no_pending")}</p>
+            )}
+            {pendingAssociations.map((p) => (
+              <div key={p.id} style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: COLORS.ink }}>{p.association_name || p.display_name}</span>
+                <PillButton color={COLORS.grass} textColor="#fff" onClick={() => onValidateAssociation(p.id)} style={{ padding: "7px 14px", fontSize: 12.5 }}>
+                  {t("mairie_validate")}
+                </PillButton>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {sub === "reports" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {reports.length === 0 && (
+            <p style={{ color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}>{t("mairie_no_pending")}</p>
+          )}
+          {reports.map((r) => (
+            <div key={r.id} style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "14px 16px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
+                <span style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: COLORS.ink }}>{reasonLabel(r.reason)}</span>
+                <span style={{
+                  fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11, padding: "3px 9px", borderRadius: 999,
+                  background: r.status === "pending" ? "#FFF4DD" : r.status === "reviewed" ? "#EAF8ED" : "#EDEAF4",
+                  color: r.status === "pending" ? COLORS.sun : r.status === "reviewed" ? COLORS.grass : "#9A93AF",
+                }}>
+                  {statusLabel(r.status)}
+                </span>
+              </div>
+              {r.details && (
+                <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#5C5578", margin: "0 0 10px" }}>{r.details}</p>
+              )}
+              {r.status === "pending" && (
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button onClick={() => onResolveReport(r.id, "reviewed")} style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, background: COLORS.ink, color: "#fff", border: "none", borderRadius: 10, padding: "7px 12px", cursor: "pointer" }}>
+                    {t("mairie_mark_reviewed")}
+                  </button>
+                  <button onClick={() => onResolveReport(r.id, "dismissed")} style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, background: "transparent", color: "#9A93AF", border: "2px solid #F0EADB", borderRadius: 10, padding: "7px 12px", cursor: "pointer" }}>
+                    {t("mairie_dismiss")}
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
     </div>
   );
 }
@@ -4664,7 +4812,7 @@ function MairieDashboard({ pendingParents, pendingAssociations, reports, onValid
 function usePikapikaData() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [profile, setProfile] = useState({ displayName: "", parentValidated: false, role: "parent", associationValidated: false, genre: null, avatarUrl: null });
+  const [profile, setProfile] = useState({ displayName: "", parentValidated: false, role: "parent", associationValidated: false, genre: null, avatarUrl: null, isAdmin: false });
   const [kids, setKids] = useState([]);
   const [rows, setRows] = useState([]);
   const [regByActivity, setRegByActivity] = useState({});
@@ -4674,6 +4822,7 @@ function usePikapikaData() {
   const [pendingParents, setPendingParents] = useState([]);
   const [pendingAssociations, setPendingAssociations] = useState([]);
   const [reports, setReports] = useState([]);
+  const [allProfiles, setAllProfiles] = useState([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -4724,6 +4873,7 @@ function usePikapikaData() {
           associationValidated: profRes.data.association_validated,
           genre: profRes.data.genre,
           avatarUrl: profRes.data.avatar_url,
+          isAdmin: !!profRes.data.is_admin,
         });
       }
       setKids(kidsRes.data || []);
@@ -4736,20 +4886,25 @@ function usePikapikaData() {
 
   // Données réservées à la mairie : profils en attente de validation + signalements
   const loadMairieData = async () => {
-    const [parentsRes, assosRes, reportsRes] = await Promise.all([
+    const [parentsRes, assosRes, reportsRes, allProfilesRes] = await Promise.all([
       supabase.from("profiles").select("*").eq("role", "parent").eq("parent_validated", false),
       supabase.from("profiles").select("*").eq("role", "association").eq("association_validated", false),
       supabase.from("reports").select("*").order("created_at", { ascending: false }),
+      supabase.from("profiles").select("genre, role"),
     ]);
     setPendingParents(parentsRes.data || []);
     setPendingAssociations(assosRes.data || []);
     setReports(reportsRes.data || []);
+    setAllProfiles(allProfilesRes.data || []);
   };
 
   useEffect(() => {
     if (user && profile.role === "mairie") loadMairieData();
+    if (user && profile.isAdmin) {
+      supabase.from("profiles").select("genre, role").then(({ data }) => setAllProfiles(data || []));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, profile.role]);
+  }, [user?.id, profile.role, profile.isAdmin]);
 
   const mapRow = (row) => {
     const start = new Date(row.starts_at);
@@ -4887,6 +5042,7 @@ function usePikapikaData() {
     user, authLoading, dataLoading,
     displayName: profile.displayName, email: user?.email || "", parentValidated: profile.parentValidated,
     role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl,
+    isAdmin: profile.isAdmin,
     kids,
     activities, teenItems, adultItems, seniorItems, assoItems,
     favorites, favTeen, favAdult, favSenior, favAsso,
@@ -4901,7 +5057,7 @@ function usePikapikaData() {
     addKid,
     uploadAvatar,
     submitReport,
-    pendingParents, pendingAssociations, reports,
+    pendingParents, pendingAssociations, reports, allProfiles, allActivitiesRaw: rows,
     validateParent, validateAssociation, resolveReport,
     signOut: () => supabase.auth.signOut(),
   };
@@ -5007,6 +5163,7 @@ export default function RecreApp() {
   const HEADER_ACTIONS = pika.user ? [
     { id: "creer", label: t("tab_creer"), icon: PlusCircle },
     { id: "mes-sorties", label: t("tab_mes_sorties"), icon: BookMarked },
+    ...(pika.isAdmin ? [{ id: "stats", label: t("mairie_sub_stats"), icon: BarChart3 }] : []),
     { id: "profil", label: t("tab_profil"), icon: UserCircle2 },
   ] : [];
 
@@ -5209,6 +5366,8 @@ export default function RecreApp() {
             onValidateParent={pika.validateParent}
             onValidateAssociation={pika.validateAssociation}
             onResolveReport={pika.resolveReport}
+            allProfiles={pika.allProfiles}
+            allActivitiesRaw={pika.allActivitiesRaw}
           />
         )}
         {tab === "ados" && parentValidated && (
@@ -5226,6 +5385,9 @@ export default function RecreApp() {
             genderMode
           onViewProfile={openUserProfile}
           />
+        )}
+        {tab === "stats" && pika.isAdmin && (
+          <StatsSection allProfiles={pika.allProfiles} allActivitiesRaw={pika.allActivitiesRaw} />
         )}
         {tab === "profil" && (
           <Profile
