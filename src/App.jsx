@@ -75,8 +75,8 @@ const TRANSLATIONS = {
     detail_registered_children: "Enfants déjà inscrits", legend_girl: "Fille", legend_boy: "Garçon",
     detail_joined: "Vous participez", detail_join_kids: "Rejoindre avec mon enfant",
     detail_already_registered: "Déjà inscrit(e)s",
-    community_adult_title: "Sorties entre parents",
-    community_adult_subtitle: "Des moments entre adultes, sans les enfants, pour se connaître entre parents du quartier.",
+    community_adult_title: "Sorties adultes",
+    community_adult_subtitle: "Des moments pour se retrouver entre parents du quartier.",
     community_teen_title: "Sorties entre jeunes",
     community_teen_subtitle: "Des activités entre jeunes, toujours encadrées par une association, une MJC ou un professeur.",
     community_empty: "Aucune sortie ne correspond. Essayez une autre recherche !",
@@ -777,7 +777,7 @@ const ADULT_MEETUPS = [
     places: 8,
     inscrits: 4,
     organisateur: "Julien P.",
-    desc: "Une soirée détente entre parents, sans les enfants, autour de jeux de société et d'un apéro partagé.",
+    desc: "Une soirée détente entre parents, autour de jeux de société et d'un apéro partagé.",
     participants: [
       { name: "Julien", genre: "H" }, { name: "Marc", genre: "H" }, { name: "Alice", genre: "F" }, { name: "Vincent", genre: "H" },
     ],
@@ -847,7 +847,7 @@ const ADULT_MEETUPS = [
     places: 19,
     inscrits: 5,
     organisateur: "Sarah W.",
-    desc: "Une soirée détente entre parents, sans les enfants, autour de jeux et d'un apéro partagé.",
+    desc: "Une soirée détente entre parents, autour de jeux et d'un apéro partagé.",
     participants: [{ name: "Romain", genre: "H" }, { name: "Marion", genre: "F" }, { name: "Benjamin", genre: "H" }, { name: "Karim", genre: "H" }, { name: "Vincent", genre: "H" }, { name: "Benjamin", genre: "H" }, { name: "Maxime", genre: "H" }, { name: "Léa", genre: "F" }, { name: "Sophie", genre: "F" }],
   },
   {
@@ -916,7 +916,7 @@ const ADULT_MEETUPS = [
     places: 9,
     inscrits: 3,
     organisateur: "Antoine T.",
-    desc: "Une soirée détente entre parents, sans les enfants, autour de jeux et d'un apéro partagé.",
+    desc: "Une soirée détente entre parents, autour de jeux et d'un apéro partagé.",
     participants: [{ name: "Benjamin", genre: "H" }, { name: "Julien", genre: "H" }, { name: "David", genre: "H" }],
   },
   {
@@ -985,7 +985,7 @@ const ADULT_MEETUPS = [
     places: 17,
     inscrits: 6,
     organisateur: "Laura K.",
-    desc: "Une soirée détente entre parents, sans les enfants, autour de jeux et d'un apéro partagé.",
+    desc: "Une soirée détente entre parents, autour de jeux et d'un apéro partagé.",
     participants: [{ name: "Nicolas", genre: "H" }, { name: "Antoine", genre: "H" }, { name: "Antoine", genre: "H" }, { name: "Marc", genre: "H" }, { name: "Léa", genre: "F" }, { name: "Marc", genre: "H" }],
   },
   {
@@ -1055,7 +1055,7 @@ const ADULT_MEETUPS = [
     places: 9,
     inscrits: 6,
     organisateur: "Fanny P.",
-    desc: "Une soirée détente entre parents, sans les enfants, autour de jeux et d'un apéro partagé.",
+    desc: "Une soirée détente entre parents, autour de jeux et d'un apéro partagé.",
     participants: [{ name: "Benjamin", genre: "H" }, { name: "Nicolas", genre: "H" }, { name: "Fanny", genre: "F" }, { name: "Maxime", genre: "H" }, { name: "Vincent", genre: "H" }, { name: "Hugo", genre: "H" }, { name: "Kevin", genre: "H" }, { name: "Sarah", genre: "F" }, { name: "Nicolas", genre: "H" }, { name: "Emma", genre: "F" }, { name: "Thomas", genre: "H" }],
   },
   {
@@ -1125,7 +1125,7 @@ const ADULT_MEETUPS = [
     places: 6,
     inscrits: 4,
     organisateur: "Amandine N.",
-    desc: "Une soirée détente entre parents, sans les enfants, autour de jeux et d'un apéro partagé.",
+    desc: "Une soirée détente entre parents, autour de jeux et d'un apéro partagé.",
     participants: [{ name: "Benjamin", genre: "H" }, { name: "David", genre: "H" }, { name: "Julie", genre: "F" }, { name: "Sophie", genre: "F" }, { name: "Emma", genre: "F" }, { name: "Guillaume", genre: "H" }, { name: "Rachid", genre: "H" }, { name: "Romain", genre: "H" }, { name: "Karim", genre: "H" }, { name: "Léa", genre: "F" }, { name: "Marion", genre: "F" }],
   },
   {
@@ -1194,7 +1194,7 @@ const ADULT_MEETUPS = [
     places: 19,
     inscrits: 4,
     organisateur: "Laura Q.",
-    desc: "Une soirée détente entre parents, sans les enfants, autour de jeux et d'un apéro partagé.",
+    desc: "Une soirée détente entre parents, autour de jeux et d'un apéro partagé.",
     participants: [{ name: "Romain", genre: "H" }, { name: "Aurélie", genre: "F" }, { name: "Thomas", genre: "H" }, { name: "Charlotte", genre: "F" }, { name: "Maxime", genre: "H" }, { name: "Amandine", genre: "F" }, { name: "Antoine", genre: "H" }, { name: "Adrien", genre: "H" }, { name: "Julien", genre: "H" }, { name: "Léa", genre: "F" }],
   },
   {
@@ -1263,7 +1263,7 @@ const ADULT_MEETUPS = [
     places: 18,
     inscrits: 9,
     organisateur: "Kevin N.",
-    desc: "Une soirée détente entre parents, sans les enfants, autour de jeux et d'un apéro partagé.",
+    desc: "Une soirée détente entre parents, autour de jeux et d'un apéro partagé.",
     participants: [{ name: "Pauline", genre: "F" }, { name: "Hugo", genre: "H" }, { name: "Marc", genre: "H" }, { name: "Vincent", genre: "H" }, { name: "Nicolas", genre: "H" }, { name: "Antoine", genre: "H" }, { name: "Thomas", genre: "H" }, { name: "Laura", genre: "F" }, { name: "Sophie", genre: "F" }, { name: "Amandine", genre: "F" }],
   },
   {
@@ -1332,7 +1332,7 @@ const ADULT_MEETUPS = [
     places: 12,
     inscrits: 3,
     organisateur: "Marion D.",
-    desc: "Une soirée détente entre parents, sans les enfants, autour de jeux et d'un apéro partagé.",
+    desc: "Une soirée détente entre parents, autour de jeux et d'un apéro partagé.",
     participants: [{ name: "Paul", genre: "H" }, { name: "Sarah", genre: "F" }, { name: "Antoine", genre: "H" }, { name: "Aurélie", genre: "F" }],
   },
   {
@@ -1402,7 +1402,7 @@ const ADULT_MEETUPS = [
     places: 9,
     inscrits: 9,
     organisateur: "Benjamin E.",
-    desc: "Une soirée détente entre parents, sans les enfants, autour de jeux et d'un apéro partagé.",
+    desc: "Une soirée détente entre parents, autour de jeux et d'un apéro partagé.",
     participants: [{ name: "Guillaume", genre: "H" }, { name: "Sophie", genre: "F" }, { name: "Guillaume", genre: "H" }, { name: "Benjamin", genre: "H" }, { name: "Marion", genre: "F" }, { name: "Mathieu", genre: "H" }, { name: "Léa", genre: "F" }, { name: "Guillaume", genre: "H" }, { name: "Nicolas", genre: "H" }, { name: "Florian", genre: "H" }],
   },
   {
@@ -1472,7 +1472,7 @@ const ADULT_MEETUPS = [
     places: 11,
     inscrits: 5,
     organisateur: "Antoine Q.",
-    desc: "Une soirée détente entre parents, sans les enfants, autour de jeux et d'un apéro partagé.",
+    desc: "Une soirée détente entre parents, autour de jeux et d'un apéro partagé.",
     participants: [{ name: "Charlotte", genre: "F" }, { name: "Alexandre", genre: "H" }, { name: "Julie", genre: "F" }, { name: "Claire", genre: "F" }, { name: "Guillaume", genre: "H" }, { name: "Yasmine", genre: "F" }, { name: "Rachid", genre: "H" }, { name: "Marc", genre: "H" }],
   },
   {
