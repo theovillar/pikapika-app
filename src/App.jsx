@@ -101,7 +101,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "Âge moyen : {age} ans",
+    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "Âge moyen : {age} ans", btn_enregistrer: "Enregistrer",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
@@ -237,7 +237,7 @@ const TRANSLATIONS = {
     auth_association_name: "Association name",
     auth_association_note: "Your account will be activated after town hall validation.",
     auth_last_name: "Your last name", show_password: "Show password", hide_password: "Hide password",
-    auth_commune_placeholder: "Your town (optional)", auth_birthdate_label: "Date of birth (optional)", avg_age_badge: "Average age: {age}",
+    auth_commune_placeholder: "Your town (optional)", auth_birthdate_label: "Date of birth (optional)", avg_age_badge: "Average age: {age}", btn_enregistrer: "Save",
     mairie_no_commune: "No town assigned to this town hall account — contact the site administrator.",
     mairie_territory: "Territory: {commune}",
     profile_not_found: "This profile is not available.", member_since: "Member since {date}",
@@ -373,7 +373,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nombre de la asociación",
     auth_association_note: "Tu cuenta se activará tras la validación del ayuntamiento.",
     auth_last_name: "Tu apellido", show_password: "Mostrar contraseña", hide_password: "Ocultar contraseña",
-    auth_commune_placeholder: "Tu localidad (opcional)", auth_birthdate_label: "Fecha de nacimiento (opcional)", avg_age_badge: "Edad media: {age}",
+    auth_commune_placeholder: "Tu localidad (opcional)", auth_birthdate_label: "Fecha de nacimiento (opcional)", avg_age_badge: "Edad media: {age}", btn_enregistrer: "Guardar",
     mairie_no_commune: "Ningún municipio asignado a esta cuenta de ayuntamiento — contacta con el administrador del sitio.",
     mairie_territory: "Territorio: {commune}",
     profile_not_found: "Este perfil no está disponible.", member_since: "Miembro desde {date}",
@@ -3077,19 +3077,27 @@ function MyOutings({ joined, activities }) {
   );
 }
 
-function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onSignOut, avatarUrl, onUploadAvatar }) {
+function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate }) {
   const [addingKid, setAddingKid] = useState(false);
   const [kidName, setKidName] = useState("");
   const [kidAge, setKidAge] = useState("");
   const [kidGenre, setKidGenre] = useState("F");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [birthdateInput, setBirthdateInput] = useState(birthdate || "");
+  const [birthdateSaved, setBirthdateSaved] = useState(false);
   const fileInputRef = useRef(null);
 
   const submitKid = () => {
     if (!kidName.trim()) return;
     onAddKid({ name: kidName.trim(), age: Number(kidAge) || null, genre: kidGenre });
     setKidName(""); setKidAge(""); setKidGenre("F"); setAddingKid(false);
+  };
+
+  const saveBirthdate = async () => {
+    await onUpdateBirthdate(birthdateInput);
+    setBirthdateSaved(true);
+    setTimeout(() => setBirthdateSaved(false), 2000);
   };
 
   const handlePhotoChange = async (e) => {
@@ -3147,6 +3155,21 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
       )}
 
       <ValidationStatus validated={validated} onToggleDemo={onToggleDemo} />
+
+      <SectionLabel>{t("auth_birthdate_label")}</SectionLabel>
+      <div style={{ display: "flex", gap: 8, marginBottom: 22, alignItems: "center" }}>
+        <input
+          type="date" value={birthdateInput} onChange={(e) => setBirthdateInput(e.target.value)}
+          max={new Date().toISOString().slice(0, 10)}
+          style={{
+            flex: 1, border: "2px solid #F0EADB", borderRadius: 14, padding: "10px 14px",
+            fontFamily: "Nunito, sans-serif", fontSize: 14, color: COLORS.ink, outline: "none", boxSizing: "border-box",
+          }}
+        />
+        <PillButton color={birthdateSaved ? COLORS.grass : COLORS.ink} textColor="#fff" onClick={saveBirthdate} style={{ padding: "10px 16px", fontSize: 13, whiteSpace: "nowrap" }}>
+          {birthdateSaved ? <Check size={16} /> : t("btn_enregistrer")}
+        </PillButton>
+      </div>
 
       <SectionLabel>{t("profile_children")}</SectionLabel>
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 22 }}>
@@ -5273,6 +5296,7 @@ function usePikapikaData() {
           genre: profRes.data.genre,
           avatarUrl: profRes.data.avatar_url,
           isAdmin: !!profRes.data.is_admin,
+          birthdate: profRes.data.birthdate,
           commune: profRes.data.commune,
           banned: !!profRes.data.banned,
         });
@@ -5399,6 +5423,13 @@ function usePikapikaData() {
     setKids((k) => [...k, data]);
   };
 
+  const updateBirthdate = async (birthdate) => {
+    if (!user) return;
+    const { error } = await supabase.from("profiles").update({ birthdate: birthdate || null }).eq("id", user.id);
+    if (error) { console.error("Erreur date de naissance :", error); return; }
+    setProfile((p) => ({ ...p, birthdate: birthdate || null }));
+  };
+
   const uploadAvatar = async (file) => {
     if (!user) return { error: t("auth_error_generic") };
     try {
@@ -5505,7 +5536,7 @@ function usePikapikaData() {
     user, authLoading, dataLoading,
     displayName: profile.displayName, email: user?.email || "", parentValidated: profile.parentValidated,
     role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl,
-    isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune,
+    isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune, birthdate: profile.birthdate,
     kids,
     activities, teenItems, adultItems, seniorItems, assoItems,
     favorites, favTeen, favAdult, favSenior, favAsso,
@@ -5519,6 +5550,7 @@ function usePikapikaData() {
     createAssoEvent: (form) => insertActivity("asso", form),
     toggleParentValidated,
     addKid,
+    updateBirthdate,
     uploadAvatar,
     submitReport,
     pendingParents, pendingAssociations, reports, allProfiles, allActivitiesRaw: rows,
@@ -5879,6 +5911,8 @@ export default function RecreApp() {
             onSignOut={pika.signOut}
             avatarUrl={pika.avatarUrl}
             onUploadAvatar={pika.uploadAvatar}
+            birthdate={pika.birthdate}
+            onUpdateBirthdate={pika.updateBirthdate}
           />
         )}
       </div>
