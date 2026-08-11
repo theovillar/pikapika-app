@@ -101,7 +101,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)",
+    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "Âge moyen : {age} ans",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
@@ -237,7 +237,7 @@ const TRANSLATIONS = {
     auth_association_name: "Association name",
     auth_association_note: "Your account will be activated after town hall validation.",
     auth_last_name: "Your last name", show_password: "Show password", hide_password: "Hide password",
-    auth_commune_placeholder: "Your town (optional)", auth_birthdate_label: "Date of birth (optional)",
+    auth_commune_placeholder: "Your town (optional)", auth_birthdate_label: "Date of birth (optional)", avg_age_badge: "Average age: {age}",
     mairie_no_commune: "No town assigned to this town hall account — contact the site administrator.",
     mairie_territory: "Territory: {commune}",
     profile_not_found: "This profile is not available.", member_since: "Member since {date}",
@@ -373,7 +373,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nombre de la asociación",
     auth_association_note: "Tu cuenta se activará tras la validación del ayuntamiento.",
     auth_last_name: "Tu apellido", show_password: "Mostrar contraseña", hide_password: "Ocultar contraseña",
-    auth_commune_placeholder: "Tu localidad (opcional)", auth_birthdate_label: "Fecha de nacimiento (opcional)",
+    auth_commune_placeholder: "Tu localidad (opcional)", auth_birthdate_label: "Fecha de nacimiento (opcional)", avg_age_badge: "Edad media: {age}",
     mairie_no_commune: "Ningún municipio asignado a esta cuenta de ayuntamiento — contacta con el administrador del sitio.",
     mairie_territory: "Territorio: {commune}",
     profile_not_found: "Este perfil no está disponible.", member_since: "Miembro desde {date}",
@@ -2333,10 +2333,11 @@ function participantName(p) { return typeof p === "string" ? p : p.name; }
 
 // Met en avant le pseudo de l'organisateur, coloré par genre quand il est connu
 // (les comptes association/institutions n'ont pas de genre : couleur neutre).
-function OrganiserBadge({ name, genre, size = 14, userId, onClick }) {
+function OrganiserBadge({ name, genre, size = 14, userId, onClick, age }) {
   if (!name) return null;
   const color = genre ? genreColor(genre) : COLORS.ink;
   const clickable = !!(userId && onClick);
+  const label = age ? `${t("by_organiser", { org: name })} · ${age} ${t("profile_years")}` : t("by_organiser", { org: name });
   const content = (
     <>
       <div style={{
@@ -2347,7 +2348,7 @@ function OrganiserBadge({ name, genre, size = 14, userId, onClick }) {
         {name.charAt(0).toUpperCase()}
       </div>
       <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: size, color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", textDecoration: clickable ? "underline" : "none" }}>
-        {t("by_organiser", { org: name })}
+        {label}
       </span>
     </>
   );
@@ -2362,6 +2363,21 @@ function OrganiserBadge({ name, genre, size = 14, userId, onClick }) {
     );
   }
   return <div style={{ display: "flex", alignItems: "center", gap: 7 }}>{content}</div>;
+}
+
+// Donne une intuition de la tranche d'âge d'une sortie — n'apparaît que s'il y a
+// suffisamment de vraies personnes inscrites avec un âge connu (jamais de date exacte affichée).
+function AvgAgeBadge({ avg, size = 11 }) {
+  if (!avg) return null;
+  return (
+    <span style={{
+      display: "inline-flex", alignItems: "center", gap: 3, background: "#EDEAF4",
+      color: COLORS.grape, fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: size,
+      padding: "2px 8px", borderRadius: 999, whiteSpace: "nowrap", flexShrink: 0,
+    }}>
+      {t("avg_age_badge", { age: avg })}
+    </span>
+  );
 }
 
 function PlainAvatar({ participant, color, size, overlap = false, genderMode = false }) {
@@ -3690,9 +3706,10 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
           {activity.title}
         </h2>
 
-        {activity.prix && (
+        {activity.payant && (
           <div style={{ marginBottom: 12 }}>
             <PriceBadge payant={activity.payant} size={14} />
+            <AvgAgeBadge avg={activity.participantsAvgAge} size={13} />
           </div>
         )}
 
@@ -3709,7 +3726,7 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
         )}
 
         <div style={{ marginBottom: 14 }}>
-          <OrganiserBadge name={activity.organisateur} genre={activity.organisateurGenre} size={20} userId={activity.createdBy} onClick={onViewProfile} />
+          <OrganiserBadge name={activity.organisateur} genre={activity.organisateurGenre} size={20} userId={activity.createdBy} onClick={onViewProfile} age={activity.organiserAge} />
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
@@ -3842,6 +3859,7 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
               {meta.label}
             </span>
             <PriceBadge payant={item.payant} size={13} />
+            <AvgAgeBadge avg={item.participantsAvgAge} size={12} />
           </div>
           <h3 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 18, color: COLORS.ink, margin: "0 34px 6px 0", lineHeight: 1.15 }}>
             {item.title}
@@ -3856,7 +3874,7 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
       </div>
 
       <div style={{ marginTop: 8 }}>
-        <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={16} userId={item.createdBy} onClick={onViewProfile} />
+        <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={16} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
       </div>
 
       <PlainParticipantsRow names={item.participants} color={meta.color} genderMode={genderMode} />
@@ -3936,10 +3954,11 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
             {lieuAvecVille(item)}
           </span>
           <PriceBadge payant={item.payant} size={12} />
+          <AvgAgeBadge avg={item.participantsAvgAge} size={11} />
         </div>
         {item.organisateur && (
           <div style={{ marginTop: 3 }}>
-            <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={15} userId={item.createdBy} onClick={onViewProfile} />
+            <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={15} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
           </div>
         )}
       </div>
@@ -4145,9 +4164,10 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
           {item.title}
         </h2>
 
-        {item.prix && (
+        {item.payant && (
           <div style={{ marginBottom: 12 }}>
             <PriceBadge payant={item.payant} size={14} />
+            <AvgAgeBadge avg={item.participantsAvgAge} size={13} />
           </div>
         )}
 
@@ -4164,7 +4184,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
         )}
 
         <div style={{ marginBottom: 14 }}>
-          <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={20} userId={item.createdBy} onClick={onViewProfile} />
+          <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={20} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
@@ -5187,6 +5207,7 @@ function usePikapikaData() {
   const [kids, setKids] = useState([]);
   const [rows, setRows] = useState([]);
   const [regByActivity, setRegByActivity] = useState({});
+  const [ageStats, setAgeStats] = useState({});
   const [myRegs, setMyRegs] = useState(new Set());
   const [myFavs, setMyFavs] = useState(new Set());
   const [dataLoading, setDataLoading] = useState(true);
@@ -5220,6 +5241,13 @@ function usePikapikaData() {
       const counts = {};
       (regRows || []).forEach((r) => { counts[r.activity_id] = (counts[r.activity_id] || 0) + 1; });
       setRegByActivity(counts);
+
+      // Âges (moyennes/arrondis uniquement — jamais de date de naissance individuelle transmise)
+      const { data: ageRows } = await supabase.from("activity_age_stats").select("*");
+      if (cancelled) return;
+      const ages = {};
+      (ageRows || []).forEach((a) => { ages[a.activity_id] = { organiserAge: a.organiser_age, participantsAvgAge: a.participants_avg_age }; });
+      setAgeStats(ages);
     })();
     return () => { cancelled = true; };
   }, []);
@@ -5288,6 +5316,7 @@ function usePikapikaData() {
     const startDay = new Date(start); startDay.setHours(0, 0, 0, 0);
     const offsetDays = Math.round((startDay - today) / 86400000);
     const time = `${String(start.getHours()).padStart(2, "0")}h${String(start.getMinutes()).padStart(2, "0")}`;
+    const ages = ageStats[row.id] || {};
     return {
       id: row.id, title: row.title, category: row.category, ville: row.ville, lieu: row.lieu,
       offsetDays, time, age: row.age, info: row.info, places: row.places,
@@ -5296,15 +5325,16 @@ function usePikapikaData() {
       intergen: row.intergen, intergenNote: row.intergen_note,
       participants: row.demo_participants || [],
       createdBy: row.created_by, payant: row.payant,
+      organiserAge: ages.organiserAge ?? null, participantsAvgAge: ages.participantsAvgAge ?? null,
     };
   };
 
   const bySpace = (space) => rows.filter((r) => r.space === space).map(mapRow);
-  const activities = useMemo(() => bySpace("kids"), [rows, regByActivity]);
-  const teenItems = useMemo(() => bySpace("teen"), [rows, regByActivity]);
-  const adultItems = useMemo(() => bySpace("adult"), [rows, regByActivity]);
-  const seniorItems = useMemo(() => bySpace("senior"), [rows, regByActivity]);
-  const assoItems = useMemo(() => bySpace("asso"), [rows, regByActivity]);
+  const activities = useMemo(() => bySpace("kids"), [rows, regByActivity, ageStats]);
+  const teenItems = useMemo(() => bySpace("teen"), [rows, regByActivity, ageStats]);
+  const adultItems = useMemo(() => bySpace("adult"), [rows, regByActivity, ageStats]);
+  const seniorItems = useMemo(() => bySpace("senior"), [rows, regByActivity, ageStats]);
+  const assoItems = useMemo(() => bySpace("asso"), [rows, regByActivity, ageStats]);
 
   const idsIn = (items, set) => items.filter((it) => set.has(it.id)).map((it) => it.id);
   const favorites = useMemo(() => idsIn(activities, myFavs), [activities, myFavs]);
