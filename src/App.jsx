@@ -101,6 +101,9 @@ const TRANSLATIONS = {
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
+    auth_commune_placeholder: "Votre commune (optionnel)",
+    mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
+    mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
     change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…",
     share_btn: "Partager", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
@@ -129,11 +132,17 @@ const TRANSLATIONS = {
     stats_outings_created: "sortie(s) créée(s)",
     deleted_account_name: "Compte supprimé",
     admin_sub_stats: "Statistiques", admin_sub_users: "Utilisateurs",
-    admin_users_title: "Tous les utilisateurs", admin_no_users: "Aucun utilisateur pour le moment.",
+    admin_users_title: "Tous les utilisateurs", admin_no_users: "Aucun utilisateur pour le moment.", admin_no_commune: "Aucune commune",
     admin_block: "Bloquer", admin_unblock: "Débloquer", admin_delete: "Supprimer",
     admin_delete_confirm: "Confirmer la suppression ?",
     admin_banned_badge: "Bloqué", admin_you: "(vous)",
     banned_title: "Compte suspendu", banned_text: "Votre compte a été suspendu par un administrateur. Contactez le support si vous pensez qu'il s'agit d'une erreur.",
+    preauth_title: "Valider des parents par email", preauth_subtitle: "Fonctionne même si la personne ne s'est pas encore inscrite : son compte sera validé automatiquement dès sa création.",
+    preauth_single_label: "Ajouter un email", preauth_single_placeholder: "parent@exemple.com",
+    preauth_bulk_label: "Ou coller une liste (un email par ligne, ou séparés par des virgules)",
+    preauth_bulk_placeholder: "parent1@exemple.com\nparent2@exemple.com\nparent3@exemple.com…",
+    preauth_bulk_submit: "Valider la liste", preauth_processing: "Traitement en cours…",
+    preauth_result: "{added} email(s) ajouté(s) · {validated} compte(s) déjà existant(s) validé(s) immédiatement · {invalid} ignoré(s) (format invalide)",
     by_organiser: "Par {org}",
     loc_placeholder: "Ville, code postal, département…", loc_all_france: "Toute la France",
     loc_no_result: 'Aucun résultat pour "{q}"', loc_dept: "Département", loc_ville: "Ville",
@@ -227,6 +236,9 @@ const TRANSLATIONS = {
     auth_association_name: "Association name",
     auth_association_note: "Your account will be activated after town hall validation.",
     auth_last_name: "Your last name", show_password: "Show password", hide_password: "Hide password",
+    auth_commune_placeholder: "Your town (optional)",
+    mairie_no_commune: "No town assigned to this town hall account — contact the site administrator.",
+    mairie_territory: "Territory: {commune}",
     profile_not_found: "This profile is not available.", member_since: "Member since {date}",
     change_photo: "Change photo", photo_uploading: "Uploading photo…",
     share_btn: "Share", share_copy_link: "Copy link", share_link_copied: "Link copied!",
@@ -255,11 +267,17 @@ const TRANSLATIONS = {
     stats_outings_created: "outing(s) created",
     deleted_account_name: "Deleted account",
     admin_sub_stats: "Statistics", admin_sub_users: "Users",
-    admin_users_title: "All users", admin_no_users: "No users yet.",
+    admin_users_title: "All users", admin_no_users: "No users yet.", admin_no_commune: "No town",
     admin_block: "Block", admin_unblock: "Unblock", admin_delete: "Delete",
     admin_delete_confirm: "Confirm deletion?",
     admin_banned_badge: "Blocked", admin_you: "(you)",
     banned_title: "Account suspended", banned_text: "Your account has been suspended by an administrator. Contact support if you think this is a mistake.",
+    preauth_title: "Validate parents by email", preauth_subtitle: "Works even if the person hasn't signed up yet: their account will be validated automatically as soon as it's created.",
+    preauth_single_label: "Add an email", preauth_single_placeholder: "parent@example.com",
+    preauth_bulk_label: "Or paste a list (one email per line, or comma-separated)",
+    preauth_bulk_placeholder: "parent1@example.com\nparent2@example.com\nparent3@example.com…",
+    preauth_bulk_submit: "Validate the list", preauth_processing: "Processing…",
+    preauth_result: "{added} email(s) added · {validated} existing account(s) validated immediately · {invalid} ignored (invalid format)",
     by_organiser: "By {org}",
     loc_placeholder: "City, postcode, department…", loc_all_france: "All of France",
     loc_no_result: 'No result for "{q}"', loc_dept: "Department", loc_ville: "City",
@@ -353,6 +371,9 @@ const TRANSLATIONS = {
     auth_association_name: "Nombre de la asociación",
     auth_association_note: "Tu cuenta se activará tras la validación del ayuntamiento.",
     auth_last_name: "Tu apellido", show_password: "Mostrar contraseña", hide_password: "Ocultar contraseña",
+    auth_commune_placeholder: "Tu localidad (opcional)",
+    mairie_no_commune: "Ningún municipio asignado a esta cuenta de ayuntamiento — contacta con el administrador del sitio.",
+    mairie_territory: "Territorio: {commune}",
     profile_not_found: "Este perfil no está disponible.", member_since: "Miembro desde {date}",
     change_photo: "Cambiar foto", photo_uploading: "Subiendo foto…",
     share_btn: "Compartir", share_copy_link: "Copiar enlace", share_link_copied: "¡Enlace copiado!",
@@ -381,11 +402,17 @@ const TRANSLATIONS = {
     stats_outings_created: "salida(s) creada(s)",
     deleted_account_name: "Cuenta eliminada",
     admin_sub_stats: "Estadísticas", admin_sub_users: "Usuarios",
-    admin_users_title: "Todos los usuarios", admin_no_users: "Todavía no hay usuarios.",
+    admin_users_title: "Todos los usuarios", admin_no_users: "Todavía no hay usuarios.", admin_no_commune: "Sin municipio",
     admin_block: "Bloquear", admin_unblock: "Desbloquear", admin_delete: "Eliminar",
     admin_delete_confirm: "¿Confirmar eliminación?",
     admin_banned_badge: "Bloqueado", admin_you: "(tú)",
     banned_title: "Cuenta suspendida", banned_text: "Tu cuenta ha sido suspendida por un administrador. Contacta con soporte si crees que es un error.",
+    preauth_title: "Validar padres por email", preauth_subtitle: "Funciona incluso si la persona aún no se ha registrado: su cuenta se validará automáticamente en cuanto se cree.",
+    preauth_single_label: "Añadir un email", preauth_single_placeholder: "padre@ejemplo.com",
+    preauth_bulk_label: "O pega una lista (un email por línea, o separados por comas)",
+    preauth_bulk_placeholder: "padre1@ejemplo.com\npadre2@ejemplo.com\npadre3@ejemplo.com…",
+    preauth_bulk_submit: "Validar la lista", preauth_processing: "Procesando…",
+    preauth_result: "{added} email(s) añadido(s) · {validated} cuenta(s) existente(s) validada(s) al instante · {invalid} ignorado(s) (formato inválido)",
     by_organiser: "Por {org}",
     loc_placeholder: "Ciudad, código postal, departamento…", loc_all_france: "Toda Francia",
     loc_no_result: 'Sin resultados para "{q}"', loc_dept: "Departamento", loc_ville: "Ciudad",
@@ -4369,8 +4396,18 @@ function MyMeetups({ items, joined, categories, onOpen }) {
 // entièrement indépendante de la validation mairie (réservée aux sorties Enfants/Ados).
 // Onglet "Créer" fusionné : sortie enfant (si validé par la mairie) ou rencontre adulte (toujours).
 // Pas d'onglet séparé pour les adultes — tout passe par les mêmes onglets Créer / Mes sorties.
-function CreatePage({ parentValidated, onCreateKid, onCreateAdult }) {
+function CreatePage({ parentValidated, onCreateKid, onCreateAdult, onCreateAsso, role }) {
   const [kind, setKind] = useState(parentValidated ? "enfant" : "adulte");
+
+  // Une mairie ou une association propose uniquement des événements Commune —
+  // pas de sortie enfant/adulte en son nom propre.
+  if (role === "mairie" || role === "association") {
+    return (
+      <div style={{ maxWidth: 560, margin: "0 auto" }}>
+        <CreateMeetup categories={ASSO_CATEGORIES} onCreate={onCreateAsso} />
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: 560, margin: "0 auto" }}>
@@ -4439,6 +4476,7 @@ function AuthScreen({ onClose }) {
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
   const [genre, setGenre] = useState("F");
+  const [commune, setCommune] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -4457,7 +4495,7 @@ function AuthScreen({ onClose }) {
         const fullName = accountType === "parent" && lastName ? `${name} ${lastName}` : name;
         const { data, error: err } = await supabase.auth.signUp({
           email, password,
-          options: { data: { display_name: fullName } },
+          options: { data: { display_name: fullName, commune: accountType === "parent" ? commune : null } },
         });
         if (err) throw err;
         if (data?.user?.id) {
@@ -4546,6 +4584,17 @@ function AuthScreen({ onClose }) {
               </button>
             ))}
           </div>
+        )}
+        {mode === "signup" && accountType === "parent" && (
+          <select
+            value={commune} onChange={(e) => setCommune(e.target.value)}
+            style={{ ...inputStyle, color: commune ? COLORS.ink : "#B7AF98" }}
+          >
+            <option value="">{t("auth_commune_placeholder")}</option>
+            {Object.entries(CITY_META).map(([id, c]) => (
+              <option key={id} value={id}>{c.label}</option>
+            ))}
+          </select>
         )}
         <input style={inputStyle} type="email" placeholder={t("auth_email")} value={email} onChange={(e) => setEmail(e.target.value)} />
         <div style={{ position: "relative" }}>
@@ -4720,7 +4769,7 @@ function StatsSection({ allProfiles, allActivitiesRaw }) {
   );
 }
 
-function UsersAdminSection({ allProfiles, currentUserId, onToggleBan, onDelete }) {
+function UsersAdminSection({ allProfiles, currentUserId, onToggleBan, onDelete, onSetCommune }) {
   const [confirmingId, setConfirmingId] = useState(null);
 
   const roleLabel = (p) => {
@@ -4771,8 +4820,25 @@ function UsersAdminSection({ allProfiles, currentUserId, onToggleBan, onDelete }
                     </span>
                   )}
                 </div>
-                <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF" }}>{roleLabel(p)}</div>
+                <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF" }}>
+                  {roleLabel(p)}{p.commune ? ` · ${villeName(p.commune)}` : ""}
+                </div>
               </div>
+              {(p.role === "mairie" || p.role === "association") && (
+                <select
+                  value={p.commune || ""}
+                  onChange={(e) => onSetCommune(p.id, e.target.value)}
+                  style={{
+                    border: "2px solid #F0EADB", borderRadius: 10, padding: "6px 8px",
+                    fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 11.5, color: COLORS.ink,
+                  }}
+                >
+                  <option value="">{t("admin_no_commune")}</option>
+                  {Object.entries(CITY_META).map(([id, c]) => (
+                    <option key={id} value={id}>{c.label}</option>
+                  ))}
+                </select>
+              )}
               {!isSelf && (
                 <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
                   <button
@@ -4805,7 +4871,7 @@ function UsersAdminSection({ allProfiles, currentUserId, onToggleBan, onDelete }
   );
 }
 
-function AdminArea({ allProfiles, allActivitiesRaw, currentUserId, onToggleBan, onDelete }) {
+function AdminArea({ allProfiles, allActivitiesRaw, currentUserId, onToggleBan, onDelete, onSetCommune }) {
   const [sub, setSub] = useState("stats");
   const subTabs = [
     { id: "stats", label: t("admin_sub_stats") },
@@ -4831,7 +4897,7 @@ function AdminArea({ allProfiles, allActivitiesRaw, currentUserId, onToggleBan, 
       </div>
       {sub === "stats" && <StatsSection allProfiles={allProfiles} allActivitiesRaw={allActivitiesRaw} />}
       {sub === "users" && (
-        <UsersAdminSection allProfiles={allProfiles} currentUserId={currentUserId} onToggleBan={onToggleBan} onDelete={onDelete} />
+        <UsersAdminSection allProfiles={allProfiles} currentUserId={currentUserId} onToggleBan={onToggleBan} onDelete={onDelete} onSetCommune={onSetCommune} />
       )}
     </div>
   );
@@ -4859,7 +4925,83 @@ function BannedScreen({ onSignOut }) {
   );
 }
 
-function MairieDashboard({ pendingParents, pendingAssociations, reports, onValidateParent, onValidateAssociation, onResolveReport }) {
+function PreauthorizeEmails({ onPreauthorize }) {
+  const [singleEmail, setSingleEmail] = useState("");
+  const [bulkText, setBulkText] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const runSingle = async () => {
+    if (!singleEmail.trim()) return;
+    setBusy(true); setResult(null);
+    const res = await onPreauthorize([singleEmail]);
+    setResult(res);
+    setBusy(false);
+    setSingleEmail("");
+  };
+
+  const runBulk = async () => {
+    const emails = bulkText.split(/[\s,;]+/).filter(Boolean);
+    if (emails.length === 0) return;
+    setBusy(true); setResult(null);
+    const res = await onPreauthorize(emails);
+    setResult(res);
+    setBusy(false);
+    setBulkText("");
+  };
+
+  const inputStyle = {
+    width: "100%", border: "2px solid #F0EADB", borderRadius: 14, padding: "12px 14px",
+    fontFamily: "Nunito, sans-serif", fontSize: 14, color: COLORS.ink, outline: "none", boxSizing: "border-box",
+  };
+
+  return (
+    <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: 18, marginBottom: 26 }}>
+      <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 16, color: COLORS.ink, marginBottom: 4 }}>
+        {t("preauth_title")}
+      </div>
+      <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", margin: "0 0 14px" }}>
+        {t("preauth_subtitle")}
+      </p>
+
+      <label style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, color: "#6B6485", textTransform: "uppercase", letterSpacing: 0.4, display: "block", marginBottom: 6 }}>
+        {t("preauth_single_label")}
+      </label>
+      <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
+        <input
+          type="email" style={inputStyle} placeholder={t("preauth_single_placeholder")}
+          value={singleEmail} onChange={(e) => setSingleEmail(e.target.value)}
+        />
+        <PillButton color={COLORS.grass} textColor="#fff" onClick={runSingle} style={{ padding: "10px 16px", fontSize: 13, whiteSpace: "nowrap" }}>
+          {t("mairie_validate")}
+        </PillButton>
+      </div>
+
+      <label style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, color: "#6B6485", textTransform: "uppercase", letterSpacing: 0.4, display: "block", marginBottom: 6 }}>
+        {t("preauth_bulk_label")}
+      </label>
+      <textarea
+        rows={5} style={{ ...inputStyle, resize: "vertical", marginBottom: 10 }}
+        placeholder={t("preauth_bulk_placeholder")}
+        value={bulkText} onChange={(e) => setBulkText(e.target.value)}
+      />
+      <PillButton color={COLORS.ink} textColor="#fff" onClick={runBulk} style={{ opacity: busy ? 0.6 : 1 }}>
+        {busy ? t("preauth_processing") : t("preauth_bulk_submit")}
+      </PillButton>
+
+      {result && (
+        <div style={{
+          marginTop: 14, background: "#EAF8ED", border: `2px solid ${COLORS.grass}`, borderRadius: 12,
+          padding: "10px 14px", fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: COLORS.ink,
+        }}>
+          {t("preauth_result", { added: result.added, validated: result.validated, invalid: result.invalid })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MairieDashboard({ pendingParents, pendingAssociations, reports, onValidateParent, onValidateAssociation, onResolveReport, onPreauthorize, commune }) {
   const [sub, setSub] = useState("validations");
   const reasonLabel = (r) => t(`report_reason_${r}`) !== `report_reason_${r}` ? t(`report_reason_${r}`) : r;
   const statusLabel = (s) => t(`mairie_report_status_${s}`);
@@ -4871,9 +5013,18 @@ function MairieDashboard({ pendingParents, pendingAssociations, reports, onValid
 
   return (
     <div style={{ maxWidth: 640, margin: "0 auto" }}>
-      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 16px" }}>
+      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
         {t("mairie_title")}
       </h1>
+      {commune ? (
+        <p style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: COLORS.grass, margin: "0 0 16px" }}>
+          {t("mairie_territory", { commune: villeName(commune) })}
+        </p>
+      ) : (
+        <p style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: COLORS.coral, margin: "0 0 16px" }}>
+          {t("mairie_no_commune")}
+        </p>
+      )}
 
       <div style={{ display: "inline-flex", background: "#F0EADB", borderRadius: 14, padding: 4, marginBottom: 22, flexWrap: "wrap" }}>
         {subTabs.map((s) => (
@@ -4894,6 +5045,8 @@ function MairieDashboard({ pendingParents, pendingAssociations, reports, onValid
 
       {sub === "validations" && (
         <>
+          <PreauthorizeEmails onPreauthorize={onPreauthorize} />
+
           <SectionLabel>{t("mairie_pending_parents")}</SectionLabel>
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 26 }}>
             {pendingParents.length === 0 && (
@@ -4972,7 +5125,7 @@ function MairieDashboard({ pendingParents, pendingAssociations, reports, onValid
 function usePikapikaData() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [profile, setProfile] = useState({ displayName: "", parentValidated: false, role: "parent", associationValidated: false, genre: null, avatarUrl: null, isAdmin: false, banned: false });
+  const [profile, setProfile] = useState({ displayName: "", parentValidated: false, role: "parent", associationValidated: false, genre: null, avatarUrl: null, isAdmin: false, banned: false, commune: null });
   const [kids, setKids] = useState([]);
   const [rows, setRows] = useState([]);
   const [regByActivity, setRegByActivity] = useState({});
@@ -5034,6 +5187,7 @@ function usePikapikaData() {
           genre: profRes.data.genre,
           avatarUrl: profRes.data.avatar_url,
           isAdmin: !!profRes.data.is_admin,
+          commune: profRes.data.commune,
           banned: !!profRes.data.banned,
         });
       }
@@ -5047,22 +5201,24 @@ function usePikapikaData() {
 
   // Données réservées à la mairie : profils en attente de validation + signalements
   const loadMairieData = async () => {
-    const [parentsRes, assosRes, reportsRes, allProfilesRes] = await Promise.all([
-      supabase.from("profiles").select("*").eq("role", "parent").eq("parent_validated", false),
-      supabase.from("profiles").select("*").eq("role", "association").eq("association_validated", false),
+    if (!profile.commune) {
+      setPendingParents([]); setPendingAssociations([]); setReports([]);
+      return;
+    }
+    const [parentsRes, assosRes, reportsRes] = await Promise.all([
+      supabase.from("profiles").select("*").eq("role", "parent").eq("parent_validated", false).eq("commune", profile.commune),
+      supabase.from("profiles").select("*").eq("role", "association").eq("association_validated", false).eq("commune", profile.commune),
       supabase.from("reports").select("*").order("created_at", { ascending: false }),
-      supabase.from("profiles").select("genre, role"),
     ]);
     setPendingParents(parentsRes.data || []);
     setPendingAssociations(assosRes.data || []);
     setReports(reportsRes.data || []);
-    setAllProfiles(allProfilesRes.data || []);
   };
 
   useEffect(() => {
     if (user && profile.role === "mairie") loadMairieData();
     if (user && profile.isAdmin) {
-      supabase.from("profiles").select("id, display_name, association_name, genre, role, banned, is_admin, created_at")
+      supabase.from("profiles").select("id, display_name, association_name, genre, role, banned, is_admin, created_at, commune")
         .then(({ data }) => setAllProfiles(data || []));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -5127,7 +5283,7 @@ function usePikapikaData() {
     if (!user) return null;
     const starts_at = `${form.dateStr}T${form.timeStr}:00`;
     const newRow = {
-      id: Date.now(), space, title: form.title, category: form.category, ville: null, lieu: form.lieu,
+      id: Date.now(), space, title: form.title, category: form.category, ville: profile.commune || null, lieu: form.lieu,
       starts_at, age: form.age || null, info: form.info || null, places: form.places,
       demo_inscrits: 0, organisateur: profile.displayName || t("you_organizer"), organisateur_genre: profile.genre || null,
       description: form.desc || "", intergen: false, intergen_note: null,
@@ -5207,6 +5363,12 @@ function usePikapikaData() {
     setAllProfiles((list) => list.map((p) => p.id === userId ? { ...p, banned: nextBanned } : p));
   };
 
+  const setUserCommune = async (userId, communeId) => {
+    const { error } = await supabase.from("profiles").update({ commune: communeId || null }).eq("id", userId);
+    if (error) { console.error("Erreur assignation commune :", error); return; }
+    setAllProfiles((list) => list.map((p) => p.id === userId ? { ...p, commune: communeId || null } : p));
+  };
+
   // Efface les données de l'utilisateur (sorties créées, enfants) et bloque le compte.
   // La ligne de connexion elle-même reste dans Supabase Auth (suppression réelle possible
   // manuellement depuis le tableau de bord Supabase si nécessaire).
@@ -5221,11 +5383,41 @@ function usePikapikaData() {
     setRows((list) => list.filter((r) => r.created_by !== userId));
   };
 
+  // ---------- Pré-autorisation de parents par email (mairie) ----------
+  // Ajoute l'email à la liste "pré-autorisée" (pour les futures inscriptions), et si un compte
+  // existe déjà avec cet email, le valide immédiatement.
+  const preauthorizeEmails = async (emails) => {
+    const clean = [...new Set(emails.map((e) => e.trim().toLowerCase()).filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)))];
+    if (clean.length === 0) return { added: 0, validated: 0, invalid: emails.length };
+    const invalidCount = emails.length - clean.length;
+    const commune = profile.commune || null;
+
+    // Insertion par lots de 500 pour rester léger même avec plusieurs milliers d'emails
+    const CHUNK = 500;
+    let added = 0;
+    for (let i = 0; i < clean.length; i += CHUNK) {
+      const batch = clean.slice(i, i + CHUNK).map((email) => ({ email, added_by: user.id, commune }));
+      const { data, error } = await supabase.from("preauthorized_emails").upsert(batch, { onConflict: "email", ignoreDuplicates: true }).select("id");
+      if (error) { console.error("Erreur pré-autorisation :", error); continue; }
+      added += data?.length || 0;
+    }
+
+    // Valide immédiatement les comptes déjà existants correspondant à ces emails,
+    // et les rattache à la commune de cette mairie s'ils n'en avaient pas encore.
+    const { data: validatedRows, error: valErr } = await supabase
+      .from("profiles").update({ parent_validated: true, commune }).in("email", clean).is("commune", null).select("id");
+    if (valErr) console.error("Erreur validation immédiate :", valErr);
+    // Pour les comptes qui avaient déjà une commune différente, on valide sans l'écraser
+    await supabase.from("profiles").update({ parent_validated: true }).in("email", clean).not("commune", "is", null);
+
+    return { added, validated: validatedRows?.length || 0, invalid: invalidCount };
+  };
+
   return {
     user, authLoading, dataLoading,
     displayName: profile.displayName, email: user?.email || "", parentValidated: profile.parentValidated,
     role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl,
-    isAdmin: profile.isAdmin, banned: profile.banned,
+    isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune,
     kids,
     activities, teenItems, adultItems, seniorItems, assoItems,
     favorites, favTeen, favAdult, favSenior, favAsso,
@@ -5236,12 +5428,13 @@ function usePikapikaData() {
     joinCommunity: (_kind, id) => joinGeneric(id),
     createActivity: (form) => insertActivity("kids", form),
     createAdultMeetup: (form) => insertActivity("adult", form),
+    createAssoEvent: (form) => insertActivity("asso", form),
     toggleParentValidated,
     addKid,
     uploadAvatar,
     submitReport,
     pendingParents, pendingAssociations, reports, allProfiles, allActivitiesRaw: rows,
-    toggleBanUser, deleteUserData,
+    toggleBanUser, deleteUserData, preauthorizeEmails, setUserCommune,
     validateParent, validateAssociation, resolveReport,
     signOut: () => supabase.auth.signOut(),
   };
@@ -5486,6 +5679,8 @@ export default function RecreApp() {
             parentValidated={parentValidated}
             onCreateKid={createActivity}
             onCreateAdult={createAdultMeetup}
+            onCreateAsso={pika.createAssoEvent}
+            role={pika.role}
           />
         )}
         {tab === "mes-sorties" && (
@@ -5554,8 +5749,8 @@ export default function RecreApp() {
             onValidateParent={pika.validateParent}
             onValidateAssociation={pika.validateAssociation}
             onResolveReport={pika.resolveReport}
-            allProfiles={pika.allProfiles}
-            allActivitiesRaw={pika.allActivitiesRaw}
+            onPreauthorize={pika.preauthorizeEmails}
+            commune={pika.commune}
           />
         )}
         {tab === "ados" && parentValidated && (
@@ -5581,6 +5776,7 @@ export default function RecreApp() {
             currentUserId={pika.user?.id}
             onToggleBan={pika.toggleBanUser}
             onDelete={pika.deleteUserData}
+            onSetCommune={pika.setUserCommune}
           />
         )}
         {tab === "profil" && (
