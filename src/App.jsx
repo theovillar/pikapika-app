@@ -3732,7 +3732,6 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
         {activity.payant && (
           <div style={{ marginBottom: 12 }}>
             <PriceBadge payant={activity.payant} size={14} />
-            <AvgAgeBadge avg={activity.participantsAvgAge} size={13} />
           </div>
         )}
 
@@ -3756,6 +3755,9 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
           <Row icon={<MapPin size={15} color={COLORS.ink} />} text={lieuAvecVille(activity)} />
           <Row icon={<CalendarDays size={15} color={COLORS.ink} />} text={displayDate(activity)} />
           <Row icon={<Users size={15} color={COLORS.ink} />} text={t("detail_participants", { a: activity.inscrits, b: activity.places })} />
+          {activity.participantsAvgAge && (
+            <div style={{ marginLeft: 23 }}><AvgAgeBadge avg={activity.participantsAvgAge} size={12.5} /></div>
+          )}
         </div>
 
         <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 14.5, color: "#5C5578", lineHeight: 1.6, marginBottom: 20 }}>
@@ -3882,7 +3884,6 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
               {meta.label}
             </span>
             <PriceBadge payant={item.payant} size={13} />
-            <AvgAgeBadge avg={item.participantsAvgAge} size={12} />
           </div>
           <h3 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 18, color: COLORS.ink, margin: "0 34px 6px 0", lineHeight: 1.15 }}>
             {item.title}
@@ -3903,11 +3904,14 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
       <PlainParticipantsRow names={item.participants} color={meta.color} genderMode={genderMode} />
 
       <div style={{ marginTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <Users size={14} color={full ? COLORS.coral : COLORS.grass} />
-          <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5, color: full ? COLORS.coral : COLORS.ink }}>
-            {full ? t("card_full") : t("card_places_left", { n: item.places - item.inscrits })}
-          </span>
+        <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <Users size={14} color={full ? COLORS.coral : COLORS.grass} />
+            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5, color: full ? COLORS.coral : COLORS.ink }}>
+              {full ? t("card_full") : t("card_places_left", { n: item.places - item.inscrits })}
+            </span>
+          </div>
+          <AvgAgeBadge avg={item.participantsAvgAge} size={11.5} />
         </div>
         <ChevronRight size={18} color="#C7C0AE" />
       </div>
@@ -3977,7 +3981,6 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
             {lieuAvecVille(item)}
           </span>
           <PriceBadge payant={item.payant} size={12} />
-          <AvgAgeBadge avg={item.participantsAvgAge} size={11} />
         </div>
         {item.organisateur && (
           <div style={{ marginTop: 3 }}>
@@ -3988,12 +3991,15 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
 
       <PlainParticipantsRow names={item.participants} color={meta.color} max={8} genderMode={genderMode} />
 
-      <span style={{
-        fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11, flexShrink: 0,
-        color: full ? COLORS.coral : COLORS.grass,
-      }}>
-        {item.inscrits}/{item.places}
-      </span>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2, flexShrink: 0 }}>
+        <span style={{
+          fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11,
+          color: full ? COLORS.coral : COLORS.grass,
+        }}>
+          {item.inscrits}/{item.places}
+        </span>
+        <AvgAgeBadge avg={item.participantsAvgAge} size={10} />
+      </div>
 
       <button
         onClick={(e) => { e.stopPropagation(); onToggleFav(item.id); }}
@@ -4190,7 +4196,6 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
         {item.payant && (
           <div style={{ marginBottom: 12 }}>
             <PriceBadge payant={item.payant} size={14} />
-            <AvgAgeBadge avg={item.participantsAvgAge} size={13} />
           </div>
         )}
 
@@ -4214,6 +4219,9 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
           <Row icon={<MapPin size={15} color={COLORS.ink} />} text={lieuAvecVille(item)} />
           <Row icon={<CalendarDays size={15} color={COLORS.ink} />} text={displayDate(item)} />
           <Row icon={<Users size={15} color={COLORS.ink} />} text={t("detail_participants", { a: item.inscrits, b: item.places })} />
+          {item.participantsAvgAge && (
+            <div style={{ marginLeft: 23 }}><AvgAgeBadge avg={item.participantsAvgAge} size={12.5} /></div>
+          )}
           {item.info && <Row icon={<Sparkles size={15} color={COLORS.ink} />} text={item.info} />}
         </div>
 
