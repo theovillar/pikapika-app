@@ -133,6 +133,7 @@ const TRANSLATIONS = {
     deleted_account_name: "Compte supprimé",
     admin_sub_stats: "Statistiques", admin_sub_users: "Utilisateurs",
     admin_users_title: "Tous les utilisateurs", admin_no_users: "Aucun utilisateur pour le moment.", admin_no_commune: "Aucune commune",
+    admin_search_placeholder: "Rechercher par nom ou email…", admin_no_results: "Aucun utilisateur ne correspond.",
     admin_block: "Bloquer", admin_unblock: "Débloquer", admin_delete: "Supprimer",
     admin_delete_confirm: "Confirmer la suppression ?",
     admin_banned_badge: "Bloqué", admin_you: "(vous)",
@@ -268,6 +269,7 @@ const TRANSLATIONS = {
     deleted_account_name: "Deleted account",
     admin_sub_stats: "Statistics", admin_sub_users: "Users",
     admin_users_title: "All users", admin_no_users: "No users yet.", admin_no_commune: "No town",
+    admin_search_placeholder: "Search by name or email…", admin_no_results: "No matching user.",
     admin_block: "Block", admin_unblock: "Unblock", admin_delete: "Delete",
     admin_delete_confirm: "Confirm deletion?",
     admin_banned_badge: "Blocked", admin_you: "(you)",
@@ -403,6 +405,7 @@ const TRANSLATIONS = {
     deleted_account_name: "Cuenta eliminada",
     admin_sub_stats: "Estadísticas", admin_sub_users: "Usuarios",
     admin_users_title: "Todos los usuarios", admin_no_users: "Todavía no hay usuarios.", admin_no_commune: "Sin municipio",
+    admin_search_placeholder: "Buscar por nombre o email…", admin_no_results: "Ningún usuario coincide.",
     admin_block: "Bloquear", admin_unblock: "Desbloquear", admin_delete: "Eliminar",
     admin_delete_confirm: "¿Confirmar eliminación?",
     admin_banned_badge: "Bloqueado", admin_you: "(tú)",
@@ -4771,12 +4774,22 @@ function StatsSection({ allProfiles, allActivitiesRaw }) {
 
 function UsersAdminSection({ allProfiles, currentUserId, onToggleBan, onDelete, onSetCommune }) {
   const [confirmingId, setConfirmingId] = useState(null);
+  const [query, setQuery] = useState("");
 
   const roleLabel = (p) => {
     if (p.role === "mairie") return t("tab_mairie");
     if (p.role === "association") return t("account_type_association");
     return t("account_type_parent");
   };
+
+  const filteredProfiles = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return allProfiles;
+    return allProfiles.filter((p) => {
+      const name = (p.role === "association" ? (p.association_name || p.display_name) : p.display_name) || "";
+      return name.toLowerCase().includes(q) || (p.email || "").toLowerCase().includes(q);
+    });
+  }, [allProfiles, query]);
 
   const handleDelete = (id) => {
     if (confirmingId === id) {
@@ -4791,11 +4804,27 @@ function UsersAdminSection({ allProfiles, currentUserId, onToggleBan, onDelete, 
   return (
     <div>
       <SectionLabel>{t("admin_users_title")}</SectionLabel>
+
+      <div style={{
+        display: "flex", alignItems: "center", gap: 8, background: "#fff",
+        border: "2px solid #F0EADB", borderRadius: 14, padding: "9px 12px", marginBottom: 14,
+      }}>
+        <Search size={16} color="#B7AF98" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t("admin_search_placeholder")}
+          style={{ border: "none", outline: "none", fontFamily: "Nunito, sans-serif", fontSize: 13.5, flex: 1, background: "transparent", color: COLORS.ink }}
+        />
+      </div>
+
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {allProfiles.length === 0 && (
-          <p style={{ color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}>{t("admin_no_users")}</p>
+        {filteredProfiles.length === 0 && (
+          <p style={{ color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}>
+            {allProfiles.length === 0 ? t("admin_no_users") : t("admin_no_results")}
+          </p>
         )}
-        {allProfiles.map((p) => {
+        {filteredProfiles.map((p) => {
           const isSelf = p.id === currentUserId;
           const name = p.role === "association" ? (p.association_name || p.display_name) : p.display_name;
           const color = p.genre ? genreColor(p.genre) : COLORS.ink;
@@ -5218,7 +5247,7 @@ function usePikapikaData() {
   useEffect(() => {
     if (user && profile.role === "mairie") loadMairieData();
     if (user && profile.isAdmin) {
-      supabase.from("profiles").select("id, display_name, association_name, genre, role, banned, is_admin, created_at, commune")
+      supabase.from("profiles").select("id, display_name, association_name, genre, role, banned, is_admin, created_at, commune, email")
         .then(({ data }) => setAllProfiles(data || []));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
