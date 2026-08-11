@@ -3943,34 +3943,45 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
     <div
       onClick={() => onOpen(item)}
       style={{
-        display: "flex", alignItems: "center", gap: 10, background: "#fff",
+        display: "flex", flexDirection: "column", gap: 6, background: "#fff",
         border: "2px solid #F0EADB", borderRadius: 14, padding: "9px 12px", cursor: "pointer",
       }}
     >
-      <div style={{
-        width: 34, height: 34, borderRadius: "50%", border: `2px dashed ${meta.color}`,
-        background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-        position: "relative",
-      }}>
-        <Icon size={15} color={meta.color} strokeWidth={2.4} />
-        {item.intergen && (
-          <span
-            title={t("intergen_badge")}
-            style={{
-              position: "absolute", top: -4, right: -4, fontSize: 11, lineHeight: 1,
-              background: "#fff", borderRadius: "50%", boxShadow: "0 1px 3px rgba(43,37,96,0.3)",
-            }}
-          >
-            🤝
-          </span>
-        )}
-      </div>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+        <div style={{
+          width: 34, height: 34, borderRadius: "50%", border: `2px dashed ${meta.color}`,
+          background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+          position: "relative",
+        }}>
+          <Icon size={15} color={meta.color} strokeWidth={2.4} />
+          {item.intergen && (
+            <span
+              title={t("intergen_badge")}
+              style={{
+                position: "absolute", top: -4, right: -4, fontSize: 11, lineHeight: 1,
+                background: "#fff", borderRadius: "50%", boxShadow: "0 1px 3px rgba(43,37,96,0.3)",
+              }}
+            >
+              🤝
+            </span>
+          )}
+        </div>
 
-      <div style={{ flex: 1, minWidth: "15ch" }}>
-        <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: COLORS.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+        <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: COLORS.ink, flex: 1, minWidth: 0, lineHeight: 1.25 }}>
           {item.title}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, whiteSpace: "nowrap", overflow: "hidden", marginTop: 3 }}>
+
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggleFav(item.id); }}
+          style={{ background: "transparent", border: "none", cursor: "pointer", padding: 2, flexShrink: 0 }}
+          aria-label={t("fav_aria")}
+        >
+          <Heart size={16} color={favorite ? COLORS.coral : "#D8D2C2"} fill={favorite ? COLORS.coral : "none"} strokeWidth={2.2} />
+        </button>
+      </div>
+
+      <div style={{ marginLeft: 44 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, whiteSpace: "nowrap", overflow: "hidden" }}>
           <span style={{
             fontFamily: "Nunito, sans-serif", fontWeight: 800, color: COLORS.ink, flexShrink: 0,
             background: COLORS.sun, padding: "2px 7px", borderRadius: 8, fontSize: 11.5,
@@ -3987,27 +3998,20 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
             <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={15} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
           </div>
         )}
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 5 }}>
+          <PlainParticipantsRow names={item.participants} color={meta.color} max={8} genderMode={genderMode} />
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2, flexShrink: 0 }}>
+            <span style={{
+              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11,
+              color: full ? COLORS.coral : COLORS.grass,
+            }}>
+              {item.inscrits}/{item.places}
+            </span>
+            <AvgAgeBadge avg={item.participantsAvgAge} size={10} />
+          </div>
+        </div>
       </div>
-
-      <PlainParticipantsRow names={item.participants} color={meta.color} max={8} genderMode={genderMode} />
-
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2, flexShrink: 0 }}>
-        <span style={{
-          fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11,
-          color: full ? COLORS.coral : COLORS.grass,
-        }}>
-          {item.inscrits}/{item.places}
-        </span>
-        <AvgAgeBadge avg={item.participantsAvgAge} size={10} />
-      </div>
-
-      <button
-        onClick={(e) => { e.stopPropagation(); onToggleFav(item.id); }}
-        style={{ background: "transparent", border: "none", cursor: "pointer", padding: 2, flexShrink: 0 }}
-        aria-label={t("fav_aria")}
-      >
-        <Heart size={16} color={favorite ? COLORS.coral : "#D8D2C2"} fill={favorite ? COLORS.coral : "none"} strokeWidth={2.2} />
-      </button>
     </div>
   );
 }
