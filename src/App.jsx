@@ -127,6 +127,13 @@ const TRANSLATIONS = {
     stats_active_today_note: "Total, toutes catégories confondues, sorties déjà passées exclues.",
     stats_monthly_chart: "Sorties créées par mois (12 derniers mois)",
     stats_outings_created: "sortie(s) créée(s)",
+    deleted_account_name: "Compte supprimé",
+    admin_sub_stats: "Statistiques", admin_sub_users: "Utilisateurs",
+    admin_users_title: "Tous les utilisateurs", admin_no_users: "Aucun utilisateur pour le moment.",
+    admin_block: "Bloquer", admin_unblock: "Débloquer", admin_delete: "Supprimer",
+    admin_delete_confirm: "Confirmer la suppression ?",
+    admin_banned_badge: "Bloqué", admin_you: "(vous)",
+    banned_title: "Compte suspendu", banned_text: "Votre compte a été suspendu par un administrateur. Contactez le support si vous pensez qu'il s'agit d'une erreur.",
     by_organiser: "Par {org}",
     loc_placeholder: "Ville, code postal, département…", loc_all_france: "Toute la France",
     loc_no_result: 'Aucun résultat pour "{q}"', loc_dept: "Département", loc_ville: "Ville",
@@ -246,6 +253,13 @@ const TRANSLATIONS = {
     stats_active_today_note: "Total across all categories, past outings excluded.",
     stats_monthly_chart: "Outings created per month (last 12 months)",
     stats_outings_created: "outing(s) created",
+    deleted_account_name: "Deleted account",
+    admin_sub_stats: "Statistics", admin_sub_users: "Users",
+    admin_users_title: "All users", admin_no_users: "No users yet.",
+    admin_block: "Block", admin_unblock: "Unblock", admin_delete: "Delete",
+    admin_delete_confirm: "Confirm deletion?",
+    admin_banned_badge: "Blocked", admin_you: "(you)",
+    banned_title: "Account suspended", banned_text: "Your account has been suspended by an administrator. Contact support if you think this is a mistake.",
     by_organiser: "By {org}",
     loc_placeholder: "City, postcode, department…", loc_all_france: "All of France",
     loc_no_result: 'No result for "{q}"', loc_dept: "Department", loc_ville: "City",
@@ -365,6 +379,13 @@ const TRANSLATIONS = {
     stats_active_today_note: "Total de todas las categorías, salidas pasadas excluidas.",
     stats_monthly_chart: "Salidas creadas por mes (últimos 12 meses)",
     stats_outings_created: "salida(s) creada(s)",
+    deleted_account_name: "Cuenta eliminada",
+    admin_sub_stats: "Estadísticas", admin_sub_users: "Usuarios",
+    admin_users_title: "Todos los usuarios", admin_no_users: "Todavía no hay usuarios.",
+    admin_block: "Bloquear", admin_unblock: "Desbloquear", admin_delete: "Eliminar",
+    admin_delete_confirm: "¿Confirmar eliminación?",
+    admin_banned_badge: "Bloqueado", admin_you: "(tú)",
+    banned_title: "Cuenta suspendida", banned_text: "Tu cuenta ha sido suspendida por un administrador. Contacta con soporte si crees que es un error.",
     by_organiser: "Por {org}",
     loc_placeholder: "Ciudad, código postal, departamento…", loc_all_france: "Toda Francia",
     loc_no_result: 'Sin resultados para "{q}"', loc_dept: "Departamento", loc_ville: "Ciudad",
@@ -4699,6 +4720,145 @@ function StatsSection({ allProfiles, allActivitiesRaw }) {
   );
 }
 
+function UsersAdminSection({ allProfiles, currentUserId, onToggleBan, onDelete }) {
+  const [confirmingId, setConfirmingId] = useState(null);
+
+  const roleLabel = (p) => {
+    if (p.role === "mairie") return t("tab_mairie");
+    if (p.role === "association") return t("account_type_association");
+    return t("account_type_parent");
+  };
+
+  const handleDelete = (id) => {
+    if (confirmingId === id) {
+      onDelete(id);
+      setConfirmingId(null);
+    } else {
+      setConfirmingId(id);
+      setTimeout(() => setConfirmingId((c) => (c === id ? null : c)), 4000);
+    }
+  };
+
+  return (
+    <div>
+      <SectionLabel>{t("admin_users_title")}</SectionLabel>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {allProfiles.length === 0 && (
+          <p style={{ color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}>{t("admin_no_users")}</p>
+        )}
+        {allProfiles.map((p) => {
+          const isSelf = p.id === currentUserId;
+          const name = p.role === "association" ? (p.association_name || p.display_name) : p.display_name;
+          const color = p.genre ? genreColor(p.genre) : COLORS.ink;
+          return (
+            <div key={p.id} style={{
+              background: "#fff", border: `2px solid ${p.banned ? COLORS.coral : "#F0EADB"}`, borderRadius: 16,
+              padding: "12px 16px", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
+            }}>
+              <div style={{
+                width: 34, height: 34, borderRadius: "50%", background: color, flexShrink: 0,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: "#fff", fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14,
+              }}>
+                {(name || "?").charAt(0).toUpperCase()}
+              </div>
+              <div style={{ flex: 1, minWidth: 120 }}>
+                <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13.5, color: COLORS.ink, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                  {name} {isSelf && <span style={{ color: "#B7AF98", fontWeight: 700 }}>{t("admin_you")}</span>}
+                  {p.banned && (
+                    <span style={{ background: "#FFF0EC", color: COLORS.coral, fontSize: 10.5, fontWeight: 800, padding: "2px 8px", borderRadius: 999 }}>
+                      {t("admin_banned_badge")}
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF" }}>{roleLabel(p)}</div>
+              </div>
+              {!isSelf && (
+                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                  <button
+                    onClick={() => onToggleBan(p.id, !p.banned)}
+                    style={{
+                      fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, cursor: "pointer",
+                      background: "transparent", border: "2px solid #F0EADB", borderRadius: 10, padding: "6px 10px", color: COLORS.ink,
+                    }}
+                  >
+                    {p.banned ? t("admin_unblock") : t("admin_block")}
+                  </button>
+                  <button
+                    onClick={() => handleDelete(p.id)}
+                    style={{
+                      fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, cursor: "pointer",
+                      background: confirmingId === p.id ? COLORS.coral : "transparent",
+                      border: `2px solid ${COLORS.coral}`, borderRadius: 10, padding: "6px 10px",
+                      color: confirmingId === p.id ? "#fff" : COLORS.coral,
+                    }}
+                  >
+                    {confirmingId === p.id ? t("admin_delete_confirm") : t("admin_delete")}
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function AdminArea({ allProfiles, allActivitiesRaw, currentUserId, onToggleBan, onDelete }) {
+  const [sub, setSub] = useState("stats");
+  const subTabs = [
+    { id: "stats", label: t("admin_sub_stats") },
+    { id: "users", label: t("admin_sub_users") },
+  ];
+  return (
+    <div>
+      <div style={{ display: "inline-flex", background: "#F0EADB", borderRadius: 14, padding: 4, marginBottom: 22 }}>
+        {subTabs.map((s) => (
+          <button
+            key={s.id}
+            onClick={() => setSub(s.id)}
+            style={{
+              border: "none", cursor: "pointer",
+              background: sub === s.id ? COLORS.ink : "transparent",
+              color: sub === s.id ? "#fff" : "#6B6485",
+              padding: "8px 14px", borderRadius: 12, fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
+            }}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+      {sub === "stats" && <StatsSection allProfiles={allProfiles} allActivitiesRaw={allActivitiesRaw} />}
+      {sub === "users" && (
+        <UsersAdminSection allProfiles={allProfiles} currentUserId={currentUserId} onToggleBan={onToggleBan} onDelete={onDelete} />
+      )}
+    </div>
+  );
+}
+
+// Écran plein affiché à la place de l'appli si le compte a été bloqué par un administrateur.
+function BannedScreen({ onSignOut }) {
+  return (
+    <div style={{ background: COLORS.cloud, minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, textAlign: "center" }}>
+      <OreeMascot size={48} />
+      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 22, color: COLORS.ink, margin: "16px 0 8px" }}>
+        {t("banned_title")}
+      </h1>
+      <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 14, color: "#6B6485", maxWidth: 320, marginBottom: 20 }}>
+        {t("banned_text")}
+      </p>
+      <button onClick={onSignOut} style={{
+        background: "transparent", border: "2px solid #F0EADB", borderRadius: 14,
+        padding: "10px 20px", cursor: "pointer", fontFamily: "Nunito, sans-serif",
+        fontWeight: 800, fontSize: 13, color: COLORS.coral,
+      }}>
+        {t("btn_sign_out")}
+      </button>
+    </div>
+  );
+}
+
 function MairieDashboard({ pendingParents, pendingAssociations, reports, onValidateParent, onValidateAssociation, onResolveReport }) {
   const [sub, setSub] = useState("validations");
   const reasonLabel = (r) => t(`report_reason_${r}`) !== `report_reason_${r}` ? t(`report_reason_${r}`) : r;
@@ -4812,7 +4972,7 @@ function MairieDashboard({ pendingParents, pendingAssociations, reports, onValid
 function usePikapikaData() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [profile, setProfile] = useState({ displayName: "", parentValidated: false, role: "parent", associationValidated: false, genre: null, avatarUrl: null, isAdmin: false });
+  const [profile, setProfile] = useState({ displayName: "", parentValidated: false, role: "parent", associationValidated: false, genre: null, avatarUrl: null, isAdmin: false, banned: false });
   const [kids, setKids] = useState([]);
   const [rows, setRows] = useState([]);
   const [regByActivity, setRegByActivity] = useState({});
@@ -4874,6 +5034,7 @@ function usePikapikaData() {
           genre: profRes.data.genre,
           avatarUrl: profRes.data.avatar_url,
           isAdmin: !!profRes.data.is_admin,
+          banned: !!profRes.data.banned,
         });
       }
       setKids(kidsRes.data || []);
@@ -4901,7 +5062,8 @@ function usePikapikaData() {
   useEffect(() => {
     if (user && profile.role === "mairie") loadMairieData();
     if (user && profile.isAdmin) {
-      supabase.from("profiles").select("genre, role").then(({ data }) => setAllProfiles(data || []));
+      supabase.from("profiles").select("id, display_name, association_name, genre, role, banned, is_admin, created_at")
+        .then(({ data }) => setAllProfiles(data || []));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, profile.role, profile.isAdmin]);
@@ -5038,11 +5200,32 @@ function usePikapikaData() {
     setReports((list) => list.map((r) => r.id === reportId ? { ...r, status } : r));
   };
 
+  // ---------- Modération : bloquer / supprimer un utilisateur (réservé à l'admin) ----------
+  const toggleBanUser = async (userId, nextBanned) => {
+    const { error } = await supabase.from("profiles").update({ banned: nextBanned }).eq("id", userId);
+    if (error) { console.error("Erreur blocage :", error); return; }
+    setAllProfiles((list) => list.map((p) => p.id === userId ? { ...p, banned: nextBanned } : p));
+  };
+
+  // Efface les données de l'utilisateur (sorties créées, enfants) et bloque le compte.
+  // La ligne de connexion elle-même reste dans Supabase Auth (suppression réelle possible
+  // manuellement depuis le tableau de bord Supabase si nécessaire).
+  const deleteUserData = async (userId) => {
+    await supabase.from("activities").delete().eq("created_by", userId);
+    await supabase.from("kids").delete().eq("parent_id", userId);
+    const { error } = await supabase.from("profiles").update({
+      banned: true, display_name: t("deleted_account_name"), association_name: null, avatar_url: null,
+    }).eq("id", userId);
+    if (error) { console.error("Erreur suppression :", error); return; }
+    setAllProfiles((list) => list.map((p) => p.id === userId ? { ...p, banned: true, display_name: t("deleted_account_name") } : p));
+    setRows((list) => list.filter((r) => r.created_by !== userId));
+  };
+
   return {
     user, authLoading, dataLoading,
     displayName: profile.displayName, email: user?.email || "", parentValidated: profile.parentValidated,
     role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl,
-    isAdmin: profile.isAdmin,
+    isAdmin: profile.isAdmin, banned: profile.banned,
     kids,
     activities, teenItems, adultItems, seniorItems, assoItems,
     favorites, favTeen, favAdult, favSenior, favAsso,
@@ -5058,6 +5241,7 @@ function usePikapikaData() {
     uploadAvatar,
     submitReport,
     pendingParents, pendingAssociations, reports, allProfiles, allActivitiesRaw: rows,
+    toggleBanUser, deleteUserData,
     validateParent, validateAssociation, resolveReport,
     signOut: () => supabase.auth.signOut(),
   };
@@ -5189,6 +5373,10 @@ export default function RecreApp() {
         <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#6B6485" }}>{t("auth_loading")}</span>
       </div>
     );
+  }
+
+  if (pika.user && pika.banned) {
+    return <BannedScreen onSignOut={pika.signOut} />;
   }
 
   return (
@@ -5387,7 +5575,13 @@ export default function RecreApp() {
           />
         )}
         {tab === "stats" && pika.isAdmin && (
-          <StatsSection allProfiles={pika.allProfiles} allActivitiesRaw={pika.allActivitiesRaw} />
+          <AdminArea
+            allProfiles={pika.allProfiles}
+            allActivitiesRaw={pika.allActivitiesRaw}
+            currentUserId={pika.user?.id}
+            onToggleBan={pika.toggleBanUser}
+            onDelete={pika.deleteUserData}
+          />
         )}
         {tab === "profil" && (
           <Profile
