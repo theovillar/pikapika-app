@@ -97,11 +97,11 @@ const TRANSLATIONS = {
     auth_switch_to_login: "Déjà un compte ? Connectez-vous",
     auth_error_generic: "Une erreur est survenue. Vérifiez vos informations et réessayez.",
     auth_loading: "Chargement…",
-    account_type_parent: "Parent", account_type_association: "Association",
+    account_type_parent: "Particulier", account_type_association: "Association",
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune (optionnel)",
+    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
@@ -233,11 +233,11 @@ const TRANSLATIONS = {
     auth_switch_to_login: "Already have an account? Sign in",
     auth_error_generic: "Something went wrong. Check your details and try again.",
     auth_loading: "Loading…",
-    account_type_parent: "Parent", account_type_association: "Association",
+    account_type_parent: "Individual", account_type_association: "Association",
     auth_association_name: "Association name",
     auth_association_note: "Your account will be activated after town hall validation.",
     auth_last_name: "Your last name", show_password: "Show password", hide_password: "Hide password",
-    auth_commune_placeholder: "Your town (optional)",
+    auth_commune_placeholder: "Your town (optional)", auth_birthdate_label: "Date of birth (optional)",
     mairie_no_commune: "No town assigned to this town hall account — contact the site administrator.",
     mairie_territory: "Territory: {commune}",
     profile_not_found: "This profile is not available.", member_since: "Member since {date}",
@@ -369,11 +369,11 @@ const TRANSLATIONS = {
     auth_switch_to_login: "¿Ya tienes cuenta? Inicia sesión",
     auth_error_generic: "Algo salió mal. Comprueba tus datos e inténtalo de nuevo.",
     auth_loading: "Cargando…",
-    account_type_parent: "Padre/Madre", account_type_association: "Asociación",
+    account_type_parent: "Particular", account_type_association: "Asociación",
     auth_association_name: "Nombre de la asociación",
     auth_association_note: "Tu cuenta se activará tras la validación del ayuntamiento.",
     auth_last_name: "Tu apellido", show_password: "Mostrar contraseña", hide_password: "Ocultar contraseña",
-    auth_commune_placeholder: "Tu localidad (opcional)",
+    auth_commune_placeholder: "Tu localidad (opcional)", auth_birthdate_label: "Fecha de nacimiento (opcional)",
     mairie_no_commune: "Ningún municipio asignado a esta cuenta de ayuntamiento — contacta con el administrador del sitio.",
     mairie_territory: "Territorio: {commune}",
     profile_not_found: "Este perfil no está disponible.", member_since: "Miembro desde {date}",
@@ -658,6 +658,19 @@ function locationLabel(location) {
 }
 
 const villeName = (id) => (CITY_META[id] || {}).label || "";
+
+// Calcule un âge à partir d'une date de naissance, sans jamais avoir besoin d'afficher
+// la date exacte ailleurs dans l'appli (plus respectueux de la vie privée).
+function ageFromBirthdate(birthdate) {
+  if (!birthdate) return null;
+  const b = new Date(birthdate);
+  if (isNaN(b.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - b.getFullYear();
+  const notYetBirthday = now.getMonth() < b.getMonth() || (now.getMonth() === b.getMonth() && now.getDate() < b.getDate());
+  if (notYetBirthday) age -= 1;
+  return age;
+}
 const lieuAvecVille = (item) => (villeName(item.ville) ? `${item.lieu} · ${villeName(item.ville)}` : item.lieu);
 
 // ---------- Carte ----------
@@ -4480,6 +4493,7 @@ function AuthScreen({ onClose }) {
   const [lastName, setLastName] = useState("");
   const [genre, setGenre] = useState("F");
   const [commune, setCommune] = useState("");
+  const [birthdate, setBirthdate] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -4498,7 +4512,11 @@ function AuthScreen({ onClose }) {
         const fullName = accountType === "parent" && lastName ? `${name} ${lastName}` : name;
         const { data, error: err } = await supabase.auth.signUp({
           email, password,
-          options: { data: { display_name: fullName, commune: accountType === "parent" ? commune : null } },
+          options: { data: {
+            display_name: fullName,
+            commune: accountType === "parent" ? commune : null,
+            birthdate: accountType === "parent" && birthdate ? birthdate : null,
+          } },
         });
         if (err) throw err;
         if (data?.user?.id) {
@@ -4598,6 +4616,17 @@ function AuthScreen({ onClose }) {
               <option key={id} value={id}>{c.label}</option>
             ))}
           </select>
+        )}
+        {mode === "signup" && accountType === "parent" && (
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 12, color: "#6B6485", display: "block", marginBottom: 6 }}>
+              {t("auth_birthdate_label")}
+            </label>
+            <input
+              type="date" style={inputStyle} value={birthdate} onChange={(e) => setBirthdate(e.target.value)}
+              max={new Date().toISOString().slice(0, 10)}
+            />
+          </div>
         )}
         <input style={inputStyle} type="email" placeholder={t("auth_email")} value={email} onChange={(e) => setEmail(e.target.value)} />
         <div style={{ position: "relative" }}>
@@ -4850,7 +4879,7 @@ function UsersAdminSection({ allProfiles, currentUserId, onToggleBan, onDelete, 
                   )}
                 </div>
                 <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF" }}>
-                  {roleLabel(p)}{p.commune ? ` · ${villeName(p.commune)}` : ""}
+                  {roleLabel(p)}{p.commune ? ` · ${villeName(p.commune)}` : ""}{ageFromBirthdate(p.birthdate) !== null ? ` · ${ageFromBirthdate(p.birthdate)} ${t("profile_years")}` : ""}
                 </div>
               </div>
               {(p.role === "mairie" || p.role === "association") && (
@@ -5247,7 +5276,7 @@ function usePikapikaData() {
   useEffect(() => {
     if (user && profile.role === "mairie") loadMairieData();
     if (user && profile.isAdmin) {
-      supabase.from("profiles").select("id, display_name, association_name, genre, role, banned, is_admin, created_at, commune, email")
+      supabase.from("profiles").select("id, display_name, association_name, genre, role, banned, is_admin, created_at, commune, email, birthdate")
         .then(({ data }) => setAllProfiles(data || []));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
