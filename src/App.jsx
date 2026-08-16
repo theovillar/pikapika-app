@@ -101,7 +101,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", cancel_outing_confirm: "Confirmer l'annulation ?",
+    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
@@ -3899,8 +3899,9 @@ function ReportModal({ onClose, onSubmit }) {
   );
 }
 
-function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfile, onShare, currentUserId, onEdit, onCancelOuting }) {
+function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfile, onShare, currentUserId, onEdit, onCancelOuting, onLeave }) {
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [confirmLeave, setConfirmLeave] = useState(false);
   if (!activity) return null;
   const meta = catMeta(activity.category);
   const isJoined = joined.includes(activity.id);
@@ -4002,11 +4003,27 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
         )}
 
         {isJoined ? (
-          <PillButton color={"#EAF8ED"} textColor={COLORS.grass} style={{ width: "100%", boxShadow: "none" }}>
-            <span style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
-              <Check size={18} /> {t("detail_joined")}
-            </span>
-          </PillButton>
+          activity.createdBy === currentUserId ? (
+            <PillButton color={"#EAF8ED"} textColor={COLORS.grass} style={{ width: "100%", boxShadow: "none" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+                <Check size={18} /> {t("detail_joined")}
+              </span>
+            </PillButton>
+          ) : (
+            <PillButton
+              color={confirmLeave ? COLORS.coral : "#EAF8ED"}
+              textColor={confirmLeave ? "#fff" : COLORS.grass}
+              style={{ width: "100%", boxShadow: "none" }}
+              onClick={() => {
+                if (confirmLeave) { onLeave(activity.id); setConfirmLeave(false); }
+                else { setConfirmLeave(true); setTimeout(() => setConfirmLeave(false), 4000); }
+              }}
+            >
+              <span style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+                {confirmLeave ? t("leave_confirm") : (<><Check size={18} /> {t("detail_joined")}</>)}
+              </span>
+            </PillButton>
+          )
         ) : (
           <PillButton
             color={full ? "#EDEAF4" : COLORS.coral}
@@ -4410,8 +4427,9 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
   );
 }
 
-function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinLabel, genderMode = false, onReport, genderLabels, onViewProfile, onShare, currentUserId, onEdit, onCancelOuting }) {
+function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinLabel, genderMode = false, onReport, genderLabels, onViewProfile, onShare, currentUserId, onEdit, onCancelOuting, onLeave }) {
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [confirmLeave, setConfirmLeave] = useState(false);
   if (!item) return null;
   const meta = metaFrom(categories, item.category);
   const Icon = meta.icon;
@@ -4512,11 +4530,27 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
         )}
 
         {isJoined ? (
-          <PillButton color={"#EAF8ED"} textColor={COLORS.grass} style={{ width: "100%", boxShadow: "none" }}>
-            <span style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
-              <Check size={18} /> {t("detail_joined")}
-            </span>
-          </PillButton>
+          item.createdBy === currentUserId ? (
+            <PillButton color={"#EAF8ED"} textColor={COLORS.grass} style={{ width: "100%", boxShadow: "none" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+                <Check size={18} /> {t("detail_joined")}
+              </span>
+            </PillButton>
+          ) : (
+            <PillButton
+              color={confirmLeave ? COLORS.coral : "#EAF8ED"}
+              textColor={confirmLeave ? "#fff" : COLORS.grass}
+              style={{ width: "100%", boxShadow: "none" }}
+              onClick={() => {
+                if (confirmLeave) { onLeave(item.id); setConfirmLeave(false); }
+                else { setConfirmLeave(true); setTimeout(() => setConfirmLeave(false), 4000); }
+              }}
+            >
+              <span style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+                {confirmLeave ? t("leave_confirm") : (<><Check size={18} /> {t("detail_joined")}</>)}
+              </span>
+            </PillButton>
+          )
         ) : (
           <PillButton
             color={full ? "#EDEAF4" : COLORS.coral}
@@ -5845,6 +5879,14 @@ function usePikapikaData() {
     if (error) console.error("Erreur inscription :", error);
   };
 
+  const leaveGeneric = async (id) => {
+    if (!user || !myRegs.has(id)) return;
+    setMyRegs((s) => { const n = new Set(s); n.delete(id); return n; });
+    setRegByActivity((c) => ({ ...c, [id]: Math.max(0, (c[id] || 1) - 1) }));
+    const { error } = await supabase.from("registrations").delete().eq("user_id", user.id).eq("activity_id", id);
+    if (error) console.error("Erreur désinscription :", error);
+  };
+
   const insertActivity = async (space, form) => {
     if (!user) return null;
     const starts_at = `${form.dateStr}T${form.timeStr}:00`;
@@ -6053,8 +6095,10 @@ function usePikapikaData() {
     joined, joinedTeen, joinedAdult, joinedSenior, joinedAsso,
     toggleFav: toggleFavGeneric,
     join: joinGeneric,
+    leave: leaveGeneric,
     toggleFavCommunity: (_kind, id) => toggleFavGeneric(id),
     joinCommunity: (_kind, id) => joinGeneric(id),
+    leaveCommunity: (_kind, id) => leaveGeneric(id),
     createActivity: (form) => insertActivity("kids", form),
     createAdultMeetup: (form) => insertActivity("adult", form),
     createAssoEvent: (form) => insertActivity("asso", form),
@@ -6109,6 +6153,11 @@ export default function RecreApp() {
     setSelected((s) => s && s.id === id ? { ...s, inscrits: s.inscrits + 1 } : s);
   });
 
+  const leave = requireAuth((id) => {
+    pika.leave(id);
+    setSelected((s) => s && s.id === id ? { ...s, inscrits: Math.max(0, s.inscrits - 1) } : s);
+  });
+
   const createActivity = pika.createActivity;
 
   const toggleFavCommunity = requireAuth((kind, id) => pika.toggleFavCommunity(kind, id));
@@ -6116,6 +6165,11 @@ export default function RecreApp() {
   const joinCommunity = requireAuth((kind, id) => {
     pika.joinCommunity(kind, id);
     setSelectedCommunity((s) => s && s.item.id === id ? { ...s, item: { ...s.item, inscrits: s.item.inscrits + 1 } } : s);
+  });
+
+  const leaveCommunity = requireAuth((kind, id) => {
+    pika.leaveCommunity(kind, id);
+    setSelectedCommunity((s) => s && s.item.id === id ? { ...s, item: { ...s.item, inscrits: Math.max(0, s.item.inscrits - 1) } } : s);
   });
 
   const createAdultMeetup = pika.createAdultMeetup;
@@ -6496,7 +6550,7 @@ export default function RecreApp() {
       <DetailModal
         activity={selected} onClose={() => setSelected(null)} joined={joined} onJoin={join} onReport={openReport}
         onViewProfile={openUserProfile} onShare={setShareTarget} currentUserId={pika.user?.id}
-        onEdit={openEditKid} onCancelOuting={cancelOuting}
+        onEdit={openEditKid} onCancelOuting={cancelOuting} onLeave={leave}
       />
 
       {(() => {
@@ -6523,6 +6577,7 @@ export default function RecreApp() {
             currentUserId={pika.user?.id}
             onEdit={(item) => openEditCommunity(selectedCommunity?.kind, item)}
             onCancelOuting={cancelOuting}
+            onLeave={(id) => leaveCommunity(selectedCommunity?.kind, id)}
           />
         );
       })()}
