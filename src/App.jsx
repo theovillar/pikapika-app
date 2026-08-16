@@ -53,7 +53,7 @@ const TRANSLATIONS = {
     label_categorie: "Catégorie", label_lieu: "Lieu", placeholder_lieu: "Parc, adresse…",
     label_date: "Date & heure", placeholder_date: "Sam. 9 août · 10h", label_heure: "Heure",
     label_age: "Âge conseillé", placeholder_age: "Ex. 4-8 ans",
-    label_places: "Places disponibles", label_description: "Description",
+    label_places: "Places disponibles", label_description: "Description", label_signe: "Signe distinctif (optionnel)", placeholder_signe: "Ex. Je porterai une casquette rouge, poussette bleue",
     placeholder_description: "Que va-t-on faire ? Quoi apporter ?",
     label_payant: "Sortie payante ?", toggle_oui: "Oui", toggle_non: "Non",
     badge_payant: "Payant", badge_gratuit: "Gratuit",
@@ -189,7 +189,7 @@ const TRANSLATIONS = {
     label_categorie: "Category", label_lieu: "Location", placeholder_lieu: "Park, address…",
     label_date: "Date & time", placeholder_date: "Sat. Aug 9 · 10am", label_heure: "Time",
     label_age: "Recommended age", placeholder_age: "E.g. 4-8 years",
-    label_places: "Available spots", label_description: "Description",
+    label_places: "Available spots", label_description: "Description", label_signe: "How to recognise you (optional)", placeholder_signe: "E.g. I'll wear a red cap, blue stroller",
     placeholder_description: "What will you do? What to bring?",
     label_payant: "Is it a paid outing?", toggle_oui: "Yes", toggle_non: "No",
     badge_payant: "Paid", badge_gratuit: "Free",
@@ -325,7 +325,7 @@ const TRANSLATIONS = {
     label_categorie: "Categoría", label_lieu: "Lugar", placeholder_lieu: "Parque, dirección…",
     label_date: "Fecha y hora", placeholder_date: "Sáb. 9 ago · 10h", label_heure: "Hora",
     label_age: "Edad recomendada", placeholder_age: "Ej. 4-8 años",
-    label_places: "Plazas disponibles", label_description: "Descripción",
+    label_places: "Plazas disponibles", label_description: "Descripción", label_signe: "Cómo reconocerte (opcional)", placeholder_signe: "Ej. Llevaré una gorra roja, carrito azul",
     placeholder_description: "¿Qué vais a hacer? ¿Qué traer?",
     label_payant: "¿Es una salida de pago?", toggle_oui: "Sí", toggle_non: "No",
     badge_payant: "De pago", badge_gratuit: "Gratis",
@@ -2908,7 +2908,7 @@ function AddressInput({ value, onChange, placeholder }) {
 function CreateActivity({ onCreate }) {
   const todayISO = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({
-    title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "", payant: false,
+    title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "", payant: false, signeDistinctif: "",
   });
   const [sent, setSent] = useState(false);
 
@@ -2919,10 +2919,11 @@ function CreateActivity({ onCreate }) {
     onCreate({
       title: form.title, category: form.category, lieu: form.lieu, age: form.age, desc: form.desc,
       dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1, payant: !!form.payant,
+      signeDistinctif: form.signeDistinctif || null,
     });
     setSent(true);
     setTimeout(() => setSent(false), 2200);
-    setForm({ title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "", payant: false });
+    setForm({ title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "", payant: false, signeDistinctif: "" });
   };
 
   const inputStyle = {
@@ -2994,6 +2995,10 @@ function CreateActivity({ onCreate }) {
             <Chip active={!form.payant} onClick={() => setForm({ ...form, payant: false })} color={COLORS.grass}>{t("toggle_non")}</Chip>
             <Chip active={!!form.payant} onClick={() => setForm({ ...form, payant: true })} color={COLORS.coral}>{t("toggle_oui")}</Chip>
           </div>
+        </div>
+        <div>
+          <label style={label}>{t("label_signe")}</label>
+          <input style={inputStyle} placeholder={t("placeholder_signe")} value={form.signeDistinctif} onChange={set("signeDistinctif")} />
         </div>
         <div>
           <label style={label}>{t("label_description")}</label>
@@ -3912,6 +3917,18 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
           </div>
         )}
 
+        {activity.signeDistinctif && (
+          <div style={{
+            display: "flex", alignItems: "flex-start", gap: 8, background: "#EDEAF4",
+            border: `2px solid ${COLORS.grape}`, borderRadius: 14, padding: "10px 12px", marginBottom: 14,
+          }}>
+            <Eye size={16} color={COLORS.grape} style={{ flexShrink: 0, marginTop: 1 }} />
+            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: COLORS.ink }}>
+              {activity.signeDistinctif}
+            </span>
+          </div>
+        )}
+
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
           <Row icon={<MapPin size={15} color={COLORS.ink} />} text={lieuAvecVille(activity)} />
           <Row icon={<CalendarDays size={15} color={COLORS.ink} />} text={displayDate(activity)} />
@@ -4374,6 +4391,18 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
           </div>
         )}
 
+        {item.signeDistinctif && (
+          <div style={{
+            display: "flex", alignItems: "flex-start", gap: 8, background: "#EDEAF4",
+            border: `2px solid ${COLORS.grape}`, borderRadius: 14, padding: "10px 12px", marginBottom: 14,
+          }}>
+            <Eye size={16} color={COLORS.grape} style={{ flexShrink: 0, marginTop: 1 }} />
+            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: COLORS.ink }}>
+              {item.signeDistinctif}
+            </span>
+          </div>
+        )}
+
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
           <Row icon={<MapPin size={15} color={COLORS.ink} />} text={lieuAvecVille(item)} />
           <Row icon={<CalendarDays size={15} color={COLORS.ink} />} text={displayDate(item)} />
@@ -4462,7 +4491,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
 function CreateMeetup({ categories, onCreate }) {
   const todayISO = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({
-    title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "", payant: false,
+    title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "", payant: false, signeDistinctif: "",
   });
   const [sent, setSent] = useState(false);
 
@@ -4473,10 +4502,11 @@ function CreateMeetup({ categories, onCreate }) {
     onCreate({
       title: form.title, category: form.category, lieu: form.lieu, info: form.info, desc: form.desc,
       dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1, payant: !!form.payant,
+      signeDistinctif: form.signeDistinctif || null,
     });
     setSent(true);
     setTimeout(() => setSent(false), 2200);
-    setForm({ title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "", payant: false });
+    setForm({ title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "", payant: false, signeDistinctif: "" });
   };
 
   const inputStyle = {
@@ -4548,6 +4578,10 @@ function CreateMeetup({ categories, onCreate }) {
             <Chip active={!form.payant} onClick={() => setForm({ ...form, payant: false })} color={COLORS.grass}>{t("toggle_non")}</Chip>
             <Chip active={!!form.payant} onClick={() => setForm({ ...form, payant: true })} color={COLORS.coral}>{t("toggle_oui")}</Chip>
           </div>
+        </div>
+        <div>
+          <label style={label}>{t("label_signe")}</label>
+          <input style={inputStyle} placeholder={t("placeholder_signe")} value={form.signeDistinctif} onChange={set("signeDistinctif")} />
         </div>
         <div>
           <label style={label}>{t("label_description")}</label>
@@ -5537,7 +5571,7 @@ function usePikapikaData() {
       organisateur: row.organisateur, organisateurGenre: row.organisateur_genre, desc: row.description,
       intergen: row.intergen, intergenNote: row.intergen_note,
       participants: row.demo_participants || [],
-      createdBy: row.created_by, payant: row.payant,
+      createdBy: row.created_by, payant: row.payant, signeDistinctif: row.signe_distinctif,
       organiserAge: ages.organiserAge ?? null, participantsAvgAge: ages.participantsAvgAge ?? null,
     };
   };
@@ -5588,7 +5622,7 @@ function usePikapikaData() {
       starts_at, age: form.age || null, info: form.info || null, places: form.places,
       demo_inscrits: 0, organisateur: profile.displayName || t("you_organizer"), organisateur_genre: profile.genre || null,
       description: form.desc || "", intergen: false, intergen_note: null,
-      demo_participants: [], created_by: user.id, payant: !!form.payant,
+      demo_participants: [], created_by: user.id, payant: !!form.payant, signe_distinctif: form.signeDistinctif || null,
     };
     const { data, error } = await supabase.from("activities").insert(newRow).select().single();
     if (error) { console.error("Erreur création :", error); return null; }
