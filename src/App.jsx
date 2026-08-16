@@ -31,7 +31,7 @@ const LANG = detectLang();
 
 const TRANSLATIONS = {
   fr: {
-    tab_enfants: "Enfants", tab_ados: "Jeune", tab_adultes: "Adultes", tab_aine: "Ainé", tab_creer: "Créer",
+    tab_enfants: "Parents", tab_ados: "Jeune", tab_adultes: "Adultes", tab_aine: "Ainé", tab_creer: "Créer",
     tab_mes_sorties: "Mes sorties", tab_profil: "Profil",
     tab_creer_adulte: "Créer une sortie", tab_mes_adultes: "Mes sorties",
     greeting: "Bonjour {name} 👋",
