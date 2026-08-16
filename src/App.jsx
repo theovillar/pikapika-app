@@ -101,7 +101,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer",
+    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
@@ -3077,7 +3077,7 @@ function MyOutings({ joined, activities }) {
   );
 }
 
-function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate }) {
+function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal }) {
   const [addingKid, setAddingKid] = useState(false);
   const [kidName, setKidName] = useState("");
   const [kidAge, setKidAge] = useState("");
@@ -3240,6 +3240,22 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
           }}>
             {c.label}
           </span>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", justifyContent: "center", gap: 14, marginBottom: 14, flexWrap: "wrap" }}>
+        {[
+          { id: "mentions", label: t("legal_mentions_title") },
+          { id: "cgu", label: t("legal_cgu_title") },
+          { id: "confidentialite", label: t("legal_confidentialite_title") },
+        ].map((d) => (
+          <button
+            key={d.id}
+            onClick={() => onOpenLegal(d.id)}
+            style={{ background: "none", border: "none", color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 11.5, cursor: "pointer", textDecoration: "underline" }}
+          >
+            {d.label}
+          </button>
         ))}
       </div>
 
@@ -3507,6 +3523,123 @@ function CityOption({ label, sub, active, onClick }) {
 
 // Fiche publique minimale d'un utilisateur : juste ce qui est nécessaire pour savoir qui organise
 // (pseudo, genre, ancienneté) — jamais l'email ni d'autre donnée privée.
+// ---------- Contenus juridiques ----------
+// Rédigés à partir des fonctionnalités réelles d'Orée. Ce sont des premiers jets :
+// à faire relire par un professionnel avant toute mise en ligne publique,
+// notamment sur les points liés aux mineurs.
+const LEGAL_MENTIONS = `
+**Éditeur du site**
+[Votre nom ou raison sociale à compléter]
+[Adresse à compléter]
+Email de contact : [votre-email@exemple.com]
+
+**Hébergement**
+Le site est hébergé par Vercel Inc. (hébergement de l'application) et Supabase Inc. (base de données et authentification). Leurs conditions et politiques respectives s'appliquent au traitement technique des données.
+
+**Directeur de publication**
+[Votre nom à compléter]
+
+**Propriété intellectuelle**
+L'ensemble des éléments graphiques et le nom "Orée" sont la propriété de l'éditeur, sauf mention contraire. Les contenus publiés par les utilisateurs (titres, descriptions de sorties, photos de profil) restent la propriété de leurs auteurs.
+`.trim();
+
+const LEGAL_CGU = `
+**1. Objet**
+Orée est une application permettant à des particuliers, associations et mairies d'organiser et de rejoindre des sorties locales (enfants, jeunes, adultes, aînés) et des événements communaux.
+
+**2. Accès au service**
+L'inscription nécessite une adresse email valide. La consultation des sorties Adultes et Aînés est possible sans compte ; la création de compte est nécessaire pour rejoindre une sortie, en proposer une, ou accéder aux sorties concernant des enfants ou des jeunes.
+
+**3. Validation par la mairie**
+L'accès aux sorties impliquant des enfants ou des jeunes est soumis à une validation par la mairie du territoire concerné. Cette validation est un contrôle organisationnel et ne constitue pas une vérification d'identité approfondie ; les utilisateurs restent responsables de leur propre vigilance.
+
+**4. Comportement attendu**
+Chaque utilisateur s'engage à :
+- fournir des informations exactes ;
+- adopter un comportement respectueux envers les autres membres ;
+- ne pas publier de contenu illicite, trompeur ou inapproprié, en particulier vis-à-vis des mineurs ;
+- signaler tout comportement ou contenu problématique via la fonction de signalement intégrée.
+
+**5. Modération**
+L'éditeur se réserve le droit de suspendre, bloquer ou supprimer tout compte ne respectant pas ces règles, sans préavis en cas de manquement grave (sécurité des mineurs notamment).
+
+**6. Responsabilité**
+Orée est un service de mise en relation. L'éditeur n'est pas partie aux sorties organisées entre utilisateurs et ne peut être tenu responsable du déroulement de ces rencontres, du comportement des participants, ou des informations qu'ils publient. Chaque utilisateur reste seul responsable des sorties qu'il organise ou rejoint, notamment s'agissant de la surveillance de ses propres enfants.
+
+**7. Droit applicable**
+Les présentes CGU sont soumises au droit français.
+`.trim();
+
+const LEGAL_CONFIDENTIALITE = `
+**1. Données collectées**
+Selon les fonctionnalités utilisées, Orée peut collecter : adresse email, prénom et nom, genre, date de naissance, commune de résidence, photo de profil, informations sur les enfants renseignées par le parent (prénom, âge, genre), participation aux sorties, contenu des sorties créées, et le contenu des éventuels signalements effectués.
+
+**2. Finalités**
+Ces données sont utilisées pour : créer et gérer le compte, permettre la mise en relation entre utilisateurs, assurer la validation des comptes par la mairie compétente, afficher une tranche d'âge indicative sur les sorties, assurer la modération et la sécurité du service.
+
+**3. Base légale**
+Le traitement repose sur l'exécution du contrat (fourniture du service) et, pour certaines données optionnelles (date de naissance, photo, commune), sur le consentement de l'utilisateur.
+
+**4. Mineurs**
+Les comptes "Particulier" peuvent être créés par des personnes mineures. Conformément à la réglementation, la création de compte par un mineur de moins de 15 ans requiert le consentement d'un titulaire de l'autorité parentale. Les informations concernant les enfants sont renseignées par le parent titulaire du compte, sous sa responsabilité.
+
+**5. Durée de conservation**
+Les données sont conservées tant que le compte est actif. En cas de suppression de compte par un administrateur, les sorties créées et les informations des enfants associées sont effacées ; certaines données peuvent être conservées de façon anonymisée à des fins statistiques.
+
+**6. Destinataires et sous-traitants**
+Les données sont hébergées par Supabase Inc. (base de données, authentification, stockage des photos) et Vercel Inc. (hébergement de l'application). Aucune donnée n'est vendue à des tiers.
+
+**7. Vos droits**
+Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, de suppression, de portabilité et d'opposition sur vos données. Vous pouvez modifier directement votre profil (photo, date de naissance) depuis l'application, ou nous contacter à [votre-email@exemple.com] pour toute autre demande.
+
+**8. Sécurité**
+L'accès aux données est protégé par des règles de sécurité au niveau de la base de données (chaque utilisateur n'accède qu'à ce qui le concerne), et les actions de modération sont réservées aux comptes habilités (mairie, administration).
+
+**9. Cookies**
+Orée utilise uniquement des cookies strictement nécessaires au fonctionnement (maintien de la connexion). Aucun cookie publicitaire ou de suivi n'est utilisé.
+`.trim();
+
+function LegalTextBlock({ text }) {
+  return (
+    <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: "#5C5578", lineHeight: 1.7, whiteSpace: "pre-line" }}>
+      {text.split("\n\n").map((para, i) => {
+        const parts = para.split(/\*\*(.*?)\*\*/g);
+        return (
+          <p key={i} style={{ margin: "0 0 14px" }}>
+            {parts.map((part, j) => (j % 2 === 1 ? <strong key={j} style={{ color: COLORS.ink }}>{part}</strong> : part))}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+function LegalModal({ doc, onClose }) {
+  if (!doc) return null;
+  const docs = {
+    mentions: { title: t("legal_mentions_title"), text: LEGAL_MENTIONS },
+    cgu: { title: t("legal_cgu_title"), text: LEGAL_CGU },
+    confidentialite: { title: t("legal_confidentialite_title"), text: LEGAL_CONFIDENTIALITE },
+  };
+  const current = docs[doc];
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 10000, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+      <div onClick={(e) => e.stopPropagation()} style={{
+        background: COLORS.cloud, width: "100%", maxWidth: 560, borderRadius: "26px 26px 0 0",
+        padding: 24, maxHeight: "calc(100vh - 100px)", overflowY: "auto", boxSizing: "border-box", position: "relative",
+      }}>
+        <button onClick={onClose} style={{ position: "sticky", top: 0, float: "right", background: "#fff", border: "none", borderRadius: "50%", width: 34, height: 34, cursor: "pointer", marginLeft: 12 }}>
+          <X size={18} color={COLORS.ink} />
+        </button>
+        <h2 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink, margin: "0 0 16px" }}>
+          {current.title}
+        </h2>
+        <LegalTextBlock text={current.text} />
+      </div>
+    </div>
+  );
+}
+
 function UserProfileModal({ userId, onClose }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -4532,7 +4665,7 @@ function MesSortiesPage({ parentValidated, joined, activities, adultItems, joine
 }
 
 // ---------- Authentification ----------
-function AuthScreen({ onClose }) {
+function AuthScreen({ onClose, onOpenLegal }) {
   const [mode, setMode] = useState("login"); // "login" | "signup"
   const [accountType, setAccountType] = useState("parent"); // "parent" | "association"
   const [email, setEmail] = useState("");
@@ -4709,6 +4842,19 @@ function AuthScreen({ onClose }) {
         <PillButton color={COLORS.grass} textColor="#fff" onClick={submit} style={{ width: "100%", opacity: loading ? 0.6 : 1 }}>
           {loading ? t("auth_loading") : mode === "signup" ? t("auth_signup_btn") : t("auth_login_btn")}
         </PillButton>
+
+        {mode === "signup" && (
+          <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 11, color: "#9A93AF", textAlign: "center", margin: "10px 0 0" }}>
+            En créant un compte, vous acceptez nos{" "}
+            <button type="button" onClick={() => onOpenLegal("cgu")} style={{ background: "none", border: "none", padding: 0, color: "#6B6485", fontSize: 11, textDecoration: "underline", cursor: "pointer" }}>
+              {t("legal_cgu_title")}
+            </button>{" "}
+            et notre{" "}
+            <button type="button" onClick={() => onOpenLegal("confidentialite")} style={{ background: "none", border: "none", padding: 0, color: "#6B6485", fontSize: 11, textDecoration: "underline", cursor: "pointer" }}>
+              {t("legal_confidentialite_title")}
+            </button>.
+          </p>
+        )}
 
         <button
           onClick={() => { setMode(mode === "signup" ? "login" : "signup"); setError(""); }}
@@ -5620,6 +5766,7 @@ export default function RecreApp() {
   const openUserProfile = requireAuth((userId) => setViewingUserId(userId));
 
   const [shareTarget, setShareTarget] = useState(null);
+  const [legalDoc, setLegalDoc] = useState(null);
 
   // Ouvre automatiquement une annonce si on arrive via un lien partagé (?activity=ID)
   const deepLinkDone = useRef(false);
@@ -5919,6 +6066,7 @@ export default function RecreApp() {
             onUploadAvatar={pika.uploadAvatar}
             birthdate={pika.birthdate}
             onUpdateBirthdate={pika.updateBirthdate}
+            onOpenLegal={setLegalDoc}
           />
         )}
       </div>
@@ -5983,7 +6131,9 @@ export default function RecreApp() {
         );
       })()}
 
-      {authPrompt && <AuthScreen onClose={() => setAuthPrompt(false)} />}
+      {authPrompt && <AuthScreen onClose={() => setAuthPrompt(false)} onOpenLegal={setLegalDoc} />}
+
+      <LegalModal doc={legalDoc} onClose={() => setLegalDoc(null)} />
 
       {viewingUserId && <UserProfileModal userId={viewingUserId} onClose={() => setViewingUserId(null)} />}
 
