@@ -101,7 +101,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !",
+    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", cancel_outing_confirm: "Confirmer l'annulation ?",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
@@ -3082,11 +3082,13 @@ function MyOutings({ joined, activities }) {
   );
 }
 
-function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio }) {
+function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onUpdateKid, onDeleteKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio }) {
   const [addingKid, setAddingKid] = useState(false);
+  const [editingKidId, setEditingKidId] = useState(null);
   const [kidName, setKidName] = useState("");
   const [kidAge, setKidAge] = useState("");
   const [kidGenre, setKidGenre] = useState("F");
+  const [confirmDeleteKid, setConfirmDeleteKid] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [birthdateInput, setBirthdateInput] = useState(birthdate || "");
@@ -3095,10 +3097,34 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
   const [birthdateSaved, setBirthdateSaved] = useState(false);
   const fileInputRef = useRef(null);
 
+  const startAddKid = () => {
+    setEditingKidId(null); setKidName(""); setKidAge(""); setKidGenre("F"); setConfirmDeleteKid(false);
+    setAddingKid(true);
+  };
+
+  const startEditKid = (k) => {
+    setEditingKidId(k.id); setKidName(k.name); setKidAge(k.age ?? ""); setKidGenre(k.genre || "F"); setConfirmDeleteKid(false);
+    setAddingKid(true);
+  };
+
   const submitKid = () => {
     if (!kidName.trim()) return;
-    onAddKid({ name: kidName.trim(), age: Number(kidAge) || null, genre: kidGenre });
-    setKidName(""); setKidAge(""); setKidGenre("F"); setAddingKid(false);
+    if (editingKidId) {
+      onUpdateKid(editingKidId, { name: kidName.trim(), age: Number(kidAge) || null, genre: kidGenre });
+    } else {
+      onAddKid({ name: kidName.trim(), age: Number(kidAge) || null, genre: kidGenre });
+    }
+    setKidName(""); setKidAge(""); setKidGenre("F"); setAddingKid(false); setEditingKidId(null);
+  };
+
+  const handleDeleteKid = () => {
+    if (confirmDeleteKid) {
+      onDeleteKid(editingKidId);
+      setAddingKid(false); setEditingKidId(null); setConfirmDeleteKid(false);
+    } else {
+      setConfirmDeleteKid(true);
+      setTimeout(() => setConfirmDeleteKid(false), 4000);
+    }
   };
 
   const saveBirthdate = async () => {
@@ -3206,21 +3232,24 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
       <SectionLabel>{t("profile_children")}</SectionLabel>
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 22 }}>
         {kids.map((k) => (
-          <div key={k.id} style={{
-            background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "12px 16px",
-            display: "flex", alignItems: "center", gap: 12,
-          }}>
-            <div style={{
-              width: 36, height: 36, borderRadius: "50%", background: COLORS.sun,
-              display: "flex", alignItems: "center", justifyContent: "center",
+          editingKidId === k.id ? null : (
+            <button key={k.id} onClick={() => startEditKid(k)} style={{
+              background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "12px 16px",
+              display: "flex", alignItems: "center", gap: 12, cursor: "pointer", textAlign: "left", width: "100%",
             }}>
-              <Baby size={18} color={COLORS.ink} />
-            </div>
-            <div style={{ fontFamily: "Nunito, sans-serif" }}>
-              <div style={{ fontWeight: 800, fontSize: 14.5, color: COLORS.ink }}>{k.name}</div>
-              <div style={{ fontSize: 12.5, color: "#6B6485" }}>{k.age} {t("profile_years")}</div>
-            </div>
-          </div>
+              <div style={{
+                width: 36, height: 36, borderRadius: "50%", background: COLORS.sun,
+                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+              }}>
+                <Baby size={18} color={COLORS.ink} />
+              </div>
+              <div style={{ fontFamily: "Nunito, sans-serif", flex: 1 }}>
+                <div style={{ fontWeight: 800, fontSize: 14.5, color: COLORS.ink }}>{k.name}</div>
+                <div style={{ fontSize: 12.5, color: "#6B6485" }}>{k.age} {t("profile_years")}</div>
+              </div>
+              <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#B7AF98", fontWeight: 700 }}>{t("btn_edit")}</span>
+            </button>
+          )
         ))}
 
         {addingKid ? (
@@ -3246,15 +3275,24 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <PillButton color={COLORS.grass} textColor="#fff" onClick={submitKid} style={{ flex: 1, padding: "8px 10px", fontSize: 13 }}>
-                {t("btn_ajouter")}
+                {editingKidId ? t("btn_enregistrer") : t("btn_ajouter")}
               </PillButton>
-              <button onClick={() => setAddingKid(false)} style={{ background: "transparent", border: "none", color: "#9A93AF", cursor: "pointer", fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13 }}>
+              {editingKidId && (
+                <button onClick={handleDeleteKid} style={{
+                  background: confirmDeleteKid ? COLORS.coral : "transparent", border: `2px solid ${COLORS.coral}`,
+                  borderRadius: 10, padding: "8px 12px", color: confirmDeleteKid ? "#fff" : COLORS.coral,
+                  cursor: "pointer", fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12,
+                }}>
+                  {confirmDeleteKid ? t("cancel_outing_confirm") : t("btn_delete")}
+                </button>
+              )}
+              <button onClick={() => { setAddingKid(false); setEditingKidId(null); }} style={{ background: "transparent", border: "none", color: "#9A93AF", cursor: "pointer", fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13 }}>
                 ✕
               </button>
             </div>
           </div>
         ) : (
-          <button onClick={() => setAddingKid(true)} style={{
+          <button onClick={startAddKid} style={{
             border: `2px dashed #D8D2C2`, background: "transparent", borderRadius: 16, padding: "12px 16px",
             fontFamily: "Nunito, sans-serif", fontWeight: 800, color: "#9A93AF", cursor: "pointer", fontSize: 13.5,
           }}>
@@ -3861,7 +3899,8 @@ function ReportModal({ onClose, onSubmit }) {
   );
 }
 
-function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfile, onShare }) {
+function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfile, onShare, currentUserId, onEdit, onCancelOuting }) {
+  const [confirmCancel, setConfirmCancel] = useState(false);
   if (!activity) return null;
   const meta = catMeta(activity.category);
   const isJoined = joined.includes(activity.id);
@@ -3990,6 +4029,34 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
         >
           <Share2 size={15} /> {t("share_btn")}
         </button>
+
+        {activity.createdBy && activity.createdBy === currentUserId && (
+          <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+            <button
+              onClick={() => onEdit(activity)}
+              style={{
+                flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                background: "#fff", border: "2px solid #F0EADB", borderRadius: 12, padding: "10px 14px",
+                color: COLORS.ink, fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "Nunito, sans-serif",
+              }}
+            >
+              {t("btn_edit")}
+            </button>
+            <button
+              onClick={() => {
+                if (confirmCancel) { onCancelOuting(activity.id); onClose(); }
+                else { setConfirmCancel(true); setTimeout(() => setConfirmCancel(false), 4000); }
+              }}
+              style={{
+                flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                background: confirmCancel ? COLORS.coral : "#fff", border: `2px solid ${COLORS.coral}`, borderRadius: 12, padding: "10px 14px",
+                color: confirmCancel ? "#fff" : COLORS.coral, fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "Nunito, sans-serif",
+              }}
+            >
+              {confirmCancel ? t("cancel_outing_confirm") : t("btn_cancel_outing")}
+            </button>
+          </div>
+        )}
 
         <button
           onClick={() => onReport(activity)}
@@ -4343,7 +4410,8 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
   );
 }
 
-function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinLabel, genderMode = false, onReport, genderLabels, onViewProfile, onShare }) {
+function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinLabel, genderMode = false, onReport, genderLabels, onViewProfile, onShare, currentUserId, onEdit, onCancelOuting }) {
+  const [confirmCancel, setConfirmCancel] = useState(false);
   if (!item) return null;
   const meta = metaFrom(categories, item.category);
   const Icon = meta.icon;
@@ -4471,6 +4539,34 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
         >
           <Share2 size={15} /> {t("share_btn")}
         </button>
+
+        {item.createdBy && item.createdBy === currentUserId && (
+          <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+            <button
+              onClick={() => onEdit(item)}
+              style={{
+                flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                background: "#fff", border: "2px solid #F0EADB", borderRadius: 12, padding: "10px 14px",
+                color: COLORS.ink, fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "Nunito, sans-serif",
+              }}
+            >
+              {t("btn_edit")}
+            </button>
+            <button
+              onClick={() => {
+                if (confirmCancel) { onCancelOuting(item.id); onClose(); }
+                else { setConfirmCancel(true); setTimeout(() => setConfirmCancel(false), 4000); }
+              }}
+              style={{
+                flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                background: confirmCancel ? COLORS.coral : "#fff", border: `2px solid ${COLORS.coral}`, borderRadius: 12, padding: "10px 14px",
+                color: confirmCancel ? "#fff" : COLORS.coral, fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "Nunito, sans-serif",
+              }}
+            >
+              {confirmCancel ? t("cancel_outing_confirm") : t("btn_cancel_outing")}
+            </button>
+          </div>
+        )}
 
         <button
           onClick={() => onReport(item)}
@@ -4604,6 +4700,141 @@ function CreateMeetup({ categories, onCreate }) {
             <Check size={16} /> {t("success_message_meetup")}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// Modale de modification d'une sortie existante, réutilisée pour les sorties enfants et adultes/asso.
+// Toute modification retire les personnes déjà inscrites (sauf l'organisateur, ré-inscrit automatiquement).
+function EditActivityModal({ activity, space, categories, onClose, onSave }) {
+  const todayISO = new Date().toISOString().slice(0, 10);
+  const initialDate = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + (activity.offsetDays || 0));
+    return d.toISOString().slice(0, 10);
+  })();
+  const initialTime = (activity.time || "10h00").replace("h", ":");
+
+  const [form, setForm] = useState({
+    title: activity.title || "", category: activity.category || (categories[0] && categories[0].id),
+    lieu: activity.lieu || "", dateStr: initialDate, timeStr: initialTime,
+    places: activity.places || 6, desc: activity.desc || "", payant: !!activity.payant,
+    signeDistinctif: activity.signeDistinctif || "", age: activity.age || "", info: activity.info || "",
+  });
+  const [saving, setSaving] = useState(false);
+
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  const inputStyle = {
+    width: "100%", border: "2px solid #F0EADB", borderRadius: 14, padding: "12px 14px",
+    fontFamily: "Nunito, sans-serif", fontSize: 14.5, color: COLORS.ink, outline: "none",
+    boxSizing: "border-box", background: "#fff",
+  };
+  const label = { fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5, color: "#6B6485", marginBottom: 6, display: "block", textTransform: "uppercase", letterSpacing: 0.4 };
+
+  const submit = async () => {
+    if (!form.title || !form.lieu || !form.dateStr) return;
+    setSaving(true);
+    const ok = await onSave({ ...form, places: Number(form.places) || 1 });
+    setSaving(false);
+    if (ok) onClose();
+  };
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+      <div onClick={(e) => e.stopPropagation()} style={{
+        background: COLORS.cloud, width: "100%", maxWidth: 560, borderRadius: "26px 26px 0 0",
+        padding: 24, maxHeight: "calc(100vh - 100px)", overflowY: "auto", boxSizing: "border-box", position: "relative",
+      }}>
+        <button onClick={onClose} style={{ position: "absolute", top: 20, right: 20, background: "#fff", border: "none", borderRadius: "50%", width: 34, height: 34, cursor: "pointer" }}>
+          <X size={18} color={COLORS.ink} />
+        </button>
+        <h2 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink, margin: "0 40px 6px 0" }}>
+          {t("edit_title")}
+        </h2>
+
+        <div style={{
+          display: "flex", alignItems: "center", gap: 8, background: "#FFF4DD",
+          border: `2px solid ${COLORS.sun}`, borderRadius: 14, padding: "10px 12px", marginBottom: 18,
+        }}>
+          <ShieldCheck size={16} color={COLORS.sun} style={{ flexShrink: 0 }} />
+          <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 12.5, color: COLORS.ink }}>
+            {t("edit_warning")}
+          </span>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div>
+            <label style={label}>{t("label_titre")}</label>
+            <input style={inputStyle} value={form.title} onChange={set("title")} />
+          </div>
+
+          <div>
+            <label style={label}>{t("label_categorie")}</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {categories.map((c) => (
+                <Chip key={c.id} active={form.category === c.id} onClick={() => setForm({ ...form, category: c.id })} color={c.color}>{c.label}</Chip>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label style={label}>{t("label_lieu")}</label>
+            <AddressInput value={form.lieu} onChange={(v) => setForm({ ...form, lieu: v })} placeholder={t("placeholder_lieu")} />
+          </div>
+
+          <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ flex: 1 }}>
+              <label style={label}>{t("label_date")}</label>
+              <input type="date" min={todayISO} style={inputStyle} value={form.dateStr} onChange={set("dateStr")} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={label}>{t("label_heure")}</label>
+              <input type="time" style={inputStyle} value={form.timeStr} onChange={set("timeStr")} />
+            </div>
+          </div>
+
+          {space === "kids" ? (
+            <div>
+              <label style={label}>{t("label_age")}</label>
+              <input style={inputStyle} placeholder={t("placeholder_age")} value={form.age} onChange={set("age")} />
+            </div>
+          ) : (
+            <div>
+              <label style={label}>{t("label_info")}</label>
+              <input style={inputStyle} placeholder={t("placeholder_info")} value={form.info} onChange={set("info")} />
+            </div>
+          )}
+
+          <div>
+            <label style={label}>{t("label_places")}</label>
+            <input type="number" min={1} style={inputStyle} value={form.places} onChange={set("places")} />
+          </div>
+
+          <div>
+            <label style={label}>{t("label_payant")}</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              <Chip active={!form.payant} onClick={() => setForm({ ...form, payant: false })} color={COLORS.grass}>{t("toggle_non")}</Chip>
+              <Chip active={!!form.payant} onClick={() => setForm({ ...form, payant: true })} color={COLORS.coral}>{t("toggle_oui")}</Chip>
+            </div>
+          </div>
+
+          <div>
+            <label style={label}>{t("label_signe")}</label>
+            <input style={inputStyle} placeholder={t("placeholder_signe")} value={form.signeDistinctif} onChange={set("signeDistinctif")} />
+          </div>
+
+          <div>
+            <label style={label}>{t("label_description")}</label>
+            <textarea rows={3} style={{ ...inputStyle, resize: "vertical", fontFamily: "Nunito, sans-serif" }}
+              placeholder={t("placeholder_description")} value={form.desc} onChange={set("desc")} />
+          </div>
+
+          <PillButton color={COLORS.grass} textColor="#fff" onClick={submit} style={{ opacity: saving ? 0.6 : 1 }}>
+            {saving ? t("auth_loading") : t("edit_save")}
+          </PillButton>
+        </div>
       </div>
     </div>
   );
@@ -5631,6 +5862,41 @@ function usePikapikaData() {
     return data.id;
   };
 
+  // Modifier une sortie retire toutes les personnes déjà inscrites (le changement peut être
+  // suffisamment important — lieu, horaire — pour que l'accord initial des participants ne tienne plus).
+  // L'organisateur, lui, reste automatiquement inscrit à sa propre sortie modifiée.
+  const updateActivity = async (id, space, form) => {
+    if (!user) return false;
+    const starts_at = `${form.dateStr}T${form.timeStr}:00`;
+    const patch = {
+      title: form.title, category: form.category, lieu: form.lieu, starts_at,
+      places: form.places, description: form.desc || "", payant: !!form.payant,
+      signe_distinctif: form.signeDistinctif || null,
+      ...(space === "kids" ? { age: form.age || null } : { info: form.info || null }),
+    };
+    const { data, error } = await supabase.from("activities").update(patch).eq("id", id).eq("created_by", user.id).select().single();
+    if (error) { console.error("Erreur modification :", error); return false; }
+    setRows((rs) => rs.map((r) => (r.id === id ? data : r)));
+
+    await supabase.from("registrations").delete().eq("activity_id", id);
+    await supabase.from("registrations").insert({ user_id: user.id, activity_id: id });
+
+    const { data: regRows } = await supabase.from("registrations").select("activity_id");
+    const counts = {};
+    (regRows || []).forEach((r) => { counts[r.activity_id] = (counts[r.activity_id] || 0) + 1; });
+    setRegByActivity(counts);
+    setMyRegs((s) => new Set(s).add(id));
+    return true;
+  };
+
+  const deleteActivity = async (id) => {
+    if (!user) return false;
+    const { error } = await supabase.from("activities").delete().eq("id", id).eq("created_by", user.id);
+    if (error) { console.error("Erreur suppression :", error); return false; }
+    setRows((rs) => rs.filter((r) => r.id !== id));
+    return true;
+  };
+
   const toggleParentValidated = async () => {
     if (!user) return;
     const next = !profile.parentValidated;
@@ -5644,6 +5910,20 @@ function usePikapikaData() {
     const { data, error } = await supabase.from("kids").insert({ parent_id: user.id, name, age, genre }).select().single();
     if (error) { console.error("Erreur ajout enfant :", error); return; }
     setKids((k) => [...k, data]);
+  };
+
+  const updateKid = async (id, { name, age, genre }) => {
+    if (!user) return;
+    const { data, error } = await supabase.from("kids").update({ name, age, genre }).eq("id", id).eq("parent_id", user.id).select().single();
+    if (error) { console.error("Erreur modification enfant :", error); return; }
+    setKids((k) => k.map((kid) => (kid.id === id ? data : kid)));
+  };
+
+  const deleteKid = async (id) => {
+    if (!user) return;
+    const { error } = await supabase.from("kids").delete().eq("id", id).eq("parent_id", user.id);
+    if (error) { console.error("Erreur suppression enfant :", error); return; }
+    setKids((k) => k.filter((kid) => kid.id !== id));
   };
 
   const updateBirthdate = async (birthdate) => {
@@ -5778,8 +6058,10 @@ function usePikapikaData() {
     createActivity: (form) => insertActivity("kids", form),
     createAdultMeetup: (form) => insertActivity("adult", form),
     createAssoEvent: (form) => insertActivity("asso", form),
+    updateActivity, deleteActivity,
     toggleParentValidated,
     addKid,
+    updateKid, deleteKid,
     updateBirthdate,
     updateBio,
     uploadAvatar,
@@ -5846,6 +6128,30 @@ export default function RecreApp() {
 
   const [shareTarget, setShareTarget] = useState(null);
   const [legalDoc, setLegalDoc] = useState(null);
+
+  const [editTarget, setEditTarget] = useState(null); // { activity, space, categories }
+  const openEditKid = (item) => setEditTarget({ activity: item, space: "kids", categories: CATEGORIES });
+  const openEditAdult = (item) => setEditTarget({ activity: item, space: "adult", categories: ADULT_CATEGORIES });
+  const openEditCommunity = (kind, item) => {
+    const catMap = { adult: ADULT_CATEGORIES, teen: TEEN_CATEGORIES, senior: SENIOR_CATEGORIES, asso: ASSO_CATEGORIES };
+    const spaceMap = { adult: "adult", teen: "teen", senior: "senior", asso: "asso" };
+    setEditTarget({ activity: item, space: spaceMap[kind], categories: catMap[kind] });
+  };
+  const saveEdit = async (form) => {
+    if (!editTarget) return false;
+    const ok = await pika.updateActivity(editTarget.activity.id, editTarget.space, form);
+    if (ok) {
+      const id = editTarget.activity.id;
+      setSelected((s) => (s && s.id === id ? null : s));
+      setSelectedCommunity((s) => (s && s.item.id === id ? null : s));
+    }
+    return ok;
+  };
+  const cancelOuting = async (id) => {
+    await pika.deleteActivity(id);
+    setSelected((s) => (s && s.id === id ? null : s));
+    setSelectedCommunity((s) => (s && s.item.id === id ? null : s));
+  };
 
   // Ouvre automatiquement une annonce si on arrive via un lien partagé (?activity=ID)
   const deepLinkDone = useRef(false);
@@ -6140,6 +6446,8 @@ export default function RecreApp() {
             email={email}
             kids={kids}
             onAddKid={pika.addKid}
+            onUpdateKid={pika.updateKid}
+            onDeleteKid={pika.deleteKid}
             onSignOut={pika.signOut}
             avatarUrl={pika.avatarUrl}
             onUploadAvatar={pika.uploadAvatar}
@@ -6185,7 +6493,11 @@ export default function RecreApp() {
         })}
       </div>
 
-      <DetailModal activity={selected} onClose={() => setSelected(null)} joined={joined} onJoin={join} onReport={openReport} onViewProfile={openUserProfile} onShare={setShareTarget} />
+      <DetailModal
+        activity={selected} onClose={() => setSelected(null)} joined={joined} onJoin={join} onReport={openReport}
+        onViewProfile={openUserProfile} onShare={setShareTarget} currentUserId={pika.user?.id}
+        onEdit={openEditKid} onCancelOuting={cancelOuting}
+      />
 
       {(() => {
         const kindMeta = {
@@ -6208,6 +6520,9 @@ export default function RecreApp() {
             onReport={openReport}
             onViewProfile={openUserProfile}
             onShare={setShareTarget}
+            currentUserId={pika.user?.id}
+            onEdit={(item) => openEditCommunity(selectedCommunity?.kind, item)}
+            onCancelOuting={cancelOuting}
           />
         );
       })()}
@@ -6215,6 +6530,16 @@ export default function RecreApp() {
       {authPrompt && <AuthScreen onClose={() => setAuthPrompt(false)} onOpenLegal={setLegalDoc} />}
 
       <LegalModal doc={legalDoc} onClose={() => setLegalDoc(null)} />
+
+      {editTarget && (
+        <EditActivityModal
+          activity={editTarget.activity}
+          space={editTarget.space}
+          categories={editTarget.categories}
+          onClose={() => setEditTarget(null)}
+          onSave={saveEdit}
+        />
+      )}
 
       {viewingUserId && <UserProfileModal userId={viewingUserId} onClose={() => setViewingUserId(null)} />}
 
