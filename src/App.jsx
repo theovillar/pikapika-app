@@ -3709,7 +3709,7 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
         onClick={(e) => e.stopPropagation()}
         style={{
           background: COLORS.cloud, width: "100%", maxWidth: 520, borderRadius: "26px 26px 0 0",
-          padding: 24, maxHeight: "85vh", overflowY: "auto", boxSizing: "border-box",
+          padding: 24, maxHeight: "calc(100vh - 100px)", overflowY: "auto", boxSizing: "border-box",
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
@@ -4170,7 +4170,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.45)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 9999 }}>
-      <div onClick={(e) => e.stopPropagation()} style={{ background: COLORS.cloud, width: "100%", maxWidth: 520, borderRadius: "26px 26px 0 0", padding: 24, maxHeight: "85vh", overflowY: "auto", boxSizing: "border-box" }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ background: COLORS.cloud, width: "100%", maxWidth: 520, borderRadius: "26px 26px 0 0", padding: 24, maxHeight: "calc(100vh - 100px)", overflowY: "auto", boxSizing: "border-box" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
           <div style={{
             width: 56, height: 56, borderRadius: "50%", border: `2px dashed ${meta.color}`,
