@@ -6121,8 +6121,8 @@ function usePikapikaData() {
 export default function RecreApp() {
   const pika = usePikapikaData();
   const [tab, setTab] = useState(pika.user ? "profil" : "adultes");
-  const [selected, setSelected] = useState(null);
-  const [selectedCommunity, setSelectedCommunity] = useState(null); // { item, kind: "adult" | "teen" | "senior" | "asso" }
+  const [selectedId, setSelectedId] = useState(null);
+  const [selectedCommunity, setSelectedCommunity] = useState(null); // { id, kind: "adult" | "teen" | "senior" | "asso" }
   const [location, setLocation] = useState(null);
   const [authPrompt, setAuthPrompt] = useState(false);
 
@@ -6148,29 +6148,17 @@ export default function RecreApp() {
 
   // Rejoindre une sortie enfant met aussi à jour l'aperçu ouvert (fiche détaillée), le temps
   // que le nombre d'inscrits recalculé depuis Supabase redescende dans le tableau `activities`.
-  const join = requireAuth((id) => {
-    pika.join(id);
-    setSelected((s) => s && s.id === id ? { ...s, inscrits: s.inscrits + 1 } : s);
-  });
+  const join = requireAuth((id) => pika.join(id));
 
-  const leave = requireAuth((id) => {
-    pika.leave(id);
-    setSelected((s) => s && s.id === id ? { ...s, inscrits: Math.max(0, s.inscrits - 1) } : s);
-  });
+  const leave = requireAuth((id) => pika.leave(id));
 
   const createActivity = pika.createActivity;
 
   const toggleFavCommunity = requireAuth((kind, id) => pika.toggleFavCommunity(kind, id));
 
-  const joinCommunity = requireAuth((kind, id) => {
-    pika.joinCommunity(kind, id);
-    setSelectedCommunity((s) => s && s.item.id === id ? { ...s, item: { ...s.item, inscrits: s.item.inscrits + 1 } } : s);
-  });
+  const joinCommunity = requireAuth((kind, id) => pika.joinCommunity(kind, id));
 
-  const leaveCommunity = requireAuth((kind, id) => {
-    pika.leaveCommunity(kind, id);
-    setSelectedCommunity((s) => s && s.item.id === id ? { ...s, item: { ...s.item, inscrits: Math.max(0, s.item.inscrits - 1) } } : s);
-  });
+  const leaveCommunity = requireAuth((kind, id) => pika.leaveCommunity(kind, id));
 
   const createAdultMeetup = pika.createAdultMeetup;
 
@@ -6196,15 +6184,15 @@ export default function RecreApp() {
     const ok = await pika.updateActivity(editTarget.activity.id, editTarget.space, form);
     if (ok) {
       const id = editTarget.activity.id;
-      setSelected((s) => (s && s.id === id ? null : s));
-      setSelectedCommunity((s) => (s && s.item.id === id ? null : s));
+      setSelectedId((s) => (s === id ? null : s));
+      setSelectedCommunity((s) => (s && s.id === id ? null : s));
     }
     return ok;
   };
   const cancelOuting = async (id) => {
     await pika.deleteActivity(id);
-    setSelected((s) => (s && s.id === id ? null : s));
-    setSelectedCommunity((s) => (s && s.item.id === id ? null : s));
+    setSelectedId((s) => (s === id ? null : s));
+    setSelectedCommunity((s) => (s && s.id === id ? null : s));
   };
 
   // Ouvre automatiquement une annonce si on arrive via un lien partagé (?activity=ID)
@@ -6225,8 +6213,8 @@ export default function RecreApp() {
       const found = s.items.find((it) => it.id === id);
       if (found) {
         setTab(s.tabId);
-        if (s.kind) setSelectedCommunity({ item: found, kind: s.kind });
-        else setSelected(found);
+        if (s.kind) setSelectedCommunity({ id: found.id, kind: s.kind });
+        else setSelectedId(found.id);
         deepLinkDone.current = true;
         break;
       }
@@ -6379,7 +6367,7 @@ export default function RecreApp() {
             items={activities}
             favorites={favorites}
             onToggleFav={toggleFav}
-            onOpen={setSelected}
+            onOpen={(item) => setSelectedId(item.id)}
             emptyText={t("empty_kids")}
             location={location}
             layout="days"
@@ -6402,7 +6390,7 @@ export default function RecreApp() {
             activities={activities}
             adultItems={adultItems}
             joinedAdult={joinedAdult}
-            onOpenAdult={(item) => setSelectedCommunity({ item, kind: "adult" })}
+            onOpenAdult={(item) => setSelectedCommunity({ id: item.id, kind: "adult" })}
           />
         )}
         {tab === "adultes" && (
@@ -6413,7 +6401,7 @@ export default function RecreApp() {
             items={adultItems}
             favorites={favAdult}
             onToggleFav={(id) => toggleFavCommunity("adult", id)}
-            onOpen={(item) => setSelectedCommunity({ item, kind: "adult" })}
+            onOpen={(item) => setSelectedCommunity({ id: item.id, kind: "adult" })}
             emptyText={t("community_empty")}
             location={location}
             layout="days"
@@ -6429,7 +6417,7 @@ export default function RecreApp() {
             items={seniorItems}
             favorites={favSenior}
             onToggleFav={(id) => toggleFavCommunity("senior", id)}
-            onOpen={(item) => setSelectedCommunity({ item, kind: "senior" })}
+            onOpen={(item) => setSelectedCommunity({ id: item.id, kind: "senior" })}
             emptyText={t("community_empty")}
             location={location}
             layout="days"
@@ -6445,7 +6433,7 @@ export default function RecreApp() {
             items={assoItems}
             favorites={favAsso}
             onToggleFav={(id) => toggleFavCommunity("asso", id)}
-            onOpen={(item) => setSelectedCommunity({ item, kind: "asso" })}
+            onOpen={(item) => setSelectedCommunity({ id: item.id, kind: "asso" })}
             emptyText={t("community_empty")}
             location={location}
             layout="days"
@@ -6473,7 +6461,7 @@ export default function RecreApp() {
             items={teenItems}
             favorites={favTeen}
             onToggleFav={(id) => toggleFavCommunity("teen", id)}
-            onOpen={(item) => setSelectedCommunity({ item, kind: "teen" })}
+            onOpen={(item) => setSelectedCommunity({ id: item.id, kind: "teen" })}
             emptyText={t("community_empty")}
             location={location}
             layout="days"
@@ -6548,22 +6536,23 @@ export default function RecreApp() {
       </div>
 
       <DetailModal
-        activity={selected} onClose={() => setSelected(null)} joined={joined} onJoin={join} onReport={openReport}
+        activity={activities.find((a) => a.id === selectedId) || null} onClose={() => setSelectedId(null)} joined={joined} onJoin={join} onReport={openReport}
         onViewProfile={openUserProfile} onShare={setShareTarget} currentUserId={pika.user?.id}
         onEdit={openEditKid} onCancelOuting={cancelOuting} onLeave={leave}
       />
 
       {(() => {
         const kindMeta = {
-          adult: { categories: ADULT_CATEGORIES, joined: joinedAdult, joinLabel: t("join_label_adult"), genderMode: true },
-          teen: { categories: TEEN_CATEGORIES, joined: joinedTeen, joinLabel: t("join_label_teen"), genderMode: true, genderLabels: { f: t("legend_girl"), m: t("legend_boy") } },
-          senior: { categories: SENIOR_CATEGORIES, joined: joinedSenior, joinLabel: t("join_label_senior"), genderMode: true },
-          asso: { categories: ASSO_CATEGORIES, joined: joinedAsso, joinLabel: t("join_label_asso"), genderMode: true },
+          adult: { categories: ADULT_CATEGORIES, items: adultItems, joined: joinedAdult, joinLabel: t("join_label_adult"), genderMode: true },
+          teen: { categories: TEEN_CATEGORIES, items: teenItems, joined: joinedTeen, joinLabel: t("join_label_teen"), genderMode: true, genderLabels: { f: t("legend_girl"), m: t("legend_boy") } },
+          senior: { categories: SENIOR_CATEGORIES, items: seniorItems, joined: joinedSenior, joinLabel: t("join_label_senior"), genderMode: true },
+          asso: { categories: ASSO_CATEGORIES, items: assoItems, joined: joinedAsso, joinLabel: t("join_label_asso"), genderMode: true },
         };
         const meta = kindMeta[selectedCommunity?.kind] || kindMeta.adult;
+        const communityItem = selectedCommunity ? meta.items.find((it) => it.id === selectedCommunity.id) || null : null;
         return (
           <CommunityDetailModal
-            item={selectedCommunity?.item}
+            item={communityItem}
             categories={meta.categories}
             onClose={() => setSelectedCommunity(null)}
             joined={meta.joined}
