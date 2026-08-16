@@ -107,7 +107,7 @@ const TRANSLATIONS = {
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
     change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…",
     share_btn: "Partager", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
-    share_whatsapp: "WhatsApp", share_message: "Regarde cette sortie sur Orée : {title}",
+    share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Regarde cette sortie sur Orée : {title}",
     report_btn: "Signaler", report_title: "Signaler cette annonce",
     report_reason_label: "Raison du signalement", report_details_label: "Détails (optionnel)",
     report_details_placeholder: "Expliquez ce qui vous a alerté…",
@@ -243,7 +243,7 @@ const TRANSLATIONS = {
     profile_not_found: "This profile is not available.", member_since: "Member since {date}",
     change_photo: "Change photo", photo_uploading: "Uploading photo…",
     share_btn: "Share", share_copy_link: "Copy link", share_link_copied: "Link copied!",
-    share_whatsapp: "WhatsApp", share_message: "Check out this outing on Orée: {title}",
+    share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Check out this outing on Orée: {title}",
     report_btn: "Report", report_title: "Report this listing",
     report_reason_label: "Reason for report", report_details_label: "Details (optional)",
     report_details_placeholder: "Explain what concerned you…",
@@ -379,7 +379,7 @@ const TRANSLATIONS = {
     profile_not_found: "Este perfil no está disponible.", member_since: "Miembro desde {date}",
     change_photo: "Cambiar foto", photo_uploading: "Subiendo foto…",
     share_btn: "Compartir", share_copy_link: "Copiar enlace", share_link_copied: "¡Enlace copiado!",
-    share_whatsapp: "WhatsApp", share_message: "Mira esta salida en Orée: {title}",
+    share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Mira esta salida en Orée: {title}",
     report_btn: "Denunciar", report_title: "Denunciar este anuncio",
     report_reason_label: "Motivo de la denuncia", report_details_label: "Detalles (opcional)",
     report_details_placeholder: "Explica qué te preocupó…",
@@ -3798,6 +3798,7 @@ function ShareModal({ item, onClose }) {
     } catch (e) { /* clipboard indisponible, on ignore silencieusement */ }
   };
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${message} ${url}`)}`;
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
 
   const btnStyle = {
     display: "flex", alignItems: "center", gap: 10, background: "#fff", border: "2px solid #F0EADB",
@@ -3825,6 +3826,10 @@ function ShareModal({ item, onClose }) {
           <button onClick={() => window.open(whatsappUrl, "_blank")} style={btnStyle}>
             <span style={iconWrap("#25D366")}><Share2 size={16} color="#fff" /></span>
             {t("share_whatsapp")}
+          </button>
+          <button onClick={() => window.open(facebookUrl, "_blank", "width=580,height=400")} style={btnStyle}>
+            <span style={iconWrap("#1877F2")}><Share2 size={16} color="#fff" /></span>
+            {t("share_facebook")}
           </button>
           <button onClick={copyLink} style={btnStyle}>
             <span style={iconWrap(COLORS.sky)}><Link2 size={16} color="#fff" /></span>
