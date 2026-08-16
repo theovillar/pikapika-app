@@ -3696,7 +3696,7 @@ function LegalModal({ doc, onClose }) {
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 10000, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
       <div onClick={(e) => e.stopPropagation()} style={{
         background: COLORS.cloud, width: "100%", maxWidth: 560, borderRadius: "26px 26px 0 0",
-        padding: 24, maxHeight: "calc(100vh - 100px)", overflowY: "auto", boxSizing: "border-box", position: "relative",
+        padding: "24px 24px calc(24px + env(safe-area-inset-bottom))", maxHeight: "calc(100dvh - 100px)", overflowY: "auto", boxSizing: "border-box", position: "relative",
       }}>
         <button onClick={onClose} style={{ position: "sticky", top: 0, float: "right", background: "#fff", border: "none", borderRadius: "50%", width: 34, height: 34, cursor: "pointer", marginLeft: 12 }}>
           <X size={18} color={COLORS.ink} />
@@ -3924,7 +3924,7 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
         onClick={(e) => e.stopPropagation()}
         style={{
           background: COLORS.cloud, width: "100%", maxWidth: 520, borderRadius: "26px 26px 0 0",
-          padding: 24, maxHeight: "calc(100vh - 100px)", overflowY: "auto", boxSizing: "border-box",
+          padding: "24px 24px calc(24px + env(safe-area-inset-bottom))", maxHeight: "calc(100dvh - 100px)", overflowY: "auto", boxSizing: "border-box",
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
@@ -4443,7 +4443,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.45)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 9999 }}>
-      <div onClick={(e) => e.stopPropagation()} style={{ background: COLORS.cloud, width: "100%", maxWidth: 520, borderRadius: "26px 26px 0 0", padding: 24, maxHeight: "calc(100vh - 100px)", overflowY: "auto", boxSizing: "border-box" }}>
+      <div onClick={(e) => e.stopPropagation()} style={{ background: COLORS.cloud, width: "100%", maxWidth: 520, borderRadius: "26px 26px 0 0", padding: "24px 24px calc(24px + env(safe-area-inset-bottom))", maxHeight: "calc(100dvh - 100px)", overflowY: "auto", boxSizing: "border-box" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
           <div style={{
             width: 56, height: 56, borderRadius: "50%", border: `2px dashed ${meta.color}`,
@@ -4784,7 +4784,7 @@ function EditActivityModal({ activity, space, categories, onClose, onSave }) {
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
       <div onClick={(e) => e.stopPropagation()} style={{
         background: COLORS.cloud, width: "100%", maxWidth: 560, borderRadius: "26px 26px 0 0",
-        padding: 24, maxHeight: "calc(100vh - 100px)", overflowY: "auto", boxSizing: "border-box", position: "relative",
+        padding: "24px 24px calc(24px + env(safe-area-inset-bottom))", maxHeight: "calc(100dvh - 100px)", overflowY: "auto", boxSizing: "border-box", position: "relative",
       }}>
         <button onClick={onClose} style={{ position: "absolute", top: 20, right: 20, background: "#fff", border: "none", borderRadius: "50%", width: 34, height: 34, cursor: "pointer" }}>
           <X size={18} color={COLORS.ink} />
@@ -5230,7 +5230,7 @@ function AuthScreen({ onClose, onOpenLegal }) {
 
   return (
     <div style={{
-      background: COLORS.cloud, minHeight: "100vh", display: "flex", flexDirection: "column",
+      background: COLORS.cloud, minHeight: "100dvh", display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "Nunito, sans-serif",
     }}>
       <style>{`
@@ -5499,7 +5499,7 @@ function AdminArea({ allProfiles, allActivitiesRaw, currentUserId, onToggleBan, 
 // Écran plein affiché à la place de l'appli si le compte a été bloqué par un administrateur.
 function BannedScreen({ onSignOut }) {
   return (
-    <div style={{ background: COLORS.cloud, minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, textAlign: "center" }}>
+    <div style={{ background: COLORS.cloud, minHeight: "100dvh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, textAlign: "center" }}>
       <OreeMascot size={48} />
       <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 22, color: COLORS.ink, margin: "16px 0 8px" }}>
         {t("banned_title")}
@@ -6258,7 +6258,7 @@ export default function RecreApp() {
 
   if (pika.authLoading) {
     return (
-      <div style={{ background: COLORS.cloud, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ background: COLORS.cloud, minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <OreeMascot size={48} />
       </div>
     );
@@ -6266,7 +6266,7 @@ export default function RecreApp() {
 
   if (pika.user && pika.dataLoading) {
     return (
-      <div style={{ background: COLORS.cloud, minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
+      <div style={{ background: COLORS.cloud, minHeight: "100dvh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12 }}>
         <OreeMascot size={48} />
         <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, color: "#6B6485" }}>{t("auth_loading")}</span>
       </div>
@@ -6278,7 +6278,7 @@ export default function RecreApp() {
   }
 
   return (
-    <div style={{ background: COLORS.cloud, minHeight: "100vh", fontFamily: "Nunito, sans-serif" }}>
+    <div style={{ background: COLORS.cloud, minHeight: "100dvh", fontFamily: "Nunito, sans-serif" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;700;800&display=swap');
         * { box-sizing: border-box; }
