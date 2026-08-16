@@ -49,7 +49,7 @@ const TRANSLATIONS = {
     cat_mairie: "Mairie", cat_solidaire: "Solidaire", cat_fete: "Fête de quartier",
     create_title: "Proposer une sortie",
     create_subtitle: "Partagez une activité, d'autres parents pourront rejoindre avec leurs enfants.",
-    label_titre: "Titre de la sortie", placeholder_titre: "Ex. Balade contée au parc",
+    label_titre: "Titre de la sortie", placeholder_titre: "Ex. Balade contée au parc", placeholder_kid_name: "Prénom de l'enfant", btn_ajouter: "Ajouter",
     label_categorie: "Catégorie", label_lieu: "Lieu", placeholder_lieu: "Parc, adresse…",
     label_date: "Date & heure", placeholder_date: "Sam. 9 août · 10h", label_heure: "Heure",
     label_age: "Âge conseillé", placeholder_age: "Ex. 4-8 ans",
@@ -185,7 +185,7 @@ const TRANSLATIONS = {
     cat_mairie: "Town hall", cat_solidaire: "Solidarity", cat_fete: "Neighbourhood fair",
     create_title: "Propose an outing",
     create_subtitle: "Share an activity, other parents can join with their kids.",
-    label_titre: "Outing title", placeholder_titre: "E.g. Storytelling walk in the park",
+    label_titre: "Outing title", placeholder_titre: "E.g. Storytelling walk in the park", placeholder_kid_name: "Child's first name", btn_ajouter: "Add",
     label_categorie: "Category", label_lieu: "Location", placeholder_lieu: "Park, address…",
     label_date: "Date & time", placeholder_date: "Sat. Aug 9 · 10am", label_heure: "Time",
     label_age: "Recommended age", placeholder_age: "E.g. 4-8 years",
@@ -321,7 +321,7 @@ const TRANSLATIONS = {
     cat_mairie: "Ayuntamiento", cat_solidaire: "Solidaridad", cat_fete: "Fiesta de barrio",
     create_title: "Proponer una salida",
     create_subtitle: "Comparte una actividad, otros padres podrán unirse con sus hijos.",
-    label_titre: "Título de la salida", placeholder_titre: "Ej. Paseo cuentacuentos en el parque",
+    label_titre: "Título de la salida", placeholder_titre: "Ej. Paseo cuentacuentos en el parque", placeholder_kid_name: "Nombre del niño/a", btn_ajouter: "Añadir",
     label_categorie: "Categoría", label_lieu: "Lugar", placeholder_lieu: "Parque, dirección…",
     label_date: "Fecha y hora", placeholder_date: "Sáb. 9 ago · 10h", label_heure: "Hora",
     label_age: "Edad recomendada", placeholder_age: "Ej. 4-8 años",
@@ -3195,7 +3195,7 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
           <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: 14, display: "flex", flexDirection: "column", gap: 8 }}>
             <input
               autoFocus value={kidName} onChange={(e) => setKidName(e.target.value)}
-              placeholder={t("placeholder_titre")}
+              placeholder={t("placeholder_kid_name")}
               style={{ border: "2px solid #F0EADB", borderRadius: 10, padding: "8px 10px", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}
             />
             <div style={{ display: "flex", gap: 8 }}>
@@ -3214,7 +3214,7 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <PillButton color={COLORS.grass} textColor="#fff" onClick={submitKid} style={{ flex: 1, padding: "8px 10px", fontSize: 13 }}>
-                {t("btn_publier")}
+                {t("btn_ajouter")}
               </PillButton>
               <button onClick={() => setAddingKid(false)} style={{ background: "transparent", border: "none", color: "#9A93AF", cursor: "pointer", fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13 }}>
                 ✕
