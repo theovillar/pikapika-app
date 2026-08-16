@@ -3747,18 +3747,18 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
           </div>
         )}
 
-        <div style={{ marginBottom: 14 }}>
-          <OrganiserBadge name={activity.organisateur} genre={activity.organisateurGenre} size={20} userId={activity.createdBy} onClick={onViewProfile} age={activity.organiserAge} />
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
           <Row icon={<MapPin size={15} color={COLORS.ink} />} text={lieuAvecVille(activity)} />
           <Row icon={<CalendarDays size={15} color={COLORS.ink} />} text={displayDate(activity)} />
           <Row icon={<Users size={15} color={COLORS.ink} />} text={t("detail_participants", { a: activity.inscrits, b: activity.places })} />
-          {activity.participantsAvgAge && (
-            <div style={{ marginLeft: 23 }}><AvgAgeBadge avg={activity.participantsAvgAge} size={12.5} /></div>
-          )}
         </div>
+
+        {(activity.organisateur || activity.participantsAvgAge) && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+            <OrganiserBadge name={activity.organisateur} genre={activity.organisateurGenre} size={20} userId={activity.createdBy} onClick={onViewProfile} age={activity.organiserAge} />
+            <AvgAgeBadge avg={activity.participantsAvgAge} size={13} />
+          </div>
+        )}
 
         <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 14.5, color: "#5C5578", lineHeight: 1.6, marginBottom: 20 }}>
           {activity.desc}
@@ -3897,24 +3897,24 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
         {item.info && <Row icon={<Users size={14} color={COLORS.ink} />} text={item.info} />}
       </div>
 
-      <div style={{ marginTop: 8 }}>
-        <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={16} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
-      </div>
-
       <PlainParticipantsRow names={item.participants} color={meta.color} genderMode={genderMode} />
 
-      <div style={{ marginTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <Users size={14} color={full ? COLORS.coral : COLORS.grass} />
-            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5, color: full ? COLORS.coral : COLORS.ink }}>
-              {full ? t("card_full") : t("card_places_left", { n: item.places - item.inscrits })}
-            </span>
-          </div>
-          <AvgAgeBadge avg={item.participantsAvgAge} size={11.5} />
+      <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <Users size={14} color={full ? COLORS.coral : COLORS.grass} />
+          <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5, color: full ? COLORS.coral : COLORS.ink }}>
+            {full ? t("card_full") : t("card_places_left", { n: item.places - item.inscrits })}
+          </span>
         </div>
         <ChevronRight size={18} color="#C7C0AE" />
       </div>
+
+      {(item.organisateur || item.participantsAvgAge) && (
+        <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}>
+          <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={16} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
+          <AvgAgeBadge avg={item.participantsAvgAge} size={12} />
+        </div>
+      )}
     </div>
   );
 }
@@ -3943,45 +3943,34 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
     <div
       onClick={() => onOpen(item)}
       style={{
-        display: "flex", flexDirection: "column", gap: 6, background: "#fff",
+        display: "flex", alignItems: "center", gap: 10, background: "#fff",
         border: "2px solid #F0EADB", borderRadius: 14, padding: "9px 12px", cursor: "pointer",
       }}
     >
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-        <div style={{
-          width: 34, height: 34, borderRadius: "50%", border: `2px dashed ${meta.color}`,
-          background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-          position: "relative",
-        }}>
-          <Icon size={15} color={meta.color} strokeWidth={2.4} />
-          {item.intergen && (
-            <span
-              title={t("intergen_badge")}
-              style={{
-                position: "absolute", top: -4, right: -4, fontSize: 11, lineHeight: 1,
-                background: "#fff", borderRadius: "50%", boxShadow: "0 1px 3px rgba(43,37,96,0.3)",
-              }}
-            >
-              🤝
-            </span>
-          )}
-        </div>
-
-        <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: COLORS.ink, flex: 1, minWidth: 0, lineHeight: 1.25 }}>
-          {item.title}
-        </div>
-
-        <button
-          onClick={(e) => { e.stopPropagation(); onToggleFav(item.id); }}
-          style={{ background: "transparent", border: "none", cursor: "pointer", padding: 2, flexShrink: 0 }}
-          aria-label={t("fav_aria")}
-        >
-          <Heart size={16} color={favorite ? COLORS.coral : "#D8D2C2"} fill={favorite ? COLORS.coral : "none"} strokeWidth={2.2} />
-        </button>
+      <div style={{
+        width: 34, height: 34, borderRadius: "50%", border: `2px dashed ${meta.color}`,
+        background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+        position: "relative",
+      }}>
+        <Icon size={15} color={meta.color} strokeWidth={2.4} />
+        {item.intergen && (
+          <span
+            title={t("intergen_badge")}
+            style={{
+              position: "absolute", top: -4, right: -4, fontSize: 11, lineHeight: 1,
+              background: "#fff", borderRadius: "50%", boxShadow: "0 1px 3px rgba(43,37,96,0.3)",
+            }}
+          >
+            🤝
+          </span>
+        )}
       </div>
 
-      <div style={{ marginLeft: 44 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, whiteSpace: "nowrap", overflow: "hidden" }}>
+      <div style={{ flex: 1, minWidth: "15ch" }}>
+        <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: COLORS.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {item.title}
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, whiteSpace: "nowrap", overflow: "hidden", marginTop: 3 }}>
           <span style={{
             fontFamily: "Nunito, sans-serif", fontWeight: 800, color: COLORS.ink, flexShrink: 0,
             background: COLORS.sun, padding: "2px 7px", borderRadius: 8, fontSize: 11.5,
@@ -3994,24 +3983,29 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
           <PriceBadge payant={item.payant} size={12} />
         </div>
         {item.organisateur && (
-          <div style={{ marginTop: 3 }}>
+          <div style={{ marginTop: 3, display: "flex", alignItems: "center", gap: 6 }}>
             <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={15} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
+            <AvgAgeBadge avg={item.participantsAvgAge} size={10.5} />
           </div>
         )}
-
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 5 }}>
-          <PlainParticipantsRow names={item.participants} color={meta.color} max={8} genderMode={genderMode} />
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2, flexShrink: 0 }}>
-            <span style={{
-              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11,
-              color: full ? COLORS.coral : COLORS.grass,
-            }}>
-              {item.inscrits}/{item.places}
-            </span>
-            <AvgAgeBadge avg={item.participantsAvgAge} size={10} />
-          </div>
-        </div>
       </div>
+
+      <PlainParticipantsRow names={item.participants} color={meta.color} max={8} genderMode={genderMode} />
+
+      <span style={{
+        fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11, flexShrink: 0,
+        color: full ? COLORS.coral : COLORS.grass,
+      }}>
+        {item.inscrits}/{item.places}
+      </span>
+
+      <button
+        onClick={(e) => { e.stopPropagation(); onToggleFav(item.id); }}
+        style={{ background: "transparent", border: "none", cursor: "pointer", padding: 2, flexShrink: 0 }}
+        aria-label={t("fav_aria")}
+      >
+        <Heart size={16} color={favorite ? COLORS.coral : "#D8D2C2"} fill={favorite ? COLORS.coral : "none"} strokeWidth={2.2} />
+      </button>
     </div>
   );
 }
@@ -4215,19 +4209,19 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
           </div>
         )}
 
-        <div style={{ marginBottom: 14 }}>
-          <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={20} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
           <Row icon={<MapPin size={15} color={COLORS.ink} />} text={lieuAvecVille(item)} />
           <Row icon={<CalendarDays size={15} color={COLORS.ink} />} text={displayDate(item)} />
           <Row icon={<Users size={15} color={COLORS.ink} />} text={t("detail_participants", { a: item.inscrits, b: item.places })} />
-          {item.participantsAvgAge && (
-            <div style={{ marginLeft: 23 }}><AvgAgeBadge avg={item.participantsAvgAge} size={12.5} /></div>
-          )}
           {item.info && <Row icon={<Sparkles size={15} color={COLORS.ink} />} text={item.info} />}
         </div>
+
+        {(item.organisateur || item.participantsAvgAge) && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+            <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={20} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
+            <AvgAgeBadge avg={item.participantsAvgAge} size={13} />
+          </div>
+        )}
 
         <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 14.5, color: "#5C5578", lineHeight: 1.6, marginBottom: 20 }}>
           {item.desc}
