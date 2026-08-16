@@ -101,7 +101,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.",
+    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
@@ -3077,7 +3077,7 @@ function MyOutings({ joined, activities }) {
   );
 }
 
-function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal }) {
+function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio }) {
   const [addingKid, setAddingKid] = useState(false);
   const [kidName, setKidName] = useState("");
   const [kidAge, setKidAge] = useState("");
@@ -3085,6 +3085,8 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [birthdateInput, setBirthdateInput] = useState(birthdate || "");
+  const [bioInput, setBioInput] = useState(bio || "");
+  const [bioSaved, setBioSaved] = useState(false);
   const [birthdateSaved, setBirthdateSaved] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -3098,6 +3100,12 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
     await onUpdateBirthdate(birthdateInput);
     setBirthdateSaved(true);
     setTimeout(() => setBirthdateSaved(false), 2000);
+  };
+
+  const saveBio = async () => {
+    await onUpdateBio(bioInput);
+    setBioSaved(true);
+    setTimeout(() => setBioSaved(false), 2000);
   };
 
   const handlePhotoChange = async (e) => {
@@ -3169,6 +3177,25 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
         <PillButton color={birthdateSaved ? COLORS.grass : COLORS.ink} textColor="#fff" onClick={saveBirthdate} style={{ padding: "10px 16px", fontSize: 13, whiteSpace: "nowrap" }}>
           {birthdateSaved ? <Check size={16} /> : t("btn_enregistrer")}
         </PillButton>
+      </div>
+
+      <SectionLabel>{t("profile_bio_label")}</SectionLabel>
+      <div style={{ marginBottom: 22 }}>
+        <textarea
+          rows={3} value={bioInput} onChange={(e) => setBioInput(e.target.value.slice(0, 220))}
+          placeholder={t("profile_bio_placeholder")}
+          style={{
+            width: "100%", border: "2px solid #F0EADB", borderRadius: 14, padding: "10px 14px",
+            fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: COLORS.ink, outline: "none",
+            boxSizing: "border-box", resize: "vertical", marginBottom: 6,
+          }}
+        />
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 11, color: "#B7AF98" }}>{bioInput.length}/220</span>
+          <PillButton color={bioSaved ? COLORS.grass : COLORS.ink} textColor="#fff" onClick={saveBio} style={{ padding: "8px 16px", fontSize: 12.5 }}>
+            {bioSaved ? <Check size={15} /> : t("btn_enregistrer")}
+          </PillButton>
+        </div>
       </div>
 
       <SectionLabel>{t("profile_children")}</SectionLabel>
@@ -3649,7 +3676,7 @@ function UserProfileModal({ userId, onClose }) {
     let cancelled = false;
     setLoading(true);
     setError(false);
-    supabase.from("profiles").select("display_name, genre, role, association_name, created_at, avatar_url").eq("id", userId).single()
+    supabase.from("profiles").select("display_name, genre, role, association_name, created_at, avatar_url, bio").eq("id", userId).single()
       .then(({ data, error: err }) => {
         if (cancelled) return;
         if (err || !data) { setError(true); } else { setProfile(data); }
@@ -3693,6 +3720,11 @@ function UserProfileModal({ userId, onClose }) {
               <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, color: COLORS.grape, textTransform: "uppercase", letterSpacing: 0.4, marginBottom: 6 }}>
                 {t("account_type_association")}
               </div>
+            )}
+            {profile.bio && (
+              <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: "#5C5578", lineHeight: 1.5, margin: "10px 0 4px" }}>
+                {profile.bio}
+              </p>
             )}
             {memberSince && (
               <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#9A93AF" }}>
@@ -5452,6 +5484,7 @@ function usePikapikaData() {
           genre: profRes.data.genre,
           avatarUrl: profRes.data.avatar_url,
           isAdmin: !!profRes.data.is_admin,
+          bio: profRes.data.bio,
           birthdate: profRes.data.birthdate,
           commune: profRes.data.commune,
           banned: !!profRes.data.banned,
@@ -5586,6 +5619,13 @@ function usePikapikaData() {
     setProfile((p) => ({ ...p, birthdate: birthdate || null }));
   };
 
+  const updateBio = async (bio) => {
+    if (!user) return;
+    const { error } = await supabase.from("profiles").update({ bio: bio || null }).eq("id", user.id);
+    if (error) { console.error("Erreur bio :", error); return; }
+    setProfile((p) => ({ ...p, bio: bio || null }));
+  };
+
   const uploadAvatar = async (file) => {
     if (!user) return { error: t("auth_error_generic") };
     try {
@@ -5692,7 +5732,7 @@ function usePikapikaData() {
     user, authLoading, dataLoading,
     displayName: profile.displayName, email: user?.email || "", parentValidated: profile.parentValidated,
     role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl,
-    isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune, birthdate: profile.birthdate,
+    isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune, birthdate: profile.birthdate, bio: profile.bio,
     kids,
     activities, teenItems, adultItems, seniorItems, assoItems,
     favorites, favTeen, favAdult, favSenior, favAsso,
@@ -5707,6 +5747,7 @@ function usePikapikaData() {
     toggleParentValidated,
     addKid,
     updateBirthdate,
+    updateBio,
     uploadAvatar,
     submitReport,
     pendingParents, pendingAssociations, reports, allProfiles, allActivitiesRaw: rows,
@@ -6071,6 +6112,8 @@ export default function RecreApp() {
             birthdate={pika.birthdate}
             onUpdateBirthdate={pika.updateBirthdate}
             onOpenLegal={setLegalDoc}
+            bio={pika.bio}
+            onUpdateBio={pika.updateBio}
           />
         )}
       </div>
