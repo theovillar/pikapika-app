@@ -4810,12 +4810,16 @@ function AuthScreen({ onClose, onOpenLegal }) {
             />
           </div>
         )}
-        <input style={inputStyle} type="email" placeholder={t("auth_email")} value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input
+          style={inputStyle} type="email" placeholder={t("auth_email")} value={email} onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email" name="email"
+        />
         <div style={{ position: "relative" }}>
           <input
             style={{ ...inputStyle, paddingRight: 42 }}
             type={showPassword ? "text" : "password"}
             placeholder={t("auth_password")} value={password} onChange={(e) => setPassword(e.target.value)}
+            autoComplete={mode === "signup" ? "new-password" : "current-password"} name="password"
           />
           <button
             type="button"
