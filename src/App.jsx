@@ -2285,22 +2285,31 @@ function Stamp({ category, size = 46, rotate = -8 }) {
   );
 }
 
-function Avatar({ name, genre, size = 26, overlap = false, genderMode = true, color }) {
+function Avatar({ name, genre, size = 26, overlap = false, genderMode = true, color, avatarUrl, userId, onViewProfile }) {
   const finalColor = genderMode ? genreColor(genre) : (color || COLORS.grape);
-  return (
-    <div
-      title={genderMode ? `${name} (${genreLabel(genre)})` : name}
-      style={{
-        width: size, height: size, borderRadius: "50%", background: finalColor,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800,
-        fontSize: size * 0.42, border: "2px solid #fff",
-        marginLeft: overlap ? -8 : 0, flexShrink: 0,
-      }}
-    >
-      {name.charAt(0).toUpperCase()}
-    </div>
+  const clickable = !!(userId && onViewProfile);
+  const style = {
+    width: size, height: size, borderRadius: "50%", background: finalColor,
+    display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
+    color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800,
+    fontSize: size * 0.42, border: "2px solid #fff",
+    marginLeft: overlap ? -8 : 0, flexShrink: 0,
+    cursor: clickable ? "pointer" : "default", padding: 0,
+  };
+  const content = avatarUrl ? (
+    <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+  ) : (
+    name.charAt(0).toUpperCase()
   );
+  const title = genderMode ? `${name} (${genreLabel(genre)})` : name;
+  if (clickable) {
+    return (
+      <button title={title} onClick={(e) => { e.stopPropagation(); onViewProfile(userId); }} style={style}>
+        {content}
+      </button>
+    );
+  }
+  return <div title={title} style={style}>{content}</div>;
 }
 
 function ParticipantsRow({ participants, max = 5 }) {
@@ -2380,33 +2389,45 @@ function AvgAgeBadge({ avg, size = 11 }) {
   );
 }
 
-function PlainAvatar({ participant, color, size, overlap = false, genderMode = false }) {
+function PlainAvatar({ participant, color, size, overlap = false, genderMode = false, onViewProfile }) {
   const name = participantName(participant);
   const avatarColor = genderMode && participant?.genre ? genreColor(participant.genre) : color;
   const label = genderMode && participant?.genre ? `${name} (${adultGenreLabel(participant.genre)})` : name;
   // Sans taille explicite : suit la variable CSS --pika-avatar-size (réduite sur petit écran via media query)
   const dim = size !== undefined ? `${size}px` : "var(--pika-avatar-size, 26px)";
   const fontSize = size !== undefined ? size * 0.42 : "calc(var(--pika-avatar-size, 26px) * 0.42)";
-  return (
-    <div
-      title={label}
-      style={{
-        width: dim, height: dim, borderRadius: "50%", background: avatarColor,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800,
-        fontSize, border: "2px solid #fff",
-        marginLeft: overlap ? -8 : 0, flexShrink: 0,
-      }}
-    >
-      {name.charAt(0).toUpperCase()}
-    </div>
+  const clickable = participant?.isReal && participant?.userId && onViewProfile;
+  const style = {
+    width: dim, height: dim, borderRadius: "50%", background: avatarColor,
+    display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
+    color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800,
+    fontSize, border: "2px solid #fff",
+    marginLeft: overlap ? -8 : 0, flexShrink: 0,
+    cursor: clickable ? "pointer" : "default", padding: 0,
+  };
+  const content = participant?.avatarUrl ? (
+    <img src={participant.avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+  ) : (
+    name.charAt(0).toUpperCase()
   );
+  if (clickable) {
+    return (
+      <button
+        title={label}
+        onClick={(e) => { e.stopPropagation(); onViewProfile(participant.userId); }}
+        style={{ ...style, border: "2px solid #fff" }}
+      >
+        {content}
+      </button>
+    );
+  }
+  return <div title={label} style={style}>{content}</div>;
 }
 
 // Affiche autant d'avatars que la place le permet réellement (mesurée via ResizeObserver),
 // avec un maximum de `max`, et un "…" explicite dès que ça ne rentre plus — plutôt qu'un
 // nombre de bulles qui varie silencieusement selon la taille de l'écran.
-function PlainParticipantsRow({ names, color, max = 8, genderMode = false }) {
+function PlainParticipantsRow({ names, color, max = 8, genderMode = false, onViewProfile }) {
   const containerRef = useRef(null);
   const [visibleCount, setVisibleCount] = useState(max);
 
@@ -2446,7 +2467,7 @@ function PlainParticipantsRow({ names, color, max = 8, genderMode = false }) {
   return (
     <div ref={containerRef} style={{ display: "flex", alignItems: "center", marginTop: 2, minWidth: 0, flexShrink: 1, overflow: "hidden" }}>
       {shown.map((p, i) => (
-        <PlainAvatar key={i} participant={p} color={color} overlap={i > 0} genderMode={genderMode} />
+        <PlainAvatar key={i} participant={p} color={color} overlap={i > 0} genderMode={genderMode} onViewProfile={onViewProfile} />
       ))}
       {extra > 0 && (
         <div style={{
@@ -3719,7 +3740,7 @@ function UserProfileModal({ userId, onClose }) {
     let cancelled = false;
     setLoading(true);
     setError(false);
-    supabase.from("profiles").select("display_name, genre, role, association_name, created_at, avatar_url, bio").eq("id", userId).single()
+    supabase.from("profiles").select("display_name, genre, role, association_name, created_at, avatar_url, bio, birthdate").eq("id", userId).single()
       .then(({ data, error: err }) => {
         if (cancelled) return;
         if (err || !data) { setError(true); } else { setProfile(data); }
@@ -3730,6 +3751,7 @@ function UserProfileModal({ userId, onClose }) {
 
   const name = profile?.role === "association" ? (profile?.association_name || profile?.display_name) : profile?.display_name;
   const color = profile?.genre ? genreColor(profile.genre) : COLORS.ink;
+  const age = profile?.birthdate ? ageFromBirthdate(profile.birthdate) : null;
   const memberSince = profile?.created_at ? new Date(profile.created_at).toLocaleDateString(
     LANG === "fr" ? "fr-FR" : LANG === "es" ? "es-ES" : "en-US", { month: "long", year: "numeric" }
   ) : null;
@@ -3759,6 +3781,11 @@ function UserProfileModal({ userId, onClose }) {
             <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 19, color: COLORS.ink, marginBottom: 4 }}>
               {name}
             </div>
+            {age && profile.role !== "association" && (
+              <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: "#6B6485", marginBottom: 4 }}>
+                {age} {t("profile_years")}
+              </div>
+            )}
             {profile.role === "association" && (
               <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, color: COLORS.grape, textTransform: "uppercase", letterSpacing: 0.4, marginBottom: 6 }}>
                 {t("account_type_association")}
@@ -3997,9 +4024,9 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
             <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 10 }}>
               {activity.participants.map((p, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <Avatar name={p.name} genderMode={false} size={30} />
+                  <Avatar name={p.name} genderMode={false} size={30} avatarUrl={p.avatarUrl} userId={p.isReal ? p.userId : null} onViewProfile={onViewProfile} />
                   <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: COLORS.ink }}>
-                    {p.name}
+                    {p.name}{p.isReal && p.age ? ` · ${p.age} ${t("profile_years")}` : ""}
                   </span>
                 </div>
               ))}
@@ -4168,7 +4195,7 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
         {item.info && <Row icon={<Users size={14} color={COLORS.ink} />} text={item.info} />}
       </div>
 
-      <PlainParticipantsRow names={item.participants} color={meta.color} genderMode={genderMode} />
+      <PlainParticipantsRow names={item.participants} color={meta.color} genderMode={genderMode} onViewProfile={onViewProfile} />
 
       <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -4261,7 +4288,7 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
         )}
       </div>
 
-      <PlainParticipantsRow names={item.participants} color={meta.color} max={8} genderMode={genderMode} />
+      <PlainParticipantsRow names={item.participants} color={meta.color} max={8} genderMode={genderMode} onViewProfile={onViewProfile} />
 
       <span style={{
         fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11, flexShrink: 0,
@@ -4526,8 +4553,10 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {item.participants.map((p, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <PlainAvatar participant={p} color={meta.color} size={30} genderMode={genderMode} />
-                  <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: COLORS.ink }}>{participantName(p)}</span>
+                  <PlainAvatar participant={p} color={meta.color} size={30} genderMode={genderMode} onViewProfile={onViewProfile} />
+                  <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: COLORS.ink }}>
+                    {participantName(p)}{p.isReal && p.age ? ` · ${p.age} ${t("profile_years")}` : ""}
+                  </span>
                 </div>
               ))}
             </div>
@@ -5723,6 +5752,7 @@ function usePikapikaData() {
   const [rows, setRows] = useState([]);
   const [regByActivity, setRegByActivity] = useState({});
   const [ageStats, setAgeStats] = useState({});
+  const [realParticipants, setRealParticipants] = useState({});
   const [myRegs, setMyRegs] = useState(new Set());
   const [myFavs, setMyFavs] = useState(new Set());
   const [dataLoading, setDataLoading] = useState(true);
@@ -5763,6 +5793,18 @@ function usePikapikaData() {
       const ages = {};
       (ageRows || []).forEach((a) => { ages[a.activity_id] = { organiserAge: a.organiser_age, participantsAvgAge: a.participants_avg_age }; });
       setAgeStats(ages);
+
+      // Les vraies personnes inscrites (en plus des participants fictifs de démonstration)
+      const { data: realRows } = await supabase.from("activity_participants_public").select("*");
+      if (cancelled) return;
+      const byActivity = {};
+      (realRows || []).forEach((p) => {
+        if (!byActivity[p.activity_id]) byActivity[p.activity_id] = [];
+        byActivity[p.activity_id].push({
+          name: p.display_name, genre: p.genre, userId: p.user_id, avatarUrl: p.avatar_url, age: p.age, isReal: true,
+        });
+      });
+      setRealParticipants(byActivity);
     })();
     return () => { cancelled = true; };
   }, []);
@@ -5834,24 +5876,25 @@ function usePikapikaData() {
     const offsetDays = Math.round((startDay - today) / 86400000);
     const time = `${String(start.getHours()).padStart(2, "0")}h${String(start.getMinutes()).padStart(2, "0")}`;
     const ages = ageStats[row.id] || {};
+    const real = realParticipants[row.id] || [];
     return {
       id: row.id, title: row.title, category: row.category, ville: row.ville, lieu: row.lieu,
       offsetDays, time, age: row.age, info: row.info, places: row.places,
       inscrits: (row.demo_inscrits || 0) + (regByActivity[row.id] || 0),
       organisateur: row.organisateur, organisateurGenre: row.organisateur_genre, desc: row.description,
       intergen: row.intergen, intergenNote: row.intergen_note,
-      participants: row.demo_participants || [],
+      participants: [...real, ...(row.demo_participants || [])],
       createdBy: row.created_by, payant: row.payant, signeDistinctif: row.signe_distinctif,
       organiserAge: ages.organiserAge ?? null, participantsAvgAge: ages.participantsAvgAge ?? null,
     };
   };
 
   const bySpace = (space) => rows.filter((r) => r.space === space).map(mapRow);
-  const activities = useMemo(() => bySpace("kids"), [rows, regByActivity, ageStats]);
-  const teenItems = useMemo(() => bySpace("teen"), [rows, regByActivity, ageStats]);
-  const adultItems = useMemo(() => bySpace("adult"), [rows, regByActivity, ageStats]);
-  const seniorItems = useMemo(() => bySpace("senior"), [rows, regByActivity, ageStats]);
-  const assoItems = useMemo(() => bySpace("asso"), [rows, regByActivity, ageStats]);
+  const activities = useMemo(() => bySpace("kids"), [rows, regByActivity, ageStats, realParticipants]);
+  const teenItems = useMemo(() => bySpace("teen"), [rows, regByActivity, ageStats, realParticipants]);
+  const adultItems = useMemo(() => bySpace("adult"), [rows, regByActivity, ageStats, realParticipants]);
+  const seniorItems = useMemo(() => bySpace("senior"), [rows, regByActivity, ageStats, realParticipants]);
+  const assoItems = useMemo(() => bySpace("asso"), [rows, regByActivity, ageStats, realParticipants]);
 
   const idsIn = (items, set) => items.filter((it) => set.has(it.id)).map((it) => it.id);
   const favorites = useMemo(() => idsIn(activities, myFavs), [activities, myFavs]);
