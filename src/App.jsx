@@ -165,6 +165,8 @@ const TRANSLATIONS = {
     my_meetups_title: "Mes sorties adultes",
     my_meetups_subtitle: "Les sorties que vous avez proposées ou rejointes.",
     my_meetups_empty: "Vous n'avez pas encore de sortie. Rejoignez-en une dans Découvrir, ou proposez la vôtre dans Créer !",
+    my_created_label: "Sorties que j'ai créées", my_created_empty: "Vous n'avez encore créé aucune sortie ici.",
+    my_joined_label: "Sorties que j'ai rejointes", my_joined_empty: "Vous n'avez encore rejoint aucune sortie ici.",
     my_teen_title: "Mes sorties jeune", my_teen_subtitle: "Les sorties que vous avez proposées ou rejointes.",
     my_senior_title: "Mes sorties ainé", my_senior_subtitle: "Les sorties que vous avez proposées ou rejointes.",
   },
@@ -3050,8 +3052,25 @@ function CreateActivity({ onCreate }) {
   );
 }
 
-function MyOutings({ joined, activities }) {
-  const myActivities = activities.filter((a) => joined.includes(a.id));
+function MyOutings({ joined, activities, currentUserId, onOpen }) {
+  const mine = activities.filter((a) => joined.includes(a.id));
+  const created = mine.filter((a) => a.createdBy && a.createdBy === currentUserId);
+  const joinedOnly = mine.filter((a) => !a.createdBy || a.createdBy !== currentUserId);
+
+  const row = (a) => (
+    <div key={a.id} onClick={() => onOpen && onOpen(a)} style={{
+      background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: 14,
+      display: "flex", alignItems: "center", gap: 12, cursor: onOpen ? "pointer" : "default",
+    }}>
+      <Stamp category={a.category} size={40} rotate={0} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15, color: COLORS.ink }}>{a.title}</div>
+        <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485" }}>{displayDate(a)} · {lieuAvecVille(a)}</div>
+      </div>
+      {onOpen && <ChevronRight size={18} color="#C7C0AE" />}
+    </div>
+  );
+
   return (
     <div>
       <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
@@ -3061,28 +3080,15 @@ function MyOutings({ joined, activities }) {
         {t("my_subtitle")}
       </p>
 
-      {myActivities.length === 0 ? (
-        <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 20, padding: 20, textAlign: "center" }}>
-          <p style={{ fontFamily: "Nunito, sans-serif", color: "#9A93AF", fontSize: 14, margin: 0 }}>
-            {t("my_meetups_empty")}
-          </p>
-        </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {myActivities.map((a) => (
-            <div key={a.id} style={{
-              background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: 14,
-              display: "flex", alignItems: "center", gap: 12,
-            }}>
-              <Stamp category={a.category} size={40} rotate={0} />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15, color: COLORS.ink }}>{a.title}</div>
-                <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485" }}>{displayDate(a)} · {a.lieu}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <SectionLabel>{t("my_created_label")}</SectionLabel>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 20 }}>
+        {created.length === 0 ? <EmptyBox text={t("my_created_empty")} /> : created.map(row)}
+      </div>
+
+      <SectionLabel>{t("my_joined_label")}</SectionLabel>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {joinedOnly.length === 0 ? <EmptyBox text={t("my_joined_empty")} /> : joinedOnly.map(row)}
+      </div>
     </div>
   );
 }
@@ -4919,8 +4925,45 @@ function EditActivityModal({ activity, space, categories, onClose, onSave }) {
   );
 }
 
-function MyMeetups({ items, joined, categories, onOpen, title, subtitle }) {
+// Une seule ligne de sortie, réutilisée dans les listes "créées" et "rejointes".
+function OutingRow({ item, categories, onOpen }) {
+  const meta = metaFrom(categories, item.category);
+  const Icon = meta.icon;
+  return (
+    <div onClick={() => onOpen(item)} style={{
+      background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: 14,
+      display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
+    }}>
+      <div style={{
+        width: 40, height: 40, borderRadius: "50%", border: `2px dashed ${meta.color}`,
+        background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+      }}>
+        <Icon size={18} color={meta.color} strokeWidth={2.4} />
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15, color: COLORS.ink }}>{item.title}</div>
+        <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485" }}>{displayDate(item)} · {lieuAvecVille(item)}</div>
+      </div>
+      <ChevronRight size={18} color="#C7C0AE" />
+    </div>
+  );
+}
+
+function EmptyBox({ text }) {
+  return (
+    <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 20, padding: 18, textAlign: "center" }}>
+      <p style={{ fontFamily: "Nunito, sans-serif", color: "#9A93AF", fontSize: 13.5, margin: 0 }}>{text}</p>
+    </div>
+  );
+}
+
+// Affiche séparément les sorties que l'on a créées (on en est l'organisateur)
+// et celles que l'on a simplement rejointes — la distinction est plus claire à l'usage.
+function MyMeetups({ items, joined, categories, onOpen, title, subtitle, currentUserId }) {
   const mine = items.filter((it) => joined.includes(it.id));
+  const created = mine.filter((it) => it.createdBy && it.createdBy === currentUserId);
+  const joinedOnly = mine.filter((it) => !it.createdBy || it.createdBy !== currentUserId);
+
   return (
     <div>
       <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
@@ -4930,38 +4973,19 @@ function MyMeetups({ items, joined, categories, onOpen, title, subtitle }) {
         {subtitle || t("my_meetups_subtitle")}
       </p>
 
-      {mine.length === 0 ? (
-        <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 20, padding: 20, textAlign: "center" }}>
-          <p style={{ fontFamily: "Nunito, sans-serif", color: "#9A93AF", fontSize: 14, margin: 0 }}>
-            {t("my_meetups_empty")}
-          </p>
-        </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {mine.map((item) => {
-            const meta = metaFrom(categories, item.category);
-            const Icon = meta.icon;
-            return (
-              <div key={item.id} onClick={() => onOpen(item)} style={{
-                background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: 14,
-                display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
-              }}>
-                <div style={{
-                  width: 40, height: 40, borderRadius: "50%", border: `2px dashed ${meta.color}`,
-                  background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                }}>
-                  <Icon size={18} color={meta.color} strokeWidth={2.4} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15, color: COLORS.ink }}>{item.title}</div>
-                  <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485" }}>{displayDate(item)} · {lieuAvecVille(item)}</div>
-                </div>
-                <ChevronRight size={18} color="#C7C0AE" />
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <SectionLabel>{t("my_created_label")}</SectionLabel>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 20 }}>
+        {created.length === 0
+          ? <EmptyBox text={t("my_created_empty")} />
+          : created.map((item) => <OutingRow key={item.id} item={item} categories={categories} onOpen={onOpen} />)}
+      </div>
+
+      <SectionLabel>{t("my_joined_label")}</SectionLabel>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {joinedOnly.length === 0
+          ? <EmptyBox text={t("my_joined_empty")} />
+          : joinedOnly.map((item) => <OutingRow key={item.id} item={item} categories={categories} onOpen={onOpen} />)}
+      </div>
     </div>
   );
 }
@@ -5027,23 +5051,23 @@ function CreatePage({ parentValidated, onCreateKid, onCreateTeen, onCreateAdult,
 }
 
 // Onglet "Mes sorties" fusionné : passeport enfants (si validé) + rencontres adultes (toujours).
-function MesSortiesPage({ parentValidated, joined, activities, teenItems, joinedTeen, onOpenTeen, adultItems, joinedAdult, onOpenAdult, seniorItems, joinedSenior, onOpenSenior }) {
+function MesSortiesPage({ parentValidated, joined, activities, onOpenKid, teenItems, joinedTeen, onOpenTeen, adultItems, joinedAdult, onOpenAdult, seniorItems, joinedSenior, onOpenSenior, currentUserId }) {
   return (
     <div>
       {parentValidated && (
         <div style={{ marginBottom: 30, paddingBottom: 26, borderBottom: "2px solid #F0EADB" }}>
-          <MyOutings joined={joined} activities={activities} />
+          <MyOutings joined={joined} activities={activities} currentUserId={currentUserId} onOpen={onOpenKid} />
         </div>
       )}
       {parentValidated && (
         <div style={{ marginBottom: 30, paddingBottom: 26, borderBottom: "2px solid #F0EADB" }}>
-          <MyMeetups items={teenItems} joined={joinedTeen} categories={TEEN_CATEGORIES} onOpen={onOpenTeen} title={t("my_teen_title")} subtitle={t("my_teen_subtitle")} />
+          <MyMeetups items={teenItems} joined={joinedTeen} categories={TEEN_CATEGORIES} onOpen={onOpenTeen} title={t("my_teen_title")} subtitle={t("my_teen_subtitle")} currentUserId={currentUserId} />
         </div>
       )}
       <div style={{ marginBottom: 30, paddingBottom: 26, borderBottom: "2px solid #F0EADB" }}>
-        <MyMeetups items={adultItems} joined={joinedAdult} categories={ADULT_CATEGORIES} onOpen={onOpenAdult} />
+        <MyMeetups items={adultItems} joined={joinedAdult} categories={ADULT_CATEGORIES} onOpen={onOpenAdult} currentUserId={currentUserId} />
       </div>
-      <MyMeetups items={seniorItems} joined={joinedSenior} categories={SENIOR_CATEGORIES} onOpen={onOpenSenior} title={t("my_senior_title")} subtitle={t("my_senior_subtitle")} />
+      <MyMeetups items={seniorItems} joined={joinedSenior} categories={SENIOR_CATEGORIES} onOpen={onOpenSenior} title={t("my_senior_title")} subtitle={t("my_senior_subtitle")} currentUserId={currentUserId} />
     </div>
   );
 }
@@ -6471,6 +6495,7 @@ export default function RecreApp() {
             parentValidated={parentValidated}
             joined={joined}
             activities={activities}
+            onOpenKid={(item) => setSelectedId(item.id)}
             teenItems={teenItems}
             joinedTeen={joinedTeen}
             onOpenTeen={(item) => setSelectedCommunity({ id: item.id, kind: "teen" })}
@@ -6480,6 +6505,7 @@ export default function RecreApp() {
             seniorItems={seniorItems}
             joinedSenior={joinedSenior}
             onOpenSenior={(item) => setSelectedCommunity({ id: item.id, kind: "senior" })}
+            currentUserId={pika.user?.id}
           />
         )}
         {tab === "adultes" && (
