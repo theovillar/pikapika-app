@@ -101,7 +101,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", auth_pseudo: "Votre pseudo", auth_pseudo_note: "C'est ce nom qui sera visible par les autres membres sur les annonces.", auth_pseudo_required: "Merci de choisir un pseudo.", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
+    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_edit_title: "Modifier mon profil", btn_back: "Retour", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
@@ -3094,7 +3094,165 @@ function MyOutings({ joined, activities, currentUserId, onOpen }) {
   );
 }
 
-function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onUpdateKid, onDeleteKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo }) {
+// Formulaire de modification du profil (atteint via le bouton Modifier de la page profil)
+// Page profil en lecture : une vraie fiche présentable, avec un bouton "Modifier"
+// qui bascule vers le formulaire d'édition (ProfileEdit).
+function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kids, joinedCount, createdCount, validated, commune, role, onEdit, onSignOut, onOpenLegal }) {
+  const age = birthdate ? ageFromBirthdate(birthdate) : null;
+  const color = genre ? genreColor(genre) : COLORS.sky;
+
+  const InfoRow = ({ label, value }) => (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: "1px solid #F5F1E6" }}>
+      <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", fontWeight: 700 }}>{label}</span>
+      <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: value ? COLORS.ink : "#C7C0AE", fontWeight: 700, textAlign: "right" }}>
+        {value || t("profile_not_filled")}
+      </span>
+    </div>
+  );
+
+  return (
+    <div style={{ maxWidth: 480, margin: "0 auto" }}>
+      {/* En-tête : photo, pseudo, âge */}
+      <div style={{
+        background: "#fff", border: "2px solid #F0EADB", borderRadius: 22, padding: "22px 18px",
+        textAlign: "center", marginBottom: 14,
+      }}>
+        <div style={{
+          width: 84, height: 84, borderRadius: "50%", background: color, margin: "0 auto 12px",
+          display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
+          fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 32, color: "#fff",
+          boxShadow: genre ? `0 0 0 3px #fff, 0 0 0 5px ${genreColor(genre)}60` : "none",
+        }}>
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          ) : (
+            (displayName || "?").charAt(0).toUpperCase()
+          )}
+        </div>
+
+        <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 22, color: COLORS.ink }}>
+          {displayName}
+        </div>
+        {age !== null && (
+          <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13.5, color: "#6B6485", marginTop: 2 }}>
+            {age} {t("profile_years")}
+          </div>
+        )}
+        {commune && (
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 8, fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485", fontWeight: 700 }}>
+            <MapPin size={13} color="#B7AF98" /> {villeName(commune)}
+          </div>
+        )}
+
+        {bio && (
+          <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: "#5C5578", lineHeight: 1.55, margin: "14px 4px 0" }}>
+            {bio}
+          </p>
+        )}
+
+        <PillButton color={COLORS.ink} textColor="#fff" onClick={onEdit} style={{ marginTop: 18, padding: "10px 22px", fontSize: 13.5 }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 7 }}>
+            <UserCircle2 size={16} /> {t("btn_edit_profile")}
+          </span>
+        </PillButton>
+      </div>
+
+      {/* Compteurs */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+        <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: "14px 10px", textAlign: "center" }}>
+          <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.grass }}>{createdCount}</div>
+          <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 11.5, color: "#6B6485" }}>{t("profile_count_created")}</div>
+        </div>
+        <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: "14px 10px", textAlign: "center" }}>
+          <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.sky }}>{joinedCount}</div>
+          <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 11.5, color: "#6B6485" }}>{t("profile_count_joined")}</div>
+        </div>
+      </div>
+
+      {/* Validation mairie */}
+      <div style={{
+        background: validated ? "#EAF8ED" : "#FFF4DD",
+        border: `2px solid ${validated ? COLORS.grass : COLORS.sun}`,
+        borderRadius: 18, padding: "12px 16px", marginBottom: 14,
+        display: "flex", alignItems: "center", gap: 10,
+      }}>
+        {validated ? <ShieldCheck size={18} color={COLORS.grass} /> : <Clock size={18} color={COLORS.sun} />}
+        <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13, color: COLORS.ink }}>
+          {validated ? t("validation_ok_title") : t("validation_pending_title")}
+        </span>
+      </div>
+
+      {/* Informations privées */}
+      <SectionLabel>{t("profile_private_info")}</SectionLabel>
+      <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: "6px 16px 10px", marginBottom: 20 }}>
+        <InfoRow label={t("auth_email")} value={email} />
+        <InfoRow label={t("profile_genre_label")} value={genre ? (genre === "F" ? t("legend_femme") : t("legend_homme")) : null} />
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "10px 0" }}>
+          <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", fontWeight: 700 }}>{t("auth_birthdate_label")}</span>
+          <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: birthdate ? COLORS.ink : "#C7C0AE", fontWeight: 700 }}>
+            {birthdate ? new Date(birthdate).toLocaleDateString(LANG === "fr" ? "fr-FR" : LANG === "es" ? "es-ES" : "en-US") : t("profile_not_filled")}
+          </span>
+        </div>
+      </div>
+
+      {/* Enfants */}
+      {role !== "association" && role !== "mairie" && (
+        <>
+          <SectionLabel>{t("profile_children")}</SectionLabel>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
+            {kids.length === 0 ? (
+              <EmptyBox text={t("profile_no_child")} />
+            ) : (
+              kids.map((k) => (
+                <div key={k.id} style={{
+                  background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "12px 16px",
+                  display: "flex", alignItems: "center", gap: 12,
+                }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: "50%", background: COLORS.sun,
+                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                  }}>
+                    <Baby size={18} color={COLORS.ink} />
+                  </div>
+                  <div style={{ fontFamily: "Nunito, sans-serif" }}>
+                    <div style={{ fontWeight: 800, fontSize: 14.5, color: COLORS.ink }}>{k.name}</div>
+                    <div style={{ fontSize: 12.5, color: "#6B6485" }}>{k.age} {t("profile_years")}</div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Liens légaux + déconnexion */}
+      <div style={{ display: "flex", justifyContent: "center", gap: 14, marginBottom: 14, flexWrap: "wrap" }}>
+        {[
+          { id: "mentions", label: t("legal_mentions_title") },
+          { id: "cgu", label: t("legal_cgu_title") },
+          { id: "confidentialite", label: t("legal_confidentialite_title") },
+        ].map((d) => (
+          <button key={d.id} onClick={() => onOpenLegal(d.id)} style={{
+            background: "none", border: "none", color: "#9A93AF", fontFamily: "Nunito, sans-serif",
+            fontWeight: 700, fontSize: 11.5, cursor: "pointer", textDecoration: "underline",
+          }}>
+            {d.label}
+          </button>
+        ))}
+      </div>
+
+      <button onClick={onSignOut} style={{
+        background: "transparent", border: "2px solid #F0EADB", borderRadius: 14,
+        padding: "10px 16px", cursor: "pointer", fontFamily: "Nunito, sans-serif",
+        fontWeight: 800, fontSize: 13, color: COLORS.coral, width: "100%",
+      }}>
+        {t("btn_sign_out")}
+      </button>
+    </div>
+  );
+}
+
+function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onUpdateKid, onDeleteKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo }) {
   const [addingKid, setAddingKid] = useState(false);
   const [editingKidId, setEditingKidId] = useState(null);
   const [kidName, setKidName] = useState("");
@@ -3174,6 +3332,18 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
 
   return (
     <div style={{ maxWidth: 480, margin: "0 auto" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+        <button onClick={onBack} aria-label={t("btn_back")} style={{
+          width: 34, height: 34, borderRadius: "50%", background: "#fff", border: "2px solid #F0EADB",
+          display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0,
+        }}>
+          <ArrowLeft size={16} color={COLORS.ink} />
+        </button>
+        <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink, margin: 0 }}>
+          {t("profile_edit_title")}
+        </h1>
+      </div>
+
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 22 }}>
         <div style={{ position: "relative", flexShrink: 0 }}>
           <div style={{
@@ -6464,6 +6634,17 @@ export default function RecreApp() {
 
   const [shareTarget, setShareTarget] = useState(null);
   const [legalDoc, setLegalDoc] = useState(null);
+  const [editingProfile, setEditingProfile] = useState(false);
+
+  // Compteurs toutes catégories confondues, pour la fiche profil
+  const allMine = [
+    ...activities.filter((it) => joined.includes(it.id)),
+    ...teenItems.filter((it) => joinedTeen.includes(it.id)),
+    ...adultItems.filter((it) => joinedAdult.includes(it.id)),
+    ...seniorItems.filter((it) => joinedSenior.includes(it.id)),
+  ];
+  const allCreatedCount = allMine.filter((it) => it.createdBy && it.createdBy === pika.user?.id).length;
+  const allJoinedCount = allMine.length - allCreatedCount;
 
   const [editTarget, setEditTarget] = useState(null); // { activity, space, categories }
   const openEditKid = (item) => setEditTarget({ activity: item, space: "kids", categories: CATEGORIES });
@@ -6793,28 +6974,49 @@ export default function RecreApp() {
           />
         )}
         {tab === "profil" && (
-          <Profile
-            joinedCount={joined.length}
-            validated={parentValidated}
-            onToggleDemo={pika.toggleParentValidated}
-            displayName={displayName}
-            email={email}
-            kids={kids}
-            onAddKid={pika.addKid}
-            onUpdateKid={pika.updateKid}
-            onDeleteKid={pika.deleteKid}
-            onSignOut={pika.signOut}
-            avatarUrl={pika.avatarUrl}
-            onUploadAvatar={pika.uploadAvatar}
-            birthdate={pika.birthdate}
-            onUpdateBirthdate={pika.updateBirthdate}
-            onOpenLegal={setLegalDoc}
-            bio={pika.bio}
-            onUpdateBio={pika.updateBio}
-            genre={pika.genre}
-            onUpdateGenre={pika.updateGenre}
-            onUpdatePseudo={pika.updatePseudo}
-          />
+          editingProfile ? (
+            <ProfileEdit
+              onBack={() => setEditingProfile(false)}
+              joinedCount={joined.length}
+              validated={parentValidated}
+              onToggleDemo={pika.toggleParentValidated}
+              displayName={displayName}
+              email={email}
+              kids={kids}
+              onAddKid={pika.addKid}
+              onUpdateKid={pika.updateKid}
+              onDeleteKid={pika.deleteKid}
+              onSignOut={pika.signOut}
+              avatarUrl={pika.avatarUrl}
+              onUploadAvatar={pika.uploadAvatar}
+              birthdate={pika.birthdate}
+              onUpdateBirthdate={pika.updateBirthdate}
+              onOpenLegal={setLegalDoc}
+              bio={pika.bio}
+              onUpdateBio={pika.updateBio}
+              genre={pika.genre}
+              onUpdateGenre={pika.updateGenre}
+              onUpdatePseudo={pika.updatePseudo}
+            />
+          ) : (
+            <ProfileView
+              displayName={displayName}
+              email={email}
+              avatarUrl={pika.avatarUrl}
+              genre={pika.genre}
+              birthdate={pika.birthdate}
+              bio={pika.bio}
+              kids={kids}
+              joinedCount={allJoinedCount}
+              createdCount={allCreatedCount}
+              validated={parentValidated}
+              commune={pika.commune}
+              role={pika.role}
+              onEdit={() => setEditingProfile(true)}
+              onSignOut={pika.signOut}
+              onOpenLegal={setLegalDoc}
+            />
+          )
         )}
       </div>
 
