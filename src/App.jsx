@@ -154,7 +154,7 @@ const TRANSLATIONS = {
     day_after_after_tomorrow: "Après-après-demain",
     legend_femme: "Femme", legend_homme: "Homme",
     accordion_empty: "Aucune sortie ce jour-là.",
-    create_toggle_child: "Sortie enfant", create_toggle_adult: "Sortie adulte",
+    create_toggle_child: "Parent", create_toggle_teen: "Jeune", create_toggle_adult: "Adulte", create_toggle_senior: "Ainé",
     note_needs_validation: "Vous pourrez aussi proposer des sorties enfants une fois votre identité validée par la mairie (voir Profil).",
     section_kids_outings: "Sorties enfants", section_adult_meetups: "Sorties adultes",
     adult_sub_decouvrir: "Découvrir", adult_sub_creer: "Créer", adult_sub_mes: "Mes sorties",
@@ -165,6 +165,8 @@ const TRANSLATIONS = {
     my_meetups_title: "Mes sorties adultes",
     my_meetups_subtitle: "Les sorties que vous avez proposées ou rejointes.",
     my_meetups_empty: "Vous n'avez pas encore de sortie. Rejoignez-en une dans Découvrir, ou proposez la vôtre dans Créer !",
+    my_teen_title: "Mes sorties jeune", my_teen_subtitle: "Les sorties que vous avez proposées ou rejointes.",
+    my_senior_title: "Mes sorties ainé", my_senior_subtitle: "Les sorties que vous avez proposées ou rejointes.",
   },
   en: {
     tab_enfants: "Kids", tab_ados: "Youth", tab_adultes: "Adults", tab_aine: "Seniors", tab_creer: "Create",
@@ -290,7 +292,7 @@ const TRANSLATIONS = {
     day_after_after_tomorrow: "In 3 days",
     legend_femme: "Woman", legend_homme: "Man",
     accordion_empty: "No meetup that day.",
-    create_toggle_child: "Kids outing", create_toggle_adult: "Adult meetup",
+    create_toggle_child: "Parent", create_toggle_teen: "Youth", create_toggle_adult: "Adult", create_toggle_senior: "Senior",
     note_needs_validation: "You'll also be able to propose kids outings once your identity is verified by the town hall (see Profile).",
     section_kids_outings: "Kids outings", section_adult_meetups: "Adult meetups",
     adult_sub_decouvrir: "Discover", adult_sub_creer: "Create", adult_sub_mes: "My meetups",
@@ -426,7 +428,7 @@ const TRANSLATIONS = {
     day_after_after_tomorrow: "En 3 días",
     legend_femme: "Mujer", legend_homme: "Hombre",
     accordion_empty: "Ningún encuentro ese día.",
-    create_toggle_child: "Salida infantil", create_toggle_adult: "Encuentro de adultos",
+    create_toggle_child: "Padres", create_toggle_teen: "Jóvenes", create_toggle_adult: "Adultos", create_toggle_senior: "Mayores",
     note_needs_validation: "También podrás proponer salidas infantiles una vez que tu identidad sea validada por el ayuntamiento (ver Perfil).",
     section_kids_outings: "Salidas infantiles", section_adult_meetups: "Encuentros de adultos",
     adult_sub_decouvrir: "Descubrir", adult_sub_creer: "Crear", adult_sub_mes: "Mis encuentros",
@@ -2289,13 +2291,13 @@ function Avatar({ name, genre, size = 26, overlap = false, genderMode = true, co
   const finalColor = genderMode ? genreColor(genre) : (color || COLORS.grape);
   const clickable = !!(userId && onViewProfile);
   const ringColor = genderMode && genre ? genreColor(genre) : null;
-  const ring = ringColor ? `0 0 0 2px #fff, 0 0 0 4px ${ringColor}` : "0 0 0 2px #fff";
+  const ring = ringColor ? `0 0 0 1.5px #fff, 0 0 0 2.5px ${ringColor}90` : "0 0 0 1.5px #fff";
   const style = {
     width: size, height: size, borderRadius: "50%", background: finalColor,
     display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
     color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800,
     fontSize: size * 0.42, border: "none", boxShadow: ring,
-    marginLeft: overlap ? (ringColor ? -10 : -8) : 0, flexShrink: 0,
+    marginLeft: overlap ? -8 : 0, flexShrink: 0,
     cursor: clickable ? "pointer" : "default", padding: 0,
   };
   const content = avatarUrl ? (
@@ -2401,13 +2403,13 @@ function PlainAvatar({ participant, color, size, overlap = false, genderMode = f
   const clickable = participant?.isReal && participant?.userId && onViewProfile;
   // Anneau coloré par genre (garde la distinction visible même quand une vraie photo masque le fond)
   const ringColor = genderMode && participant?.genre ? genreColor(participant.genre) : null;
-  const ring = ringColor ? `0 0 0 2px #fff, 0 0 0 4px ${ringColor}` : "0 0 0 2px #fff";
+  const ring = ringColor ? `0 0 0 1.5px #fff, 0 0 0 2.5px ${ringColor}90` : "0 0 0 1.5px #fff";
   const style = {
     width: dim, height: dim, borderRadius: "50%", background: avatarColor,
     display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
     color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800,
     fontSize, border: "none", boxShadow: ring,
-    marginLeft: overlap ? (ringColor ? -10 : -8) : 0, flexShrink: 0,
+    marginLeft: overlap ? -8 : 0, flexShrink: 0,
     cursor: clickable ? "pointer" : "default", padding: 0,
   };
   const content = participant?.avatarUrl ? (
@@ -3059,47 +3061,28 @@ function MyOutings({ joined, activities }) {
         {t("my_subtitle")}
       </p>
 
-      <div style={{
-        background: "#fff", border: "2px solid #F0EADB", borderRadius: 20, padding: 20, marginBottom: 22,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-          <Sparkles size={18} color={COLORS.sun} />
-          <span style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 16, color: COLORS.ink }}>
-            {t("passport_title")}
-          </span>
-        </div>
-        {myActivities.length === 0 ? (
-          <p style={{ fontFamily: "Nunito, sans-serif", color: "#9A93AF", fontSize: 14 }}>
-            {t("passport_empty")}
+      {myActivities.length === 0 ? (
+        <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 20, padding: 20, textAlign: "center" }}>
+          <p style={{ fontFamily: "Nunito, sans-serif", color: "#9A93AF", fontSize: 14, margin: 0 }}>
+            {t("my_meetups_empty")}
           </p>
-        ) : (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
-            {myActivities.map((a, i) => (
-              <div key={a.id} style={{ textAlign: "center", width: 78 }}>
-                <Stamp category={a.category} size={58} rotate={(i % 2 === 0 ? -1 : 1) * (6 + (i * 3) % 10)} />
-                <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11, fontWeight: 700, color: "#6B6485", marginTop: 6 }}>
-                  {a.title.split(" ").slice(0, 2).join(" ")}
-                </div>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {myActivities.map((a) => (
+            <div key={a.id} style={{
+              background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: 14,
+              display: "flex", alignItems: "center", gap: 12,
+            }}>
+              <Stamp category={a.category} size={40} rotate={0} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15, color: COLORS.ink }}>{a.title}</div>
+                <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485" }}>{displayDate(a)} · {a.lieu}</div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {myActivities.map((a) => (
-          <div key={a.id} style={{
-            background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: 14,
-            display: "flex", alignItems: "center", gap: 12,
-          }}>
-            <Stamp category={a.category} size={40} rotate={0} />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15, color: COLORS.ink }}>{a.title}</div>
-              <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485" }}>{displayDate(a)} · {a.lieu}</div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -4936,15 +4919,15 @@ function EditActivityModal({ activity, space, categories, onClose, onSave }) {
   );
 }
 
-function MyMeetups({ items, joined, categories, onOpen }) {
+function MyMeetups({ items, joined, categories, onOpen, title, subtitle }) {
   const mine = items.filter((it) => joined.includes(it.id));
   return (
     <div>
       <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
-        {t("my_meetups_title")}
+        {title || t("my_meetups_title")}
       </h1>
       <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 18px" }}>
-        {t("my_meetups_subtitle")}
+        {subtitle || t("my_meetups_subtitle")}
       </p>
 
       {mine.length === 0 ? (
@@ -4987,11 +4970,11 @@ function MyMeetups({ items, joined, categories, onOpen }) {
 // entièrement indépendante de la validation mairie (réservée aux sorties Enfants/Ados).
 // Onglet "Créer" fusionné : sortie enfant (si validé par la mairie) ou rencontre adulte (toujours).
 // Pas d'onglet séparé pour les adultes — tout passe par les mêmes onglets Créer / Mes sorties.
-function CreatePage({ parentValidated, onCreateKid, onCreateAdult, onCreateAsso, role }) {
+function CreatePage({ parentValidated, onCreateKid, onCreateTeen, onCreateAdult, onCreateSenior, onCreateAsso, role }) {
   const [kind, setKind] = useState(parentValidated ? "enfant" : "adulte");
 
   // Une mairie ou une association propose uniquement des événements Commune —
-  // pas de sortie enfant/adulte en son nom propre.
+  // pas de sortie en son nom propre dans une autre catégorie.
   if (role === "mairie" || role === "association") {
     return (
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
@@ -5000,51 +4983,51 @@ function CreatePage({ parentValidated, onCreateKid, onCreateAdult, onCreateAsso,
     );
   }
 
+  const OPTIONS = [
+    { id: "enfant", label: t("create_toggle_child"), needsValidation: true },
+    { id: "jeune", label: t("create_toggle_teen"), needsValidation: true },
+    { id: "adulte", label: t("create_toggle_adult"), needsValidation: false },
+    { id: "aine", label: t("create_toggle_senior"), needsValidation: false },
+  ].filter((opt) => !opt.needsValidation || parentValidated);
+
   return (
     <div style={{ maxWidth: 560, margin: "0 auto" }}>
-      {parentValidated && (
-        <div style={{ display: "inline-flex", background: "#F0EADB", borderRadius: 14, padding: 4, marginBottom: 18 }}>
-          {[
-            { id: "enfant", label: t("create_toggle_child") },
-            { id: "adulte", label: t("create_toggle_adult") },
-          ].map((opt) => (
-            <button
-              key={opt.id}
-              onClick={() => setKind(opt.id)}
-              style={{
-                border: "none", cursor: "pointer",
-                background: kind === opt.id ? COLORS.ink : "transparent",
-                color: kind === opt.id ? "#fff" : "#6B6485",
-                padding: "8px 16px", borderRadius: 12, fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
-              }}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      )}
+      <div style={{ display: "inline-flex", flexWrap: "wrap", background: "#F0EADB", borderRadius: 14, padding: 4, marginBottom: 18 }}>
+        {OPTIONS.map((opt) => (
+          <button
+            key={opt.id}
+            onClick={() => setKind(opt.id)}
+            style={{
+              border: "none", cursor: "pointer",
+              background: kind === opt.id ? COLORS.ink : "transparent",
+              color: kind === opt.id ? "#fff" : "#6B6485",
+              padding: "8px 16px", borderRadius: 12, fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
+            }}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
 
-      {kind === "enfant" && parentValidated ? (
-        <CreateActivity onCreate={onCreateKid} />
-      ) : (
-        <>
-          <CreateMeetup categories={ADULT_CATEGORIES} onCreate={onCreateAdult} />
-          {!parentValidated && (
-            <p style={{
-              fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF",
-              textAlign: "center", marginTop: 16,
-            }}>
-              {t("note_needs_validation")}
-            </p>
-          )}
-        </>
+      {kind === "enfant" && parentValidated && <CreateActivity onCreate={onCreateKid} />}
+      {kind === "jeune" && parentValidated && <CreateMeetup categories={TEEN_CATEGORIES} onCreate={onCreateTeen} />}
+      {kind === "adulte" && <CreateMeetup categories={ADULT_CATEGORIES} onCreate={onCreateAdult} />}
+      {kind === "aine" && <CreateMeetup categories={SENIOR_CATEGORIES} onCreate={onCreateSenior} />}
+
+      {!parentValidated && (kind === "adulte" || kind === "aine") && (
+        <p style={{
+          fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF",
+          textAlign: "center", marginTop: 16,
+        }}>
+          {t("note_needs_validation")}
+        </p>
       )}
     </div>
   );
 }
 
 // Onglet "Mes sorties" fusionné : passeport enfants (si validé) + rencontres adultes (toujours).
-function MesSortiesPage({ parentValidated, joined, activities, adultItems, joinedAdult, onOpenAdult }) {
+function MesSortiesPage({ parentValidated, joined, activities, teenItems, joinedTeen, onOpenTeen, adultItems, joinedAdult, onOpenAdult, seniorItems, joinedSenior, onOpenSenior }) {
   return (
     <div>
       {parentValidated && (
@@ -5052,7 +5035,15 @@ function MesSortiesPage({ parentValidated, joined, activities, adultItems, joine
           <MyOutings joined={joined} activities={activities} />
         </div>
       )}
-      <MyMeetups items={adultItems} joined={joinedAdult} categories={ADULT_CATEGORIES} onOpen={onOpenAdult} />
+      {parentValidated && (
+        <div style={{ marginBottom: 30, paddingBottom: 26, borderBottom: "2px solid #F0EADB" }}>
+          <MyMeetups items={teenItems} joined={joinedTeen} categories={TEEN_CATEGORIES} onOpen={onOpenTeen} title={t("my_teen_title")} subtitle={t("my_teen_subtitle")} />
+        </div>
+      )}
+      <div style={{ marginBottom: 30, paddingBottom: 26, borderBottom: "2px solid #F0EADB" }}>
+        <MyMeetups items={adultItems} joined={joinedAdult} categories={ADULT_CATEGORIES} onOpen={onOpenAdult} />
+      </div>
+      <MyMeetups items={seniorItems} joined={joinedSenior} categories={SENIOR_CATEGORIES} onOpen={onOpenSenior} title={t("my_senior_title")} subtitle={t("my_senior_subtitle")} />
     </div>
   );
 }
@@ -5975,9 +5966,13 @@ function usePikapikaData() {
     };
     const { data, error } = await supabase.from("activities").insert(newRow).select().single();
     if (error) { console.error("Erreur création :", error); return null; }
-    setRows((r) => [data, ...r]);
-    await joinGeneric(data.id);
-    return data.id;
+    // On force notre propre identifiant (celui qu'on a généré et qu'on maîtrise) plutôt que
+    // celui renvoyé par Supabase : les grands nombres (bigint) peuvent subir un léger arrondi
+    // lors de l'aller-retour, ce qui cassait silencieusement le lien avec l'inscription créée juste après.
+    const savedRow = { ...data, id: newRow.id };
+    setRows((r) => [savedRow, ...r]);
+    await joinGeneric(newRow.id);
+    return newRow.id;
   };
 
   // Modifier une sortie retire toutes les personnes déjà inscrites (le changement peut être
@@ -6185,6 +6180,8 @@ function usePikapikaData() {
     createActivity: (form) => insertActivity("kids", form),
     createAdultMeetup: (form) => insertActivity("adult", form),
     createAssoEvent: (form) => insertActivity("asso", form),
+    createTeenMeetup: (form) => insertActivity("teen", form),
+    createSeniorMeetup: (form) => insertActivity("senior", form),
     updateActivity, deleteActivity,
     toggleParentValidated,
     addKid,
@@ -6462,7 +6459,9 @@ export default function RecreApp() {
           <CreatePage
             parentValidated={parentValidated}
             onCreateKid={createActivity}
+            onCreateTeen={pika.createTeenMeetup}
             onCreateAdult={createAdultMeetup}
+            onCreateSenior={pika.createSeniorMeetup}
             onCreateAsso={pika.createAssoEvent}
             role={pika.role}
           />
@@ -6472,9 +6471,15 @@ export default function RecreApp() {
             parentValidated={parentValidated}
             joined={joined}
             activities={activities}
+            teenItems={teenItems}
+            joinedTeen={joinedTeen}
+            onOpenTeen={(item) => setSelectedCommunity({ id: item.id, kind: "teen" })}
             adultItems={adultItems}
             joinedAdult={joinedAdult}
             onOpenAdult={(item) => setSelectedCommunity({ id: item.id, kind: "adult" })}
+            seniorItems={seniorItems}
+            joinedSenior={joinedSenior}
+            onOpenSenior={(item) => setSelectedCommunity({ id: item.id, kind: "senior" })}
           />
         )}
         {tab === "adultes" && (
