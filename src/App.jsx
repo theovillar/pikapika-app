@@ -4254,7 +4254,9 @@ function LegalModal({ doc, onClose }) {
   );
 }
 
-function UserProfileModal({ userId, onClose }) {
+// Page profil publique d'un autre membre : même présentation que sa propre page profil
+// (couverture, grande photo, informations), en lecture seule et sans les données privées.
+function UserProfilePage({ userId, onClose }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -4263,7 +4265,9 @@ function UserProfileModal({ userId, onClose }) {
     let cancelled = false;
     setLoading(true);
     setError(false);
-    supabase.from("profiles").select("display_name, genre, role, association_name, created_at, avatar_url, bio, birthdate, profession, interets, animaux, coup_de_coeur").eq("id", userId).single()
+    supabase.from("profiles")
+      .select("display_name, genre, role, association_name, created_at, avatar_url, cover_url, bio, birthdate, commune, situation, profession, interets, animaux, coup_de_coeur")
+      .eq("id", userId).single()
       .then(({ data, error: err }) => {
         if (cancelled) return;
         if (err || !data) { setError(true); } else { setProfile(data); }
@@ -4273,76 +4277,149 @@ function UserProfileModal({ userId, onClose }) {
   }, [userId]);
 
   const name = profile?.role === "association" ? (profile?.association_name || profile?.display_name) : profile?.display_name;
-  const color = profile?.genre ? genreColor(profile.genre) : COLORS.ink;
   const age = profile?.birthdate ? ageFromBirthdate(profile.birthdate) : null;
+  const color = profile?.genre ? genreColor(profile.genre) : COLORS.sky;
   const memberSince = profile?.created_at ? new Date(profile.created_at).toLocaleDateString(
     LANG === "fr" ? "fr-FR" : LANG === "es" ? "es-ES" : "en-US", { month: "long", year: "numeric" }
   ) : null;
 
+  const AboutCard = ({ icon, label, value, accent }) => (
+    <div style={{
+      background: "#fff", border: "2px solid #F0EADB", borderRadius: 18,
+      padding: "14px 16px", display: "flex", gap: 12, alignItems: "flex-start", minWidth: 0,
+    }}>
+      <div style={{
+        width: 34, height: 34, borderRadius: "50%", background: `${accent}18`, flexShrink: 0,
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        {icon}
+      </div>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{
+          fontFamily: "Nunito, sans-serif", fontSize: 10.5, fontWeight: 800, letterSpacing: 0.5,
+          textTransform: "uppercase", color: accent, marginBottom: 3,
+        }}>
+          {label}
+        </div>
+        <div style={{
+          fontFamily: "Nunito, sans-serif", fontSize: 14, color: COLORS.ink, fontWeight: 600,
+          lineHeight: 1.5, overflowWrap: "anywhere", wordBreak: "break-word", whiteSpace: "pre-wrap",
+        }}>
+          {value}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div onClick={(e) => e.stopPropagation()} style={{ background: COLORS.cloud, borderRadius: 22, padding: 26, width: "100%", maxWidth: 340, position: "relative", textAlign: "center" }}>
-        <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "#fff", border: "none", borderRadius: "50%", width: 30, height: 30, cursor: "pointer" }}>
-          <X size={15} color={COLORS.ink} />
+    <div style={{
+      position: "fixed", inset: 0, background: COLORS.cloud, zIndex: 9999,
+      overflowY: "auto", padding: "16px 16px calc(24px + env(safe-area-inset-bottom))",
+    }}>
+      <div style={{ maxWidth: 760, margin: "0 auto" }}>
+        <button onClick={onClose} style={{
+          display: "inline-flex", alignItems: "center", gap: 7, marginBottom: 14,
+          background: "#fff", border: "2px solid #F0EADB", borderRadius: 999,
+          padding: "8px 16px", cursor: "pointer", fontFamily: "Nunito, sans-serif",
+          fontWeight: 800, fontSize: 13, color: COLORS.ink,
+        }}>
+          <ArrowLeft size={15} /> {t("btn_back")}
         </button>
 
-        {loading && <p style={{ fontFamily: "Nunito, sans-serif", color: "#9A93AF" }}>{t("auth_loading")}</p>}
-        {!loading && error && <p style={{ fontFamily: "Nunito, sans-serif", color: "#9A93AF" }}>{t("profile_not_found")}</p>}
+        {loading && (
+          <div style={{ textAlign: "center", padding: "60px 0" }}>
+            <OreeMascot size={44} />
+          </div>
+        )}
+        {!loading && error && (
+          <EmptyBox text={t("profile_not_found")} />
+        )}
+
         {!loading && !error && profile && (
           <>
             <div style={{
-              width: 64, height: 64, borderRadius: "50%", background: color, margin: "0 auto 14px",
-              display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
-              fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 26, color: "#fff",
+              background: "#fff", border: "2px solid #F0EADB", borderRadius: 22,
+              textAlign: "center", marginBottom: 14,
             }}>
-              {profile.avatar_url ? (
-                <img src={profile.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              ) : (
-                (name || "?").charAt(0).toUpperCase()
-              )}
-            </div>
-            <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 19, color: COLORS.ink, marginBottom: 4 }}>
-              {name}
-            </div>
-            {age && profile.role !== "association" && (
-              <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: "#6B6485", marginBottom: 4 }}>
-                {age} {t("profile_years")}
+              <div className="pika-cover" style={{
+                width: "100%", position: "relative",
+                aspectRatio: "26 / 10", minHeight: 190, maxHeight: 380,
+                borderRadius: "20px 20px 0 0",
+                background: profile.cover_url
+                  ? `url(${profile.cover_url}) center center / cover no-repeat`
+                  : `linear-gradient(135deg, ${COLORS.sun}, ${COLORS.coral})`,
+              }}>
+                <div className="pika-cover-avatar" style={{
+                  width: 160, height: 160, borderRadius: "50%", background: color,
+                  position: "absolute", bottom: -10, left: "50%", transform: "translateX(-50%)",
+                  display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
+                  fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 62, color: "#fff",
+                  boxShadow: profile.genre
+                    ? `0 0 0 6px #fff, 0 0 0 9px ${genreColor(profile.genre)}60`
+                    : "0 0 0 6px #fff",
+                }}>
+                  {profile.avatar_url
+                    ? <img src={profile.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : (name || "?").charAt(0).toUpperCase()}
+                </div>
               </div>
-            )}
-            {profile.role === "association" && (
-              <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, color: COLORS.grape, textTransform: "uppercase", letterSpacing: 0.4, marginBottom: 6 }}>
-                {t("account_type_association")}
-              </div>
-            )}
-            {profile.bio && (
-              <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: "#5C5578", lineHeight: 1.5, margin: "10px 0 4px" }}>
-                {profile.bio}
-              </p>
-            )}
 
-            {(profile.profession || profile.interets || profile.animaux || profile.coup_de_coeur) && (
-              <div style={{ textAlign: "left", background: "#F9F7F2", borderRadius: 14, padding: "10px 14px", margin: "12px 0 10px" }}>
-                {[
-                  { label: t("profile_profession_label"), value: profile.profession },
-                  { label: t("profile_interets_label"), value: profile.interets },
-                  { label: t("profile_animaux_label"), value: profile.animaux },
-                  { label: t("profile_coeur_label"), value: profile.coup_de_coeur },
-                ].filter((r) => r.value).map((r, i) => (
-                  <div key={i} style={{ marginBottom: 6 }}>
-                    <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 10.5, color: "#9A93AF", fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.3 }}>
-                      {r.label}
-                    </div>
-                    <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: COLORS.ink, fontWeight: 700, lineHeight: 1.4, overflowWrap: "anywhere", wordBreak: "break-word", whiteSpace: "pre-wrap" }}>
-                      {r.value}
-                    </div>
+              <div style={{ padding: "34px 18px 24px" }}>
+                <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 22, color: COLORS.ink }}>
+                  {name}
+                </div>
+                {age !== null && (
+                  <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13.5, color: "#6B6485", marginTop: 2 }}>
+                    {age} {t("profile_years")}
                   </div>
-                ))}
+                )}
+                {profile.role === "association" && (
+                  <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, color: COLORS.grape, textTransform: "uppercase", letterSpacing: 0.4, marginTop: 6 }}>
+                    {t("account_type_association")}
+                  </div>
+                )}
+                {profile.commune && (
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 8, fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485", fontWeight: 700 }}>
+                    <MapPin size={13} color="#B7AF98" /> {villeName(profile.commune)}
+                  </div>
+                )}
+                {profile.bio && (
+                  <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: "#5C5578", lineHeight: 1.55, margin: "14px 4px 0" }}>
+                    {profile.bio}
+                  </p>
+                )}
+                {memberSince && (
+                  <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12, color: "#B7AF98", marginTop: 12 }}>
+                    {t("member_since", { date: memberSince })}
+                  </div>
+                )}
               </div>
-            )}
-            {memberSince && (
-              <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#9A93AF" }}>
-                {t("member_since", { date: memberSince })}
-              </div>
+            </div>
+
+            {(profile.profession || profile.interets || profile.animaux || profile.coup_de_coeur || profile.situation) && (
+              <>
+                <SectionLabel>{t("profile_about_section")}</SectionLabel>
+                <div style={{
+                  display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                  gap: 10, marginBottom: 20,
+                }}>
+                  {profile.situation && (
+                    <AboutCard icon={<Users size={16} color={COLORS.sun} />} label={t("profile_situation_label")} value={situationLabel(profile.situation)} accent={COLORS.sun} />
+                  )}
+                  {profile.profession && (
+                    <AboutCard icon={<BookOpen size={16} color={COLORS.sky} />} label={t("profile_profession_label")} value={profile.profession} accent={COLORS.sky} />
+                  )}
+                  {profile.interets && (
+                    <AboutCard icon={<Sparkles size={16} color={COLORS.grape} />} label={t("profile_interets_label")} value={profile.interets} accent={COLORS.grape} />
+                  )}
+                  {profile.animaux && (
+                    <AboutCard icon={<HeartHandshake size={16} color={COLORS.grass} />} label={t("profile_animaux_label")} value={profile.animaux} accent={COLORS.grass} />
+                  )}
+                  {profile.coup_de_coeur && (
+                    <AboutCard icon={<Heart size={16} color={COLORS.coral} />} label={t("profile_coeur_label")} value={profile.coup_de_coeur} accent={COLORS.coral} />
+                  )}
+                </div>
+              </>
             )}
           </>
         )}
@@ -7511,7 +7588,7 @@ export default function RecreApp() {
         />
       )}
 
-      {viewingUserId && <UserProfileModal userId={viewingUserId} onClose={() => setViewingUserId(null)} />}
+      {viewingUserId && <UserProfilePage userId={viewingUserId} onClose={() => setViewingUserId(null)} />}
 
       {shareTarget && <ShareModal item={shareTarget} onClose={() => setShareTarget(null)} />}
 
