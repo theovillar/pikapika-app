@@ -165,6 +165,7 @@ const TRANSLATIONS = {
     my_meetups_title: "Mes sorties adultes",
     my_meetups_subtitle: "Les sorties que vous avez proposées ou rejointes.",
     my_meetups_empty: "Vous n'avez pas encore de sortie. Rejoignez-en une dans Découvrir, ou proposez la vôtre dans Créer !",
+    my_all_subtitle: "Toutes vos sorties, toutes catégories confondues.", legend_created: "Créée par vous", legend_joined: "Rejointe", badge_organiser: "Organisateur", badge_past: "Passée",
     my_created_label: "Sorties que j'ai créées", my_created_empty: "Vous n'avez encore créé aucune sortie ici.",
     my_joined_label: "Sorties que j'ai rejointes", my_joined_empty: "Vous n'avez encore rejoint aucune sortie ici.",
     my_teen_title: "Mes sorties jeune", my_teen_subtitle: "Les sorties que vous avez proposées ou rejointes.",
@@ -5051,23 +5052,125 @@ function CreatePage({ parentValidated, onCreateKid, onCreateTeen, onCreateAdult,
 }
 
 // Onglet "Mes sorties" fusionné : passeport enfants (si validé) + rencontres adultes (toujours).
+// Une seule liste unifiée : toutes catégories confondues (Parent, Jeune, Adulte, Ainé),
+// créées ET rejointes, triées par date. Les sorties créées par la personne se distinguent
+// visuellement, et les sorties déjà passées sont grisées.
 function MesSortiesPage({ parentValidated, joined, activities, onOpenKid, teenItems, joinedTeen, onOpenTeen, adultItems, joinedAdult, onOpenAdult, seniorItems, joinedSenior, onOpenSenior, currentUserId }) {
+  const groups = [
+    { items: activities, joinedIds: joined, categories: CATEGORIES, onOpen: onOpenKid, label: t("tab_enfants"), visible: parentValidated },
+    { items: teenItems, joinedIds: joinedTeen, categories: TEEN_CATEGORIES, onOpen: onOpenTeen, label: t("tab_ados"), visible: parentValidated },
+    { items: adultItems, joinedIds: joinedAdult, categories: ADULT_CATEGORIES, onOpen: onOpenAdult, label: t("tab_adultes"), visible: true },
+    { items: seniorItems, joinedIds: joinedSenior, categories: SENIOR_CATEGORIES, onOpen: onOpenSenior, label: t("tab_aine"), visible: true },
+  ];
+
+  const all = [];
+  groups.forEach((g) => {
+    if (!g.visible) return;
+    g.items.filter((it) => g.joinedIds.includes(it.id)).forEach((it) => {
+      all.push({ item: it, categories: g.categories, onOpen: g.onOpen, spaceLabel: g.label });
+    });
+  });
+
+  // Tri chronologique : les plus proches d'abord, les sorties passées relèguées à la fin
+  const withDate = all.map((entry) => {
+    const d = new Date();
+    d.setDate(d.getDate() + (entry.item.offsetDays || 0));
+    d.setHours(0, 0, 0, 0);
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return { ...entry, isPast: d < today, sortKey: entry.item.offsetDays ?? 0 };
+  });
+  withDate.sort((a, b) => {
+    if (a.isPast !== b.isPast) return a.isPast ? 1 : -1;
+    return a.sortKey - b.sortKey;
+  });
+
   return (
     <div>
-      {parentValidated && (
-        <div style={{ marginBottom: 30, paddingBottom: 26, borderBottom: "2px solid #F0EADB" }}>
-          <MyOutings joined={joined} activities={activities} currentUserId={currentUserId} onOpen={onOpenKid} />
-        </div>
-      )}
-      {parentValidated && (
-        <div style={{ marginBottom: 30, paddingBottom: 26, borderBottom: "2px solid #F0EADB" }}>
-          <MyMeetups items={teenItems} joined={joinedTeen} categories={TEEN_CATEGORIES} onOpen={onOpenTeen} title={t("my_teen_title")} subtitle={t("my_teen_subtitle")} currentUserId={currentUserId} />
-        </div>
-      )}
-      <div style={{ marginBottom: 30, paddingBottom: 26, borderBottom: "2px solid #F0EADB" }}>
-        <MyMeetups items={adultItems} joined={joinedAdult} categories={ADULT_CATEGORIES} onOpen={onOpenAdult} currentUserId={currentUserId} />
+      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
+        {t("my_title")}
+      </h1>
+      <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 12px" }}>
+        {t("my_all_subtitle")}
+      </p>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18, flexWrap: "wrap" }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#6B6485", fontWeight: 700 }}>
+          <span style={{ width: 12, height: 12, borderRadius: 4, background: "#FFF9EC", border: `2px solid ${COLORS.sun}`, display: "inline-block" }} />
+          {t("legend_created")}
+        </span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#6B6485", fontWeight: 700 }}>
+          <span style={{ width: 12, height: 12, borderRadius: 4, background: "#fff", border: "2px solid #F0EADB", display: "inline-block" }} />
+          {t("legend_joined")}
+        </span>
       </div>
-      <MyMeetups items={seniorItems} joined={joinedSenior} categories={SENIOR_CATEGORIES} onOpen={onOpenSenior} title={t("my_senior_title")} subtitle={t("my_senior_subtitle")} currentUserId={currentUserId} />
+
+      {withDate.length === 0 ? (
+        <EmptyBox text={t("my_meetups_empty")} />
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {withDate.map(({ item, categories, onOpen, spaceLabel, isPast }) => {
+            const meta = metaFrom(categories, item.category);
+            const Icon = meta.icon;
+            const isCreator = item.createdBy && item.createdBy === currentUserId;
+            return (
+              <div
+                key={`${spaceLabel}-${item.id}`}
+                onClick={() => onOpen(item)}
+                style={{
+                  background: isPast ? "#F7F5F0" : (isCreator ? "#FFF9EC" : "#fff"),
+                  border: `2px solid ${isPast ? "#E8E4DA" : (isCreator ? COLORS.sun : "#F0EADB")}`,
+                  borderRadius: 18, padding: 14, display: "flex", alignItems: "center", gap: 12,
+                  cursor: "pointer", opacity: isPast ? 0.6 : 1,
+                }}
+              >
+                <div style={{
+                  width: 40, height: 40, borderRadius: "50%", border: `2px dashed ${isPast ? "#C7C0AE" : meta.color}`,
+                  background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                }}>
+                  <Icon size={18} color={isPast ? "#C7C0AE" : meta.color} strokeWidth={2.4} />
+                </div>
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 2 }}>
+                    <span style={{
+                      fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 10, letterSpacing: 0.4,
+                      textTransform: "uppercase", color: isPast ? "#B7AF98" : meta.color,
+                    }}>
+                      {spaceLabel}
+                    </span>
+                    {isCreator && (
+                      <span style={{
+                        fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9.5, padding: "2px 7px",
+                        borderRadius: 999, background: isPast ? "#E8E4DA" : COLORS.sun, color: isPast ? "#8A8399" : COLORS.ink,
+                        letterSpacing: 0.3, textTransform: "uppercase",
+                      }}>
+                        {t("badge_organiser")}
+                      </span>
+                    )}
+                    {isPast && (
+                      <span style={{
+                        fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9.5, padding: "2px 7px",
+                        borderRadius: 999, background: "#E8E4DA", color: "#8A8399",
+                        letterSpacing: 0.3, textTransform: "uppercase",
+                      }}>
+                        {t("badge_past")}
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15, color: isPast ? "#8A8399" : COLORS.ink }}>
+                    {item.title}
+                  </div>
+                  <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: isPast ? "#A9A294" : "#6B6485" }}>
+                    {displayDate(item)} · {lieuAvecVille(item)}
+                  </div>
+                </div>
+
+                <ChevronRight size={18} color="#C7C0AE" />
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
