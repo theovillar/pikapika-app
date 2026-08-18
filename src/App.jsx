@@ -675,19 +675,6 @@ function locationLabel(location) {
 
 const villeName = (id) => (CITY_META[id] || {}).label || "";
 
-// Situation familiale : information optionnelle, l'utilisateur peut toujours ne rien indiquer.
-const SITUATIONS = [
-  { id: "celibataire", labelKey: "situation_celibataire" },
-  { id: "en_couple", labelKey: "situation_en_couple" },
-  { id: "marie", labelKey: "situation_marie" },
-  { id: "famille_mono", labelKey: "situation_famille_mono" },
-  { id: "autre", labelKey: "situation_autre" },
-];
-const situationLabel = (id) => {
-  const s = SITUATIONS.find((x) => x.id === id);
-  return s ? t(s.labelKey) : null;
-};
-
 // Calcule un âge à partir d'une date de naissance, sans jamais avoir besoin d'afficher
 // la date exacte ailleurs dans l'appli (plus respectueux de la vie privée).
 function ageFromBirthdate(birthdate) {
@@ -3467,7 +3454,7 @@ function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayNam
       >
         <option value="">{t("situation_non_precise")}</option>
         {SITUATIONS.map((s) => (
-          <option key={s.id} value={s.id}>{t(s.labelKey)}</option>
+          <option key={s.id} value={s.id}>{s.label}</option>
         ))}
       </select>
 
