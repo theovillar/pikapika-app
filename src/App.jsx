@@ -100,7 +100,7 @@ const TRANSLATIONS = {
     account_type_parent: "Particulier", account_type_association: "Association",
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
-    auth_last_name: "Votre nom de famille", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
+    auth_last_name: "Votre nom de famille", auth_pseudo: "Votre pseudo", auth_pseudo_note: "C'est ce nom qui sera visible par les autres membres sur les annonces.", auth_pseudo_required: "Merci de choisir un pseudo.", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
     auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
@@ -3094,7 +3094,7 @@ function MyOutings({ joined, activities, currentUserId, onOpen }) {
   );
 }
 
-function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onUpdateKid, onDeleteKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre }) {
+function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onUpdateKid, onDeleteKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo }) {
   const [addingKid, setAddingKid] = useState(false);
   const [editingKidId, setEditingKidId] = useState(null);
   const [kidName, setKidName] = useState("");
@@ -3108,6 +3108,8 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
   const [bioSaved, setBioSaved] = useState(false);
   const [birthdateSaved, setBirthdateSaved] = useState(false);
   const [genreSaving, setGenreSaving] = useState(false);
+  const [pseudoInput, setPseudoInput] = useState(displayName || "");
+  const [pseudoSaved, setPseudoSaved] = useState(false);
   const fileInputRef = useRef(null);
 
   const startAddKid = () => {
@@ -3150,6 +3152,13 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
     await onUpdateBio(bioInput);
     setBioSaved(true);
     setTimeout(() => setBioSaved(false), 2000);
+  };
+
+  const savePseudo = async () => {
+    if (!pseudoInput.trim()) return;
+    await onUpdatePseudo(pseudoInput);
+    setPseudoSaved(true);
+    setTimeout(() => setPseudoSaved(false), 2000);
   };
 
   const handlePhotoChange = async (e) => {
@@ -3207,6 +3216,23 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
       )}
 
       <ValidationStatus validated={validated} onToggleDemo={onToggleDemo} />
+
+      <SectionLabel>{t("auth_pseudo")}</SectionLabel>
+      <div style={{ display: "flex", gap: 8, marginBottom: 6 }}>
+        <input
+          value={pseudoInput} onChange={(e) => setPseudoInput(e.target.value)}
+          style={{
+            flex: 1, border: "2px solid #F0EADB", borderRadius: 14, padding: "10px 14px",
+            fontFamily: "Nunito, sans-serif", fontSize: 14, color: COLORS.ink, outline: "none", boxSizing: "border-box",
+          }}
+        />
+        <PillButton color={pseudoSaved ? COLORS.grass : COLORS.ink} textColor="#fff" onClick={savePseudo} style={{ padding: "10px 16px", fontSize: 13, whiteSpace: "nowrap" }}>
+          {pseudoSaved ? <Check size={16} /> : t("btn_enregistrer")}
+        </PillButton>
+      </div>
+      <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF", margin: "0 0 22px" }}>
+        {t("auth_pseudo_note")}
+      </p>
 
       <SectionLabel>{t("profile_genre_label")}</SectionLabel>
       <div style={{ display: "flex", gap: 8, marginBottom: 22 }}>
@@ -5195,6 +5221,7 @@ function AuthScreen({ onClose, onOpenLegal }) {
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [pseudo, setPseudo] = useState("");
   const [genre, setGenre] = useState("F");
   const [commune, setCommune] = useState("");
   const [birthdate, setBirthdate] = useState("");
@@ -5210,14 +5237,22 @@ function AuthScreen({ onClose, onOpenLegal }) {
   const submit = async () => {
     setError("");
     if (!email || !password || (mode === "signup" && !name)) return;
+    if (mode === "signup" && accountType === "parent" && !pseudo.trim()) {
+      setError(t("auth_pseudo_required"));
+      return;
+    }
     setLoading(true);
     try {
       if (mode === "signup") {
-        const fullName = accountType === "parent" && lastName ? `${name} ${lastName}` : name;
+        // Le pseudo est ce qui s'affiche publiquement ; prénom et nom restent privés.
+        const publicName = accountType === "association" ? name : (pseudo.trim() || name);
         const { data, error: err } = await supabase.auth.signUp({
           email, password,
           options: { data: {
-            display_name: fullName,
+            display_name: publicName,
+            pseudo: publicName,
+            first_name: accountType === "parent" ? name : null,
+            last_name: accountType === "parent" ? (lastName || null) : null,
             commune: accountType === "parent" ? commune : null,
             birthdate: accountType === "parent" && birthdate ? birthdate : null,
           } },
@@ -5287,6 +5322,16 @@ function AuthScreen({ onClose, onOpenLegal }) {
             placeholder={t("auth_last_name")}
             value={lastName} onChange={(e) => setLastName(e.target.value)}
           />
+        )}
+        {mode === "signup" && accountType === "parent" && (
+          <>
+            <input
+              style={inputStyle}
+              placeholder={t("auth_pseudo")}
+              value={pseudo} onChange={(e) => setPseudo(e.target.value)}
+            />
+            <p style={{ fontSize: 11, color: "#9A93AF", margin: "-6px 0 12px" }}>{t("auth_pseudo_note")}</p>
+          </>
         )}
         {mode === "signup" && accountType === "parent" && (
           <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
@@ -6191,6 +6236,15 @@ function usePikapikaData() {
     setProfile((p) => ({ ...p, bio: bio || null }));
   };
 
+  // Le pseudo est le nom public : on met à jour les deux colonnes pour rester cohérent partout.
+  const updatePseudo = async (pseudo) => {
+    if (!user || !pseudo.trim()) return;
+    const clean = pseudo.trim();
+    const { error } = await supabase.from("profiles").update({ pseudo: clean, display_name: clean }).eq("id", user.id);
+    if (error) { console.error("Erreur pseudo :", error); return; }
+    setProfile((p) => ({ ...p, displayName: clean }));
+  };
+
   const updateGenre = async (genre) => {
     if (!user) return;
     const { error } = await supabase.from("profiles").update({ genre }).eq("id", user.id);
@@ -6327,6 +6381,7 @@ function usePikapikaData() {
     updateBirthdate,
     updateGenre,
     updateBio,
+    updatePseudo,
     uploadAvatar,
     submitReport,
     pendingParents, pendingAssociations, reports, allProfiles, allActivitiesRaw: rows,
@@ -6738,6 +6793,7 @@ export default function RecreApp() {
             onUpdateBio={pika.updateBio}
             genre={pika.genre}
             onUpdateGenre={pika.updateGenre}
+            onUpdatePseudo={pika.updatePseudo}
           />
         )}
       </div>
