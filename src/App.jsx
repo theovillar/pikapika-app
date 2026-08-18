@@ -3112,17 +3112,52 @@ function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kid
   const age = birthdate ? ageFromBirthdate(birthdate) : null;
   const color = genre ? genreColor(genre) : COLORS.sky;
 
+  // Ligne courte : label à gauche, valeur à droite (email, genre, date…)
   const InfoRow = ({ label, value }) => (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14, padding: "10px 0", borderBottom: "1px solid #F5F1E6" }}>
       <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", fontWeight: 700, flexShrink: 0 }}>{label}</span>
-      <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: value ? COLORS.ink : "#C7C0AE", fontWeight: 700, textAlign: "right", lineHeight: 1.45 }}>
+      <span style={{
+        fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: value ? COLORS.ink : "#C7C0AE",
+        fontWeight: 700, textAlign: "right", lineHeight: 1.45, minWidth: 0,
+        overflowWrap: "anywhere", wordBreak: "break-word",
+      }}>
         {value || t("profile_not_filled")}
       </span>
     </div>
   );
 
+  // Carte "À propos" : le label au-dessus, le texte dessous sur toute la largeur —
+  // adapté aux textes longs, qui ne débordent plus et restent lisibles.
+  const AboutCard = ({ icon, label, value, accent }) => (
+    <div style={{
+      background: "#fff", border: "2px solid #F0EADB", borderRadius: 18,
+      padding: "14px 16px", display: "flex", gap: 12, alignItems: "flex-start", minWidth: 0,
+    }}>
+      <div style={{
+        width: 34, height: 34, borderRadius: "50%", background: `${accent}18`, flexShrink: 0,
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+        {icon}
+      </div>
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{
+          fontFamily: "Nunito, sans-serif", fontSize: 10.5, fontWeight: 800, letterSpacing: 0.5,
+          textTransform: "uppercase", color: accent, marginBottom: 3,
+        }}>
+          {label}
+        </div>
+        <div style={{
+          fontFamily: "Nunito, sans-serif", fontSize: 14, color: COLORS.ink, fontWeight: 600,
+          lineHeight: 1.5, overflowWrap: "anywhere", wordBreak: "break-word", whiteSpace: "pre-wrap",
+        }}>
+          {value}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div style={{ maxWidth: 480, margin: "0 auto" }}>
+    <div style={{ maxWidth: 760, margin: "0 auto" }}>
       {/* En-tête : photo, pseudo, âge */}
       <div style={{
         background: "#fff", border: "2px solid #F0EADB", borderRadius: 22, padding: "22px 18px",
@@ -3197,11 +3232,22 @@ function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kid
       {(profession || interets || animaux || coupDeCoeur) && (
         <>
           <SectionLabel>{t("profile_about_section")}</SectionLabel>
-          <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: "6px 16px 10px", marginBottom: 20 }}>
-            {profession && <InfoRow label={t("profile_profession_label")} value={profession} />}
-            {interets && <InfoRow label={t("profile_interets_label")} value={interets} />}
-            {animaux && <InfoRow label={t("profile_animaux_label")} value={animaux} />}
-            {coupDeCoeur && <InfoRow label={t("profile_coeur_label")} value={coupDeCoeur} />}
+          <div style={{
+            display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: 10, marginBottom: 20,
+          }}>
+            {profession && (
+              <AboutCard icon={<BookOpen size={16} color={COLORS.sky} />} label={t("profile_profession_label")} value={profession} accent={COLORS.sky} />
+            )}
+            {interets && (
+              <AboutCard icon={<Sparkles size={16} color={COLORS.grape} />} label={t("profile_interets_label")} value={interets} accent={COLORS.grape} />
+            )}
+            {animaux && (
+              <AboutCard icon={<HeartHandshake size={16} color={COLORS.grass} />} label={t("profile_animaux_label")} value={animaux} accent={COLORS.grass} />
+            )}
+            {coupDeCoeur && (
+              <AboutCard icon={<Heart size={16} color={COLORS.coral} />} label={t("profile_coeur_label")} value={coupDeCoeur} accent={COLORS.coral} />
+            )}
           </div>
         </>
       )}
@@ -3223,7 +3269,11 @@ function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kid
       {role !== "association" && role !== "mairie" && (
         <>
           <SectionLabel>{t("profile_children")}</SectionLabel>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
+          <div style={{
+            display: kids.length === 0 ? "block" : "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: 10, marginBottom: 20,
+          }}>
             {kids.length === 0 ? (
               <EmptyBox text={t("profile_no_child")} />
             ) : (
@@ -3396,7 +3446,7 @@ function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayNam
   };
 
   return (
-    <div style={{ maxWidth: 480, margin: "0 auto" }}>
+    <div style={{ maxWidth: 760, margin: "0 auto" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
         <button onClick={onBack} aria-label={t("btn_back")} style={{
           width: 34, height: 34, borderRadius: "50%", background: "#fff", border: "2px solid #F0EADB",
@@ -4121,7 +4171,7 @@ function UserProfileModal({ userId, onClose }) {
                     <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 10.5, color: "#9A93AF", fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.3 }}>
                       {r.label}
                     </div>
-                    <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: COLORS.ink, fontWeight: 700, lineHeight: 1.4 }}>
+                    <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: COLORS.ink, fontWeight: 700, lineHeight: 1.4, overflowWrap: "anywhere", wordBreak: "break-word", whiteSpace: "pre-wrap" }}>
                       {r.value}
                     </div>
                   </div>
