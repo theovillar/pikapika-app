@@ -101,7 +101,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", auth_pseudo: "Votre pseudo", auth_pseudo_note: "C'est ce nom qui sera visible par les autres membres sur les annonces.", auth_pseudo_required: "Merci de choisir un pseudo.", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_situation_label: "Situation familiale", situation_celibataire: "Célibataire", situation_en_couple: "En couple", situation_marie: "Marié(e)", situation_famille_mono: "Famille monoparentale", situation_autre: "Autre", situation_non_precise: "Je préfère ne pas préciser", profile_edit_title: "Modifier mon profil", btn_back: "Retour", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
+    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_situation_label: "Situation familiale", profile_profession_label: "Profession", profile_profession_ph: "Ex. Infirmière, enseignant, retraité…", profile_interets_label: "Centres d'intérêt", profile_interets_ph: "Ex. Randonnée, cuisine, lecture, jardinage…", profile_animaux_label: "Animaux", profile_animaux_ph: "Ex. Un chien, deux chats…", profile_coeur_label: "Ce que j'aime par-dessus tout", profile_coeur_ph: "Ex. Les balades en forêt le dimanche matin", profile_about_section: "À propos", situation_celibataire: "Célibataire", situation_en_couple: "En couple", situation_marie: "Marié(e)", situation_famille_mono: "Famille monoparentale", situation_autre: "Autre", situation_non_precise: "Je préfère ne pas préciser", profile_edit_title: "Modifier mon profil", btn_back: "Retour", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
@@ -3108,14 +3108,14 @@ function MyOutings({ joined, activities, currentUserId, onOpen }) {
 // Formulaire de modification du profil (atteint via le bouton Modifier de la page profil)
 // Page profil en lecture : une vraie fiche présentable, avec un bouton "Modifier"
 // qui bascule vers le formulaire d'édition (ProfileEdit).
-function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kids, joinedCount, createdCount, validated, commune, role, situation, onEdit, onSignOut, onOpenLegal }) {
+function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kids, joinedCount, createdCount, validated, commune, role, situation, profession, interets, animaux, coupDeCoeur, onEdit, onSignOut, onOpenLegal }) {
   const age = birthdate ? ageFromBirthdate(birthdate) : null;
   const color = genre ? genreColor(genre) : COLORS.sky;
 
   const InfoRow = ({ label, value }) => (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: "1px solid #F5F1E6" }}>
-      <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", fontWeight: 700 }}>{label}</span>
-      <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: value ? COLORS.ink : "#C7C0AE", fontWeight: 700, textAlign: "right" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14, padding: "10px 0", borderBottom: "1px solid #F5F1E6" }}>
+      <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", fontWeight: 700, flexShrink: 0 }}>{label}</span>
+      <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: value ? COLORS.ink : "#C7C0AE", fontWeight: 700, textAlign: "right", lineHeight: 1.45 }}>
         {value || t("profile_not_filled")}
       </span>
     </div>
@@ -3194,6 +3194,18 @@ function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kid
       </div>
 
       {/* Informations privées */}
+      {(profession || interets || animaux || coupDeCoeur) && (
+        <>
+          <SectionLabel>{t("profile_about_section")}</SectionLabel>
+          <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: "6px 16px 10px", marginBottom: 20 }}>
+            {profession && <InfoRow label={t("profile_profession_label")} value={profession} />}
+            {interets && <InfoRow label={t("profile_interets_label")} value={interets} />}
+            {animaux && <InfoRow label={t("profile_animaux_label")} value={animaux} />}
+            {coupDeCoeur && <InfoRow label={t("profile_coeur_label")} value={coupDeCoeur} />}
+          </div>
+        </>
+      )}
+
       <SectionLabel>{t("profile_private_info")}</SectionLabel>
       <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: "6px 16px 10px", marginBottom: 20 }}>
         <InfoRow label={t("auth_email")} value={email} />
@@ -3264,7 +3276,48 @@ function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kid
   );
 }
 
-function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onUpdateKid, onDeleteKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo, situation, onUpdateSituation }) {
+// Petit champ texte du profil, avec son propre bouton d'enregistrement et son accusé de réception.
+function ProfileTextField({ label, placeholder, value, onSave, multiline = false, maxLength = 160 }) {
+  const [input, setInput] = useState(value || "");
+  const [saved, setSaved] = useState(false);
+
+  const save = async () => {
+    await onSave(input);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const baseStyle = {
+    width: "100%", border: "2px solid #F0EADB", borderRadius: 14, padding: "10px 14px",
+    fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: COLORS.ink, outline: "none",
+    boxSizing: "border-box",
+  };
+
+  return (
+    <div style={{ marginBottom: 18 }}>
+      <SectionLabel>{label}</SectionLabel>
+      {multiline ? (
+        <textarea
+          rows={2} value={input} onChange={(e) => setInput(e.target.value.slice(0, maxLength))}
+          placeholder={placeholder} style={{ ...baseStyle, resize: "vertical", marginBottom: 6 }}
+        />
+      ) : (
+        <input
+          value={input} onChange={(e) => setInput(e.target.value.slice(0, maxLength))}
+          placeholder={placeholder} style={{ ...baseStyle, marginBottom: 6 }}
+        />
+      )}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 11, color: "#B7AF98" }}>{input.length}/{maxLength}</span>
+        <PillButton color={saved ? COLORS.grass : COLORS.ink} textColor="#fff" onClick={save} style={{ padding: "7px 14px", fontSize: 12.5 }}>
+          {saved ? <Check size={14} /> : t("btn_enregistrer")}
+        </PillButton>
+      </div>
+    </div>
+  );
+}
+
+function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onUpdateKid, onDeleteKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo, situation, onUpdateSituation, profession, interets, animaux, coupDeCoeur, onUpdateField }) {
   const [addingKid, setAddingKid] = useState(false);
   const [editingKidId, setEditingKidId] = useState(null);
   const [kidName, setKidName] = useState("");
@@ -3457,6 +3510,23 @@ function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayNam
           <option key={s.id} value={s.id}>{s.label}</option>
         ))}
       </select>
+
+      <ProfileTextField
+        label={t("profile_profession_label")} placeholder={t("profile_profession_ph")}
+        value={profession} onSave={(v) => onUpdateField("profession", v)} maxLength={60}
+      />
+      <ProfileTextField
+        label={t("profile_interets_label")} placeholder={t("profile_interets_ph")}
+        value={interets} onSave={(v) => onUpdateField("interets", v)} multiline maxLength={160}
+      />
+      <ProfileTextField
+        label={t("profile_animaux_label")} placeholder={t("profile_animaux_ph")}
+        value={animaux} onSave={(v) => onUpdateField("animaux", v)} maxLength={80}
+      />
+      <ProfileTextField
+        label={t("profile_coeur_label")} placeholder={t("profile_coeur_ph")}
+        value={coupDeCoeur} onSave={(v) => onUpdateField("coupDeCoeur", v)} multiline maxLength={160}
+      />
 
       <SectionLabel>{t("auth_birthdate_label")}</SectionLabel>
       <div style={{ display: "flex", gap: 8, marginBottom: 22, alignItems: "center" }}>
@@ -3982,7 +4052,7 @@ function UserProfileModal({ userId, onClose }) {
     let cancelled = false;
     setLoading(true);
     setError(false);
-    supabase.from("profiles").select("display_name, genre, role, association_name, created_at, avatar_url, bio, birthdate").eq("id", userId).single()
+    supabase.from("profiles").select("display_name, genre, role, association_name, created_at, avatar_url, bio, birthdate, profession, interets, animaux, coup_de_coeur").eq("id", userId).single()
       .then(({ data, error: err }) => {
         if (cancelled) return;
         if (err || !data) { setError(true); } else { setProfile(data); }
@@ -4037,6 +4107,26 @@ function UserProfileModal({ userId, onClose }) {
               <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: "#5C5578", lineHeight: 1.5, margin: "10px 0 4px" }}>
                 {profile.bio}
               </p>
+            )}
+
+            {(profile.profession || profile.interets || profile.animaux || profile.coup_de_coeur) && (
+              <div style={{ textAlign: "left", background: "#F9F7F2", borderRadius: 14, padding: "10px 14px", margin: "12px 0 10px" }}>
+                {[
+                  { label: t("profile_profession_label"), value: profile.profession },
+                  { label: t("profile_interets_label"), value: profile.interets },
+                  { label: t("profile_animaux_label"), value: profile.animaux },
+                  { label: t("profile_coeur_label"), value: profile.coup_de_coeur },
+                ].filter((r) => r.value).map((r, i) => (
+                  <div key={i} style={{ marginBottom: 6 }}>
+                    <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 10.5, color: "#9A93AF", fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.3 }}>
+                      {r.label}
+                    </div>
+                    <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: COLORS.ink, fontWeight: 700, lineHeight: 1.4 }}>
+                      {r.value}
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
             {memberSince && (
               <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#9A93AF" }}>
@@ -6245,6 +6335,10 @@ function usePikapikaData() {
           isAdmin: !!profRes.data.is_admin,
           bio: profRes.data.bio,
           situation: profRes.data.situation,
+          profession: profRes.data.profession,
+          interets: profRes.data.interets,
+          animaux: profRes.data.animaux,
+          coupDeCoeur: profRes.data.coup_de_coeur,
           birthdate: profRes.data.birthdate,
           commune: profRes.data.commune,
           banned: !!profRes.data.banned,
@@ -6478,6 +6572,24 @@ function usePikapikaData() {
     setProfile((p) => ({ ...p, situation: situation || null }));
   };
 
+  // Champs texte libres du profil (profession, centres d'intérêt, animaux, coup de cœur).
+  // Une seule fonction générique plutôt qu'une par champ.
+  const PROFILE_TEXT_FIELDS = {
+    profession: "profession",
+    interets: "interets",
+    animaux: "animaux",
+    coupDeCoeur: "coup_de_coeur",
+  };
+  const updateProfileField = async (field, value) => {
+    if (!user) return;
+    const column = PROFILE_TEXT_FIELDS[field];
+    if (!column) return;
+    const clean = (value || "").trim() || null;
+    const { error } = await supabase.from("profiles").update({ [column]: clean }).eq("id", user.id);
+    if (error) { console.error(`Erreur ${field} :`, error); return; }
+    setProfile((p) => ({ ...p, [field]: clean }));
+  };
+
   const uploadAvatar = async (file) => {
     if (!user) return { error: t("auth_error_generic") };
     try {
@@ -6584,7 +6696,7 @@ function usePikapikaData() {
     user, authLoading, dataLoading,
     displayName: profile.displayName, email: user?.email || "", parentValidated: profile.parentValidated,
     role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl,
-    isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune, birthdate: profile.birthdate, bio: profile.bio, genre: profile.genre, situation: profile.situation,
+    isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune, birthdate: profile.birthdate, bio: profile.bio, genre: profile.genre, situation: profile.situation, profession: profile.profession, interets: profile.interets, animaux: profile.animaux, coupDeCoeur: profile.coupDeCoeur,
     kids,
     activities, teenItems, adultItems, seniorItems, assoItems,
     favorites, favTeen, favAdult, favSenior, favAsso,
@@ -6609,6 +6721,7 @@ function usePikapikaData() {
     updateBio,
     updatePseudo,
     updateSituation,
+    updateProfileField,
     uploadAvatar,
     submitReport,
     pendingParents, pendingAssociations, reports, allProfiles, allActivitiesRaw: rows,
@@ -7036,6 +7149,11 @@ export default function RecreApp() {
               onUpdatePseudo={pika.updatePseudo}
               situation={pika.situation}
               onUpdateSituation={pika.updateSituation}
+              profession={pika.profession}
+              interets={pika.interets}
+              animaux={pika.animaux}
+              coupDeCoeur={pika.coupDeCoeur}
+              onUpdateField={pika.updateProfileField}
             />
           ) : (
             <ProfileView
@@ -7052,6 +7170,10 @@ export default function RecreApp() {
               commune={pika.commune}
               role={pika.role}
               situation={pika.situation}
+              profession={pika.profession}
+              interets={pika.interets}
+              animaux={pika.animaux}
+              coupDeCoeur={pika.coupDeCoeur}
               onEdit={() => setEditingProfile(true)}
               onSignOut={pika.signOut}
               onOpenLegal={setLegalDoc}
