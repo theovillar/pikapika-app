@@ -105,7 +105,7 @@ const TRANSLATIONS = {
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
-    change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…",
+    change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
     share_btn: "Partager", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
     share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Regarde cette sortie sur Orée : {title}",
     report_btn: "Signaler", report_title: "Signaler cette annonce",
@@ -2426,11 +2426,9 @@ function PlainAvatar({ participant, color, size, overlap = false, genderMode = f
     marginLeft: overlap ? -8 : 0, flexShrink: 0,
     cursor: clickable ? "pointer" : "default", padding: 0,
   };
-  const content = participant?.avatarUrl ? (
-    <img src={participant.avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-  ) : (
-    name.charAt(0).toUpperCase()
-  );
+  // Les bulles n'affichent que l'initiale : charger une photo pleine taille pour une
+  // vignette de 26px gaspillerait beaucoup de bande passante sur les longues listes.
+  const content = name.charAt(0).toUpperCase();
   if (clickable) {
     return (
       <button title={label} onClick={(e) => { e.stopPropagation(); onViewProfile(participant.userId); }} style={style}>
@@ -3108,7 +3106,7 @@ function MyOutings({ joined, activities, currentUserId, onOpen }) {
 // Formulaire de modification du profil (atteint via le bouton Modifier de la page profil)
 // Page profil en lecture : une vraie fiche présentable, avec un bouton "Modifier"
 // qui bascule vers le formulaire d'édition (ProfileEdit).
-function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kids, joinedCount, createdCount, validated, commune, role, situation, profession, interets, animaux, coupDeCoeur, onEdit, onSignOut, onOpenLegal }) {
+function ProfileView({ displayName, email, avatarUrl, coverUrl, genre, birthdate, bio, kids, joinedCount, createdCount, validated, commune, role, situation, profession, interets, animaux, coupDeCoeur, onEdit, onSignOut, onOpenLegal }) {
   const age = birthdate ? ageFromBirthdate(birthdate) : null;
   const color = genre ? genreColor(genre) : COLORS.sky;
 
@@ -3158,13 +3156,22 @@ function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kid
 
   return (
     <div style={{ maxWidth: 760, margin: "0 auto" }}>
-      {/* En-tête : photo, pseudo, âge */}
+      {/* En-tête : couverture, photo, pseudo, âge */}
       <div style={{
-        background: "#fff", border: "2px solid #F0EADB", borderRadius: 22, padding: "22px 18px",
-        textAlign: "center", marginBottom: 14,
+        background: "#fff", border: "2px solid #F0EADB", borderRadius: 22,
+        textAlign: "center", marginBottom: 14, overflow: "hidden",
       }}>
+        {/* Bandeau de couverture (ou dégradé par défaut) */}
         <div style={{
-          width: 132, height: 132, borderRadius: "50%", background: color, margin: "0 auto 14px",
+          height: 150,
+          background: coverUrl
+            ? `url(${coverUrl}) center/cover no-repeat`
+            : `linear-gradient(135deg, ${COLORS.sun}, ${COLORS.coral})`,
+        }} />
+
+        <div style={{ padding: "0 18px 22px" }}>
+        <div style={{
+          width: 132, height: 132, borderRadius: "50%", background: color, margin: "-66px auto 14px",
           display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
           fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 50, color: "#fff",
           boxShadow: genre ? `0 0 0 4px #fff, 0 0 0 7px ${genreColor(genre)}60` : "none",
@@ -3201,6 +3208,7 @@ function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kid
             <UserCircle2 size={16} /> {t("btn_edit_profile")}
           </span>
         </PillButton>
+        </div>
       </div>
 
       {/* Compteurs */}
@@ -3367,7 +3375,7 @@ function ProfileTextField({ label, placeholder, value, onSave, multiline = false
   );
 }
 
-function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onUpdateKid, onDeleteKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo, situation, onUpdateSituation, profession, interets, animaux, coupDeCoeur, onUpdateField }) {
+function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onUpdateKid, onDeleteKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo, situation, onUpdateSituation, profession, interets, animaux, coupDeCoeur, onUpdateField, coverUrl, onUploadCover, onRemoveCover }) {
   const [addingKid, setAddingKid] = useState(false);
   const [editingKidId, setEditingKidId] = useState(null);
   const [kidName, setKidName] = useState("");
@@ -3384,6 +3392,17 @@ function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayNam
   const [pseudoInput, setPseudoInput] = useState(displayName || "");
   const [pseudoSaved, setPseudoSaved] = useState(false);
   const fileInputRef = useRef(null);
+  const coverInputRef = useRef(null);
+  const [coverUploading, setCoverUploading] = useState(false);
+
+  const handleCoverChange = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setCoverUploading(true);
+    await onUploadCover(file);
+    setCoverUploading(false);
+  };
 
   const startAddKid = () => {
     setEditingKidId(null); setKidName(""); setKidAge(""); setKidGenre("F"); setConfirmDeleteKid(false);
@@ -3457,6 +3476,48 @@ function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayNam
         <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink, margin: 0 }}>
           {t("profile_edit_title")}
         </h1>
+      </div>
+
+      {/* Photo de couverture */}
+      <SectionLabel>{t("profile_cover_label")}</SectionLabel>
+      <div style={{ marginBottom: 20 }}>
+        <div style={{
+          height: 130, borderRadius: 18, marginBottom: 8, position: "relative", overflow: "hidden",
+          border: "2px solid #F0EADB",
+          background: coverUrl
+            ? `url(${coverUrl}) center/cover no-repeat`
+            : `linear-gradient(135deg, ${COLORS.sun}, ${COLORS.coral})`,
+        }}>
+          {coverUploading && (
+            <div style={{
+              position: "absolute", inset: 0, background: "rgba(255,255,255,0.75)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13, color: COLORS.ink,
+            }}>
+              {t("photo_uploading")}
+            </div>
+          )}
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={() => coverInputRef.current?.click()} disabled={coverUploading} style={{
+            flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+            background: "#fff", border: "2px solid #F0EADB", borderRadius: 12, padding: "9px 14px",
+            color: COLORS.ink, fontWeight: 800, fontSize: 12.5, cursor: "pointer", fontFamily: "Nunito, sans-serif",
+            opacity: coverUploading ? 0.6 : 1,
+          }}>
+            <Camera size={14} /> {coverUrl ? t("profile_cover_change") : t("profile_cover_add")}
+          </button>
+          {coverUrl && (
+            <button onClick={onRemoveCover} style={{
+              background: "transparent", border: `2px solid ${COLORS.coral}`, borderRadius: 12,
+              padding: "9px 14px", color: COLORS.coral, fontWeight: 800, fontSize: 12.5,
+              cursor: "pointer", fontFamily: "Nunito, sans-serif",
+            }}>
+              {t("btn_delete")}
+            </button>
+          )}
+          <input ref={coverInputRef} type="file" accept="image/*" onChange={handleCoverChange} style={{ display: "none" }} />
+        </div>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 22 }}>
@@ -6382,6 +6443,7 @@ function usePikapikaData() {
           associationValidated: profRes.data.association_validated,
           genre: profRes.data.genre,
           avatarUrl: profRes.data.avatar_url,
+          coverUrl: profRes.data.cover_url,
           isAdmin: !!profRes.data.is_admin,
           bio: profRes.data.bio,
           situation: profRes.data.situation,
@@ -6661,6 +6723,35 @@ function usePikapikaData() {
     }
   };
 
+  // La couverture est plus large mais fortement compressée (300 Ko max) : elle ne s'affiche
+  // que sur la page profil, jamais dans les listes, pour limiter la bande passante.
+  const uploadCover = async (file) => {
+    if (!user) return { error: t("auth_error_generic") };
+    try {
+      const blob = await compressImage(file, 300 * 1024, 1200);
+      const path = `${user.id}.jpg`;
+      const { error: uploadErr } = await supabase.storage.from("covers").upload(path, blob, {
+        contentType: "image/jpeg", upsert: true,
+      });
+      if (uploadErr) throw uploadErr;
+      const { data: pub } = supabase.storage.from("covers").getPublicUrl(path);
+      const coverUrl = `${pub.publicUrl}?t=${Date.now()}`;
+      await supabase.from("profiles").update({ cover_url: coverUrl }).eq("id", user.id);
+      setProfile((p) => ({ ...p, coverUrl }));
+      return { error: null };
+    } catch (e) {
+      console.error("Erreur envoi couverture :", e);
+      return { error: e?.message || t("auth_error_generic") };
+    }
+  };
+
+  const removeCover = async () => {
+    if (!user) return;
+    await supabase.storage.from("covers").remove([`${user.id}.jpg`]);
+    await supabase.from("profiles").update({ cover_url: null }).eq("id", user.id);
+    setProfile((p) => ({ ...p, coverUrl: null }));
+  };
+
   const submitReport = async ({ activityId, reportedUserId, reason, details }) => {
     if (!user) return false;
     const { error } = await supabase.from("reports").insert({
@@ -6745,7 +6836,7 @@ function usePikapikaData() {
   return {
     user, authLoading, dataLoading,
     displayName: profile.displayName, email: user?.email || "", parentValidated: profile.parentValidated,
-    role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl,
+    role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl, coverUrl: profile.coverUrl,
     isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune, birthdate: profile.birthdate, bio: profile.bio, genre: profile.genre, situation: profile.situation, profession: profile.profession, interets: profile.interets, animaux: profile.animaux, coupDeCoeur: profile.coupDeCoeur,
     kids,
     activities, teenItems, adultItems, seniorItems, assoItems,
@@ -6773,6 +6864,7 @@ function usePikapikaData() {
     updateSituation,
     updateProfileField,
     uploadAvatar,
+    uploadCover, removeCover,
     submitReport,
     pendingParents, pendingAssociations, reports, allProfiles, allActivitiesRaw: rows,
     toggleBanUser, deleteUserData, preauthorizeEmails, setUserCommune,
@@ -7204,12 +7296,16 @@ export default function RecreApp() {
               animaux={pika.animaux}
               coupDeCoeur={pika.coupDeCoeur}
               onUpdateField={pika.updateProfileField}
+              coverUrl={pika.coverUrl}
+              onUploadCover={pika.uploadCover}
+              onRemoveCover={pika.removeCover}
             />
           ) : (
             <ProfileView
               displayName={displayName}
               email={email}
               avatarUrl={pika.avatarUrl}
+              coverUrl={pika.coverUrl}
               genre={pika.genre}
               birthdate={pika.birthdate}
               bio={pika.bio}
