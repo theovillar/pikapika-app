@@ -3163,18 +3163,21 @@ function ProfileView({ displayName, email, avatarUrl, coverUrl, genre, birthdate
       }}>
         {/* Bandeau de couverture (ou dégradé par défaut) */}
         <div style={{
-          height: 150,
+          height: 160, width: "100%",
           background: coverUrl
-            ? `url(${coverUrl}) center/cover no-repeat`
+            ? `url(${coverUrl}) center center / cover no-repeat`
             : `linear-gradient(135deg, ${COLORS.sun}, ${COLORS.coral})`,
         }} />
 
         <div style={{ padding: "0 18px 22px" }}>
         <div style={{
-          width: 132, height: 132, borderRadius: "50%", background: color, margin: "-66px auto 14px",
+          width: 132, height: 132, borderRadius: "50%", background: color,
+          margin: "-56px auto 14px", position: "relative", zIndex: 1,
           display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
           fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 50, color: "#fff",
-          boxShadow: genre ? `0 0 0 4px #fff, 0 0 0 7px ${genreColor(genre)}60` : "none",
+          boxShadow: genre
+            ? `0 0 0 5px #fff, 0 0 0 8px ${genreColor(genre)}60`
+            : "0 0 0 5px #fff",
         }}>
           {avatarUrl ? (
             <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
