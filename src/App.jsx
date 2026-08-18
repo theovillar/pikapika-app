@@ -2360,6 +2360,96 @@ function participantName(p) { return typeof p === "string" ? p : p.name; }
 
 // Met en avant le pseudo de l'organisateur, coloré par genre quand il est connu
 // (les comptes association/institutions n'ont pas de genre : couleur neutre).
+// Petite carte qui apparaît au survol d'un pseudo (ordinateur uniquement — sur mobile,
+// le clic reste le moyen d'ouvrir la fiche complète). Les données sont chargées une seule
+// fois, puis gardées en mémoire pour éviter de réinterroger la base à chaque survol.
+const hoverProfileCache = {};
+
+function ProfileHoverCard({ userId, children }) {
+  const [visible, setVisible] = useState(false);
+  const [data, setData] = useState(hoverProfileCache[userId] || null);
+  const timerRef = useRef(null);
+
+  const show = () => {
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(async () => {
+      setVisible(true);
+      if (!hoverProfileCache[userId]) {
+        const { data: row } = await supabase
+          .from("profiles")
+          .select("display_name, avatar_url, genre, birthdate, bio, role, association_name")
+          .eq("id", userId).single();
+        if (row) {
+          hoverProfileCache[userId] = row;
+          setData(row);
+        }
+      } else {
+        setData(hoverProfileCache[userId]);
+      }
+    }, 350);
+  };
+
+  const hide = () => {
+    clearTimeout(timerRef.current);
+    setVisible(false);
+  };
+
+  useEffect(() => () => clearTimeout(timerRef.current), []);
+
+  if (!userId) return children;
+
+  const name = data?.role === "association" ? (data?.association_name || data?.display_name) : data?.display_name;
+  const age = data?.birthdate ? ageFromBirthdate(data.birthdate) : null;
+  const color = data?.genre ? genreColor(data.genre) : COLORS.ink;
+
+  return (
+    <span
+      style={{ position: "relative", display: "inline-flex" }}
+      onMouseEnter={show}
+      onMouseLeave={hide}
+    >
+      {children}
+      {visible && data && (
+        <span
+          style={{
+            position: "absolute", bottom: "calc(100% + 8px)", left: 0, zIndex: 9998,
+            background: "#fff", border: "2px solid #F0EADB", borderRadius: 16,
+            boxShadow: "0 8px 24px rgba(43,37,96,0.16)", padding: 12,
+            display: "flex", alignItems: "center", gap: 10, width: 230,
+            pointerEvents: "none",
+          }}
+        >
+          <span style={{
+            width: 52, height: 52, borderRadius: "50%", background: color, flexShrink: 0,
+            display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
+            color: "#fff", fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20,
+            boxShadow: data.genre ? `0 0 0 2px #fff, 0 0 0 3.5px ${genreColor(data.genre)}70` : "none",
+          }}>
+            {data.avatar_url
+              ? <img src={data.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              : (name || "?").charAt(0).toUpperCase()}
+          </span>
+          <span style={{ minWidth: 0, textAlign: "left" }}>
+            <span style={{ display: "block", fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: COLORS.ink, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {name}
+            </span>
+            {age !== null && (
+              <span style={{ display: "block", fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 12, color: "#6B6485" }}>
+                {age} {t("profile_years")}
+              </span>
+            )}
+            {data.bio && (
+              <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF", marginTop: 3, lineHeight: 1.35, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+                {data.bio}
+              </span>
+            )}
+          </span>
+        </span>
+      )}
+    </span>
+  );
+}
+
 function OrganiserBadge({ name, genre, size = 14, userId, onClick, age }) {
   if (!name) return null;
   const color = genre ? genreColor(genre) : COLORS.ink;
@@ -2381,12 +2471,14 @@ function OrganiserBadge({ name, genre, size = 14, userId, onClick, age }) {
   );
   if (clickable) {
     return (
-      <button
-        onClick={(e) => { e.stopPropagation(); onClick(userId); }}
-        style={{ display: "flex", alignItems: "center", gap: 7, background: "none", border: "none", padding: 0, cursor: "pointer" }}
-      >
-        {content}
-      </button>
+      <ProfileHoverCard userId={userId}>
+        <button
+          onClick={(e) => { e.stopPropagation(); onClick(userId); }}
+          style={{ display: "flex", alignItems: "center", gap: 7, background: "none", border: "none", padding: 0, cursor: "pointer" }}
+        >
+          {content}
+        </button>
+      </ProfileHoverCard>
     );
   }
   return <div style={{ display: "flex", alignItems: "center", gap: 7 }}>{content}</div>;
@@ -2431,9 +2523,11 @@ function PlainAvatar({ participant, color, size, overlap = false, genderMode = f
   const content = name.charAt(0).toUpperCase();
   if (clickable) {
     return (
-      <button title={label} onClick={(e) => { e.stopPropagation(); onViewProfile(participant.userId); }} style={style}>
-        {content}
-      </button>
+      <ProfileHoverCard userId={participant.userId}>
+        <button title={label} onClick={(e) => { e.stopPropagation(); onViewProfile(participant.userId); }} style={style}>
+          {content}
+        </button>
+      </ProfileHoverCard>
     );
   }
   return <div title={label} style={style}>{content}</div>;
