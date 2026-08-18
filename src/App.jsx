@@ -4258,24 +4258,28 @@ function PriceBadge({ payant, size = 11 }) {
   );
 }
 
-function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, genderMode, onViewProfile }) {
+// `isCreator` et `isPast` ne servent que dans "Mes sorties" : ailleurs, la ligne s'affiche normalement.
+function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, genderMode, onViewProfile, isCreator = false, isPast = false, spaceLabel }) {
   const meta = metaFrom(categories, item.category);
   const Icon = meta.icon;
   const full = item.inscrits >= item.places;
+  const iconColor = isPast ? "#C7C0AE" : meta.color;
   return (
     <div
       onClick={() => onOpen(item)}
       style={{
-        display: "flex", alignItems: "center", gap: 10, background: "#fff",
-        border: "2px solid #F0EADB", borderRadius: 14, padding: "9px 12px", cursor: "pointer",
+        display: "flex", alignItems: "center", gap: 10,
+        background: isPast ? "#F7F5F0" : (isCreator ? "#FFF9EC" : "#fff"),
+        border: `2px solid ${isPast ? "#E8E4DA" : (isCreator ? COLORS.sun : "#F0EADB")}`,
+        borderRadius: 14, padding: "9px 12px", cursor: "pointer", opacity: isPast ? 0.65 : 1,
       }}
     >
       <div style={{
-        width: 34, height: 34, borderRadius: "50%", border: `2px dashed ${meta.color}`,
+        width: 34, height: 34, borderRadius: "50%", border: `2px dashed ${iconColor}`,
         background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
         position: "relative",
       }}>
-        <Icon size={15} color={meta.color} strokeWidth={2.4} />
+        <Icon size={15} color={iconColor} strokeWidth={2.4} />
         {item.intergen && (
           <span
             title={t("intergen_badge")}
@@ -4290,7 +4294,37 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
       </div>
 
       <div style={{ flex: 1, minWidth: "15ch" }}>
-        <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: COLORS.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+        {(spaceLabel || isCreator || isPast) && (
+          <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap", marginBottom: 2 }}>
+            {spaceLabel && (
+              <span style={{
+                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9.5, letterSpacing: 0.4,
+                textTransform: "uppercase", color: isPast ? "#B7AF98" : meta.color,
+              }}>
+                {spaceLabel}
+              </span>
+            )}
+            {isCreator && (
+              <span style={{
+                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9, padding: "1px 6px",
+                borderRadius: 999, background: isPast ? "#E8E4DA" : COLORS.sun, color: isPast ? "#8A8399" : COLORS.ink,
+                letterSpacing: 0.3, textTransform: "uppercase",
+              }}>
+                {t("badge_organiser")}
+              </span>
+            )}
+            {isPast && (
+              <span style={{
+                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9, padding: "1px 6px",
+                borderRadius: 999, background: "#E8E4DA", color: "#8A8399",
+                letterSpacing: 0.3, textTransform: "uppercase",
+              }}>
+                {t("badge_past")}
+              </span>
+            )}
+          </div>
+        )}
+        <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: isPast ? "#8A8399" : COLORS.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
           {item.title}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, whiteSpace: "nowrap", overflow: "hidden", marginTop: 3 }}>
@@ -5069,19 +5103,28 @@ function CreatePage({ parentValidated, onCreateKid, onCreateTeen, onCreateAdult,
 // Une seule liste unifiée : toutes catégories confondues (Parent, Jeune, Adulte, Ainé),
 // créées ET rejointes, triées par date. Les sorties créées par la personne se distinguent
 // visuellement, et les sorties déjà passées sont grisées.
-function MesSortiesPage({ parentValidated, joined, activities, onOpenKid, teenItems, joinedTeen, onOpenTeen, adultItems, joinedAdult, onOpenAdult, seniorItems, joinedSenior, onOpenSenior, currentUserId }) {
+function MesSortiesPage({
+  parentValidated, currentUserId, onViewProfile,
+  joined, activities, onOpenKid, favorites, onToggleFavKid,
+  teenItems, joinedTeen, onOpenTeen, favTeen, onToggleFavTeen,
+  adultItems, joinedAdult, onOpenAdult, favAdult, onToggleFavAdult,
+  seniorItems, joinedSenior, onOpenSenior, favSenior, onToggleFavSenior,
+}) {
   const groups = [
-    { items: activities, joinedIds: joined, categories: CATEGORIES, onOpen: onOpenKid, label: t("tab_enfants"), visible: parentValidated },
-    { items: teenItems, joinedIds: joinedTeen, categories: TEEN_CATEGORIES, onOpen: onOpenTeen, label: t("tab_ados"), visible: parentValidated },
-    { items: adultItems, joinedIds: joinedAdult, categories: ADULT_CATEGORIES, onOpen: onOpenAdult, label: t("tab_adultes"), visible: true },
-    { items: seniorItems, joinedIds: joinedSenior, categories: SENIOR_CATEGORIES, onOpen: onOpenSenior, label: t("tab_aine"), visible: true },
+    { items: activities, joinedIds: joined, categories: CATEGORIES, onOpen: onOpenKid, label: t("tab_enfants"), visible: parentValidated, genderMode: false, favorites: favorites, onToggleFav: onToggleFavKid },
+    { items: teenItems, joinedIds: joinedTeen, categories: TEEN_CATEGORIES, onOpen: onOpenTeen, label: t("tab_ados"), visible: parentValidated, genderMode: true, favorites: favTeen, onToggleFav: onToggleFavTeen },
+    { items: adultItems, joinedIds: joinedAdult, categories: ADULT_CATEGORIES, onOpen: onOpenAdult, label: t("tab_adultes"), visible: true, genderMode: true, favorites: favAdult, onToggleFav: onToggleFavAdult },
+    { items: seniorItems, joinedIds: joinedSenior, categories: SENIOR_CATEGORIES, onOpen: onOpenSenior, label: t("tab_aine"), visible: true, genderMode: true, favorites: favSenior, onToggleFav: onToggleFavSenior },
   ];
 
   const all = [];
   groups.forEach((g) => {
     if (!g.visible) return;
     g.items.filter((it) => g.joinedIds.includes(it.id)).forEach((it) => {
-      all.push({ item: it, categories: g.categories, onOpen: g.onOpen, spaceLabel: g.label });
+      all.push({
+        item: it, categories: g.categories, onOpen: g.onOpen, spaceLabel: g.label,
+        genderMode: g.genderMode, favorites: g.favorites || [], onToggleFav: g.onToggleFav,
+      });
     });
   });
 
@@ -5121,68 +5164,22 @@ function MesSortiesPage({ parentValidated, joined, activities, onOpenKid, teenIt
       {withDate.length === 0 ? (
         <EmptyBox text={t("my_meetups_empty")} />
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {withDate.map(({ item, categories, onOpen, spaceLabel, isPast }) => {
-            const meta = metaFrom(categories, item.category);
-            const Icon = meta.icon;
-            const isCreator = item.createdBy && item.createdBy === currentUserId;
-            return (
-              <div
-                key={`${spaceLabel}-${item.id}`}
-                onClick={() => onOpen(item)}
-                style={{
-                  background: isPast ? "#F7F5F0" : (isCreator ? "#FFF9EC" : "#fff"),
-                  border: `2px solid ${isPast ? "#E8E4DA" : (isCreator ? COLORS.sun : "#F0EADB")}`,
-                  borderRadius: 18, padding: 14, display: "flex", alignItems: "center", gap: 12,
-                  cursor: "pointer", opacity: isPast ? 0.6 : 1,
-                }}
-              >
-                <div style={{
-                  width: 40, height: 40, borderRadius: "50%", border: `2px dashed ${isPast ? "#C7C0AE" : meta.color}`,
-                  background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                }}>
-                  <Icon size={18} color={isPast ? "#C7C0AE" : meta.color} strokeWidth={2.4} />
-                </div>
-
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 2 }}>
-                    <span style={{
-                      fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 10, letterSpacing: 0.4,
-                      textTransform: "uppercase", color: isPast ? "#B7AF98" : meta.color,
-                    }}>
-                      {spaceLabel}
-                    </span>
-                    {isCreator && (
-                      <span style={{
-                        fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9.5, padding: "2px 7px",
-                        borderRadius: 999, background: isPast ? "#E8E4DA" : COLORS.sun, color: isPast ? "#8A8399" : COLORS.ink,
-                        letterSpacing: 0.3, textTransform: "uppercase",
-                      }}>
-                        {t("badge_organiser")}
-                      </span>
-                    )}
-                    {isPast && (
-                      <span style={{
-                        fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9.5, padding: "2px 7px",
-                        borderRadius: 999, background: "#E8E4DA", color: "#8A8399",
-                        letterSpacing: 0.3, textTransform: "uppercase",
-                      }}>
-                        {t("badge_past")}
-                      </span>
-                    )}
-                  </div>
-                  <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15, color: isPast ? "#8A8399" : COLORS.ink }}>
-                    {item.title}
-                  </div>
-                  <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: isPast ? "#A9A294" : "#6B6485" }}>
-                    {displayDate(item)} · {lieuAvecVille(item)}
-                  </div>
-                </div>
-
-                <ChevronRight size={18} color="#C7C0AE" />
-              </div>
-            );
-          })}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {withDate.map(({ item, categories, onOpen, spaceLabel, isPast, genderMode, favorites, onToggleFav }) => (
+            <NarrowMeetupRow
+              key={`${spaceLabel}-${item.id}`}
+              item={item}
+              categories={categories}
+              onOpen={onOpen}
+              favorite={favorites.includes(item.id)}
+              onToggleFav={onToggleFav}
+              genderMode={genderMode}
+              onViewProfile={onViewProfile}
+              isCreator={!!(item.createdBy && item.createdBy === currentUserId)}
+              isPast={isPast}
+              spaceLabel={spaceLabel}
+            />
+          ))}
         </div>
       )}
     </div>
@@ -6610,19 +6607,28 @@ export default function RecreApp() {
         {tab === "mes-sorties" && (
           <MesSortiesPage
             parentValidated={parentValidated}
+            currentUserId={pika.user?.id}
+            onViewProfile={openUserProfile}
             joined={joined}
             activities={activities}
             onOpenKid={(item) => setSelectedId(item.id)}
+            favorites={favorites}
+            onToggleFavKid={toggleFav}
             teenItems={teenItems}
             joinedTeen={joinedTeen}
             onOpenTeen={(item) => setSelectedCommunity({ id: item.id, kind: "teen" })}
+            favTeen={favTeen}
+            onToggleFavTeen={(id) => toggleFavCommunity("teen", id)}
             adultItems={adultItems}
             joinedAdult={joinedAdult}
             onOpenAdult={(item) => setSelectedCommunity({ id: item.id, kind: "adult" })}
+            favAdult={favAdult}
+            onToggleFavAdult={(id) => toggleFavCommunity("adult", id)}
             seniorItems={seniorItems}
             joinedSenior={joinedSenior}
             onOpenSenior={(item) => setSelectedCommunity({ id: item.id, kind: "senior" })}
-            currentUserId={pika.user?.id}
+            favSenior={favSenior}
+            onToggleFavSenior={(id) => toggleFavCommunity("senior", id)}
           />
         )}
         {tab === "adultes" && (
