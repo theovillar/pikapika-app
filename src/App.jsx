@@ -3956,6 +3956,7 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
   const meta = catMeta(activity.category);
   const isJoined = joined.includes(activity.id);
   const full = activity.inscrits >= activity.places && !isJoined;
+  const isPast = (activity.offsetDays ?? 0) < 0;
 
   return (
     <div
@@ -4052,7 +4053,11 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
           </div>
         )}
 
-        {isJoined ? (
+        {isPast ? (
+          <PillButton color={"#EDEAF4"} textColor={"#8A8399"} style={{ width: "100%", boxShadow: "none" }}>
+            {t("badge_past")}
+          </PillButton>
+        ) : isJoined ? (
           activity.createdBy === currentUserId ? (
             <PillButton color={"#EAF8ED"} textColor={COLORS.grass} style={{ width: "100%", boxShadow: "none" }}>
               <span style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
@@ -4085,19 +4090,21 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
           </PillButton>
         )}
 
-        <button
-          onClick={() => onShare(activity)}
-          style={{
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%",
-            background: "#fff", border: "2px solid #F0EADB", borderRadius: 12, padding: "10px 14px",
-            color: COLORS.ink, fontWeight: 800, fontSize: 13, marginTop: 14, cursor: "pointer",
-            fontFamily: "Nunito, sans-serif",
-          }}
-        >
-          <Share2 size={15} /> {t("share_btn")}
-        </button>
+        {!isPast && (
+          <button
+            onClick={() => onShare(activity)}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%",
+              background: "#fff", border: "2px solid #F0EADB", borderRadius: 12, padding: "10px 14px",
+              color: COLORS.ink, fontWeight: 800, fontSize: 13, marginTop: 14, cursor: "pointer",
+              fontFamily: "Nunito, sans-serif",
+            }}
+          >
+            <Share2 size={15} /> {t("share_btn")}
+          </button>
+        )}
 
-        {activity.createdBy && activity.createdBy === currentUserId && (
+        {!isPast && activity.createdBy && activity.createdBy === currentUserId && (
           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
             <button
               onClick={() => onEdit(activity)}
@@ -4485,6 +4492,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
   const Icon = meta.icon;
   const isJoined = joined.includes(item.id);
   const full = item.inscrits >= item.places && !isJoined;
+  const isPast = (item.offsetDays ?? 0) < 0;
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.45)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 9999 }}>
@@ -4581,7 +4589,11 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
           </div>
         )}
 
-        {isJoined ? (
+        {isPast ? (
+          <PillButton color={"#EDEAF4"} textColor={"#8A8399"} style={{ width: "100%", boxShadow: "none" }}>
+            {t("badge_past")}
+          </PillButton>
+        ) : isJoined ? (
           item.createdBy === currentUserId ? (
             <PillButton color={"#EAF8ED"} textColor={COLORS.grass} style={{ width: "100%", boxShadow: "none" }}>
               <span style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
@@ -4614,19 +4626,21 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
           </PillButton>
         )}
 
-        <button
-          onClick={() => onShare(item)}
-          style={{
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%",
-            background: "#fff", border: "2px solid #F0EADB", borderRadius: 12, padding: "10px 14px",
-            color: COLORS.ink, fontWeight: 800, fontSize: 13, marginTop: 14, cursor: "pointer",
-            fontFamily: "Nunito, sans-serif",
-          }}
-        >
-          <Share2 size={15} /> {t("share_btn")}
-        </button>
+        {!isPast && (
+          <button
+            onClick={() => onShare(item)}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%",
+              background: "#fff", border: "2px solid #F0EADB", borderRadius: 12, padding: "10px 14px",
+              color: COLORS.ink, fontWeight: 800, fontSize: 13, marginTop: 14, cursor: "pointer",
+              fontFamily: "Nunito, sans-serif",
+            }}
+          >
+            <Share2 size={15} /> {t("share_btn")}
+          </button>
+        )}
 
-        {item.createdBy && item.createdBy === currentUserId && (
+        {!isPast && item.createdBy && item.createdBy === currentUserId && (
           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
             <button
               onClick={() => onEdit(item)}
