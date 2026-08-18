@@ -3159,33 +3159,34 @@ function ProfileView({ displayName, email, avatarUrl, coverUrl, genre, birthdate
       {/* En-tête : couverture, photo, pseudo, âge */}
       <div style={{
         background: "#fff", border: "2px solid #F0EADB", borderRadius: 22,
-        textAlign: "center", marginBottom: 14, overflow: "hidden",
+        textAlign: "center", marginBottom: 14,
       }}>
-        {/* Bandeau de couverture (ou dégradé par défaut) */}
+        {/* Bandeau de couverture : descend jusqu'au bas de la photo, qui se pose dessus */}
         <div style={{
-          height: 160, width: "100%",
+          height: 200, width: "100%", position: "relative",
+          borderRadius: "20px 20px 0 0",
           background: coverUrl
             ? `url(${coverUrl}) center center / cover no-repeat`
             : `linear-gradient(135deg, ${COLORS.sun}, ${COLORS.coral})`,
-        }} />
-
-        <div style={{ padding: "0 18px 22px" }}>
-        <div style={{
-          width: 132, height: 132, borderRadius: "50%", background: color,
-          margin: "-56px auto 14px", position: "relative", zIndex: 1,
-          display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
-          fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 50, color: "#fff",
-          boxShadow: genre
-            ? `0 0 0 5px #fff, 0 0 0 8px ${genreColor(genre)}60`
-            : "0 0 0 5px #fff",
         }}>
-          {avatarUrl ? (
-            <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          ) : (
-            (displayName || "?").charAt(0).toUpperCase()
-          )}
+          <div style={{
+            width: 132, height: 132, borderRadius: "50%", background: color,
+            position: "absolute", bottom: -8, left: "50%", transform: "translateX(-50%)",
+            display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
+            fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 50, color: "#fff",
+            boxShadow: genre
+              ? `0 0 0 5px #fff, 0 0 0 8px ${genreColor(genre)}60`
+              : "0 0 0 5px #fff",
+          }}>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              (displayName || "?").charAt(0).toUpperCase()
+            )}
+          </div>
         </div>
 
+        <div style={{ padding: "26px 18px 22px" }}>
         <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 22, color: COLORS.ink }}>
           {displayName}
         </div>
