@@ -101,7 +101,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
+    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
@@ -2288,12 +2288,14 @@ function Stamp({ category, size = 46, rotate = -8 }) {
 function Avatar({ name, genre, size = 26, overlap = false, genderMode = true, color, avatarUrl, userId, onViewProfile }) {
   const finalColor = genderMode ? genreColor(genre) : (color || COLORS.grape);
   const clickable = !!(userId && onViewProfile);
+  const ringColor = genderMode && genre ? genreColor(genre) : null;
+  const ring = ringColor ? `0 0 0 2px #fff, 0 0 0 4px ${ringColor}` : "0 0 0 2px #fff";
   const style = {
     width: size, height: size, borderRadius: "50%", background: finalColor,
     display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
     color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800,
-    fontSize: size * 0.42, border: "2px solid #fff",
-    marginLeft: overlap ? -8 : 0, flexShrink: 0,
+    fontSize: size * 0.42, border: "none", boxShadow: ring,
+    marginLeft: overlap ? (ringColor ? -10 : -8) : 0, flexShrink: 0,
     cursor: clickable ? "pointer" : "default", padding: 0,
   };
   const content = avatarUrl ? (
@@ -2397,12 +2399,15 @@ function PlainAvatar({ participant, color, size, overlap = false, genderMode = f
   const dim = size !== undefined ? `${size}px` : "var(--pika-avatar-size, 26px)";
   const fontSize = size !== undefined ? size * 0.42 : "calc(var(--pika-avatar-size, 26px) * 0.42)";
   const clickable = participant?.isReal && participant?.userId && onViewProfile;
+  // Anneau coloré par genre (garde la distinction visible même quand une vraie photo masque le fond)
+  const ringColor = genderMode && participant?.genre ? genreColor(participant.genre) : null;
+  const ring = ringColor ? `0 0 0 2px #fff, 0 0 0 4px ${ringColor}` : "0 0 0 2px #fff";
   const style = {
     width: dim, height: dim, borderRadius: "50%", background: avatarColor,
     display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
     color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800,
-    fontSize, border: "2px solid #fff",
-    marginLeft: overlap ? -8 : 0, flexShrink: 0,
+    fontSize, border: "none", boxShadow: ring,
+    marginLeft: overlap ? (ringColor ? -10 : -8) : 0, flexShrink: 0,
     cursor: clickable ? "pointer" : "default", padding: 0,
   };
   const content = participant?.avatarUrl ? (
@@ -2412,11 +2417,7 @@ function PlainAvatar({ participant, color, size, overlap = false, genderMode = f
   );
   if (clickable) {
     return (
-      <button
-        title={label}
-        onClick={(e) => { e.stopPropagation(); onViewProfile(participant.userId); }}
-        style={{ ...style, border: "2px solid #fff" }}
-      >
+      <button title={label} onClick={(e) => { e.stopPropagation(); onViewProfile(participant.userId); }} style={style}>
         {content}
       </button>
     );
@@ -3103,7 +3104,7 @@ function MyOutings({ joined, activities }) {
   );
 }
 
-function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onUpdateKid, onDeleteKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio }) {
+function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onUpdateKid, onDeleteKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre }) {
   const [addingKid, setAddingKid] = useState(false);
   const [editingKidId, setEditingKidId] = useState(null);
   const [kidName, setKidName] = useState("");
@@ -3116,6 +3117,7 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
   const [bioInput, setBioInput] = useState(bio || "");
   const [bioSaved, setBioSaved] = useState(false);
   const [birthdateSaved, setBirthdateSaved] = useState(false);
+  const [genreSaving, setGenreSaving] = useState(false);
   const fileInputRef = useRef(null);
 
   const startAddKid = () => {
@@ -3215,6 +3217,32 @@ function Profile({ joinedCount, validated, onToggleDemo, displayName, email, kid
       )}
 
       <ValidationStatus validated={validated} onToggleDemo={onToggleDemo} />
+
+      <SectionLabel>{t("profile_genre_label")}</SectionLabel>
+      <div style={{ display: "flex", gap: 8, marginBottom: 22 }}>
+        {[
+          { id: "F", label: t("legend_femme") },
+          { id: "H", label: t("legend_homme") },
+        ].map((opt) => (
+          <button
+            key={opt.id}
+            onClick={async () => {
+              setGenreSaving(true);
+              await onUpdateGenre(opt.id);
+              setGenreSaving(false);
+            }}
+            style={{
+              flex: 1, border: `2px solid ${genre === opt.id ? genreColor(opt.id) : "#F0EADB"}`,
+              background: genre === opt.id ? genreColor(opt.id) : "#fff",
+              color: genre === opt.id ? "#fff" : COLORS.ink,
+              borderRadius: 14, padding: "10px 8px", fontFamily: "Nunito, sans-serif",
+              fontWeight: 800, fontSize: 13, cursor: "pointer", opacity: genreSaving ? 0.6 : 1,
+            }}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
 
       <SectionLabel>{t("auth_birthdate_label")}</SectionLabel>
       <div style={{ display: "flex", gap: 8, marginBottom: 22, alignItems: "center" }}>
@@ -6030,6 +6058,13 @@ function usePikapikaData() {
     setProfile((p) => ({ ...p, bio: bio || null }));
   };
 
+  const updateGenre = async (genre) => {
+    if (!user) return;
+    const { error } = await supabase.from("profiles").update({ genre }).eq("id", user.id);
+    if (error) { console.error("Erreur genre :", error); return; }
+    setProfile((p) => ({ ...p, genre }));
+  };
+
   const uploadAvatar = async (file) => {
     if (!user) return { error: t("auth_error_generic") };
     try {
@@ -6136,7 +6171,7 @@ function usePikapikaData() {
     user, authLoading, dataLoading,
     displayName: profile.displayName, email: user?.email || "", parentValidated: profile.parentValidated,
     role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl,
-    isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune, birthdate: profile.birthdate, bio: profile.bio,
+    isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune, birthdate: profile.birthdate, bio: profile.bio, genre: profile.genre,
     kids,
     activities, teenItems, adultItems, seniorItems, assoItems,
     favorites, favTeen, favAdult, favSenior, favAsso,
@@ -6155,6 +6190,7 @@ function usePikapikaData() {
     addKid,
     updateKid, deleteKid,
     updateBirthdate,
+    updateGenre,
     updateBio,
     uploadAvatar,
     submitReport,
@@ -6546,6 +6582,8 @@ export default function RecreApp() {
             onOpenLegal={setLegalDoc}
             bio={pika.bio}
             onUpdateBio={pika.updateBio}
+            genre={pika.genre}
+            onUpdateGenre={pika.updateGenre}
           />
         )}
       </div>
