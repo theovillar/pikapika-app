@@ -5955,6 +5955,7 @@ function usePikapikaData() {
   const [regByActivity, setRegByActivity] = useState({});
   const [ageStats, setAgeStats] = useState({});
   const [realParticipants, setRealParticipants] = useState({});
+  const [organiserProfiles, setOrganiserProfiles] = useState({});
   const [myRegs, setMyRegs] = useState(new Set());
   const [myFavs, setMyFavs] = useState(new Set());
   const [dataLoading, setDataLoading] = useState(true);
@@ -6007,6 +6008,18 @@ function usePikapikaData() {
         });
       });
       setRealParticipants(byActivity);
+
+      // Profils des organisateurs, lus en direct : le pseudo affiché sur une annonce suit
+      // désormais toujours le profil actuel, même si le nom avait été figé à la création.
+      const creatorIds = [...new Set((data || []).map((a) => a.created_by).filter(Boolean))];
+      if (creatorIds.length > 0) {
+        const { data: creatorRows } = await supabase
+          .from("profiles").select("id, display_name, genre").in("id", creatorIds);
+        if (cancelled) return;
+        const byId = {};
+        (creatorRows || []).forEach((p) => { byId[p.id] = { displayName: p.display_name, genre: p.genre }; });
+        setOrganiserProfiles(byId);
+      }
     })();
     return () => { cancelled = true; };
   }, []);
@@ -6079,11 +6092,15 @@ function usePikapikaData() {
     const time = `${String(start.getHours()).padStart(2, "0")}h${String(start.getMinutes()).padStart(2, "0")}`;
     const ages = ageStats[row.id] || {};
     const real = realParticipants[row.id] || [];
+    // Si l'annonce a un vrai créateur, on affiche son pseudo actuel (et non celui figé à la création).
+    const creator = row.created_by ? organiserProfiles[row.created_by] : null;
     return {
       id: row.id, title: row.title, category: row.category, ville: row.ville, lieu: row.lieu,
       offsetDays, time, age: row.age, info: row.info, places: row.places,
       inscrits: (row.demo_inscrits || 0) + (regByActivity[row.id] || 0),
-      organisateur: row.organisateur, organisateurGenre: row.organisateur_genre, desc: row.description,
+      organisateur: creator?.displayName || row.organisateur,
+      organisateurGenre: creator?.genre ?? row.organisateur_genre,
+      desc: row.description,
       intergen: row.intergen, intergenNote: row.intergen_note,
       participants: [...real, ...(row.demo_participants || [])],
       createdBy: row.created_by, payant: row.payant, signeDistinctif: row.signe_distinctif,
@@ -6092,11 +6109,11 @@ function usePikapikaData() {
   };
 
   const bySpace = (space) => rows.filter((r) => r.space === space).map(mapRow);
-  const activities = useMemo(() => bySpace("kids"), [rows, regByActivity, ageStats, realParticipants]);
-  const teenItems = useMemo(() => bySpace("teen"), [rows, regByActivity, ageStats, realParticipants]);
-  const adultItems = useMemo(() => bySpace("adult"), [rows, regByActivity, ageStats, realParticipants]);
-  const seniorItems = useMemo(() => bySpace("senior"), [rows, regByActivity, ageStats, realParticipants]);
-  const assoItems = useMemo(() => bySpace("asso"), [rows, regByActivity, ageStats, realParticipants]);
+  const activities = useMemo(() => bySpace("kids"), [rows, regByActivity, ageStats, realParticipants, organiserProfiles]);
+  const teenItems = useMemo(() => bySpace("teen"), [rows, regByActivity, ageStats, realParticipants, organiserProfiles]);
+  const adultItems = useMemo(() => bySpace("adult"), [rows, regByActivity, ageStats, realParticipants, organiserProfiles]);
+  const seniorItems = useMemo(() => bySpace("senior"), [rows, regByActivity, ageStats, realParticipants, organiserProfiles]);
+  const assoItems = useMemo(() => bySpace("asso"), [rows, regByActivity, ageStats, realParticipants, organiserProfiles]);
 
   const idsIn = (items, set) => items.filter((it) => set.has(it.id)).map((it) => it.id);
   const favorites = useMemo(() => idsIn(activities, myFavs), [activities, myFavs]);
@@ -6243,6 +6260,8 @@ function usePikapikaData() {
     const { error } = await supabase.from("profiles").update({ pseudo: clean, display_name: clean }).eq("id", user.id);
     if (error) { console.error("Erreur pseudo :", error); return; }
     setProfile((p) => ({ ...p, displayName: clean }));
+    // Répercute aussitôt sur toutes les annonces affichées, sans attendre un rechargement
+    setOrganiserProfiles((m) => ({ ...m, [user.id]: { ...(m[user.id] || {}), displayName: clean } }));
   };
 
   const updateGenre = async (genre) => {
@@ -6250,6 +6269,7 @@ function usePikapikaData() {
     const { error } = await supabase.from("profiles").update({ genre }).eq("id", user.id);
     if (error) { console.error("Erreur genre :", error); return; }
     setProfile((p) => ({ ...p, genre }));
+    setOrganiserProfiles((m) => ({ ...m, [user.id]: { ...(m[user.id] || {}), genre } }));
   };
 
   const uploadAvatar = async (file) => {
