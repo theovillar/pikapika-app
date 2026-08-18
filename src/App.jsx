@@ -3255,22 +3255,24 @@ function ProfileView({ displayName, email, avatarUrl, coverUrl, genre, birthdate
         background: "#fff", border: "2px solid #F0EADB", borderRadius: 22,
         textAlign: "center", marginBottom: 14,
       }}>
-        {/* Bandeau de couverture : descend jusqu'au bas de la photo, qui se pose dessus */}
-        <div style={{
-          height: 200, width: "100%", position: "relative",
+        {/* Bandeau de couverture : hauteur proportionnelle à la largeur (ratio ~2.6:1),
+            donc bien plus généreuse sur grand écran, avec des bornes pour rester raisonnable. */}
+        <div className="pika-cover" style={{
+          width: "100%", position: "relative",
+          aspectRatio: "26 / 10", minHeight: 190, maxHeight: 380,
           borderRadius: "20px 20px 0 0",
           background: coverUrl
             ? `url(${coverUrl}) center center / cover no-repeat`
             : `linear-gradient(135deg, ${COLORS.sun}, ${COLORS.coral})`,
         }}>
-          <div style={{
-            width: 132, height: 132, borderRadius: "50%", background: color,
-            position: "absolute", bottom: -8, left: "50%", transform: "translateX(-50%)",
+          <div className="pika-cover-avatar" style={{
+            width: 160, height: 160, borderRadius: "50%", background: color,
+            position: "absolute", bottom: -10, left: "50%", transform: "translateX(-50%)",
             display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
-            fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 50, color: "#fff",
+            fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 62, color: "#fff",
             boxShadow: genre
-              ? `0 0 0 5px #fff, 0 0 0 8px ${genreColor(genre)}60`
-              : "0 0 0 5px #fff",
+              ? `0 0 0 6px #fff, 0 0 0 9px ${genreColor(genre)}60`
+              : "0 0 0 6px #fff",
           }}>
             {avatarUrl ? (
               <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -3280,7 +3282,7 @@ function ProfileView({ displayName, email, avatarUrl, coverUrl, genre, birthdate
           </div>
         </div>
 
-        <div style={{ padding: "26px 18px 22px" }}>
+        <div style={{ padding: "34px 18px 24px" }}>
         <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 22, color: COLORS.ink }}>
           {displayName}
         </div>
@@ -7524,6 +7526,10 @@ export default function RecreApp() {
         @media (min-width: 768px) {
           .desktop-nav { display: flex !important; }
           .mobile-nav { display: none !important; }
+        }
+        @media (max-width: 560px) {
+          .pika-cover { min-height: 150px !important; }
+          .pika-cover-avatar { width: 116px !important; height: 116px !important; font-size: 44px !important; }
         }
         @media (max-width: 400px) {
           .mobile-nav { padding: 8px 4px 14px !important; gap: 2px !important; }
