@@ -101,7 +101,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", auth_pseudo: "Votre pseudo", auth_pseudo_note: "C'est ce nom qui sera visible par les autres membres sur les annonces.", auth_pseudo_required: "Merci de choisir un pseudo.", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_edit_title: "Modifier mon profil", btn_back: "Retour", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
+    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_situation_label: "Situation familiale", situation_celibataire: "Célibataire", situation_en_couple: "En couple", situation_marie: "Marié(e)", situation_famille_mono: "Famille monoparentale", situation_autre: "Autre", situation_non_precise: "Je préfère ne pas préciser", profile_edit_title: "Modifier mon profil", btn_back: "Retour", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
@@ -500,6 +500,17 @@ const catMeta = (id) => CATEGORIES.find((c) => c.id === id) || CATEGORIES[0];
 
 // ---------- Localisation (villes, départements, distances) ----------
 // Coordonnées des villes utilisées par les sorties de démo (id "ville" -> position + département)
+// Situations familiales proposées (toujours optionnel — la personne peut ne rien indiquer)
+const SITUATIONS = [
+  { id: "celibataire", label: "Célibataire" },
+  { id: "en_couple", label: "En couple" },
+  { id: "marie", label: "Marié(e) / Pacsé(e)" },
+  { id: "famille_mono", label: "Famille monoparentale" },
+  { id: "separe", label: "Séparé(e) / Divorcé(e)" },
+  { id: "veuf", label: "Veuf / Veuve" },
+];
+const situationLabel = (id) => (SITUATIONS.find((s) => s.id === id) || {}).label || null;
+
 const CITY_META = {
   grenoble: { label: "Grenoble", lat: 45.1885, lon: 5.7245, dept: "38" },
   varces: { label: "Varces-Allières-et-Risset", lat: 45.1024, lon: 5.6698, dept: "38" },
@@ -663,6 +674,19 @@ function locationLabel(location) {
 }
 
 const villeName = (id) => (CITY_META[id] || {}).label || "";
+
+// Situation familiale : information optionnelle, l'utilisateur peut toujours ne rien indiquer.
+const SITUATIONS = [
+  { id: "celibataire", labelKey: "situation_celibataire" },
+  { id: "en_couple", labelKey: "situation_en_couple" },
+  { id: "marie", labelKey: "situation_marie" },
+  { id: "famille_mono", labelKey: "situation_famille_mono" },
+  { id: "autre", labelKey: "situation_autre" },
+];
+const situationLabel = (id) => {
+  const s = SITUATIONS.find((x) => x.id === id);
+  return s ? t(s.labelKey) : null;
+};
 
 // Calcule un âge à partir d'une date de naissance, sans jamais avoir besoin d'afficher
 // la date exacte ailleurs dans l'appli (plus respectueux de la vie privée).
@@ -3097,7 +3121,7 @@ function MyOutings({ joined, activities, currentUserId, onOpen }) {
 // Formulaire de modification du profil (atteint via le bouton Modifier de la page profil)
 // Page profil en lecture : une vraie fiche présentable, avec un bouton "Modifier"
 // qui bascule vers le formulaire d'édition (ProfileEdit).
-function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kids, joinedCount, createdCount, validated, commune, role, onEdit, onSignOut, onOpenLegal }) {
+function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kids, joinedCount, createdCount, validated, commune, role, situation, onEdit, onSignOut, onOpenLegal }) {
   const age = birthdate ? ageFromBirthdate(birthdate) : null;
   const color = genre ? genreColor(genre) : COLORS.sky;
 
@@ -3118,10 +3142,10 @@ function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kid
         textAlign: "center", marginBottom: 14,
       }}>
         <div style={{
-          width: 84, height: 84, borderRadius: "50%", background: color, margin: "0 auto 12px",
+          width: 132, height: 132, borderRadius: "50%", background: color, margin: "0 auto 14px",
           display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
-          fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 32, color: "#fff",
-          boxShadow: genre ? `0 0 0 3px #fff, 0 0 0 5px ${genreColor(genre)}60` : "none",
+          fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 50, color: "#fff",
+          boxShadow: genre ? `0 0 0 4px #fff, 0 0 0 7px ${genreColor(genre)}60` : "none",
         }}>
           {avatarUrl ? (
             <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -3187,6 +3211,7 @@ function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kid
       <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: "6px 16px 10px", marginBottom: 20 }}>
         <InfoRow label={t("auth_email")} value={email} />
         <InfoRow label={t("profile_genre_label")} value={genre ? (genre === "F" ? t("legend_femme") : t("legend_homme")) : null} />
+        <InfoRow label={t("profile_situation_label")} value={situationLabel(situation)} />
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "10px 0" }}>
           <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", fontWeight: 700 }}>{t("auth_birthdate_label")}</span>
           <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: birthdate ? COLORS.ink : "#C7C0AE", fontWeight: 700 }}>
@@ -3252,7 +3277,7 @@ function ProfileView({ displayName, email, avatarUrl, genre, birthdate, bio, kid
   );
 }
 
-function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onUpdateKid, onDeleteKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo }) {
+function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onUpdateKid, onDeleteKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo, situation, onUpdateSituation }) {
   const [addingKid, setAddingKid] = useState(false);
   const [editingKidId, setEditingKidId] = useState(null);
   const [kidName, setKidName] = useState("");
@@ -3347,9 +3372,9 @@ function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayNam
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 22 }}>
         <div style={{ position: "relative", flexShrink: 0 }}>
           <div style={{
-            width: 64, height: 64, borderRadius: "50%", background: COLORS.sky,
+            width: 104, height: 104, borderRadius: "50%", background: COLORS.sky,
             display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
-            fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: "#fff",
+            fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 40, color: "#fff",
           }}>
             {avatarUrl ? (
               <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -3362,12 +3387,12 @@ function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayNam
             disabled={uploading}
             aria-label={t("change_photo")}
             style={{
-              position: "absolute", bottom: -2, right: -2, width: 26, height: 26, borderRadius: "50%",
-              background: COLORS.ink, border: "2px solid #fff", display: "flex", alignItems: "center",
+              position: "absolute", bottom: 2, right: 2, width: 34, height: 34, borderRadius: "50%",
+              background: COLORS.ink, border: "3px solid #fff", display: "flex", alignItems: "center",
               justifyContent: "center", cursor: uploading ? "default" : "pointer", opacity: uploading ? 0.6 : 1,
             }}
           >
-            <Camera size={13} color="#fff" />
+            <Camera size={16} color="#fff" />
           </button>
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: "none" }} />
         </div>
@@ -3429,6 +3454,22 @@ function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayNam
           </button>
         ))}
       </div>
+
+      <SectionLabel>{t("profile_situation_label")}</SectionLabel>
+      <select
+        value={situation || ""}
+        onChange={(e) => onUpdateSituation(e.target.value || null)}
+        style={{
+          width: "100%", border: "2px solid #F0EADB", borderRadius: 14, padding: "11px 14px",
+          fontFamily: "Nunito, sans-serif", fontSize: 14, color: situation ? COLORS.ink : "#B7AF98",
+          outline: "none", boxSizing: "border-box", background: "#fff", marginBottom: 22,
+        }}
+      >
+        <option value="">{t("situation_non_precise")}</option>
+        {SITUATIONS.map((s) => (
+          <option key={s.id} value={s.id}>{t(s.labelKey)}</option>
+        ))}
+      </select>
 
       <SectionLabel>{t("auth_birthdate_label")}</SectionLabel>
       <div style={{ display: "flex", gap: 8, marginBottom: 22, alignItems: "center" }}>
@@ -6216,6 +6257,7 @@ function usePikapikaData() {
           avatarUrl: profRes.data.avatar_url,
           isAdmin: !!profRes.data.is_admin,
           bio: profRes.data.bio,
+          situation: profRes.data.situation,
           birthdate: profRes.data.birthdate,
           commune: profRes.data.commune,
           banned: !!profRes.data.banned,
@@ -6442,6 +6484,13 @@ function usePikapikaData() {
     setOrganiserProfiles((m) => ({ ...m, [user.id]: { ...(m[user.id] || {}), genre } }));
   };
 
+  const updateSituation = async (situation) => {
+    if (!user) return;
+    const { error } = await supabase.from("profiles").update({ situation: situation || null }).eq("id", user.id);
+    if (error) { console.error("Erreur situation :", error); return; }
+    setProfile((p) => ({ ...p, situation: situation || null }));
+  };
+
   const uploadAvatar = async (file) => {
     if (!user) return { error: t("auth_error_generic") };
     try {
@@ -6548,7 +6597,7 @@ function usePikapikaData() {
     user, authLoading, dataLoading,
     displayName: profile.displayName, email: user?.email || "", parentValidated: profile.parentValidated,
     role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl,
-    isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune, birthdate: profile.birthdate, bio: profile.bio, genre: profile.genre,
+    isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune, birthdate: profile.birthdate, bio: profile.bio, genre: profile.genre, situation: profile.situation,
     kids,
     activities, teenItems, adultItems, seniorItems, assoItems,
     favorites, favTeen, favAdult, favSenior, favAsso,
@@ -6572,6 +6621,7 @@ function usePikapikaData() {
     updateGenre,
     updateBio,
     updatePseudo,
+    updateSituation,
     uploadAvatar,
     submitReport,
     pendingParents, pendingAssociations, reports, allProfiles, allActivitiesRaw: rows,
@@ -6997,6 +7047,8 @@ export default function RecreApp() {
               genre={pika.genre}
               onUpdateGenre={pika.updateGenre}
               onUpdatePseudo={pika.updatePseudo}
+              situation={pika.situation}
+              onUpdateSituation={pika.updateSituation}
             />
           ) : (
             <ProfileView
@@ -7012,6 +7064,7 @@ export default function RecreApp() {
               validated={parentValidated}
               commune={pika.commune}
               role={pika.role}
+              situation={pika.situation}
               onEdit={() => setEditingProfile(true)}
               onSignOut={pika.signOut}
               onOpenLegal={setLegalDoc}
