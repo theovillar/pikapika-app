@@ -2412,34 +2412,34 @@ function ProfileHoverCard({ userId, children }) {
       {visible && data && (
         <span
           style={{
-            position: "absolute", bottom: "calc(100% + 8px)", left: 0, zIndex: 9998,
-            background: "#fff", border: "2px solid #F0EADB", borderRadius: 16,
-            boxShadow: "0 8px 24px rgba(43,37,96,0.16)", padding: 12,
-            display: "flex", alignItems: "center", gap: 10, width: 230,
+            position: "absolute", bottom: "calc(100% + 10px)", left: 0, zIndex: 9998,
+            background: "#fff", border: "2px solid #F0EADB", borderRadius: 20,
+            boxShadow: "0 12px 32px rgba(43,37,96,0.2)", padding: 16,
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: 260,
             pointerEvents: "none",
           }}
         >
           <span style={{
-            width: 52, height: 52, borderRadius: "50%", background: color, flexShrink: 0,
+            width: 150, height: 150, borderRadius: "50%", background: color, flexShrink: 0,
             display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
-            color: "#fff", fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20,
-            boxShadow: data.genre ? `0 0 0 2px #fff, 0 0 0 3.5px ${genreColor(data.genre)}70` : "none",
+            color: "#fff", fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 56,
+            boxShadow: data.genre ? `0 0 0 3px #fff, 0 0 0 6px ${genreColor(data.genre)}70` : "none",
           }}>
             {data.avatar_url
               ? <img src={data.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
               : (name || "?").charAt(0).toUpperCase()}
           </span>
-          <span style={{ minWidth: 0, textAlign: "left" }}>
-            <span style={{ display: "block", fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: COLORS.ink, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <span style={{ minWidth: 0, textAlign: "center", width: "100%" }}>
+            <span style={{ display: "block", fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 18, color: COLORS.ink, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {name}
             </span>
             {age !== null && (
-              <span style={{ display: "block", fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 12, color: "#6B6485" }}>
+              <span style={{ display: "block", fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: "#6B6485", marginTop: 2 }}>
                 {age} {t("profile_years")}
               </span>
             )}
             {data.bio && (
-              <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF", marginTop: 3, lineHeight: 1.35, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>
+              <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", marginTop: 6, lineHeight: 1.45, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" }}>
                 {data.bio}
               </span>
             )}
