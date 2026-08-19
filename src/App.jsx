@@ -6682,7 +6682,10 @@ function usePikapikaData() {
       supabase.from("profiles").select("id, display_name, association_name, genre, role, banned, is_admin, created_at, commune, email, birthdate")
         .then(({ data }) => setAllProfiles(data || []));
       supabase.from("reports_detailed").select("*").order("created_at", { ascending: false })
-        .then(({ data }) => setReportsDetailed(data || []));
+        .then(({ data, error }) => {
+          console.log("[Orée] signalements chargés :", data, "erreur :", error);
+          setReportsDetailed(data || []);
+        });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, profile.role, profile.isAdmin]);
