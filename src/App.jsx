@@ -131,7 +131,7 @@ const TRANSLATIONS = {
     stats_monthly_chart: "Sorties créées par mois (12 derniers mois)",
     stats_outings_created: "sortie(s) créée(s)",
     deleted_account_name: "Compte supprimé",
-    admin_sub_stats: "Statistiques", admin_sub_users: "Utilisateurs", admin_sub_reports: "Signalements", admin_reports_title: "Signalements reçus", admin_reports_empty: "Aucun signalement dans cette catégorie.", admin_reports_pending: "{n} signalement(s) en attente de traitement", admin_report_reporter: "Signalé par", admin_report_reported: "Personne visée", admin_report_activity: "Sortie concernée", admin_report_note: "Note interne", admin_report_note_ph: "Ex. Contacté par téléphone le 12/03, avertissement donné.", admin_report_add_note: "Ajouter une note", admin_report_escalate: "Transmis aux autorités", report_status_escalated: "Transmis",
+    admin_sub_stats: "Statistiques", admin_sub_users: "Utilisateurs", admin_sub_reports: "Signalements", admin_reports_title: "Signalements reçus", admin_reports_empty: "Aucun signalement dans cette catégorie.", admin_reports_pending: "{n} signalement(s) en attente de traitement", admin_report_reporter: "Signalé par", admin_report_reported: "Personne visée", admin_report_activity: "Sortie concernée", admin_report_note: "Note interne", admin_report_note_ph: "Ex. Contacté par téléphone le 12/03, avertissement donné.", admin_report_add_note: "Ajouter une note", admin_report_escalate: "Transmis aux autorités", admin_report_reopen: "Remettre en attente", report_status_escalated: "Transmis",
     admin_users_title: "Tous les utilisateurs", admin_no_users: "Aucun utilisateur pour le moment.", admin_no_commune: "Aucune commune",
     admin_search_placeholder: "Rechercher par nom ou email…", admin_no_results: "Aucun utilisateur ne correspond.",
     admin_block: "Bloquer", admin_unblock: "Débloquer", admin_delete: "Supprimer",
@@ -6233,8 +6233,11 @@ function UsersAdminSection({ allProfiles, currentUserId, onToggleBan, onDelete, 
 
 // Traitement des signalements par l'administrateur : consulter, annoter,
 // classer, bloquer la personne visée ou marquer comme transmis aux autorités.
+// Traitement des signalements : une ligne compacte par signalement, dépliable au clic
+// pour consulter le détail complet et agir (traiter, transmettre, bloquer, annoter).
 function ReportsAdminSection({ reports, onHandle, onToggleBan, onViewProfile }) {
   const [filter, setFilter] = useState("pending");
+  const [openId, setOpenId] = useState(null);
   const [noteFor, setNoteFor] = useState(null);
   const [noteText, setNoteText] = useState("");
 
@@ -6268,7 +6271,7 @@ function ReportsAdminSection({ reports, onHandle, onToggleBan, onViewProfile }) 
   };
 
   const actionBtn = (label, onClick, accent = COLORS.ink, filled = false) => (
-    <button onClick={onClick} style={{
+    <button onClick={(e) => { e.stopPropagation(); onClick(); }} style={{
       fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, cursor: "pointer",
       background: filled ? accent : "transparent", color: filled ? "#fff" : accent,
       border: `2px solid ${accent}`, borderRadius: 10, padding: "6px 11px",
@@ -6300,122 +6303,157 @@ function ReportsAdminSection({ reports, onHandle, onToggleBan, onViewProfile }) 
         ))}
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         {filtered.length === 0 && <EmptyBox text={t("admin_reports_empty")} />}
         {filtered.map((r) => {
           const st = statusStyle(r.status);
-          const dateStr = new Date(r.created_at).toLocaleDateString(
+          const isOpen = openId === r.id;
+          const shortDate = new Date(r.created_at).toLocaleDateString(
+            LANG === "fr" ? "fr-FR" : LANG === "es" ? "es-ES" : "en-US", { day: "2-digit", month: "2-digit" }
+          );
+          const fullDate = new Date(r.created_at).toLocaleDateString(
             LANG === "fr" ? "fr-FR" : LANG === "es" ? "es-ES" : "en-US",
             { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }
           );
+
           return (
             <div key={r.id} style={{
               background: "#fff", border: `2px solid ${r.status === "pending" ? COLORS.sun : "#F0EADB"}`,
-              borderRadius: 18, padding: 16,
+              borderRadius: 14, overflow: "hidden",
             }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, marginBottom: 10 }}>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15.5, color: COLORS.ink }}>
-                    {reasonLabel(r.reason)}
-                  </div>
-                  <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF" }}>{dateStr}</div>
-                </div>
+              {/* Ligne compacte */}
+              <div
+                onClick={() => { setOpenId(isOpen ? null : r.id); setNoteFor(null); }}
+                style={{
+                  display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", cursor: "pointer",
+                }}
+              >
                 <span style={{
-                  fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11, padding: "3px 9px",
-                  borderRadius: 999, background: st.bg, color: st.fg, flexShrink: 0,
+                  fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 10, padding: "2px 7px",
+                  borderRadius: 999, background: st.bg, color: st.fg, flexShrink: 0, whiteSpace: "nowrap",
                 }}>
                   {st.label}
                 </span>
+                <span style={{
+                  fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13, color: COLORS.ink,
+                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", flexShrink: 0,
+                }}>
+                  {reasonLabel(r.reason)}
+                </span>
+                <span style={{
+                  fontFamily: "Nunito, sans-serif", fontSize: 12, color: "#8A8399", flex: 1, minWidth: 0,
+                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                }}>
+                  {r.reported_name ? `→ ${r.reported_name}` : (r.activity_title || "")}
+                </span>
+                {r.reported_banned && (
+                  <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9.5, color: COLORS.coral, flexShrink: 0 }}>
+                    {t("admin_banned_badge")}
+                  </span>
+                )}
+                <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 11, color: "#B7AF98", flexShrink: 0 }}>
+                  {shortDate}
+                </span>
+                <ChevronDown
+                  size={16} color="#C7C0AE"
+                  style={{ flexShrink: 0, transform: isOpen ? "rotate(180deg)" : "none", transition: "transform .15s" }}
+                />
               </div>
 
-              {r.details && (
-                <p style={{
-                  fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: "#5C5578", lineHeight: 1.5,
-                  background: "#F9F7F2", borderRadius: 12, padding: "10px 12px", margin: "0 0 12px",
-                  overflowWrap: "anywhere",
-                }}>
-                  {r.details}
-                </p>
-              )}
-
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 8, marginBottom: 12 }}>
-                <div style={{ background: "#F9F7F2", borderRadius: 12, padding: "8px 12px" }}>
-                  <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 10, fontWeight: 800, color: "#9A93AF", textTransform: "uppercase", letterSpacing: 0.4 }}>
-                    {t("admin_report_reporter")}
+              {/* Détail déplié */}
+              {isOpen && (
+                <div style={{ padding: "0 14px 14px", borderTop: "1px solid #F5F1E6" }}>
+                  <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF", margin: "10px 0" }}>
+                    {fullDate}
                   </div>
-                  <button
-                    onClick={() => r.reporter_id && onViewProfile(r.reporter_id)}
-                    style={{ background: "none", border: "none", padding: 0, cursor: r.reporter_id ? "pointer" : "default", textAlign: "left", fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: COLORS.ink, textDecoration: r.reporter_id ? "underline" : "none" }}
-                  >
-                    {r.reporter_name || "—"}
-                  </button>
-                  {r.reporter_email && (
-                    <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11, color: "#9A93AF", overflowWrap: "anywhere" }}>{r.reporter_email}</div>
-                  )}
-                </div>
 
-                <div style={{ background: r.reported_banned ? "#FFF0EC" : "#F9F7F2", borderRadius: 12, padding: "8px 12px" }}>
-                  <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 10, fontWeight: 800, color: "#9A93AF", textTransform: "uppercase", letterSpacing: 0.4 }}>
-                    {t("admin_report_reported")}
-                  </div>
-                  <button
-                    onClick={() => r.reported_user_id && onViewProfile(r.reported_user_id)}
-                    style={{ background: "none", border: "none", padding: 0, cursor: r.reported_user_id ? "pointer" : "default", textAlign: "left", fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: COLORS.ink, textDecoration: r.reported_user_id ? "underline" : "none" }}
-                  >
-                    {r.reported_name || "—"}
-                  </button>
-                  {r.reported_email && (
-                    <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11, color: "#9A93AF", overflowWrap: "anywhere" }}>{r.reported_email}</div>
+                  {r.details && (
+                    <p style={{
+                      fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: "#5C5578", lineHeight: 1.5,
+                      background: "#F9F7F2", borderRadius: 12, padding: "10px 12px", margin: "0 0 12px",
+                      overflowWrap: "anywhere",
+                    }}>
+                      {r.details}
+                    </p>
                   )}
-                  {r.reported_banned && (
-                    <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 10.5, fontWeight: 800, color: COLORS.coral, marginTop: 2 }}>
-                      {t("admin_banned_badge")}
+
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 8, marginBottom: 12 }}>
+                    <div style={{ background: "#F9F7F2", borderRadius: 12, padding: "8px 12px" }}>
+                      <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 10, fontWeight: 800, color: "#9A93AF", textTransform: "uppercase", letterSpacing: 0.4 }}>
+                        {t("admin_report_reporter")}
+                      </div>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); r.reporter_id && onViewProfile(r.reporter_id); }}
+                        style={{ background: "none", border: "none", padding: 0, cursor: r.reporter_id ? "pointer" : "default", textAlign: "left", fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: COLORS.ink, textDecoration: r.reporter_id ? "underline" : "none" }}
+                      >
+                        {r.reporter_name || "—"}
+                      </button>
+                      {r.reporter_email && (
+                        <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11, color: "#9A93AF", overflowWrap: "anywhere" }}>{r.reporter_email}</div>
+                      )}
+                    </div>
+
+                    <div style={{ background: r.reported_banned ? "#FFF0EC" : "#F9F7F2", borderRadius: 12, padding: "8px 12px" }}>
+                      <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 10, fontWeight: 800, color: "#9A93AF", textTransform: "uppercase", letterSpacing: 0.4 }}>
+                        {t("admin_report_reported")}
+                      </div>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); r.reported_user_id && onViewProfile(r.reported_user_id); }}
+                        style={{ background: "none", border: "none", padding: 0, cursor: r.reported_user_id ? "pointer" : "default", textAlign: "left", fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: COLORS.ink, textDecoration: r.reported_user_id ? "underline" : "none" }}
+                      >
+                        {r.reported_name || "—"}
+                      </button>
+                      {r.reported_email && (
+                        <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11, color: "#9A93AF", overflowWrap: "anywhere" }}>{r.reported_email}</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {r.activity_title && (
+                    <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12, color: "#6B6485", marginBottom: 12 }}>
+                      <span style={{ fontWeight: 800, color: "#9A93AF" }}>{t("admin_report_activity")} : </span>
+                      {r.activity_title}
                     </div>
                   )}
-                </div>
-              </div>
 
-              {r.activity_title && (
-                <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 12, color: "#6B6485", marginBottom: 12 }}>
-                  <span style={{ fontWeight: 800, color: "#9A93AF" }}>{t("admin_report_activity")} : </span>
-                  {r.activity_title}
-                </div>
-              )}
+                  {r.admin_note && noteFor !== r.id && (
+                    <div style={{
+                      background: "#EDEAF4", borderRadius: 12, padding: "8px 12px", marginBottom: 12,
+                      fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: COLORS.grape, overflowWrap: "anywhere",
+                    }}>
+                      <span style={{ fontWeight: 800 }}>{t("admin_report_note")} : </span>{r.admin_note}
+                    </div>
+                  )}
 
-              {r.admin_note && noteFor !== r.id && (
-                <div style={{
-                  background: "#EDEAF4", borderRadius: 12, padding: "8px 12px", marginBottom: 12,
-                  fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: COLORS.grape, overflowWrap: "anywhere",
-                }}>
-                  <span style={{ fontWeight: 800 }}>{t("admin_report_note")} : </span>{r.admin_note}
-                </div>
-              )}
-
-              {noteFor === r.id ? (
-                <div style={{ marginBottom: 10 }}>
-                  <textarea
-                    autoFocus rows={2} value={noteText} onChange={(e) => setNoteText(e.target.value)}
-                    placeholder={t("admin_report_note_ph")}
-                    style={{
-                      width: "100%", border: "2px solid #F0EADB", borderRadius: 12, padding: "8px 12px",
-                      fontFamily: "Nunito, sans-serif", fontSize: 13, boxSizing: "border-box", resize: "vertical", marginBottom: 6,
-                    }}
-                  />
-                  <div style={{ display: "flex", gap: 8 }}>
-                    {actionBtn(t("btn_enregistrer"), () => saveNote(r.id), COLORS.grass, true)}
-                    {actionBtn("✕", () => { setNoteFor(null); setNoteText(""); }, "#C7C0AE")}
-                  </div>
-                </div>
-              ) : (
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {r.status !== "reviewed" && actionBtn(t("mairie_mark_reviewed"), () => onHandle(r.id, "reviewed"), COLORS.grass)}
-                  {r.status !== "escalated" && actionBtn(t("admin_report_escalate"), () => onHandle(r.id, "escalated"), COLORS.coral)}
-                  {r.status !== "dismissed" && actionBtn(t("mairie_dismiss"), () => onHandle(r.id, "dismissed"), "#9A93AF")}
-                  {actionBtn(t("admin_report_add_note"), () => { setNoteFor(r.id); setNoteText(r.admin_note || ""); }, COLORS.grape)}
-                  {r.reported_user_id && actionBtn(
-                    r.reported_banned ? t("admin_unblock") : t("admin_block"),
-                    () => onToggleBan(r.reported_user_id, !r.reported_banned),
-                    COLORS.coral, !r.reported_banned
+                  {noteFor === r.id ? (
+                    <div>
+                      <textarea
+                        autoFocus rows={2} value={noteText} onChange={(e) => setNoteText(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        placeholder={t("admin_report_note_ph")}
+                        style={{
+                          width: "100%", border: "2px solid #F0EADB", borderRadius: 12, padding: "8px 12px",
+                          fontFamily: "Nunito, sans-serif", fontSize: 13, boxSizing: "border-box", resize: "vertical", marginBottom: 6,
+                        }}
+                      />
+                      <div style={{ display: "flex", gap: 8 }}>
+                        {actionBtn(t("btn_enregistrer"), () => saveNote(r.id), COLORS.grass, true)}
+                        {actionBtn("✕", () => { setNoteFor(null); setNoteText(""); }, "#C7C0AE")}
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      {r.status !== "pending" && actionBtn(t("admin_report_reopen"), () => onHandle(r.id, "pending"), COLORS.sun)}
+                      {r.status !== "reviewed" && actionBtn(t("mairie_mark_reviewed"), () => onHandle(r.id, "reviewed"), COLORS.grass)}
+                      {r.status !== "escalated" && actionBtn(t("admin_report_escalate"), () => onHandle(r.id, "escalated"), COLORS.coral)}
+                      {r.status !== "dismissed" && actionBtn(t("mairie_dismiss"), () => onHandle(r.id, "dismissed"), "#9A93AF")}
+                      {actionBtn(t("admin_report_add_note"), () => { setNoteFor(r.id); setNoteText(r.admin_note || ""); }, COLORS.grape)}
+                      {r.reported_user_id && actionBtn(
+                        r.reported_banned ? t("admin_unblock") : t("admin_block"),
+                        () => onToggleBan(r.reported_user_id, !r.reported_banned),
+                        COLORS.coral, !r.reported_banned
+                      )}
+                    </div>
                   )}
                 </div>
               )}
