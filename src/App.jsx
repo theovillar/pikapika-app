@@ -106,7 +106,7 @@ const TRANSLATIONS = {
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
     change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
-    share_btn: "Partager", defi_btn: "La roue des défis", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
+    share_btn: "Partager", defi_btn: "La roue des défis", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
     share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Regarde cette sortie sur Orée : {title}",
     report_btn: "Signaler", report_title: "Signaler cette annonce",
     report_reason_label: "Raison du signalement", report_details_label: "Détails (optionnel)",
@@ -4338,13 +4338,16 @@ const DEFIS = [
   "Décris ta journée idéale en une seule phrase.",
 ];
 
+const MAX_SPINS = 2;
+
 function DefiWheel({ onClose }) {
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState(null);
   const [angle, setAngle] = useState(0);
+  const [spinsLeft, setSpinsLeft] = useState(MAX_SPINS);
 
   const spin = () => {
-    if (spinning) return;
+    if (spinning || spinsLeft <= 0) return;
     setSpinning(true);
     setResult(null);
     const pick = Math.floor(Math.random() * DEFIS.length);
@@ -4354,6 +4357,7 @@ function DefiWheel({ onClose }) {
     setTimeout(() => {
       setResult(DEFIS[pick]);
       setSpinning(false);
+      setSpinsLeft((n) => n - 1);
     }, 2600);
   };
 
@@ -4428,9 +4432,25 @@ function DefiWheel({ onClose }) {
           </p>
         )}
 
-        <PillButton color={COLORS.sun} onClick={spin} style={{ width: "100%", opacity: spinning ? 0.6 : 1 }}>
-          {spinning ? t("defi_spinning") : result ? t("defi_again") : t("defi_spin")}
-        </PillButton>
+        {spinsLeft > 0 ? (
+          <>
+            <PillButton color={COLORS.sun} onClick={spin} style={{ width: "100%", opacity: spinning ? 0.6 : 1 }}>
+              {spinning ? t("defi_spinning") : result ? t("defi_again") : t("defi_spin")}
+            </PillButton>
+            <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF", marginTop: 8 }}>
+              {t("defi_spins_left", { n: spinsLeft })}
+            </div>
+          </>
+        ) : (
+          <>
+            <PillButton color={COLORS.grass} textColor="#fff" onClick={onClose} style={{ width: "100%" }}>
+              {t("defi_accept")}
+            </PillButton>
+            <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF", marginTop: 8 }}>
+              {t("defi_no_more")}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
