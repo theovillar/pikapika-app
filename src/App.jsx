@@ -53,7 +53,7 @@ const TRANSLATIONS = {
     label_categorie: "Catégorie", label_lieu: "Lieu", placeholder_lieu: "Parc, adresse…",
     label_date: "Date & heure", placeholder_date: "Sam. 9 août · 10h", label_heure: "Heure",
     label_age: "Âge conseillé", placeholder_age: "Ex. 4-8 ans",
-    label_places: "Places disponibles", label_description: "Description", label_signe: "Signe distinctif (optionnel)", placeholder_signe: "Ex. Je porterai une casquette rouge, poussette bleue",
+    label_places: "Places disponibles", label_places_parents: "Places parents", label_places_enfants: "Places enfants", detail_parents_count: "{a}/{b} parents", detail_kids_count: "{a}/{b} enfants", join_kids_question: "Combien d'enfants amenez-vous ?", join_kids_max: "Vous avez déclaré {n} enfant(s) sur votre profil.", profile_nb_enfants_label: "Nombre d'enfants", profile_nb_enfants_note: "Sert à limiter le nombre d'enfants que vous pouvez inscrire à une sortie.", label_description: "Description", label_signe: "Signe distinctif (optionnel)", placeholder_signe: "Ex. Je porterai une casquette rouge, poussette bleue",
     placeholder_description: "Que va-t-on faire ? Quoi apporter ?",
     label_payant: "Sortie payante ?", toggle_oui: "Oui", toggle_non: "Non",
     badge_payant: "Payant", badge_gratuit: "Gratuit",
@@ -3038,7 +3038,7 @@ function AddressInput({ value, onChange, placeholder }) {
 function CreateActivity({ onCreate }) {
   const todayISO = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({
-    title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "", payant: false, signeDistinctif: "",
+    title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, placesEnfants: 10, desc: "", payant: false, signeDistinctif: "",
   });
   const [sent, setSent] = useState(false);
 
@@ -3048,12 +3048,12 @@ function CreateActivity({ onCreate }) {
     if (!form.title || !form.lieu || !form.dateStr) return;
     onCreate({
       title: form.title, category: form.category, lieu: form.lieu, age: form.age, desc: form.desc,
-      dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1, payant: !!form.payant,
+      dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1, placesEnfants: Number(form.placesEnfants) || 0, payant: !!form.payant,
       signeDistinctif: form.signeDistinctif || null,
     });
     setSent(true);
     setTimeout(() => setSent(false), 2200);
-    setForm({ title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, desc: "", payant: false, signeDistinctif: "" });
+    setForm({ title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, placesEnfants: 10, desc: "", payant: false, signeDistinctif: "" });
   };
 
   const inputStyle = {
@@ -3113,8 +3113,12 @@ function CreateActivity({ onCreate }) {
             <input style={inputStyle} placeholder={t("placeholder_age")} value={form.age} onChange={set("age")} />
           </div>
           <div>
-            <label style={label}>{t("label_places")}</label>
+            <label style={label}>{t("label_places_parents")}</label>
             <input type="number" min={1} style={inputStyle} value={form.places} onChange={set("places")} />
+          </div>
+          <div>
+            <label style={label}>{t("label_places_enfants")}</label>
+            <input type="number" min={0} style={inputStyle} value={form.placesEnfants} onChange={set("placesEnfants")} />
           </div>
         </div>
 
@@ -3200,7 +3204,7 @@ function MyOutings({ joined, activities, currentUserId, onOpen }) {
 // Formulaire de modification du profil (atteint via le bouton Modifier de la page profil)
 // Page profil en lecture : une vraie fiche présentable, avec un bouton "Modifier"
 // qui bascule vers le formulaire d'édition (ProfileEdit).
-function ProfileView({ displayName, email, avatarUrl, coverUrl, genre, birthdate, bio, kids, joinedCount, createdCount, validated, commune, role, situation, profession, interets, animaux, coupDeCoeur, onEdit, onSignOut, onOpenLegal }) {
+function ProfileView({ displayName, email, avatarUrl, coverUrl, genre, birthdate, bio, nbEnfants, joinedCount, createdCount, validated, commune, role, situation, profession, interets, animaux, coupDeCoeur, onEdit, onSignOut, onOpenLegal }) {
   const age = birthdate ? ageFromBirthdate(birthdate) : null;
   const color = genre ? genreColor(genre) : COLORS.sky;
 
@@ -3365,6 +3369,7 @@ function ProfileView({ displayName, email, avatarUrl, coverUrl, genre, birthdate
         <InfoRow label={t("auth_email")} value={email} />
         <InfoRow label={t("profile_genre_label")} value={genre ? (genre === "F" ? t("legend_femme") : t("legend_homme")) : null} />
         <InfoRow label={t("profile_situation_label")} value={situationLabel(situation)} />
+        <InfoRow label={t("profile_nb_enfants_label")} value={nbEnfants > 0 ? `${nbEnfants}` : null} />
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "10px 0" }}>
           <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", fontWeight: 700 }}>{t("auth_birthdate_label")}</span>
           <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: birthdate ? COLORS.ink : "#C7C0AE", fontWeight: 700 }}>
@@ -3373,39 +3378,7 @@ function ProfileView({ displayName, email, avatarUrl, coverUrl, genre, birthdate
         </div>
       </div>
 
-      {/* Enfants */}
-      {role !== "association" && role !== "mairie" && (
-        <>
-          <SectionLabel>{t("profile_children")}</SectionLabel>
-          <div style={{
-            display: kids.length === 0 ? "block" : "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: 10, marginBottom: 20,
-          }}>
-            {kids.length === 0 ? (
-              <EmptyBox text={t("profile_no_child")} />
-            ) : (
-              kids.map((k) => (
-                <div key={k.id} style={{
-                  background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "12px 16px",
-                  display: "flex", alignItems: "center", gap: 12,
-                }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: "50%", background: COLORS.sun,
-                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                  }}>
-                    <Baby size={18} color={COLORS.ink} />
-                  </div>
-                  <div style={{ fontFamily: "Nunito, sans-serif" }}>
-                    <div style={{ fontWeight: 800, fontSize: 14.5, color: COLORS.ink }}>{k.name}</div>
-                    <div style={{ fontSize: 12.5, color: "#6B6485" }}>{k.age} {t("profile_years")}</div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </>
-      )}
+      {/* Nombre d'enfants (affiché dans les informations privées) */}
 
       {/* Liens légaux + déconnexion */}
       <div style={{ display: "flex", justifyContent: "center", gap: 14, marginBottom: 14, flexWrap: "wrap" }}>
@@ -3475,13 +3448,7 @@ function ProfileTextField({ label, placeholder, value, onSave, multiline = false
   );
 }
 
-function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayName, email, kids, onAddKid, onUpdateKid, onDeleteKid, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo, situation, onUpdateSituation, profession, interets, animaux, coupDeCoeur, onUpdateField, coverUrl, onUploadCover, onRemoveCover }) {
-  const [addingKid, setAddingKid] = useState(false);
-  const [editingKidId, setEditingKidId] = useState(null);
-  const [kidName, setKidName] = useState("");
-  const [kidAge, setKidAge] = useState("");
-  const [kidGenre, setKidGenre] = useState("F");
-  const [confirmDeleteKid, setConfirmDeleteKid] = useState(false);
+function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayName, email, nbEnfants, onUpdateNbEnfants, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo, situation, onUpdateSituation, profession, interets, animaux, coupDeCoeur, onUpdateField, coverUrl, onUploadCover, onRemoveCover }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [birthdateInput, setBirthdateInput] = useState(birthdate || "");
@@ -3502,36 +3469,6 @@ function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayNam
     setCoverUploading(true);
     await onUploadCover(file);
     setCoverUploading(false);
-  };
-
-  const startAddKid = () => {
-    setEditingKidId(null); setKidName(""); setKidAge(""); setKidGenre("F"); setConfirmDeleteKid(false);
-    setAddingKid(true);
-  };
-
-  const startEditKid = (k) => {
-    setEditingKidId(k.id); setKidName(k.name); setKidAge(k.age ?? ""); setKidGenre(k.genre || "F"); setConfirmDeleteKid(false);
-    setAddingKid(true);
-  };
-
-  const submitKid = () => {
-    if (!kidName.trim()) return;
-    if (editingKidId) {
-      onUpdateKid(editingKidId, { name: kidName.trim(), age: Number(kidAge) || null, genre: kidGenre });
-    } else {
-      onAddKid({ name: kidName.trim(), age: Number(kidAge) || null, genre: kidGenre });
-    }
-    setKidName(""); setKidAge(""); setKidGenre("F"); setAddingKid(false); setEditingKidId(null);
-  };
-
-  const handleDeleteKid = () => {
-    if (confirmDeleteKid) {
-      onDeleteKid(editingKidId);
-      setAddingKid(false); setEditingKidId(null); setConfirmDeleteKid(false);
-    } else {
-      setConfirmDeleteKid(true);
-      setTimeout(() => setConfirmDeleteKid(false), 4000);
-    }
   };
 
   const saveBirthdate = async () => {
@@ -3773,77 +3710,36 @@ function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayNam
         </div>
       </div>
 
-      <SectionLabel>{t("profile_children")}</SectionLabel>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 22 }}>
-        {kids.map((k) => (
-          editingKidId === k.id ? null : (
-            <button key={k.id} onClick={() => startEditKid(k)} style={{
-              background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "12px 16px",
-              display: "flex", alignItems: "center", gap: 12, cursor: "pointer", textAlign: "left", width: "100%",
-            }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: "50%", background: COLORS.sun,
-                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-              }}>
-                <Baby size={18} color={COLORS.ink} />
-              </div>
-              <div style={{ fontFamily: "Nunito, sans-serif", flex: 1 }}>
-                <div style={{ fontWeight: 800, fontSize: 14.5, color: COLORS.ink }}>{k.name}</div>
-                <div style={{ fontSize: 12.5, color: "#6B6485" }}>{k.age} {t("profile_years")}</div>
-              </div>
-              <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#B7AF98", fontWeight: 700 }}>{t("btn_edit")}</span>
-            </button>
-          )
-        ))}
-
-        {addingKid ? (
-          <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: 14, display: "flex", flexDirection: "column", gap: 8 }}>
-            <input
-              autoFocus value={kidName} onChange={(e) => setKidName(e.target.value)}
-              placeholder={t("placeholder_kid_name")}
-              style={{ border: "2px solid #F0EADB", borderRadius: 10, padding: "8px 10px", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}
-            />
-            <div style={{ display: "flex", gap: 8 }}>
-              <input
-                type="number" min={0} value={kidAge} onChange={(e) => setKidAge(e.target.value)}
-                placeholder={t("profile_years")}
-                style={{ flex: 1, border: "2px solid #F0EADB", borderRadius: 10, padding: "8px 10px", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}
-              />
-              <select
-                value={kidGenre} onChange={(e) => setKidGenre(e.target.value)}
-                style={{ flex: 1, border: "2px solid #F0EADB", borderRadius: 10, padding: "8px 10px", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}
-              >
-                <option value="F">{t("legend_girl")}</option>
-                <option value="G">{t("legend_boy")}</option>
-              </select>
-            </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              <PillButton color={COLORS.grass} textColor="#fff" onClick={submitKid} style={{ flex: 1, padding: "8px 10px", fontSize: 13 }}>
-                {editingKidId ? t("btn_enregistrer") : t("btn_ajouter")}
-              </PillButton>
-              {editingKidId && (
-                <button onClick={handleDeleteKid} style={{
-                  background: confirmDeleteKid ? COLORS.coral : "transparent", border: `2px solid ${COLORS.coral}`,
-                  borderRadius: 10, padding: "8px 12px", color: confirmDeleteKid ? "#fff" : COLORS.coral,
-                  cursor: "pointer", fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12,
-                }}>
-                  {confirmDeleteKid ? t("cancel_outing_confirm") : t("btn_delete")}
-                </button>
-              )}
-              <button onClick={() => { setAddingKid(false); setEditingKidId(null); }} style={{ background: "transparent", border: "none", color: "#9A93AF", cursor: "pointer", fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13 }}>
-                ✕
-              </button>
-            </div>
-          </div>
-        ) : (
-          <button onClick={startAddKid} style={{
-            border: `2px dashed #D8D2C2`, background: "transparent", borderRadius: 16, padding: "12px 16px",
-            fontFamily: "Nunito, sans-serif", fontWeight: 800, color: "#9A93AF", cursor: "pointer", fontSize: 13.5,
-          }}>
-            {t("profile_add_child")}
-          </button>
-        )}
+      <SectionLabel>{t("profile_nb_enfants_label")}</SectionLabel>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+        <button
+          onClick={() => onUpdateNbEnfants(Math.max(0, (nbEnfants || 0) - 1))}
+          style={{
+            width: 42, height: 42, borderRadius: 12, border: "2px solid #F0EADB", background: "#fff",
+            cursor: "pointer", fontFamily: "Fredoka, sans-serif", fontSize: 20, color: COLORS.ink, flexShrink: 0,
+          }}
+        >
+          −
+        </button>
+        <div style={{
+          flex: 1, textAlign: "center", background: "#fff", border: "2px solid #F0EADB", borderRadius: 12,
+          padding: "9px 0", fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink,
+        }}>
+          {nbEnfants || 0}
+        </div>
+        <button
+          onClick={() => onUpdateNbEnfants(Math.min(12, (nbEnfants || 0) + 1))}
+          style={{
+            width: 42, height: 42, borderRadius: 12, border: "2px solid #F0EADB", background: "#fff",
+            cursor: "pointer", fontFamily: "Fredoka, sans-serif", fontSize: 20, color: COLORS.ink, flexShrink: 0,
+          }}
+        >
+          +
+        </button>
       </div>
+      <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF", margin: "0 0 22px" }}>
+        {t("profile_nb_enfants_note")}
+      </p>
 
       <SectionLabel>{t("profile_preferences")}</SectionLabel>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 26 }}>
@@ -4551,9 +4447,10 @@ function ReportModal({ onClose, onSubmit }) {
   );
 }
 
-function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfile, onShare, currentUserId, onEdit, onCancelOuting, onLeave }) {
+function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfile, onShare, currentUserId, onEdit, onCancelOuting, onLeave, myNbEnfants = 0, myKidsHere = 0 }) {
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirmLeave, setConfirmLeave] = useState(false);
+  const [kidsToBring, setKidsToBring] = useState(Math.min(myNbEnfants, 1));
   if (!activity) return null;
   const meta = catMeta(activity.category);
   const isJoined = joined.includes(activity.id);
@@ -4625,7 +4522,10 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
           <Row icon={<MapPin size={15} color={COLORS.ink} />} text={lieuAvecVille(activity)} />
           <Row icon={<CalendarDays size={15} color={COLORS.ink} />} text={displayDate(activity)} />
-          <Row icon={<Users size={15} color={COLORS.ink} />} text={t("detail_participants", { a: activity.inscrits, b: activity.places })} />
+          <Row icon={<Users size={15} color={COLORS.ink} />} text={t("detail_parents_count", { a: activity.inscrits, b: activity.places })} />
+          {activity.placesEnfants != null && activity.placesEnfants > 0 && (
+            <Row icon={<Baby size={15} color={COLORS.ink} />} text={t("detail_kids_count", { a: activity.inscritsEnfants || 0, b: activity.placesEnfants })} />
+          )}
         </div>
 
         {(activity.organisateur || activity.participantsAvgAge) && (
@@ -4682,14 +4582,46 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
             </PillButton>
           )
         ) : (
-          <PillButton
-            color={full ? "#EDEAF4" : COLORS.coral}
-            textColor={full ? "#B7AF98" : "#fff"}
-            onClick={() => !full && onJoin(activity.id)}
-            style={{ width: "100%" }}
-          >
-            {full ? t("card_full") : t("detail_join_kids")}
-          </PillButton>
+          <>
+            {myNbEnfants > 0 && !full && (
+              <div style={{
+                background: "#FFF9EC", border: `2px solid ${COLORS.sun}`, borderRadius: 14,
+                padding: "12px 14px", marginBottom: 10,
+              }}>
+                <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5, color: COLORS.ink, marginBottom: 8 }}>
+                  {t("join_kids_question")}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <button
+                    onClick={() => setKidsToBring((n) => Math.max(0, n - 1))}
+                    style={{ width: 36, height: 36, borderRadius: 10, border: "2px solid #F0EADB", background: "#fff", cursor: "pointer", fontFamily: "Fredoka, sans-serif", fontSize: 18, color: COLORS.ink }}
+                  >
+                    −
+                  </button>
+                  <div style={{ flex: 1, textAlign: "center", fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 18, color: COLORS.ink }}>
+                    {kidsToBring}
+                  </div>
+                  <button
+                    onClick={() => setKidsToBring((n) => Math.min(myNbEnfants, n + 1))}
+                    style={{ width: 36, height: 36, borderRadius: 10, border: "2px solid #F0EADB", background: "#fff", cursor: "pointer", fontFamily: "Fredoka, sans-serif", fontSize: 18, color: COLORS.ink }}
+                  >
+                    +
+                  </button>
+                </div>
+                <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11, color: "#9A93AF", marginTop: 6 }}>
+                  {t("join_kids_max", { n: myNbEnfants })}
+                </div>
+              </div>
+            )}
+            <PillButton
+              color={full ? "#EDEAF4" : COLORS.coral}
+              textColor={full ? "#B7AF98" : "#fff"}
+              onClick={() => !full && onJoin(activity.id, kidsToBring)}
+              style={{ width: "100%" }}
+            >
+              {full ? t("card_full") : t("detail_join_kids")}
+            </PillButton>
+          </>
         )}
 
         {!isPast && (
@@ -6526,9 +6458,10 @@ function usePikapikaData() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [profile, setProfile] = useState({ displayName: "", parentValidated: false, role: "parent", associationValidated: false, genre: null, avatarUrl: null, isAdmin: false, banned: false, commune: null });
-  const [kids, setKids] = useState([]);
   const [rows, setRows] = useState([]);
   const [regByActivity, setRegByActivity] = useState({});
+  const [kidsByActivity, setKidsByActivity] = useState({});
+  const [myRegsKids, setMyRegsKids] = useState({});
   const [ageStats, setAgeStats] = useState({});
   const [realParticipants, setRealParticipants] = useState({});
   const [organiserProfiles, setOrganiserProfiles] = useState({});
@@ -6560,11 +6493,16 @@ function usePikapikaData() {
       if (cancelled) return;
       if (error) console.error("Erreur chargement activités :", error);
       setRows(data || []);
-      const { data: regRows } = await supabase.from("registrations").select("activity_id");
+      const { data: regRows } = await supabase.from("registrations").select("activity_id, nb_enfants");
       if (cancelled) return;
       const counts = {};
-      (regRows || []).forEach((r) => { counts[r.activity_id] = (counts[r.activity_id] || 0) + 1; });
+      const kidCounts = {};
+      (regRows || []).forEach((r) => {
+        counts[r.activity_id] = (counts[r.activity_id] || 0) + 1;
+        kidCounts[r.activity_id] = (kidCounts[r.activity_id] || 0) + (r.nb_enfants || 0);
+      });
       setRegByActivity(counts);
+      setKidsByActivity(kidCounts);
 
       // Âges (moyennes/arrondis uniquement — jamais de date de naissance individuelle transmise)
       const { data: ageRows } = await supabase.from("activity_age_stats").select("*");
@@ -6601,14 +6539,13 @@ function usePikapikaData() {
   }, []);
 
   useEffect(() => {
-    if (!user) { setDataLoading(false); setKids([]); setMyRegs(new Set()); setMyFavs(new Set()); return; }
+    if (!user) { setDataLoading(false); setMyRegs(new Set()); setMyFavs(new Set()); return; }
     let cancelled = false;
     setDataLoading(true);
     (async () => {
-      const [profRes, kidsRes, myRegsRes, favRes] = await Promise.all([
+      const [profRes, myRegsRes, favRes] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", user.id).single(),
-        supabase.from("kids").select("*").eq("parent_id", user.id),
-        supabase.from("registrations").select("activity_id").eq("user_id", user.id),
+        supabase.from("registrations").select("activity_id, nb_enfants").eq("user_id", user.id),
         supabase.from("favorites").select("activity_id").eq("user_id", user.id),
       ]);
       if (cancelled) return;
@@ -6621,6 +6558,7 @@ function usePikapikaData() {
           genre: profRes.data.genre,
           avatarUrl: profRes.data.avatar_url,
           coverUrl: profRes.data.cover_url,
+          nbEnfants: profRes.data.nb_enfants ?? 0,
           isAdmin: !!profRes.data.is_admin,
           bio: profRes.data.bio,
           situation: profRes.data.situation,
@@ -6633,8 +6571,10 @@ function usePikapikaData() {
           banned: !!profRes.data.banned,
         });
       }
-      setKids(kidsRes.data || []);
       setMyRegs(new Set((myRegsRes.data || []).map((r) => r.activity_id)));
+      const mineKids = {};
+      (myRegsRes.data || []).forEach((r) => { mineKids[r.activity_id] = r.nb_enfants || 0; });
+      setMyRegsKids(mineKids);
       setMyFavs(new Set((favRes.data || []).map((r) => r.activity_id)));
       setDataLoading(false);
     })();
@@ -6686,16 +6626,17 @@ function usePikapikaData() {
       intergen: row.intergen, intergenNote: row.intergen_note,
       participants: [...real, ...(row.demo_participants || [])],
       createdBy: row.created_by, payant: row.payant, signeDistinctif: row.signe_distinctif,
+      placesEnfants: row.places_enfants, inscritsEnfants: kidsByActivity[row.id] || 0,
       organiserAge: ages.organiserAge ?? null, participantsAvgAge: ages.participantsAvgAge ?? null,
     };
   };
 
   const bySpace = (space) => rows.filter((r) => r.space === space).map(mapRow);
-  const activities = useMemo(() => bySpace("kids"), [rows, regByActivity, ageStats, realParticipants, organiserProfiles]);
-  const teenItems = useMemo(() => bySpace("teen"), [rows, regByActivity, ageStats, realParticipants, organiserProfiles]);
-  const adultItems = useMemo(() => bySpace("adult"), [rows, regByActivity, ageStats, realParticipants, organiserProfiles]);
-  const seniorItems = useMemo(() => bySpace("senior"), [rows, regByActivity, ageStats, realParticipants, organiserProfiles]);
-  const assoItems = useMemo(() => bySpace("asso"), [rows, regByActivity, ageStats, realParticipants, organiserProfiles]);
+  const activities = useMemo(() => bySpace("kids"), [rows, regByActivity, kidsByActivity, ageStats, realParticipants, organiserProfiles]);
+  const teenItems = useMemo(() => bySpace("teen"), [rows, regByActivity, kidsByActivity, ageStats, realParticipants, organiserProfiles]);
+  const adultItems = useMemo(() => bySpace("adult"), [rows, regByActivity, kidsByActivity, ageStats, realParticipants, organiserProfiles]);
+  const seniorItems = useMemo(() => bySpace("senior"), [rows, regByActivity, kidsByActivity, ageStats, realParticipants, organiserProfiles]);
+  const assoItems = useMemo(() => bySpace("asso"), [rows, regByActivity, kidsByActivity, ageStats, realParticipants, organiserProfiles]);
 
   const idsIn = (items, set) => items.filter((it) => set.has(it.id)).map((it) => it.id);
   const favorites = useMemo(() => idsIn(activities, myFavs), [activities, myFavs]);
@@ -6720,18 +6661,23 @@ function usePikapikaData() {
     }
   };
 
-  const joinGeneric = async (id) => {
+  const joinGeneric = async (id, nbEnfants = 0) => {
     if (!user || myRegs.has(id)) return;
+    const n = Math.max(0, Math.min(profile.nbEnfants || 0, Number(nbEnfants) || 0));
     setMyRegs((s) => new Set(s).add(id));
     setRegByActivity((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
-    const { error } = await supabase.from("registrations").insert({ user_id: user.id, activity_id: id });
+    setKidsByActivity((c) => ({ ...c, [id]: (c[id] || 0) + n }));
+    setMyRegsKids((m) => ({ ...m, [id]: n }));
+    const { error } = await supabase.from("registrations").insert({ user_id: user.id, activity_id: id, nb_enfants: n });
     if (error) console.error("Erreur inscription :", error);
   };
 
   const leaveGeneric = async (id) => {
     if (!user || !myRegs.has(id)) return;
+    const mine = myRegsKids[id] || 0;
     setMyRegs((s) => { const n = new Set(s); n.delete(id); return n; });
     setRegByActivity((c) => ({ ...c, [id]: Math.max(0, (c[id] || 1) - 1) }));
+    setKidsByActivity((c) => ({ ...c, [id]: Math.max(0, (c[id] || 0) - mine) }));
     const { error } = await supabase.from("registrations").delete().eq("user_id", user.id).eq("activity_id", id);
     if (error) console.error("Erreur désinscription :", error);
   };
@@ -6741,7 +6687,7 @@ function usePikapikaData() {
     const starts_at = `${form.dateStr}T${form.timeStr}:00`;
     const newRow = {
       id: Date.now(), space, title: form.title, category: form.category, ville: profile.commune || null, lieu: form.lieu,
-      starts_at, age: form.age || null, info: form.info || null, places: form.places,
+      starts_at, age: form.age || null, info: form.info || null, places: form.places, places_enfants: form.placesEnfants ?? null,
       demo_inscrits: 0, organisateur: profile.displayName || t("you_organizer"), organisateur_genre: profile.genre || null,
       description: form.desc || "", intergen: false, intergen_note: null,
       demo_participants: [], created_by: user.id, payant: !!form.payant, signe_distinctif: form.signeDistinctif || null,
@@ -6765,7 +6711,7 @@ function usePikapikaData() {
     const starts_at = `${form.dateStr}T${form.timeStr}:00`;
     const patch = {
       title: form.title, category: form.category, lieu: form.lieu, starts_at,
-      places: form.places, description: form.desc || "", payant: !!form.payant,
+      places: form.places, places_enfants: form.placesEnfants ?? null, description: form.desc || "", payant: !!form.payant,
       signe_distinctif: form.signeDistinctif || null,
       ...(space === "kids" ? { age: form.age || null } : { info: form.info || null }),
     };
@@ -6798,27 +6744,6 @@ function usePikapikaData() {
     setProfile((p) => ({ ...p, parentValidated: next }));
     const { error } = await supabase.from("profiles").update({ parent_validated: next }).eq("id", user.id);
     if (error) console.error("Erreur validation :", error);
-  };
-
-  const addKid = async ({ name, age, genre }) => {
-    if (!user) return;
-    const { data, error } = await supabase.from("kids").insert({ parent_id: user.id, name, age, genre }).select().single();
-    if (error) { console.error("Erreur ajout enfant :", error); return; }
-    setKids((k) => [...k, data]);
-  };
-
-  const updateKid = async (id, { name, age, genre }) => {
-    if (!user) return;
-    const { data, error } = await supabase.from("kids").update({ name, age, genre }).eq("id", id).eq("parent_id", user.id).select().single();
-    if (error) { console.error("Erreur modification enfant :", error); return; }
-    setKids((k) => k.map((kid) => (kid.id === id ? data : kid)));
-  };
-
-  const deleteKid = async (id) => {
-    if (!user) return;
-    const { error } = await supabase.from("kids").delete().eq("id", id).eq("parent_id", user.id);
-    if (error) { console.error("Erreur suppression enfant :", error); return; }
-    setKids((k) => k.filter((kid) => kid.id !== id));
   };
 
   const updateBirthdate = async (birthdate) => {
@@ -6859,6 +6784,14 @@ function usePikapikaData() {
     const { error } = await supabase.from("profiles").update({ situation: situation || null }).eq("id", user.id);
     if (error) { console.error("Erreur situation :", error); return; }
     setProfile((p) => ({ ...p, situation: situation || null }));
+  };
+
+  const updateNbEnfants = async (nb) => {
+    if (!user) return;
+    const n = Math.max(0, Math.min(12, Number(nb) || 0));
+    const { error } = await supabase.from("profiles").update({ nb_enfants: n }).eq("id", user.id);
+    if (error) { console.error("Erreur nombre d'enfants :", error); return; }
+    setProfile((p) => ({ ...p, nbEnfants: n }));
   };
 
   // Champs texte libres du profil (profession, centres d'intérêt, animaux, coup de cœur).
@@ -6971,7 +6904,6 @@ function usePikapikaData() {
   // manuellement depuis le tableau de bord Supabase si nécessaire).
   const deleteUserData = async (userId) => {
     await supabase.from("activities").delete().eq("created_by", userId);
-    await supabase.from("kids").delete().eq("parent_id", userId);
     const { error } = await supabase.from("profiles").update({
       banned: true, display_name: t("deleted_account_name"), association_name: null, avatar_url: null,
     }).eq("id", userId);
@@ -7013,17 +6945,16 @@ function usePikapikaData() {
   return {
     user, authLoading, dataLoading,
     displayName: profile.displayName, email: user?.email || "", parentValidated: profile.parentValidated,
-    role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl, coverUrl: profile.coverUrl,
+    role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl, coverUrl: profile.coverUrl, nbEnfants: profile.nbEnfants,
     isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune, birthdate: profile.birthdate, bio: profile.bio, genre: profile.genre, situation: profile.situation, profession: profile.profession, interets: profile.interets, animaux: profile.animaux, coupDeCoeur: profile.coupDeCoeur,
-    kids,
     activities, teenItems, adultItems, seniorItems, assoItems,
     favorites, favTeen, favAdult, favSenior, favAsso,
     joined, joinedTeen, joinedAdult, joinedSenior, joinedAsso,
     toggleFav: toggleFavGeneric,
-    join: joinGeneric,
+    join: (id, nb) => joinGeneric(id, nb),
     leave: leaveGeneric,
     toggleFavCommunity: (_kind, id) => toggleFavGeneric(id),
-    joinCommunity: (_kind, id) => joinGeneric(id),
+    joinCommunity: (_kind, id, nb) => joinGeneric(id, nb),
     leaveCommunity: (_kind, id) => leaveGeneric(id),
     createActivity: (form) => insertActivity("kids", form),
     createAdultMeetup: (form) => insertActivity("adult", form),
@@ -7032,13 +6963,13 @@ function usePikapikaData() {
     createSeniorMeetup: (form) => insertActivity("senior", form),
     updateActivity, deleteActivity,
     toggleParentValidated,
-    addKid,
-    updateKid, deleteKid,
     updateBirthdate,
     updateGenre,
     updateBio,
     updatePseudo,
     updateSituation,
+    updateNbEnfants,
+    myRegsKids,
     updateProfileField,
     uploadAvatar,
     uploadCover, removeCover,
@@ -7081,7 +7012,7 @@ export default function RecreApp() {
 
   // Rejoindre une sortie enfant met aussi à jour l'aperçu ouvert (fiche détaillée), le temps
   // que le nombre d'inscrits recalculé depuis Supabase redescende dans le tableau `activities`.
-  const join = requireAuth((id) => pika.join(id));
+  const join = requireAuth((id, nb) => pika.join(id, nb));
 
   const leave = requireAuth((id) => pika.leave(id));
 
@@ -7451,10 +7382,8 @@ export default function RecreApp() {
               onToggleDemo={pika.toggleParentValidated}
               displayName={displayName}
               email={email}
-              kids={kids}
-              onAddKid={pika.addKid}
-              onUpdateKid={pika.updateKid}
-              onDeleteKid={pika.deleteKid}
+              nbEnfants={pika.nbEnfants}
+              onUpdateNbEnfants={pika.updateNbEnfants}
               onSignOut={pika.signOut}
               avatarUrl={pika.avatarUrl}
               onUploadAvatar={pika.uploadAvatar}
@@ -7486,7 +7415,7 @@ export default function RecreApp() {
               genre={pika.genre}
               birthdate={pika.birthdate}
               bio={pika.bio}
-              kids={kids}
+              nbEnfants={pika.nbEnfants}
               joinedCount={allJoinedCount}
               createdCount={allCreatedCount}
               validated={parentValidated}
@@ -7542,6 +7471,7 @@ export default function RecreApp() {
         activity={activities.find((a) => a.id === selectedId) || null} onClose={() => setSelectedId(null)} joined={joined} onJoin={join} onReport={openReport}
         onViewProfile={openUserProfile} onShare={setShareTarget} currentUserId={pika.user?.id}
         onEdit={openEditKid} onCancelOuting={cancelOuting} onLeave={leave}
+        myNbEnfants={pika.nbEnfants || 0} myKidsHere={(pika.myRegsKids || {})[selectedId] || 0}
       />
 
       {(() => {
