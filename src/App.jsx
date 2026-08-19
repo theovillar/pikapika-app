@@ -73,7 +73,7 @@ const TRANSLATIONS = {
     val_pending_text: "Pour la sécurité des enfants, l'accès aux sorties enfants et jeune (Enfants, Jeune, Créer, Mes sorties) n'est ouvert qu'aux parents dont l'identité a été vérifiée par la mairie de leur commune. Les sorties Adultes et Ainé restent accessibles sans validation. Vous recevrez une notification dès que ce sera fait.",
     val_demo_on: "Simuler : repasser en attente (démo)", val_demo_off: "Simuler : validation par la mairie (démo)",
     detail_participants: "{a}/{b} participants",
-    detail_registered_children: "Enfants déjà inscrits", legend_girl: "Fille", legend_boy: "Garçon",
+    detail_registered_children: "Enfants déjà inscrits", detail_registered_parents: "Parents déjà inscrits", legend_girl: "Fille", legend_boy: "Garçon",
     detail_joined: "Vous participez", detail_join_kids: "Rejoindre avec mon enfant",
     detail_already_registered: "Déjà inscrit(e)s",
     community_adult_title: "Sorties adultes",
@@ -4541,11 +4541,11 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
 
         {activity.participants && activity.participants.length > 0 && (
           <div style={{ marginBottom: 20 }}>
-            <SectionLabel>{t("detail_registered_children")}</SectionLabel>
+            <SectionLabel>{t("detail_registered_parents")}</SectionLabel>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 10 }}>
               {activity.participants.map((p, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <Avatar name={p.name} genderMode={false} size={30} avatarUrl={p.avatarUrl} userId={p.isReal ? p.userId : null} onViewProfile={onViewProfile} />
+                  <Avatar name={p.name} genre={p.genre} genderMode size={30} avatarUrl={p.avatarUrl} userId={p.isReal ? p.userId : null} onViewProfile={onViewProfile} />
                   <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: COLORS.ink }}>
                     {p.name}{p.isReal && p.age ? ` · ${p.age} ${t("profile_years")}` : ""}
                   </span>
@@ -7246,6 +7246,7 @@ export default function RecreApp() {
             emptyText={t("empty_kids")}
             location={location}
             layout="days"
+            genderMode
           onViewProfile={openUserProfile}
           />
         )}
