@@ -4685,6 +4685,23 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
           </div>
         )}
 
+        {activity.defi && (
+          <div style={{
+            display: "flex", alignItems: "flex-start", gap: 8, background: "#FFF9EC",
+            border: `2px solid ${COLORS.sun}`, borderRadius: 14, padding: "10px 12px", marginBottom: 14,
+          }}>
+            <Sparkles size={16} color={COLORS.sun} style={{ flexShrink: 0, marginTop: 1 }} />
+            <div>
+              <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 10, fontWeight: 800, color: COLORS.sun, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>
+                {t("defi_group_label")}
+              </div>
+              <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: COLORS.ink, lineHeight: 1.45 }}>
+                {activity.defi}
+              </span>
+            </div>
+          </div>
+        )}
+
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
           <Row icon={<MapPin size={15} color={COLORS.ink} />} text={lieuAvecVille(activity)} />
           <Row icon={<CalendarDays size={15} color={COLORS.ink} />} text={displayDate(activity)} />
@@ -5292,6 +5309,23 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
             <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: COLORS.ink }}>
               {item.signeDistinctif}
             </span>
+          </div>
+        )}
+
+        {item.defi && (
+          <div style={{
+            display: "flex", alignItems: "flex-start", gap: 8, background: "#FFF9EC",
+            border: `2px solid ${COLORS.sun}`, borderRadius: 14, padding: "10px 12px", marginBottom: 14,
+          }}>
+            <Sparkles size={16} color={COLORS.sun} style={{ flexShrink: 0, marginTop: 1 }} />
+            <div>
+              <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 10, fontWeight: 800, color: COLORS.sun, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 }}>
+                {t("defi_group_label")}
+              </div>
+              <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: COLORS.ink, lineHeight: 1.45 }}>
+                {item.defi}
+              </span>
+            </div>
           </div>
         )}
 
