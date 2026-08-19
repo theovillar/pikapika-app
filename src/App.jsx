@@ -106,7 +106,7 @@ const TRANSLATIONS = {
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
     change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
-    share_btn: "Partager", defi_btn: "La roue des défis", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
+    share_btn: "Partager", defi_btn: "La roue des défis", defi_btn_view: "Voir le défi du groupe", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", defi_validate: "Valider ce défi pour le groupe", defi_group_label: "Le défi du groupe", defi_group_subtitle: "Le défi a déjà été tiré pour cette sortie — le voici !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
     share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Regarde cette sortie sur Orée : {title}",
     report_btn: "Signaler", report_title: "Signaler cette annonce",
     report_reason_label: "Raison du signalement", report_details_label: "Détails (optionnel)",
@@ -4340,14 +4340,19 @@ const DEFIS = [
 
 const MAX_SPINS = 2;
 
-function DefiWheel({ onClose }) {
+// Un seul défi par sortie, partagé par tout le groupe : la première personne à le tirer
+// le fixe pour tout le monde. Deux tirages possibles avant validation définitive.
+function DefiWheel({ onClose, existingDefi, onSaveDefi }) {
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState(null);
   const [angle, setAngle] = useState(0);
   const [spinsLeft, setSpinsLeft] = useState(MAX_SPINS);
+  const [saving, setSaving] = useState(false);
+
+  const locked = !!existingDefi;
 
   const spin = () => {
-    if (spinning || spinsLeft <= 0) return;
+    if (spinning || spinsLeft <= 0 || locked) return;
     setSpinning(true);
     setResult(null);
     const pick = Math.floor(Math.random() * DEFIS.length);
@@ -4359,6 +4364,14 @@ function DefiWheel({ onClose }) {
       setSpinning(false);
       setSpinsLeft((n) => n - 1);
     }, 2600);
+  };
+
+  const validate = async () => {
+    if (!result) return;
+    setSaving(true);
+    await onSaveDefi(result);
+    setSaving(false);
+    onClose();
   };
 
   const SECTORS = 8;
@@ -4384,7 +4397,7 @@ function DefiWheel({ onClose }) {
           {t("defi_title")}
         </h3>
         <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485", margin: "0 0 18px" }}>
-          {t("defi_subtitle")}
+          {locked ? t("defi_group_subtitle") : t("defi_subtitle")}
         </p>
 
         <div style={{ position: "relative", width: 210, height: 210, margin: "0 auto 18px" }}>
@@ -4414,7 +4427,19 @@ function DefiWheel({ onClose }) {
           </div>
         </div>
 
-        {result ? (
+        {locked ? (
+          <div style={{
+            background: "#fff", border: `2px solid ${COLORS.grass}`, borderRadius: 16,
+            padding: "14px 16px", marginBottom: 14,
+          }}>
+            <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 10.5, fontWeight: 800, color: COLORS.grass, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>
+              {t("defi_group_label")}
+            </div>
+            <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 15, fontWeight: 700, color: COLORS.ink, lineHeight: 1.45 }}>
+              {existingDefi}
+            </div>
+          </div>
+        ) : result ? (
           <div style={{
             background: "#fff", border: `2px solid ${COLORS.sun}`, borderRadius: 16,
             padding: "14px 16px", marginBottom: 14,
@@ -4432,19 +4457,28 @@ function DefiWheel({ onClose }) {
           </p>
         )}
 
-        {spinsLeft > 0 ? (
+        {locked ? (
+          <PillButton color={COLORS.grass} textColor="#fff" onClick={onClose} style={{ width: "100%" }}>
+            {t("btn_back")}
+          </PillButton>
+        ) : spinsLeft > 0 ? (
           <>
             <PillButton color={COLORS.sun} onClick={spin} style={{ width: "100%", opacity: spinning ? 0.6 : 1 }}>
               {spinning ? t("defi_spinning") : result ? t("defi_again") : t("defi_spin")}
             </PillButton>
+            {result && (
+              <PillButton color={COLORS.grass} textColor="#fff" onClick={validate} style={{ width: "100%", marginTop: 8, opacity: saving ? 0.6 : 1 }}>
+                {saving ? t("auth_loading") : t("defi_validate")}
+              </PillButton>
+            )}
             <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF", marginTop: 8 }}>
               {t("defi_spins_left", { n: spinsLeft })}
             </div>
           </>
         ) : (
           <>
-            <PillButton color={COLORS.grass} textColor="#fff" onClick={onClose} style={{ width: "100%" }}>
-              {t("defi_accept")}
+            <PillButton color={COLORS.grass} textColor="#fff" onClick={validate} style={{ width: "100%", opacity: saving ? 0.6 : 1 }}>
+              {saving ? t("auth_loading") : t("defi_accept")}
             </PillButton>
             <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF", marginTop: 8 }}>
               {t("defi_no_more")}
@@ -4766,7 +4800,7 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
               fontFamily: "Nunito, sans-serif", boxShadow: `0 3px 0 ${shade(COLORS.sun, -18)}`,
             }}
           >
-            <Sparkles size={16} /> {t("defi_btn")}
+            <Sparkles size={16} /> {activity.defi ? t("defi_btn_view") : t("defi_btn")}
           </button>
         )}
 
@@ -5350,7 +5384,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
               fontFamily: "Nunito, sans-serif", boxShadow: `0 3px 0 ${shade(COLORS.sun, -18)}`,
             }}
           >
-            <Sparkles size={16} /> {t("defi_btn")}
+            <Sparkles size={16} /> {item.defi ? t("defi_btn_view") : t("defi_btn")}
           </button>
         )}
 
@@ -6911,6 +6945,7 @@ function usePikapikaData() {
       intergen: row.intergen, intergenNote: row.intergen_note,
       participants: [...real, ...(row.demo_participants || [])],
       createdBy: row.created_by, payant: row.payant, signeDistinctif: row.signe_distinctif,
+      defi: row.defi, defiLe: row.defi_le,
       placesEnfants: row.places_enfants, inscritsEnfants: kidsByActivity[row.id] || 0,
       organiserAge: ages.organiserAge ?? null, participantsAvgAge: ages.participantsAvgAge ?? null,
     };
@@ -7012,6 +7047,17 @@ function usePikapikaData() {
     (regRows || []).forEach((r) => { counts[r.activity_id] = (counts[r.activity_id] || 0) + 1; });
     setRegByActivity(counts);
     setMyRegs((s) => new Set(s).add(id));
+    return true;
+  };
+
+  // Fixe le défi d'une sortie : partagé par tout le groupe, et définitif une fois tiré.
+  const setActivityDefi = async (id, defi) => {
+    if (!user) return false;
+    const { data, error } = await supabase.from("activities")
+      .update({ defi, defi_par: user.id, defi_le: new Date().toISOString() })
+      .eq("id", id).is("defi", null).select().single();
+    if (error || !data) { console.error("Erreur défi :", error); return false; }
+    setRows((rs) => rs.map((r) => (r.id === id ? data : r)));
     return true;
   };
 
@@ -7224,7 +7270,7 @@ function usePikapikaData() {
     createAssoEvent: (form) => insertActivity("asso", form),
     createTeenMeetup: (form) => insertActivity("teen", form),
     createSeniorMeetup: (form) => insertActivity("senior", form),
-    updateActivity, deleteActivity,
+    updateActivity, deleteActivity, setActivityDefi,
     updateBirthdate,
     updateGenre,
     updateBio,
@@ -7773,7 +7819,20 @@ export default function RecreApp() {
 
       <LegalModal doc={legalDoc} onClose={() => setLegalDoc(null)} />
 
-      {defiOpen && <DefiWheel onClose={() => setDefiOpen(false)} />}
+      {defiOpen && (() => {
+        const kindMap = { teen: teenItems, adult: adultItems, senior: seniorItems, asso: assoItems };
+        const current = selectedCommunity
+          ? (kindMap[selectedCommunity.kind] || []).find((it) => it.id === selectedCommunity.id)
+          : activities.find((a) => a.id === selectedId);
+        if (!current) return null;
+        return (
+          <DefiWheel
+            existingDefi={current.defi}
+            onSaveDefi={(defi) => pika.setActivityDefi(current.id, defi)}
+            onClose={() => setDefiOpen(false)}
+          />
+        );
+      })()}
 
       {editTarget && (
         <EditActivityModal
