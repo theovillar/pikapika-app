@@ -106,7 +106,7 @@ const TRANSLATIONS = {
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
     change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
-    share_btn: "Partager", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
+    share_btn: "Partager", defi_btn: "La roue des défis", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
     share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Regarde cette sortie sur Orée : {title}",
     report_btn: "Signaler", report_title: "Signaler cette annonce",
     report_reason_label: "Raison du signalement", report_details_label: "Détails (optionnel)",
@@ -4318,6 +4318,124 @@ function UserProfilePage({ userId, onClose }) {
   );
 }
 
+// La roue des défis : un petit gage tiré au sort, à faire ensemble une fois sur place.
+// Toujours bienveillant et tourné vers l'échange — jamais gênant ni moqueur.
+const DEFIS = [
+  "Trouve un point commun avec quelqu'un que tu ne connaissais pas.",
+  "Fais une photo de groupe avec la plus belle grimace possible.",
+  "Apprends un mot dans une autre langue à quelqu'un du groupe.",
+  "Raconte ton meilleur souvenir de vacances en 30 secondes.",
+  "Demande à quelqu'un quel est son plat préféré, et pourquoi.",
+  "Trouve quelqu'un né le même mois que toi.",
+  "Invente un cri de ralliement pour le groupe.",
+  "Dis un compliment sincère à la personne à ta droite.",
+  "Trouve trois choses vertes autour de toi avant les autres.",
+  "Fais deviner ton animal préféré en le mimant.",
+  "Raconte une chose que tu as apprise cette semaine.",
+  "Propose une idée de sortie pour la prochaine fois.",
+  "Trouve quelqu'un qui a le même nombre de frères et sœurs que toi.",
+  "Fais un high five à trois personnes différentes.",
+  "Décris ta journée idéale en une seule phrase.",
+];
+
+function DefiWheel({ onClose }) {
+  const [spinning, setSpinning] = useState(false);
+  const [result, setResult] = useState(null);
+  const [angle, setAngle] = useState(0);
+
+  const spin = () => {
+    if (spinning) return;
+    setSpinning(true);
+    setResult(null);
+    const pick = Math.floor(Math.random() * DEFIS.length);
+    // Plusieurs tours complets, puis on s'arrête sur un secteur au hasard
+    const turns = 4 + Math.random() * 2;
+    setAngle((a) => a + turns * 360 + Math.random() * 360);
+    setTimeout(() => {
+      setResult(DEFIS[pick]);
+      setSpinning(false);
+    }, 2600);
+  };
+
+  const SECTORS = 8;
+  const sectorColors = [COLORS.sun, COLORS.coral, COLORS.grass, COLORS.sky, COLORS.grape, COLORS.sun, COLORS.coral, COLORS.grass];
+
+  return (
+    <div onClick={onClose} style={{
+      position: "fixed", inset: 0, background: "rgba(43,37,96,0.55)", zIndex: 9999,
+      display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+    }}>
+      <div onClick={(e) => e.stopPropagation()} style={{
+        background: COLORS.cloud, borderRadius: 24, padding: "24px 20px", width: "100%", maxWidth: 360,
+        position: "relative", textAlign: "center",
+      }}>
+        <button onClick={onClose} style={{
+          position: "absolute", top: 14, right: 14, background: "#fff", border: "none",
+          borderRadius: "50%", width: 32, height: 32, cursor: "pointer",
+        }}>
+          <X size={16} color={COLORS.ink} />
+        </button>
+
+        <h3 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink, margin: "0 0 4px" }}>
+          {t("defi_title")}
+        </h3>
+        <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485", margin: "0 0 18px" }}>
+          {t("defi_subtitle")}
+        </p>
+
+        <div style={{ position: "relative", width: 210, height: 210, margin: "0 auto 18px" }}>
+          {/* Pointeur */}
+          <div style={{
+            position: "absolute", top: -6, left: "50%", transform: "translateX(-50%)",
+            width: 0, height: 0, borderLeft: "10px solid transparent", borderRight: "10px solid transparent",
+            borderTop: `18px solid ${COLORS.ink}`, zIndex: 2,
+          }} />
+          {/* Roue */}
+          <div style={{
+            width: "100%", height: "100%", borderRadius: "50%",
+            border: `6px solid #fff`, boxShadow: "0 6px 18px rgba(43,37,96,0.18)",
+            transform: `rotate(${angle}deg)`,
+            transition: spinning ? "transform 2.5s cubic-bezier(.17,.67,.21,1)" : "none",
+            background: `conic-gradient(${sectorColors.map((c, i) =>
+              `${c} ${(i * 360) / SECTORS}deg ${((i + 1) * 360) / SECTORS}deg`).join(", ")})`,
+          }} />
+          {/* Moyeu */}
+          <div style={{
+            position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+            width: 54, height: 54, borderRadius: "50%", background: "#fff",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "0 2px 8px rgba(43,37,96,0.2)",
+          }}>
+            <Sparkles size={22} color={COLORS.sun} />
+          </div>
+        </div>
+
+        {result ? (
+          <div style={{
+            background: "#fff", border: `2px solid ${COLORS.sun}`, borderRadius: 16,
+            padding: "14px 16px", marginBottom: 14,
+          }}>
+            <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 10.5, fontWeight: 800, color: COLORS.sun, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>
+              {t("defi_result_label")}
+            </div>
+            <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 15, fontWeight: 700, color: COLORS.ink, lineHeight: 1.45 }}>
+              {result}
+            </div>
+          </div>
+        ) : (
+          <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#9A93AF", marginBottom: 14, minHeight: 40 }}>
+            {spinning ? t("defi_spinning") : t("defi_hint")}
+          </p>
+        )}
+
+        <PillButton color={COLORS.sun} onClick={spin} style={{ width: "100%", opacity: spinning ? 0.6 : 1 }}>
+          {spinning ? t("defi_spinning") : result ? t("defi_again") : t("defi_spin")}
+        </PillButton>
+      </div>
+    </div>
+  );
+}
+
 function ShareModal({ item, onClose }) {
   const [copied, setCopied] = useState(false);
   const url = `${window.location.origin}${window.location.pathname}?activity=${item.id}`;
@@ -4441,7 +4559,7 @@ function ReportModal({ onClose, onSubmit }) {
   );
 }
 
-function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfile, onShare, currentUserId, onEdit, onCancelOuting, onLeave, myNbEnfants = 0, myKidsHere = 0 }) {
+function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfile, onShare, currentUserId, onEdit, onCancelOuting, onLeave, myNbEnfants = 0, myKidsHere = 0, onOpenDefi }) {
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirmLeave, setConfirmLeave] = useState(false);
   const [kidsToBring, setKidsToBring] = useState(Math.min(myNbEnfants, 1));
@@ -4616,6 +4734,20 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
               {full ? t("card_full") : t("detail_join_kids")}
             </PillButton>
           </>
+        )}
+
+        {!isPast && isJoined && (
+          <button
+            onClick={onOpenDefi}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%",
+              background: COLORS.sun, border: "none", borderRadius: 12, padding: "11px 14px",
+              color: COLORS.ink, fontWeight: 800, fontSize: 13.5, marginTop: 14, cursor: "pointer",
+              fontFamily: "Nunito, sans-serif", boxShadow: `0 3px 0 ${shade(COLORS.sun, -18)}`,
+            }}
+          >
+            <Sparkles size={16} /> {t("defi_btn")}
+          </button>
         )}
 
         {!isPast && (
@@ -5046,7 +5178,7 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
   );
 }
 
-function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinLabel, genderMode = false, onReport, genderLabels, onViewProfile, onShare, currentUserId, onEdit, onCancelOuting, onLeave }) {
+function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinLabel, genderMode = false, onReport, genderLabels, onViewProfile, onShare, currentUserId, onEdit, onCancelOuting, onLeave, onOpenDefi }) {
   const [confirmCancel, setConfirmCancel] = useState(false);
   const [confirmLeave, setConfirmLeave] = useState(false);
   if (!item) return null;
@@ -5186,6 +5318,20 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
           >
             {full ? t("card_full") : joinLabel}
           </PillButton>
+        )}
+
+        {!isPast && isJoined && (
+          <button
+            onClick={onOpenDefi}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 6, width: "100%",
+              background: COLORS.sun, border: "none", borderRadius: 12, padding: "11px 14px",
+              color: COLORS.ink, fontWeight: 800, fontSize: 13.5, marginTop: 14, cursor: "pointer",
+              fontFamily: "Nunito, sans-serif", boxShadow: `0 3px 0 ${shade(COLORS.sun, -18)}`,
+            }}
+          >
+            <Sparkles size={16} /> {t("defi_btn")}
+          </button>
         )}
 
         {!isPast && (
@@ -7131,6 +7277,7 @@ export default function RecreApp() {
 
   const [shareTarget, setShareTarget] = useState(null);
   const [legalDoc, setLegalDoc] = useState(null);
+  const [defiOpen, setDefiOpen] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
 
   // Compteurs toutes catégories confondues, pour la fiche profil
@@ -7567,7 +7714,7 @@ export default function RecreApp() {
       <DetailModal
         activity={activities.find((a) => a.id === selectedId) || null} onClose={() => setSelectedId(null)} joined={joined} onJoin={join} onReport={openReport}
         onViewProfile={openUserProfile} onShare={setShareTarget} currentUserId={pika.user?.id}
-        onEdit={openEditKid} onCancelOuting={cancelOuting} onLeave={leave}
+        onEdit={openEditKid} onCancelOuting={cancelOuting} onLeave={leave} onOpenDefi={() => setDefiOpen(true)}
         myNbEnfants={pika.nbEnfants || 0} myKidsHere={(pika.myRegsKids || {})[selectedId] || 0}
       />
 
@@ -7597,6 +7744,7 @@ export default function RecreApp() {
             onEdit={(item) => openEditCommunity(selectedCommunity?.kind, item)}
             onCancelOuting={cancelOuting}
             onLeave={(id) => leaveCommunity(selectedCommunity?.kind, id)}
+            onOpenDefi={() => setDefiOpen(true)}
           />
         );
       })()}
@@ -7604,6 +7752,8 @@ export default function RecreApp() {
       {authPrompt && <AuthScreen onClose={() => setAuthPrompt(false)} onOpenLegal={setLegalDoc} />}
 
       <LegalModal doc={legalDoc} onClose={() => setLegalDoc(null)} />
+
+      {defiOpen && <DefiWheel onClose={() => setDefiOpen(false)} />}
 
       {editTarget && (
         <EditActivityModal
