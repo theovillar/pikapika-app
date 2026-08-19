@@ -53,7 +53,7 @@ const TRANSLATIONS = {
     label_categorie: "Catégorie", label_lieu: "Lieu", placeholder_lieu: "Parc, adresse…",
     label_date: "Date & heure", placeholder_date: "Sam. 9 août · 10h", label_heure: "Heure",
     label_age: "Âge conseillé", placeholder_age: "Ex. 4-8 ans",
-    label_places: "Places disponibles", label_places_parents: "Places parents", label_places_enfants: "Places enfants", detail_parents_count: "{a}/{b} parents", detail_kids_count: "{a}/{b} enfants", join_kids_question: "Combien d'enfants amenez-vous ?", join_kids_max: "Vous avez déclaré {n} enfant(s) sur votre profil.", profile_nb_enfants_label: "Nombre d'enfants", profile_nb_enfants_note: "Sert à limiter le nombre d'enfants que vous pouvez inscrire à une sortie.", label_description: "Description", label_signe: "Signe distinctif (optionnel)", placeholder_signe: "Ex. Je porterai une casquette rouge, poussette bleue",
+    label_places: "Places disponibles", label_places_parents: "Places parents", label_places_enfants: "Places enfants", detail_parents_count: "{a}/{b} parents", detail_kids_count: "{a}/{b} enfants", join_kids_question: "Combien d'enfants amenez-vous ?", join_kids_max: "Vous avez déclaré {n} enfant(s) sur votre profil.", profile_nb_enfants_label: "Nombre d'enfants", profile_nb_moins12_label: "Dont enfants de moins de 12 ans", access_parent_ok: "Vous avez accès aux sorties Parent et Jeune.", access_parent_locked: "Les sorties Parent et Jeune sont réservées aux personnes ayant au moins un enfant de moins de 12 ans.", auth_nb_moins12: "Combien ont moins de 12 ans ?", profile_nb_enfants_note: "Sert à limiter le nombre d'enfants que vous pouvez inscrire à une sortie.", label_description: "Description", label_signe: "Signe distinctif (optionnel)", placeholder_signe: "Ex. Je porterai une casquette rouge, poussette bleue",
     placeholder_description: "Que va-t-on faire ? Quoi apporter ?",
     label_payant: "Sortie payante ?", toggle_oui: "Oui", toggle_non: "Non",
     badge_payant: "Payant", badge_gratuit: "Gratuit",
@@ -3332,11 +3332,11 @@ function ProfileView({ displayName, email, avatarUrl, coverUrl, genre, birthdate
         background: validated ? "#EAF8ED" : "#FFF4DD",
         border: `2px solid ${validated ? COLORS.grass : COLORS.sun}`,
         borderRadius: 18, padding: "12px 16px", marginBottom: 14,
-        display: "flex", alignItems: "center", gap: 10,
+        display: "flex", alignItems: "flex-start", gap: 10, textAlign: "left",
       }}>
-        {validated ? <ShieldCheck size={18} color={COLORS.grass} /> : <Clock size={18} color={COLORS.sun} />}
-        <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13, color: COLORS.ink }}>
-          {validated ? t("validation_ok_title") : t("validation_pending_title")}
+        {validated ? <ShieldCheck size={18} color={COLORS.grass} style={{ flexShrink: 0, marginTop: 1 }} /> : <Baby size={18} color={COLORS.sun} style={{ flexShrink: 0, marginTop: 1 }} />}
+        <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 12.5, color: COLORS.ink, lineHeight: 1.5 }}>
+          {validated ? t("access_parent_ok") : t("access_parent_locked")}
         </span>
       </div>
 
@@ -3448,7 +3448,7 @@ function ProfileTextField({ label, placeholder, value, onSave, multiline = false
   );
 }
 
-function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayName, email, nbEnfants, onUpdateNbEnfants, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo, situation, onUpdateSituation, profession, interets, animaux, coupDeCoeur, onUpdateField, coverUrl, onUploadCover, onRemoveCover }) {
+function ProfileEdit({ onBack,  joinedCount, validated, displayName, email, nbEnfants, onUpdateNbEnfants, nbEnfantsMoins12, onUpdateNbEnfantsMoins12, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo, situation, onUpdateSituation, profession, interets, animaux, coupDeCoeur, onUpdateField, coverUrl, onUploadCover, onRemoveCover }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [birthdateInput, setBirthdateInput] = useState(birthdate || "");
@@ -3598,8 +3598,6 @@ function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayNam
         <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: COLORS.coral, margin: "-14px 0 16px" }}>{uploadError}</p>
       )}
 
-      <ValidationStatus validated={validated} onToggleDemo={onToggleDemo} />
-
       <SectionLabel>{t("auth_pseudo")}</SectionLabel>
       <div style={{ display: "flex", gap: 8, marginBottom: 6 }}>
         <input
@@ -3741,6 +3739,42 @@ function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayNam
         {t("profile_nb_enfants_note")}
       </p>
 
+      <SectionLabel>{t("profile_nb_moins12_label")}</SectionLabel>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+        <button
+          onClick={() => onUpdateNbEnfantsMoins12(Math.max(0, (nbEnfantsMoins12 || 0) - 1))}
+          style={{
+            width: 42, height: 42, borderRadius: 12, border: "2px solid #F0EADB", background: "#fff",
+            cursor: "pointer", fontFamily: "Fredoka, sans-serif", fontSize: 20, color: COLORS.ink, flexShrink: 0,
+          }}
+        >
+          −
+        </button>
+        <div style={{
+          flex: 1, textAlign: "center", background: "#fff", border: "2px solid #F0EADB", borderRadius: 12,
+          padding: "9px 0", fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink,
+        }}>
+          {nbEnfantsMoins12 || 0}
+        </div>
+        <button
+          onClick={() => onUpdateNbEnfantsMoins12(Math.min(nbEnfants || 0, (nbEnfantsMoins12 || 0) + 1))}
+          style={{
+            width: 42, height: 42, borderRadius: 12, border: "2px solid #F0EADB", background: "#fff",
+            cursor: "pointer", fontFamily: "Fredoka, sans-serif", fontSize: 20, color: COLORS.ink, flexShrink: 0,
+          }}
+        >
+          +
+        </button>
+      </div>
+      <p style={{
+        fontFamily: "Nunito, sans-serif", fontSize: 11.5,
+        color: (nbEnfantsMoins12 || 0) > 0 ? COLORS.grass : "#9A93AF",
+        fontWeight: (nbEnfantsMoins12 || 0) > 0 ? 700 : 400,
+        margin: "0 0 22px",
+      }}>
+        {(nbEnfantsMoins12 || 0) > 0 ? t("access_parent_ok") : t("access_parent_locked")}
+      </p>
+
       <SectionLabel>{t("profile_preferences")}</SectionLabel>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 26 }}>
         {CATEGORIES.map((c) => (
@@ -3776,46 +3810,6 @@ function ProfileEdit({ onBack,  joinedCount, validated, onToggleDemo, displayNam
       }}>
         {t("btn_sign_out")}
       </button>
-    </div>
-  );
-}
-
-function ValidationStatus({ validated, onToggleDemo }) {
-  return (
-    <div style={{
-      background: validated ? "#EAF8ED" : "#FFF4DD",
-      border: `2px solid ${validated ? COLORS.grass : COLORS.sun}`,
-      borderRadius: 20, padding: 18, marginBottom: 22,
-    }}>
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-        <div style={{
-          width: 38, height: 38, borderRadius: "50%", flexShrink: 0,
-          background: validated ? COLORS.grass : COLORS.sun,
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          {validated ? <ShieldCheck size={19} color="#fff" /> : <Clock size={19} color={COLORS.ink} />}
-        </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15.5, color: COLORS.ink, marginBottom: 4 }}>
-            {validated ? t("val_validated_title") : t("val_pending_title")}
-          </div>
-          <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#5C5578", lineHeight: 1.5, margin: 0 }}>
-            {validated ? t("val_validated_text") : t("val_pending_text")}
-          </p>
-          {onToggleDemo && (
-            <button
-              onClick={onToggleDemo}
-              style={{
-                marginTop: 10, fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12,
-                background: "transparent", border: `2px solid ${COLORS.ink}`, color: COLORS.ink,
-                borderRadius: 10, padding: "6px 12px", cursor: "pointer",
-              }}
-            >
-              {validated ? t("val_demo_on") : t("val_demo_off")}
-            </button>
-          )}
-        </div>
-      </div>
     </div>
   );
 }
@@ -5730,6 +5724,8 @@ function AuthScreen({ onClose, onOpenLegal }) {
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
   const [pseudo, setPseudo] = useState("");
+  const [nbEnfants, setNbEnfants] = useState(0);
+  const [nbMoins12, setNbMoins12] = useState(0);
   const [genre, setGenre] = useState("F");
   const [commune, setCommune] = useState("");
   const [birthdate, setBirthdate] = useState("");
@@ -5763,6 +5759,8 @@ function AuthScreen({ onClose, onOpenLegal }) {
             last_name: accountType === "parent" ? (lastName || null) : null,
             commune: accountType === "parent" ? commune : null,
             birthdate: accountType === "parent" && birthdate ? birthdate : null,
+            nb_enfants: accountType === "parent" ? nbEnfants : 0,
+            nb_enfants_moins_12: accountType === "parent" ? nbMoins12 : 0,
           } },
         });
         if (err) throw err;
@@ -5839,6 +5837,36 @@ function AuthScreen({ onClose, onOpenLegal }) {
               value={pseudo} onChange={(e) => setPseudo(e.target.value)}
             />
             <p style={{ fontSize: 11, color: "#9A93AF", margin: "-6px 0 12px" }}>{t("auth_pseudo_note")}</p>
+
+            <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 11.5, color: "#6B6485", display: "block", marginBottom: 4 }}>
+                  {t("profile_nb_enfants_label")}
+                </label>
+                <input
+                  type="number" min={0} max={12} style={{ ...inputStyle, marginBottom: 0 }}
+                  value={nbEnfants}
+                  onChange={(e) => {
+                    const v = Math.max(0, Math.min(12, Number(e.target.value) || 0));
+                    setNbEnfants(v);
+                    if (nbMoins12 > v) setNbMoins12(v);
+                  }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 11.5, color: "#6B6485", display: "block", marginBottom: 4 }}>
+                  {t("auth_nb_moins12")}
+                </label>
+                <input
+                  type="number" min={0} max={nbEnfants} style={{ ...inputStyle, marginBottom: 0 }}
+                  value={nbMoins12}
+                  onChange={(e) => setNbMoins12(Math.max(0, Math.min(nbEnfants, Number(e.target.value) || 0)))}
+                />
+              </div>
+            </div>
+            <p style={{ fontSize: 11, color: nbMoins12 > 0 ? COLORS.grass : "#9A93AF", fontWeight: nbMoins12 > 0 ? 700 : 400, margin: "-4px 0 12px", lineHeight: 1.4 }}>
+              {nbMoins12 > 0 ? t("access_parent_ok") : t("access_parent_locked")}
+            </p>
           </>
         )}
         {mode === "signup" && accountType === "parent" && (
@@ -6257,195 +6285,57 @@ function BannedScreen({ onSignOut }) {
   );
 }
 
-function PreauthorizeEmails({ onPreauthorize }) {
-  const [singleEmail, setSingleEmail] = useState("");
-  const [bulkText, setBulkText] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState(null);
-
-  const runSingle = async () => {
-    if (!singleEmail.trim()) return;
-    setBusy(true); setResult(null);
-    const res = await onPreauthorize([singleEmail]);
-    setResult(res);
-    setBusy(false);
-    setSingleEmail("");
-  };
-
-  const runBulk = async () => {
-    const emails = bulkText.split(/[\s,;]+/).filter(Boolean);
-    if (emails.length === 0) return;
-    setBusy(true); setResult(null);
-    const res = await onPreauthorize(emails);
-    setResult(res);
-    setBusy(false);
-    setBulkText("");
-  };
-
-  const inputStyle = {
-    width: "100%", border: "2px solid #F0EADB", borderRadius: 14, padding: "12px 14px",
-    fontFamily: "Nunito, sans-serif", fontSize: 14, color: COLORS.ink, outline: "none", boxSizing: "border-box",
-  };
-
-  return (
-    <div style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 18, padding: 18, marginBottom: 26 }}>
-      <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 16, color: COLORS.ink, marginBottom: 4 }}>
-        {t("preauth_title")}
-      </div>
-      <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", margin: "0 0 14px" }}>
-        {t("preauth_subtitle")}
-      </p>
-
-      <label style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, color: "#6B6485", textTransform: "uppercase", letterSpacing: 0.4, display: "block", marginBottom: 6 }}>
-        {t("preauth_single_label")}
-      </label>
-      <div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
-        <input
-          type="email" style={inputStyle} placeholder={t("preauth_single_placeholder")}
-          value={singleEmail} onChange={(e) => setSingleEmail(e.target.value)}
-        />
-        <PillButton color={COLORS.grass} textColor="#fff" onClick={runSingle} style={{ padding: "10px 16px", fontSize: 13, whiteSpace: "nowrap" }}>
-          {t("mairie_validate")}
-        </PillButton>
-      </div>
-
-      <label style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, color: "#6B6485", textTransform: "uppercase", letterSpacing: 0.4, display: "block", marginBottom: 6 }}>
-        {t("preauth_bulk_label")}
-      </label>
-      <textarea
-        rows={5} style={{ ...inputStyle, resize: "vertical", marginBottom: 10 }}
-        placeholder={t("preauth_bulk_placeholder")}
-        value={bulkText} onChange={(e) => setBulkText(e.target.value)}
-      />
-      <PillButton color={COLORS.ink} textColor="#fff" onClick={runBulk} style={{ opacity: busy ? 0.6 : 1 }}>
-        {busy ? t("preauth_processing") : t("preauth_bulk_submit")}
-      </PillButton>
-
-      {result && (
-        <div style={{
-          marginTop: 14, background: "#EAF8ED", border: `2px solid ${COLORS.grass}`, borderRadius: 12,
-          padding: "10px 14px", fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: COLORS.ink,
-        }}>
-          {t("preauth_result", { added: result.added, validated: result.validated, invalid: result.invalid })}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function MairieDashboard({ pendingParents, pendingAssociations, reports, onValidateParent, onValidateAssociation, onResolveReport, onPreauthorize, commune }) {
-  const [sub, setSub] = useState("validations");
+// Espace mairie : uniquement la modération des signalements.
+// (La validation des comptes a été supprimée : l'accès aux sorties Parent dépend
+// désormais simplement du fait d'avoir déclaré un enfant de moins de 12 ans.)
+function MairieDashboard({ reports, onResolveReport, commune }) {
   const reasonLabel = (r) => t(`report_reason_${r}`) !== `report_reason_${r}` ? t(`report_reason_${r}`) : r;
   const statusLabel = (s) => t(`mairie_report_status_${s}`);
-
-  const subTabs = [
-    { id: "validations", label: t("mairie_sub_validations") },
-    { id: "reports", label: t("mairie_sub_reports") },
-  ];
 
   return (
     <div style={{ maxWidth: 640, margin: "0 auto" }}>
       <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
         {t("mairie_title")}
       </h1>
-      {commune ? (
+      {commune && (
         <p style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: COLORS.grass, margin: "0 0 16px" }}>
           {t("mairie_territory", { commune: villeName(commune) })}
         </p>
-      ) : (
-        <p style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 13, color: COLORS.coral, margin: "0 0 16px" }}>
-          {t("mairie_no_commune")}
-        </p>
       )}
 
-      <div style={{ display: "inline-flex", background: "#F0EADB", borderRadius: 14, padding: 4, marginBottom: 22, flexWrap: "wrap" }}>
-        {subTabs.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => setSub(s.id)}
-            style={{
-              border: "none", cursor: "pointer",
-              background: sub === s.id ? COLORS.ink : "transparent",
-              color: sub === s.id ? "#fff" : "#6B6485",
-              padding: "8px 14px", borderRadius: 12, fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
-            }}
-          >
-            {s.label}
-          </button>
+      <SectionLabel>{t("mairie_reports")}</SectionLabel>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {reports.length === 0 && (
+          <EmptyBox text={t("mairie_no_pending")} />
+        )}
+        {reports.map((r) => (
+          <div key={r.id} style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "14px 16px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6, gap: 10 }}>
+              <span style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: COLORS.ink }}>{reasonLabel(r.reason)}</span>
+              <span style={{
+                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11, padding: "3px 9px", borderRadius: 999, flexShrink: 0,
+                background: r.status === "pending" ? "#FFF4DD" : r.status === "reviewed" ? "#EAF8ED" : "#EDEAF4",
+                color: r.status === "pending" ? COLORS.sun : r.status === "reviewed" ? COLORS.grass : "#9A93AF",
+              }}>
+                {statusLabel(r.status)}
+              </span>
+            </div>
+            {r.details && (
+              <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#5C5578", margin: "0 0 10px" }}>{r.details}</p>
+            )}
+            {r.status === "pending" && (
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => onResolveReport(r.id, "reviewed")} style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, background: COLORS.ink, color: "#fff", border: "none", borderRadius: 10, padding: "7px 12px", cursor: "pointer" }}>
+                  {t("mairie_mark_reviewed")}
+                </button>
+                <button onClick={() => onResolveReport(r.id, "dismissed")} style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, background: "transparent", color: "#9A93AF", border: "2px solid #F0EADB", borderRadius: 10, padding: "7px 12px", cursor: "pointer" }}>
+                  {t("mairie_dismiss")}
+                </button>
+              </div>
+            )}
+          </div>
         ))}
       </div>
-
-      {sub === "validations" && (
-        <>
-          <PreauthorizeEmails onPreauthorize={onPreauthorize} />
-
-          <SectionLabel>{t("mairie_pending_parents")}</SectionLabel>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 26 }}>
-            {pendingParents.length === 0 && (
-              <p style={{ color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}>{t("mairie_no_pending")}</p>
-            )}
-            {pendingParents.map((p) => (
-              <div key={p.id} style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: COLORS.ink }}>{p.display_name}</span>
-                <PillButton color={COLORS.grass} textColor="#fff" onClick={() => onValidateParent(p.id)} style={{ padding: "7px 14px", fontSize: 12.5 }}>
-                  {t("mairie_validate")}
-                </PillButton>
-              </div>
-            ))}
-          </div>
-
-          <SectionLabel>{t("mairie_pending_assos")}</SectionLabel>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {pendingAssociations.length === 0 && (
-              <p style={{ color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}>{t("mairie_no_pending")}</p>
-            )}
-            {pendingAssociations.map((p) => (
-              <div key={p.id} style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14, color: COLORS.ink }}>{p.association_name || p.display_name}</span>
-                <PillButton color={COLORS.grass} textColor="#fff" onClick={() => onValidateAssociation(p.id)} style={{ padding: "7px 14px", fontSize: 12.5 }}>
-                  {t("mairie_validate")}
-                </PillButton>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-
-      {sub === "reports" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {reports.length === 0 && (
-            <p style={{ color: "#9A93AF", fontFamily: "Nunito, sans-serif", fontSize: 13.5 }}>{t("mairie_no_pending")}</p>
-          )}
-          {reports.map((r) => (
-            <div key={r.id} style={{ background: "#fff", border: "2px solid #F0EADB", borderRadius: 16, padding: "14px 16px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-                <span style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: COLORS.ink }}>{reasonLabel(r.reason)}</span>
-                <span style={{
-                  fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11, padding: "3px 9px", borderRadius: 999,
-                  background: r.status === "pending" ? "#FFF4DD" : r.status === "reviewed" ? "#EAF8ED" : "#EDEAF4",
-                  color: r.status === "pending" ? COLORS.sun : r.status === "reviewed" ? COLORS.grass : "#9A93AF",
-                }}>
-                  {statusLabel(r.status)}
-                </span>
-              </div>
-              {r.details && (
-                <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#5C5578", margin: "0 0 10px" }}>{r.details}</p>
-              )}
-              {r.status === "pending" && (
-                <div style={{ display: "flex", gap: 8 }}>
-                  <button onClick={() => onResolveReport(r.id, "reviewed")} style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, background: COLORS.ink, color: "#fff", border: "none", borderRadius: 10, padding: "7px 12px", cursor: "pointer" }}>
-                    {t("mairie_mark_reviewed")}
-                  </button>
-                  <button onClick={() => onResolveReport(r.id, "dismissed")} style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, background: "transparent", color: "#9A93AF", border: "2px solid #F0EADB", borderRadius: 10, padding: "7px 12px", cursor: "pointer" }}>
-                    {t("mairie_dismiss")}
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
     </div>
   );
 }
@@ -6468,8 +6358,6 @@ function usePikapikaData() {
   const [myRegs, setMyRegs] = useState(new Set());
   const [myFavs, setMyFavs] = useState(new Set());
   const [dataLoading, setDataLoading] = useState(true);
-  const [pendingParents, setPendingParents] = useState([]);
-  const [pendingAssociations, setPendingAssociations] = useState([]);
   const [reports, setReports] = useState([]);
   const [allProfiles, setAllProfiles] = useState([]);
 
@@ -6559,6 +6447,7 @@ function usePikapikaData() {
           avatarUrl: profRes.data.avatar_url,
           coverUrl: profRes.data.cover_url,
           nbEnfants: profRes.data.nb_enfants ?? 0,
+          nbEnfantsMoins12: profRes.data.nb_enfants_moins_12 ?? 0,
           isAdmin: !!profRes.data.is_admin,
           bio: profRes.data.bio,
           situation: profRes.data.situation,
@@ -6582,23 +6471,11 @@ function usePikapikaData() {
   }, [user?.id]);
 
   // Données réservées à la mairie : profils en attente de validation + signalements
-  const loadMairieData = async () => {
-    if (!profile.commune) {
-      setPendingParents([]); setPendingAssociations([]); setReports([]);
-      return;
-    }
-    const [parentsRes, assosRes, reportsRes] = await Promise.all([
-      supabase.from("profiles").select("*").eq("role", "parent").eq("parent_validated", false).eq("commune", profile.commune),
-      supabase.from("profiles").select("*").eq("role", "association").eq("association_validated", false).eq("commune", profile.commune),
-      supabase.from("reports").select("*").order("created_at", { ascending: false }),
-    ]);
-    setPendingParents(parentsRes.data || []);
-    setPendingAssociations(assosRes.data || []);
-    setReports(reportsRes.data || []);
-  };
-
   useEffect(() => {
-    if (user && profile.role === "mairie") loadMairieData();
+    if (user && profile.role === "mairie") {
+      supabase.from("reports").select("*").order("created_at", { ascending: false })
+        .then(({ data }) => setReports(data || []));
+    }
     if (user && profile.isAdmin) {
       supabase.from("profiles").select("id, display_name, association_name, genre, role, banned, is_admin, created_at, commune, email, birthdate")
         .then(({ data }) => setAllProfiles(data || []));
@@ -6738,14 +6615,6 @@ function usePikapikaData() {
     return true;
   };
 
-  const toggleParentValidated = async () => {
-    if (!user) return;
-    const next = !profile.parentValidated;
-    setProfile((p) => ({ ...p, parentValidated: next }));
-    const { error } = await supabase.from("profiles").update({ parent_validated: next }).eq("id", user.id);
-    if (error) console.error("Erreur validation :", error);
-  };
-
   const updateBirthdate = async (birthdate) => {
     if (!user) return;
     const { error } = await supabase.from("profiles").update({ birthdate: birthdate || null }).eq("id", user.id);
@@ -6786,12 +6655,23 @@ function usePikapikaData() {
     setProfile((p) => ({ ...p, situation: situation || null }));
   };
 
+  const updateNbEnfantsMoins12 = async (nb) => {
+    if (!user) return;
+    const n = Math.max(0, Math.min(profile.nbEnfants || 0, Number(nb) || 0));
+    const { error } = await supabase.from("profiles").update({ nb_enfants_moins_12: n }).eq("id", user.id);
+    if (error) { console.error("Erreur enfants -12 ans :", error); return; }
+    setProfile((p) => ({ ...p, nbEnfantsMoins12: n }));
+  };
+
   const updateNbEnfants = async (nb) => {
     if (!user) return;
     const n = Math.max(0, Math.min(12, Number(nb) || 0));
-    const { error } = await supabase.from("profiles").update({ nb_enfants: n }).eq("id", user.id);
+    // Le nombre d'enfants de moins de 12 ans ne peut pas dépasser le total
+    const moins12 = Math.min(profile.nbEnfantsMoins12 || 0, n);
+    const { error } = await supabase.from("profiles")
+      .update({ nb_enfants: n, nb_enfants_moins_12: moins12 }).eq("id", user.id);
     if (error) { console.error("Erreur nombre d'enfants :", error); return; }
-    setProfile((p) => ({ ...p, nbEnfants: n }));
+    setProfile((p) => ({ ...p, nbEnfants: n, nbEnfantsMoins12: moins12 }));
   };
 
   // Champs texte libres du profil (profession, centres d'intérêt, animaux, coup de cœur).
@@ -6873,14 +6753,6 @@ function usePikapikaData() {
   };
 
   // ---------- Actions réservées à la mairie ----------
-  const validateParent = async (profileId) => {
-    await supabase.from("profiles").update({ parent_validated: true }).eq("id", profileId);
-    setPendingParents((list) => list.filter((p) => p.id !== profileId));
-  };
-  const validateAssociation = async (profileId) => {
-    await supabase.from("profiles").update({ association_validated: true }).eq("id", profileId);
-    setPendingAssociations((list) => list.filter((p) => p.id !== profileId));
-  };
   const resolveReport = async (reportId, status) => {
     await supabase.from("reports").update({ status }).eq("id", reportId);
     setReports((list) => list.map((r) => r.id === reportId ? { ...r, status } : r));
@@ -6912,40 +6784,10 @@ function usePikapikaData() {
     setRows((list) => list.filter((r) => r.created_by !== userId));
   };
 
-  // ---------- Pré-autorisation de parents par email (mairie) ----------
-  // Ajoute l'email à la liste "pré-autorisée" (pour les futures inscriptions), et si un compte
-  // existe déjà avec cet email, le valide immédiatement.
-  const preauthorizeEmails = async (emails) => {
-    const clean = [...new Set(emails.map((e) => e.trim().toLowerCase()).filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)))];
-    if (clean.length === 0) return { added: 0, validated: 0, invalid: emails.length };
-    const invalidCount = emails.length - clean.length;
-    const commune = profile.commune || null;
-
-    // Insertion par lots de 500 pour rester léger même avec plusieurs milliers d'emails
-    const CHUNK = 500;
-    let added = 0;
-    for (let i = 0; i < clean.length; i += CHUNK) {
-      const batch = clean.slice(i, i + CHUNK).map((email) => ({ email, added_by: user.id, commune }));
-      const { data, error } = await supabase.from("preauthorized_emails").upsert(batch, { onConflict: "email", ignoreDuplicates: true }).select("id");
-      if (error) { console.error("Erreur pré-autorisation :", error); continue; }
-      added += data?.length || 0;
-    }
-
-    // Valide immédiatement les comptes déjà existants correspondant à ces emails,
-    // et les rattache à la commune de cette mairie s'ils n'en avaient pas encore.
-    const { data: validatedRows, error: valErr } = await supabase
-      .from("profiles").update({ parent_validated: true, commune }).in("email", clean).is("commune", null).select("id");
-    if (valErr) console.error("Erreur validation immédiate :", valErr);
-    // Pour les comptes qui avaient déjà une commune différente, on valide sans l'écraser
-    await supabase.from("profiles").update({ parent_validated: true }).in("email", clean).not("commune", "is", null);
-
-    return { added, validated: validatedRows?.length || 0, invalid: invalidCount };
-  };
-
   return {
     user, authLoading, dataLoading,
-    displayName: profile.displayName, email: user?.email || "", parentValidated: profile.parentValidated,
-    role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl, coverUrl: profile.coverUrl, nbEnfants: profile.nbEnfants,
+    displayName: profile.displayName, email: user?.email || "", parentValidated: (profile.nbEnfantsMoins12 || 0) > 0,
+    role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl, coverUrl: profile.coverUrl, nbEnfants: profile.nbEnfants, nbEnfantsMoins12: profile.nbEnfantsMoins12,
     isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune, birthdate: profile.birthdate, bio: profile.bio, genre: profile.genre, situation: profile.situation, profession: profile.profession, interets: profile.interets, animaux: profile.animaux, coupDeCoeur: profile.coupDeCoeur,
     activities, teenItems, adultItems, seniorItems, assoItems,
     favorites, favTeen, favAdult, favSenior, favAsso,
@@ -6962,21 +6804,21 @@ function usePikapikaData() {
     createTeenMeetup: (form) => insertActivity("teen", form),
     createSeniorMeetup: (form) => insertActivity("senior", form),
     updateActivity, deleteActivity,
-    toggleParentValidated,
     updateBirthdate,
     updateGenre,
     updateBio,
     updatePseudo,
     updateSituation,
     updateNbEnfants,
+    updateNbEnfantsMoins12,
     myRegsKids,
     updateProfileField,
     uploadAvatar,
     uploadCover, removeCover,
     submitReport,
-    pendingParents, pendingAssociations, reports, allProfiles, allActivitiesRaw: rows,
-    toggleBanUser, deleteUserData, preauthorizeEmails, setUserCommune,
-    validateParent, validateAssociation, resolveReport,
+    reports, allProfiles, allActivitiesRaw: rows,
+    toggleBanUser, deleteUserData, setUserCommune,
+    resolveReport,
     signOut: () => supabase.auth.signOut(),
   };
 }
@@ -7338,13 +7180,8 @@ export default function RecreApp() {
         )}
         {tab === "mairie" && pika.role === "mairie" && (
           <MairieDashboard
-            pendingParents={pika.pendingParents}
-            pendingAssociations={pika.pendingAssociations}
             reports={pika.reports}
-            onValidateParent={pika.validateParent}
-            onValidateAssociation={pika.validateAssociation}
             onResolveReport={pika.resolveReport}
-            onPreauthorize={pika.preauthorizeEmails}
             commune={pika.commune}
           />
         )}
@@ -7380,11 +7217,12 @@ export default function RecreApp() {
               onBack={() => setEditingProfile(false)}
               joinedCount={joined.length}
               validated={parentValidated}
-              onToggleDemo={pika.toggleParentValidated}
               displayName={displayName}
               email={email}
               nbEnfants={pika.nbEnfants}
               onUpdateNbEnfants={pika.updateNbEnfants}
+              nbEnfantsMoins12={pika.nbEnfantsMoins12}
+              onUpdateNbEnfantsMoins12={pika.updateNbEnfantsMoins12}
               onSignOut={pika.signOut}
               avatarUrl={pika.avatarUrl}
               onUploadAvatar={pika.uploadAvatar}
