@@ -101,7 +101,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", auth_pseudo: "Votre pseudo", auth_pseudo_note: "C'est ce nom qui sera visible par les autres membres sur les annonces.", auth_pseudo_required: "Merci de choisir un pseudo.", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_situation_label: "Situation familiale", profile_commune_label: "Votre commune", profile_commune_none: "Non renseignée", profile_commune_note: "Utilisée par défaut pour filtrer les sorties près de chez vous.", profile_profession_label: "Profession", profile_profession_ph: "Ex. Infirmière, enseignant, retraité…", profile_interets_label: "Centres d'intérêt", profile_interets_ph: "Ex. Randonnée, cuisine, lecture, jardinage…", profile_animaux_label: "Animaux", profile_animaux_ph: "Ex. Un chien, deux chats…", profile_coeur_label: "Ce que j'aime par-dessus tout", profile_coeur_ph: "Ex. Les balades en forêt le dimanche matin", profile_about_section: "À propos", situation_celibataire: "Célibataire", situation_en_couple: "En couple", situation_marie: "Marié(e)", situation_famille_mono: "Famille monoparentale", situation_autre: "Autre", situation_non_precise: "Je préfère ne pas préciser", profile_edit_title: "Modifier mon profil", btn_back: "Retour", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
+    auth_commune_placeholder: "Votre commune", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_situation_label: "Situation familiale", profile_commune_label: "Votre commune", profile_commune_none: "Non renseignée", profile_commune_search: "Rechercher votre commune…", profile_commune_note: "Utilisée par défaut pour filtrer les sorties près de chez vous.", profile_profession_label: "Profession", profile_profession_ph: "Ex. Infirmière, enseignant, retraité…", profile_interets_label: "Centres d'intérêt", profile_interets_ph: "Ex. Randonnée, cuisine, lecture, jardinage…", profile_animaux_label: "Animaux", profile_animaux_ph: "Ex. Un chien, deux chats…", profile_coeur_label: "Ce que j'aime par-dessus tout", profile_coeur_ph: "Ex. Les balades en forêt le dimanche matin", profile_about_section: "À propos", situation_celibataire: "Célibataire", situation_en_couple: "En couple", situation_marie: "Marié(e)", situation_famille_mono: "Famille monoparentale", situation_autre: "Autre", situation_non_precise: "Je préfère ne pas préciser", profile_edit_title: "Modifier mon profil", btn_back: "Retour", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
@@ -2973,6 +2973,102 @@ function Explorer({ activities, favorites, onToggleFav, onOpen, location }) {
 
 // Champ d'adresse avec suggestions en direct, via l'API officielle et gratuite du gouvernement
 // (Base Adresse Nationale) — aide à saisir une adresse réelle et bien formée, sans obliger à la choisir.
+// Recherche parmi toutes les communes françaises (API officielle geo.api.gouv.fr),
+// avec repli sur la liste locale si le réseau n'est pas disponible.
+function CommunePicker({ value, onSelect, placeholder }) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const q = query.trim();
+    if (q.length < 2) { setResults([]); return; }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      // Repli local immédiat, remplacé par les résultats officiels dès qu'ils arrivent
+      const local = Object.entries(CITY_META)
+        .filter(([, v]) => v.label.toLowerCase().includes(q.toLowerCase()))
+        .slice(0, 6)
+        .map(([, v]) => ({ nom: v.label, dept: v.dept, lat: v.lat, lon: v.lon }));
+      if (!cancelled) setResults(local);
+
+      if (typeof fetch === "undefined") return;
+      fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(q)}&fields=nom,codeDepartement,centre&boost=population&limit=8`)
+        .then((r) => (r.ok ? r.json() : []))
+        .then((data) => {
+          if (cancelled || !Array.isArray(data) || data.length === 0) return;
+          setResults(data
+            .map((d) => ({
+              nom: d.nom, dept: d.codeDepartement,
+              lat: d.centre?.coordinates?.[1], lon: d.centre?.coordinates?.[0],
+            }))
+            .filter((d) => d.lat && d.lon));
+        })
+        .catch(() => {});
+    }, 300);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [query]);
+
+  const inputStyle = {
+    width: "100%", border: "2px solid #F0EADB", borderRadius: 14, padding: "11px 14px",
+    fontFamily: "Nunito, sans-serif", fontSize: 14, color: COLORS.ink, outline: "none",
+    boxSizing: "border-box", background: "#fff",
+  };
+
+  return (
+    <div style={{ position: "relative" }}>
+      {value && !open ? (
+        <div style={{ ...inputStyle, display: "flex", alignItems: "center", gap: 8 }}>
+          <MapPin size={15} color={COLORS.grass} style={{ flexShrink: 0 }} />
+          <span style={{ flex: 1, fontWeight: 700 }}>{value}</span>
+          <button
+            onClick={() => { setOpen(true); setQuery(""); }}
+            style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, color: COLORS.sky }}
+          >
+            {t("btn_edit")}
+          </button>
+        </div>
+      ) : (
+        <input
+          autoFocus={open}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => setOpen(true)}
+          onBlur={() => setTimeout(() => setOpen(false), 160)}
+          placeholder={placeholder}
+          style={inputStyle}
+        />
+      )}
+
+      {open && results.length > 0 && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0, background: "#fff",
+          border: "2px solid #F0EADB", borderRadius: 14, boxShadow: "0 10px 24px rgba(43,37,96,0.14)",
+          zIndex: 30, maxHeight: 220, overflowY: "auto",
+        }}>
+          {results.map((r, i) => (
+            <button
+              key={`${r.nom}-${r.dept}-${i}`}
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => { onSelect(r); setQuery(""); setOpen(false); }}
+              style={{
+                display: "flex", alignItems: "center", gap: 8, width: "100%", textAlign: "left",
+                background: "transparent", border: "none", padding: "10px 12px", cursor: "pointer",
+                fontFamily: "Nunito, sans-serif", fontSize: 13.5, color: COLORS.ink, borderBottom: "1px solid #F5F1E6",
+              }}
+            >
+              <MapPin size={14} color="#B7AF98" style={{ flexShrink: 0 }} />
+              <span style={{ flex: 1 }}>{r.nom}</span>
+              <span style={{ fontSize: 11, color: "#B7AF98", fontWeight: 700 }}>{r.dept}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AddressInput({ value, onChange, placeholder }) {
   const [suggestions, setSuggestions] = useState([]);
   const [open, setOpen] = useState(false);
@@ -3205,7 +3301,7 @@ function MyOutings({ joined, activities, currentUserId, onOpen }) {
 // Formulaire de modification du profil (atteint via le bouton Modifier de la page profil)
 // Page profil en lecture : une vraie fiche présentable, avec un bouton "Modifier"
 // qui bascule vers le formulaire d'édition (ProfileEdit).
-function ProfileView({ displayName, email, avatarUrl, coverUrl, genre, birthdate, bio, nbEnfants, joinedCount, createdCount, validated, commune, role, situation, profession, interets, animaux, coupDeCoeur, onEdit, onSignOut, onOpenLegal }) {
+function ProfileView({ displayName, email, avatarUrl, coverUrl, genre, birthdate, bio, nbEnfants, joinedCount, createdCount, validated, commune, communeNom, role, situation, profession, interets, animaux, coupDeCoeur, onEdit, onSignOut, onOpenLegal }) {
   const age = birthdate ? ageFromBirthdate(birthdate) : null;
   const color = genre ? genreColor(genre) : COLORS.sky;
 
@@ -3298,7 +3394,7 @@ function ProfileView({ displayName, email, avatarUrl, coverUrl, genre, birthdate
         )}
         {commune && (
           <div style={{ display: "inline-flex", alignItems: "center", gap: 4, marginTop: 8, fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#6B6485", fontWeight: 700 }}>
-            <MapPin size={13} color="#B7AF98" /> {villeName(commune)}
+            <MapPin size={13} color="#B7AF98" /> {communeNom || villeName(commune)}
           </div>
         )}
 
@@ -3449,7 +3545,7 @@ function ProfileTextField({ label, placeholder, value, onSave, multiline = false
   );
 }
 
-function ProfileEdit({ onBack,  joinedCount, validated, displayName, email, nbEnfants, onUpdateNbEnfants, nbEnfantsMoins12, onUpdateNbEnfantsMoins12, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo, situation, onUpdateSituation, profession, interets, animaux, coupDeCoeur, onUpdateField, coverUrl, onUploadCover, onRemoveCover, commune, onUpdateCommune }) {
+function ProfileEdit({ onBack,  joinedCount, validated, displayName, email, nbEnfants, onUpdateNbEnfants, nbEnfantsMoins12, onUpdateNbEnfantsMoins12, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo, situation, onUpdateSituation, profession, interets, animaux, coupDeCoeur, onUpdateField, coverUrl, onUploadCover, onRemoveCover, communeNom, onUpdateCommune }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [birthdateInput, setBirthdateInput] = useState(birthdate || "");
@@ -3643,20 +3739,13 @@ function ProfileEdit({ onBack,  joinedCount, validated, displayName, email, nbEn
       </div>
 
       <SectionLabel>{t("profile_commune_label")}</SectionLabel>
-      <select
-        value={commune || ""}
-        onChange={(e) => onUpdateCommune(e.target.value || null)}
-        style={{
-          width: "100%", border: "2px solid #F0EADB", borderRadius: 14, padding: "11px 14px",
-          fontFamily: "Nunito, sans-serif", fontSize: 14, color: commune ? COLORS.ink : "#B7AF98",
-          outline: "none", boxSizing: "border-box", background: "#fff", marginBottom: 6,
-        }}
-      >
-        <option value="">{t("profile_commune_none")}</option>
-        {Object.entries(CITY_META).map(([id, v]) => (
-          <option key={id} value={id}>{v.label}</option>
-        ))}
-      </select>
+      <div style={{ marginBottom: 6 }}>
+        <CommunePicker
+          value={communeNom}
+          onSelect={onUpdateCommune}
+          placeholder={t("profile_commune_search")}
+        />
+      </div>
       <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF", margin: "0 0 22px" }}>
         {t("profile_commune_note")}
       </p>
@@ -6298,7 +6387,7 @@ function AuthScreen({ onClose, onOpenLegal }) {
   const [nbEnfants, setNbEnfants] = useState(0);
   const [nbMoins12, setNbMoins12] = useState(0);
   const [genre, setGenre] = useState("F");
-  const [commune, setCommune] = useState("");
+  const [commune, setCommune] = useState(null);
   const [birthdate, setBirthdate] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -6328,7 +6417,10 @@ function AuthScreen({ onClose, onOpenLegal }) {
             pseudo: publicName,
             first_name: accountType === "parent" ? name : null,
             last_name: accountType === "parent" ? (lastName || null) : null,
-            commune: accountType === "parent" ? commune : null,
+            commune_nom: accountType === "parent" && commune ? commune.nom : null,
+            commune_lat: accountType === "parent" && commune ? commune.lat : null,
+            commune_lon: accountType === "parent" && commune ? commune.lon : null,
+            commune_dept: accountType === "parent" && commune ? (commune.dept || null) : null,
             birthdate: accountType === "parent" && birthdate ? birthdate : null,
             nb_enfants: accountType === "parent" ? nbEnfants : 0,
             nb_enfants_moins_12: accountType === "parent" ? nbMoins12 : 0,
@@ -6463,15 +6555,13 @@ function AuthScreen({ onClose, onOpenLegal }) {
           </div>
         )}
         {mode === "signup" && accountType === "parent" && (
-          <select
-            value={commune} onChange={(e) => setCommune(e.target.value)}
-            style={{ ...inputStyle, color: commune ? COLORS.ink : "#B7AF98" }}
-          >
-            <option value="">{t("auth_commune_placeholder")}</option>
-            {Object.entries(CITY_META).map(([id, c]) => (
-              <option key={id} value={id}>{c.label}</option>
-            ))}
-          </select>
+          <div style={{ marginBottom: 12 }}>
+            <CommunePicker
+              value={commune?.nom}
+              onSelect={setCommune}
+              placeholder={t("auth_commune_placeholder")}
+            />
+          </div>
         )}
         {mode === "signup" && accountType === "parent" && (
           <div style={{ marginBottom: 12 }}>
@@ -7268,6 +7358,10 @@ function usePikapikaData() {
           coupDeCoeur: profRes.data.coup_de_coeur,
           birthdate: profRes.data.birthdate,
           commune: profRes.data.commune,
+          communeNom: profRes.data.commune_nom,
+          communeLat: profRes.data.commune_lat,
+          communeLon: profRes.data.commune_lon,
+          communeDept: profRes.data.commune_dept,
           banned: !!profRes.data.banned,
         });
       }
@@ -7500,11 +7594,20 @@ function usePikapikaData() {
     setProfile((p) => ({ ...p, situation: situation || null }));
   };
 
-  const updateCommune = async (commune) => {
+  // Accepte n'importe quelle commune française : on garde son nom et ses coordonnées,
+  // ce qui permet de centrer le filtre de lieu même hors de la liste pré-enregistrée.
+  const updateCommune = async (c) => {
     if (!user) return;
-    const { error } = await supabase.from("profiles").update({ commune: commune || null }).eq("id", user.id);
+    const patch = c
+      ? { commune_nom: c.nom, commune_lat: c.lat, commune_lon: c.lon, commune_dept: c.dept || null }
+      : { commune_nom: null, commune_lat: null, commune_lon: null, commune_dept: null };
+    const { error } = await supabase.from("profiles").update(patch).eq("id", user.id);
     if (error) { console.error("Erreur commune :", error); return; }
-    setProfile((p) => ({ ...p, commune: commune || null }));
+    setProfile((p) => ({
+      ...p,
+      communeNom: patch.commune_nom, communeLat: patch.commune_lat,
+      communeLon: patch.commune_lon, communeDept: patch.commune_dept,
+    }));
   };
 
   const updateNbEnfantsMoins12 = async (nb) => {
@@ -7653,7 +7756,7 @@ function usePikapikaData() {
     user, authLoading, dataLoading,
     displayName: profile.displayName, email: user?.email || "", parentValidated: (profile.nbEnfantsMoins12 || 0) > 0,
     role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl, coverUrl: profile.coverUrl, nbEnfants: profile.nbEnfants, nbEnfantsMoins12: profile.nbEnfantsMoins12,
-    isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune, birthdate: profile.birthdate, bio: profile.bio, genre: profile.genre, situation: profile.situation, profession: profile.profession, interets: profile.interets, animaux: profile.animaux, coupDeCoeur: profile.coupDeCoeur,
+    isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune, communeNom: profile.communeNom, communeLat: profile.communeLat, communeLon: profile.communeLon, communeDept: profile.communeDept, birthdate: profile.birthdate, bio: profile.bio, genre: profile.genre, situation: profile.situation, profession: profile.profession, interets: profile.interets, animaux: profile.animaux, coupDeCoeur: profile.coupDeCoeur,
     activities, teenItems, adultItems, seniorItems, assoItems,
     allActivities, allTeenItems, allAdultItems, allSeniorItems,
     favorites, favTeen, favAdult, favSenior, favAsso,
@@ -7700,12 +7803,23 @@ export default function RecreApp() {
   // Au premier chargement, on centre le filtre sur la commune renseignée dans le profil
   const locationPrefilled = useRef(false);
   useEffect(() => {
-    if (locationPrefilled.current || location || !pika.commune) return;
-    const meta = CITY_META[pika.commune];
-    if (!meta) return;
-    locationPrefilled.current = true;
-    setLocation({ type: "commune", nom: meta.label, lat: meta.lat, lon: meta.lon, dept: meta.dept, radius: 25 });
-  }, [pika.commune, location]);
+    if (locationPrefilled.current || location) return;
+    // Commune libre enregistrée sur le profil (n'importe quelle commune française)
+    if (pika.communeNom && pika.communeLat && pika.communeLon) {
+      locationPrefilled.current = true;
+      setLocation({
+        type: "commune", nom: pika.communeNom, lat: pika.communeLat,
+        lon: pika.communeLon, dept: pika.communeDept, radius: 25,
+      });
+      return;
+    }
+    // Repli sur l'ancienne commune pré-listée, pour les comptes créés avant
+    const meta = pika.commune ? CITY_META[pika.commune] : null;
+    if (meta) {
+      locationPrefilled.current = true;
+      setLocation({ type: "commune", nom: meta.label, lat: meta.lat, lon: meta.lon, dept: meta.dept, radius: 25 });
+    }
+  }, [pika.commune, pika.communeNom, pika.communeLat, pika.communeLon, pika.communeDept, location]);
   const [authPrompt, setAuthPrompt] = useState(false);
 
   const {
@@ -8131,7 +8245,7 @@ export default function RecreApp() {
               coverUrl={pika.coverUrl}
               onUploadCover={pika.uploadCover}
               onRemoveCover={pika.removeCover}
-              commune={pika.commune}
+              communeNom={pika.communeNom}
               onUpdateCommune={pika.updateCommune}
             />
           ) : (
@@ -8148,6 +8262,7 @@ export default function RecreApp() {
               createdCount={allCreatedCount}
               validated={parentValidated}
               commune={pika.commune}
+              communeNom={pika.communeNom}
               role={pika.role}
               situation={pika.situation}
               profession={pika.profession}
