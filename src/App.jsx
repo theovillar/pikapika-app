@@ -7809,7 +7809,7 @@ export default function RecreApp() {
       locationPrefilled.current = true;
       setLocation({
         type: "commune", nom: pika.communeNom, lat: pika.communeLat,
-        lon: pika.communeLon, dept: pika.communeDept, radius: 25,
+        lon: pika.communeLon, dept: pika.communeDept, radius: 0,
       });
       return;
     }
@@ -7817,7 +7817,7 @@ export default function RecreApp() {
     const meta = pika.commune ? CITY_META[pika.commune] : null;
     if (meta) {
       locationPrefilled.current = true;
-      setLocation({ type: "commune", nom: meta.label, lat: meta.lat, lon: meta.lon, dept: meta.dept, radius: 25 });
+      setLocation({ type: "commune", nom: meta.label, lat: meta.lat, lon: meta.lon, dept: meta.dept, radius: 0 });
     }
   }, [pika.commune, pika.communeNom, pika.communeLat, pika.communeLon, pika.communeDept, location]);
   const [authPrompt, setAuthPrompt] = useState(false);
