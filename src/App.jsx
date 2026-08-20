@@ -4622,6 +4622,8 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
   const isJoined = joined.includes(activity.id);
   const full = activity.inscrits >= activity.places && !isJoined;
   const isPast = (activity.offsetDays ?? 0) < 0;
+  // La roue des défis n'a de sens que le jour même, sur place
+  const isToday = (activity.offsetDays ?? 0) === 0;
 
   return (
     <div
@@ -4807,7 +4809,7 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
           </>
         )}
 
-        {!isPast && isJoined && (
+        {isToday && isJoined && (
           <button
             onClick={onOpenDefi}
             style={{
@@ -5258,6 +5260,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
   const isJoined = joined.includes(item.id);
   const full = item.inscrits >= item.places && !isJoined;
   const isPast = (item.offsetDays ?? 0) < 0;
+  const isToday = (item.offsetDays ?? 0) === 0;
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.45)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 9999 }}>
@@ -5408,7 +5411,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
           </PillButton>
         )}
 
-        {!isPast && isJoined && (
+        {isToday && isJoined && (
           <button
             onClick={onOpenDefi}
             style={{
