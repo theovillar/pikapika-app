@@ -101,7 +101,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", auth_pseudo: "Votre pseudo", auth_pseudo_note: "C'est ce nom qui sera visible par les autres membres sur les annonces.", auth_pseudo_required: "Merci de choisir un pseudo.", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune (optionnel)", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_situation_label: "Situation familiale", profile_profession_label: "Profession", profile_profession_ph: "Ex. Infirmière, enseignant, retraité…", profile_interets_label: "Centres d'intérêt", profile_interets_ph: "Ex. Randonnée, cuisine, lecture, jardinage…", profile_animaux_label: "Animaux", profile_animaux_ph: "Ex. Un chien, deux chats…", profile_coeur_label: "Ce que j'aime par-dessus tout", profile_coeur_ph: "Ex. Les balades en forêt le dimanche matin", profile_about_section: "À propos", situation_celibataire: "Célibataire", situation_en_couple: "En couple", situation_marie: "Marié(e)", situation_famille_mono: "Famille monoparentale", situation_autre: "Autre", situation_non_precise: "Je préfère ne pas préciser", profile_edit_title: "Modifier mon profil", btn_back: "Retour", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
+    auth_commune_placeholder: "Votre commune", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_situation_label: "Situation familiale", profile_commune_label: "Votre commune", profile_commune_none: "Non renseignée", profile_commune_note: "Utilisée par défaut pour filtrer les sorties près de chez vous.", profile_profession_label: "Profession", profile_profession_ph: "Ex. Infirmière, enseignant, retraité…", profile_interets_label: "Centres d'intérêt", profile_interets_ph: "Ex. Randonnée, cuisine, lecture, jardinage…", profile_animaux_label: "Animaux", profile_animaux_ph: "Ex. Un chien, deux chats…", profile_coeur_label: "Ce que j'aime par-dessus tout", profile_coeur_ph: "Ex. Les balades en forêt le dimanche matin", profile_about_section: "À propos", situation_celibataire: "Célibataire", situation_en_couple: "En couple", situation_marie: "Marié(e)", situation_famille_mono: "Famille monoparentale", situation_autre: "Autre", situation_non_precise: "Je préfère ne pas préciser", profile_edit_title: "Modifier mon profil", btn_back: "Retour", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
@@ -3449,7 +3449,7 @@ function ProfileTextField({ label, placeholder, value, onSave, multiline = false
   );
 }
 
-function ProfileEdit({ onBack,  joinedCount, validated, displayName, email, nbEnfants, onUpdateNbEnfants, nbEnfantsMoins12, onUpdateNbEnfantsMoins12, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo, situation, onUpdateSituation, profession, interets, animaux, coupDeCoeur, onUpdateField, coverUrl, onUploadCover, onRemoveCover }) {
+function ProfileEdit({ onBack,  joinedCount, validated, displayName, email, nbEnfants, onUpdateNbEnfants, nbEnfantsMoins12, onUpdateNbEnfantsMoins12, onSignOut, avatarUrl, onUploadAvatar, birthdate, onUpdateBirthdate, onOpenLegal, bio, onUpdateBio, genre, onUpdateGenre, onUpdatePseudo, situation, onUpdateSituation, profession, interets, animaux, coupDeCoeur, onUpdateField, coverUrl, onUploadCover, onRemoveCover, commune, onUpdateCommune }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [birthdateInput, setBirthdateInput] = useState(birthdate || "");
@@ -3641,6 +3641,25 @@ function ProfileEdit({ onBack,  joinedCount, validated, displayName, email, nbEn
           </button>
         ))}
       </div>
+
+      <SectionLabel>{t("profile_commune_label")}</SectionLabel>
+      <select
+        value={commune || ""}
+        onChange={(e) => onUpdateCommune(e.target.value || null)}
+        style={{
+          width: "100%", border: "2px solid #F0EADB", borderRadius: 14, padding: "11px 14px",
+          fontFamily: "Nunito, sans-serif", fontSize: 14, color: commune ? COLORS.ink : "#B7AF98",
+          outline: "none", boxSizing: "border-box", background: "#fff", marginBottom: 6,
+        }}
+      >
+        <option value="">{t("profile_commune_none")}</option>
+        {Object.entries(CITY_META).map(([id, v]) => (
+          <option key={id} value={id}>{v.label}</option>
+        ))}
+      </select>
+      <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF", margin: "0 0 22px" }}>
+        {t("profile_commune_note")}
+      </p>
 
       <SectionLabel>{t("profile_situation_label")}</SectionLabel>
       <select
@@ -7481,6 +7500,13 @@ function usePikapikaData() {
     setProfile((p) => ({ ...p, situation: situation || null }));
   };
 
+  const updateCommune = async (commune) => {
+    if (!user) return;
+    const { error } = await supabase.from("profiles").update({ commune: commune || null }).eq("id", user.id);
+    if (error) { console.error("Erreur commune :", error); return; }
+    setProfile((p) => ({ ...p, commune: commune || null }));
+  };
+
   const updateNbEnfantsMoins12 = async (nb) => {
     if (!user) return;
     const n = Math.max(0, Math.min(profile.nbEnfants || 0, Number(nb) || 0));
@@ -7651,6 +7677,7 @@ function usePikapikaData() {
     updateSituation,
     updateNbEnfants,
     updateNbEnfantsMoins12,
+    updateCommune,
     myRegsKids,
     updateProfileField,
     uploadAvatar,
@@ -7670,6 +7697,15 @@ export default function RecreApp() {
   const [selectedId, setSelectedId] = useState(null);
   const [selectedCommunity, setSelectedCommunity] = useState(null); // { id, kind: "adult" | "teen" | "senior" | "asso" }
   const [location, setLocation] = useState(null);
+  // Au premier chargement, on centre le filtre sur la commune renseignée dans le profil
+  const locationPrefilled = useRef(false);
+  useEffect(() => {
+    if (locationPrefilled.current || location || !pika.commune) return;
+    const meta = CITY_META[pika.commune];
+    if (!meta) return;
+    locationPrefilled.current = true;
+    setLocation({ type: "commune", nom: meta.label, lat: meta.lat, lon: meta.lon, dept: meta.dept, radius: 25 });
+  }, [pika.commune, location]);
   const [authPrompt, setAuthPrompt] = useState(false);
 
   const {
@@ -8095,6 +8131,8 @@ export default function RecreApp() {
               coverUrl={pika.coverUrl}
               onUploadCover={pika.uploadCover}
               onRemoveCover={pika.removeCover}
+              commune={pika.commune}
+              onUpdateCommune={pika.updateCommune}
             />
           ) : (
             <ProfileView
