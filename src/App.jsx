@@ -7861,10 +7861,10 @@ export default function RecreApp() {
             background: COLORS.coral, color: "#fff", border: "none",
             borderRadius: 999, padding: "14px 20px", cursor: "pointer",
             fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15,
-            boxShadow: `0 4px 0 ${shade(COLORS.coral, -18)}, 0 8px 20px rgba(43,37,96,0.22)`,
+            boxShadow: "0 6px 20px rgba(43,37,96,0.25)",
           }}
         >
-          <PlusCircle size={20} />
+          <PlusCircle size={20} className="pika-fab-icon" />
           <span className="pika-fab-label">{t("tab_creer")}</span>
         </button>
       )}
@@ -7988,8 +7988,9 @@ export default function RecreApp() {
         @media (max-width: 460px) {
           /* Sur petit écran : le bouton flottant devient rond (icône seule) et les
              libellés d'en-tête sont masqués pour laisser la place au sélecteur de lieu. */
-          .pika-fab { padding: 15px !important; right: 14px !important; }
+          .pika-fab { padding: 16px !important; right: 14px !important; }
           .pika-fab-label { display: none !important; }
+          .pika-fab-icon { width: 30px !important; height: 30px !important; }
           .pika-header-action { padding: 7px !important; }
           .pika-header-action-label { display: none !important; }
         }
