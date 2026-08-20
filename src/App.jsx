@@ -4511,6 +4511,7 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
           borderTop: "2px solid #F0EADB", background: "#fff", flexShrink: 0,
         }}>
           {chatOuvert ? (
+            <>
             {emojiOpen && (
               <div style={{
                 display: "grid", gridTemplateColumns: "repeat(8, 1fr)", gap: 2,
@@ -4569,6 +4570,7 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
                 <ChevronRight size={20} color={draft.trim() ? "#fff" : "#B7AF98"} />
               </button>
             </div>
+            </>
           ) : (
             <p style={{
               textAlign: "center", fontFamily: "Nunito, sans-serif", fontSize: 12.5,
