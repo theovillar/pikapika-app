@@ -88,7 +88,7 @@ const TRANSLATIONS = {
     tab_associations: "Commune", community_asso_title: "Associations & Mairie",
     community_asso_subtitle: "Événements organisés par la mairie et les associations de votre commune.",
     join_label_asso: "Je participe",
-    chip_intergen: "Intergénérationnel", intergen_badge: "Intergénérationnel", chip_favorites: "Favoris", filter_from_date: "À partir du", filter_reset_date: "Tout voir",
+    chip_intergen: "Intergénérationnel", intergen_badge: "Intergénérationnel", chip_favorites: "Favoris", filter_from_date: "À partir du", filter_from_date_short: "Date", filter_reset_date: "Toutes dates",
     btn_sign_out: "Se déconnecter",
     auth_title: "Bienvenue sur Orée", auth_subtitle: "Connectez-vous pour retrouver vos sorties.",
     auth_email: "Adresse email", auth_password: "Mot de passe", auth_name: "Votre prénom",
@@ -5170,6 +5170,7 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
   const [view, setView] = useState("liste");
   // Date de départ de l'affichage : permet de se projeter dans le futur (ex. dans un mois)
   const [fromDate, setFromDate] = useState("");
+  const dateInputRef = useRef(null);
 
   // Nombre de jours entre aujourd'hui et la date choisie
   const fromOffset = useMemo(() => {
@@ -5216,40 +5217,38 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
         />
       </div>
 
-      {/* Se positionner à une date : pratique pour se projeter (ex. dans un mois) */}
-      <div style={{
-        display: "flex", alignItems: "center", gap: 8, background: "#fff",
-        border: "2px solid #F0EADB", borderRadius: 16, padding: "8px 12px", marginBottom: 10,
-        flexWrap: "wrap",
-      }}>
-        <CalendarDays size={16} color="#B7AF98" style={{ flexShrink: 0 }} />
-        <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 12.5, color: "#6B6485", flexShrink: 0 }}>
-          {t("filter_from_date")}
-        </span>
-        <input
-          type="date"
-          value={fromDate}
-          min={new Date().toISOString().slice(0, 10)}
-          onChange={(e) => setFromDate(e.target.value)}
-          style={{
-            border: "2px solid #F0EADB", borderRadius: 10, padding: "5px 8px",
-            fontFamily: "Nunito, sans-serif", fontSize: 13, color: COLORS.ink, outline: "none", flex: 1, minWidth: 130,
-          }}
-        />
-        {fromDate && (
-          <button
-            onClick={() => setFromDate("")}
-            style={{
-              background: "transparent", border: "none", cursor: "pointer", padding: "4px 6px",
-              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, color: COLORS.coral,
-            }}
-          >
-            {t("filter_reset_date")}
-          </button>
-        )}
-      </div>
-
       <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 6, marginBottom: 10 }}>
+        {/* Se positionner à une date : petit bouton discret, le calendrier natif s'ouvre au clic */}
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          <Chip active={!!fromDate} onClick={() => dateInputRef.current?.showPicker?.() ?? dateInputRef.current?.focus()} color={COLORS.sky}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+              <CalendarDays size={13} />
+              {fromDate
+                ? new Date(fromDate + "T00:00:00").toLocaleDateString(
+                    LANG === "fr" ? "fr-FR" : LANG === "es" ? "es-ES" : "en-US",
+                    { day: "numeric", month: "short" })
+                : t("filter_from_date_short")}
+            </span>
+          </Chip>
+          <input
+            ref={dateInputRef}
+            type="date"
+            value={fromDate}
+            min={new Date().toISOString().slice(0, 10)}
+            onChange={(e) => setFromDate(e.target.value)}
+            style={{
+              position: "absolute", inset: 0, opacity: 0, pointerEvents: "none",
+              width: "100%", height: "100%", border: "none",
+            }}
+          />
+        </div>
+        {fromDate && (
+          <Chip active={false} onClick={() => setFromDate("")} color={COLORS.coral}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+              <X size={12} /> {t("filter_reset_date")}
+            </span>
+          </Chip>
+        )}
         <Chip active={cat === "tous"} onClick={() => setCat("tous")} color={COLORS.ink}>{t("chip_all")}</Chip>
         <Chip active={onlyFav} onClick={() => setOnlyFav((v) => !v)} color={COLORS.coral}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
