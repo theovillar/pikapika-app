@@ -2540,7 +2540,9 @@ function PlainParticipantsRow({ names, color, max = 8, genderMode = false, onVie
   useEffect(() => {
     const el = containerRef.current;
     if (!el || typeof ResizeObserver === "undefined" || !names || names.length === 0) return;
-    const AVATAR_SIZE = 26, STEP = 18, ELLIPSIS_WIDTH = 26;
+    // La bulle mesure 26px + 2px de bordure de chaque côté = 30px de large.
+    // Avec un chevauchement de -10px, chaque bulle suivante n'ajoute que 20px.
+    const AVATAR_SIZE = 30, STEP = 20, ELLIPSIS_WIDTH = 30;
 
     const compute = (width) => {
       if (names.length <= max) {
@@ -2571,7 +2573,7 @@ function PlainParticipantsRow({ names, color, max = 8, genderMode = false, onVie
   const extra = names.length - shown.length;
 
   return (
-    <div ref={containerRef} style={{ display: "flex", alignItems: "center", marginTop: 2, minWidth: 0, flexShrink: 1, overflow: "hidden" }}>
+    <div ref={containerRef} style={{ display: "flex", alignItems: "center", marginTop: 2, minWidth: 0, flexShrink: 1, paddingLeft: 2 }}>
       {shown.map((p, i) => (
         <PlainAvatar key={i} participant={p} color={color} overlap={i > 0} genderMode={genderMode} onViewProfile={onViewProfile} />
       ))}
