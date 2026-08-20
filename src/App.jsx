@@ -2304,14 +2304,12 @@ function Stamp({ category, size = 46, rotate = -8 }) {
 function Avatar({ name, genre, size = 26, overlap = false, genderMode = true, color, avatarUrl, userId, onViewProfile }) {
   const finalColor = genderMode ? genreColor(genre) : (color || COLORS.grape);
   const clickable = !!(userId && onViewProfile);
-  const ringColor = genderMode && genre ? genreColor(genre) : null;
-  const ring = ringColor ? `0 0 0 1.5px #fff, 0 0 0 2.5px ${ringColor}90` : "0 0 0 1.5px #fff";
   const style = {
-    width: size, height: size, borderRadius: "50%", background: finalColor,
+    width: size, height: size, minWidth: size, borderRadius: "50%", background: finalColor,
     display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
-    color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800,
-    fontSize: size * 0.42, border: "none", boxShadow: ring,
-    marginLeft: overlap ? -8 : 0, flexShrink: 0,
+    color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800, lineHeight: 1,
+    fontSize: size * 0.42, border: "2px solid #fff", boxSizing: "content-box", boxShadow: "none",
+    marginLeft: overlap ? -10 : 0, flexShrink: 0,
     cursor: clickable ? "pointer" : "default", padding: 0,
   };
   const content = avatarUrl ? (
@@ -2507,15 +2505,14 @@ function PlainAvatar({ participant, color, size, overlap = false, genderMode = f
   const dim = size !== undefined ? `${size}px` : "var(--pika-avatar-size, 26px)";
   const fontSize = size !== undefined ? size * 0.42 : "calc(var(--pika-avatar-size, 26px) * 0.42)";
   const clickable = participant?.isReal && participant?.userId && onViewProfile;
-  // Anneau coloré par genre (garde la distinction visible même quand une vraie photo masque le fond)
-  const ringColor = genderMode && participant?.genre ? genreColor(participant.genre) : null;
-  const ring = ringColor ? `0 0 0 1.5px #fff, 0 0 0 2.5px ${ringColor}90` : "0 0 0 1.5px #fff";
+  // Le sexe est déjà indiqué par la couleur de fond de la bulle : pas d'anneau supplémentaire,
+  // juste un fin liseré blanc pour détacher les bulles qui se chevauchent.
   const style = {
-    width: dim, height: dim, borderRadius: "50%", background: avatarColor,
+    width: dim, height: dim, minWidth: dim, borderRadius: "50%", background: avatarColor,
     display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
-    color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800,
-    fontSize, border: "none", boxShadow: ring,
-    marginLeft: overlap ? -8 : 0, flexShrink: 0,
+    color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800, lineHeight: 1,
+    fontSize, border: "2px solid #fff", boxSizing: "content-box", boxShadow: "none",
+    marginLeft: overlap ? -10 : 0, flexShrink: 0,
     cursor: clickable ? "pointer" : "default", padding: 0,
   };
   // Les bulles n'affichent que l'initiale : charger une photo pleine taille pour une
@@ -2580,10 +2577,12 @@ function PlainParticipantsRow({ names, color, max = 8, genderMode = false, onVie
       ))}
       {extra > 0 && (
         <div style={{
-          width: 26, height: 26, borderRadius: "50%", background: "#EDEAF4",
+          width: "var(--pika-avatar-size, 26px)", height: "var(--pika-avatar-size, 26px)",
+          minWidth: "var(--pika-avatar-size, 26px)",
+          borderRadius: "50%", background: "#EDEAF4",
           display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-          color: COLORS.ink, fontFamily: "Nunito, sans-serif", fontWeight: 800,
-          fontSize: 13, border: "2px solid #fff", marginLeft: -8,
+          color: COLORS.ink, fontFamily: "Nunito, sans-serif", fontWeight: 800, lineHeight: 1,
+          fontSize: 13, border: "2px solid #fff", boxSizing: "content-box", marginLeft: -10,
         }}>
           …
         </div>
