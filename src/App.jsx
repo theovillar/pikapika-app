@@ -88,7 +88,7 @@ const TRANSLATIONS = {
     tab_associations: "Commune", community_asso_title: "Associations & Mairie",
     community_asso_subtitle: "Événements organisés par la mairie et les associations de votre commune.",
     join_label_asso: "Je participe",
-    chip_intergen: "Intergénérationnel", intergen_badge: "Intergénérationnel", chip_favorites: "Favoris",
+    chip_intergen: "Intergénérationnel", intergen_badge: "Intergénérationnel", chip_favorites: "Favoris", filter_from_date: "À partir du", filter_reset_date: "Tout voir",
     btn_sign_out: "Se déconnecter",
     auth_title: "Bienvenue sur Orée", auth_subtitle: "Connectez-vous pour retrouver vos sorties.",
     auth_email: "Adresse email", auth_password: "Mot de passe", auth_name: "Votre prénom",
@@ -5168,16 +5168,28 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
   const [cat, setCat] = useState("tous");
   const [onlyFav, setOnlyFav] = useState(false);
   const [view, setView] = useState("liste");
+  // Date de départ de l'affichage : permet de se projeter dans le futur (ex. dans un mois)
+  const [fromDate, setFromDate] = useState("");
+
+  // Nombre de jours entre aujourd'hui et la date choisie
+  const fromOffset = useMemo(() => {
+    if (!fromDate) return null;
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const picked = new Date(fromDate + "T00:00:00");
+    if (Number.isNaN(picked.getTime())) return null;
+    return Math.round((picked - today) / 86400000);
+  }, [fromDate]);
 
   const filtered = useMemo(() => {
     return items.filter((a) => {
       const matchCat = cat === "tous" || (cat === "intergen" ? a.intergen : a.category === cat);
       const matchLoc = matchLocation(a.ville, location);
       const matchFav = !onlyFav || favorites.includes(a.id);
+      const matchDate = fromOffset === null || (a.offsetDays ?? 0) >= fromOffset;
       const matchQuery = a.title.toLowerCase().includes(query.toLowerCase()) || a.lieu.toLowerCase().includes(query.toLowerCase());
-      return matchCat && matchLoc && matchFav && matchQuery;
+      return matchCat && matchLoc && matchFav && matchDate && matchQuery;
     });
-  }, [items, query, cat, location, onlyFav, favorites]);
+  }, [items, query, cat, location, onlyFav, favorites, fromOffset]);
   const hasIntergen = items.some((a) => a.intergen);
 
   return (
@@ -5202,6 +5214,39 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
           placeholder={t("search_placeholder_community")}
           style={{ border: "none", outline: "none", fontFamily: "Nunito, sans-serif", fontSize: 14.5, flex: 1, background: "transparent", color: COLORS.ink }}
         />
+      </div>
+
+      {/* Se positionner à une date : pratique pour se projeter (ex. dans un mois) */}
+      <div style={{
+        display: "flex", alignItems: "center", gap: 8, background: "#fff",
+        border: "2px solid #F0EADB", borderRadius: 16, padding: "8px 12px", marginBottom: 10,
+        flexWrap: "wrap",
+      }}>
+        <CalendarDays size={16} color="#B7AF98" style={{ flexShrink: 0 }} />
+        <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 12.5, color: "#6B6485", flexShrink: 0 }}>
+          {t("filter_from_date")}
+        </span>
+        <input
+          type="date"
+          value={fromDate}
+          min={new Date().toISOString().slice(0, 10)}
+          onChange={(e) => setFromDate(e.target.value)}
+          style={{
+            border: "2px solid #F0EADB", borderRadius: 10, padding: "5px 8px",
+            fontFamily: "Nunito, sans-serif", fontSize: 13, color: COLORS.ink, outline: "none", flex: 1, minWidth: 130,
+          }}
+        />
+        {fromDate && (
+          <button
+            onClick={() => setFromDate("")}
+            style={{
+              background: "transparent", border: "none", cursor: "pointer", padding: "4px 6px",
+              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, color: COLORS.coral,
+            }}
+          >
+            {t("filter_reset_date")}
+          </button>
+        )}
       </div>
 
       <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 6, marginBottom: 10 }}>
