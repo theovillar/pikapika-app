@@ -4360,7 +4360,6 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
   const [emojiOpen, setEmojiOpen] = useState(false);
   const bottomRef = useRef(null);
 
-  const debut = new Date(activity.starts_at || 0).getTime();
   const chatOuvert = activity.chatOpen;
 
   const load = async () => {
