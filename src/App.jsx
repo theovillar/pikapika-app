@@ -106,7 +106,7 @@ const TRANSLATIONS = {
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
     change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
-    share_btn: "Partager", defi_btn: "La roue des défis", chat_btn: "Discussion du groupe", chat_open: "Discussion ouverte", chat_closed: "Discussion fermée", chat_placeholder: "Écrire un message…", chat_empty: "Aucun message pour le moment.\nÉcrivez le premier pour organiser vos retrouvailles !", chat_closed_note: "La discussion est fermée (5h après le début de la sortie). Vous pouvez toujours relire les messages.", defi_btn_view: "Voir le défi du groupe", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", defi_validate: "Valider ce défi pour le groupe", defi_group_label: "Le défi du groupe", defi_group_subtitle: "Le défi a déjà été tiré pour cette sortie — le voici !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
+    share_btn: "Partager", defi_btn: "La roue des défis", chat_btn: "Discussion du groupe", chat_open: "Discussion ouverte", chat_closed: "Discussion fermée", chat_placeholder: "Écrire un message…", chat_emoji: "Émoticônes", chat_empty: "Aucun message pour le moment.\nÉcrivez le premier pour organiser vos retrouvailles !", chat_closed_note: "La discussion est fermée (5h après le début de la sortie). Vous pouvez toujours relire les messages.", defi_btn_view: "Voir le défi du groupe", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", defi_validate: "Valider ce défi pour le groupe", defi_group_label: "Le défi du groupe", defi_group_subtitle: "Le défi a déjà été tiré pour cette sortie — le voici !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
     share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Regarde cette sortie sur Orée : {title}",
     report_btn: "Signaler", report_title: "Signaler cette annonce",
     report_reason_label: "Raison du signalement", report_details_label: "Détails (optionnel)",
@@ -4344,11 +4344,20 @@ const MAX_SPINS = 2;
 // Chat de groupe entre participants d'une même sortie : sert surtout à se retrouver
 // le jour J. L'écriture se ferme automatiquement 5h après le début de la sortie,
 // mais l'historique reste consultable.
+// Sélection d'émojis utiles pour se retrouver et échanger simplement
+const EMOJIS = [
+  "😀", "😄", "😉", "🙂", "😍", "🤗", "😂", "🥳",
+  "👍", "👋", "🙏", "👏", "💪", "🤝", "❤️", "✨",
+  "🏃", "🚶", "🚗", "🚲", "⏰", "📍", "🗺️", "☀️",
+  "🌧️", "☂️", "🎉", "🎈", "☕", "🍎", "⚽", "🎨",
+];
+
 function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [emojiOpen, setEmojiOpen] = useState(false);
   const bottomRef = useRef(null);
 
   const debut = new Date(activity.starts_at || 0).getTime();
@@ -4385,7 +4394,7 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
       activity_id: activity.id, user_id: currentUserId, content: texte.slice(0, 500),
     });
     if (error) console.error("Erreur envoi message :", error);
-    else { setDraft(""); await load(); }
+    else { setDraft(""); setEmojiOpen(false); await load(); }
     setSending(false);
   };
 
@@ -4501,7 +4510,39 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
           borderTop: "2px solid #F0EADB", background: "#fff", flexShrink: 0,
         }}>
           {chatOuvert ? (
+            {emojiOpen && (
+              <div style={{
+                display: "grid", gridTemplateColumns: "repeat(8, 1fr)", gap: 2,
+                background: COLORS.cloud, border: "2px solid #F0EADB", borderRadius: 16,
+                padding: 8, marginBottom: 8, maxHeight: 150, overflowY: "auto",
+              }}>
+                {EMOJIS.map((e) => (
+                  <button
+                    key={e}
+                    onClick={() => setDraft((d) => (d + e).slice(0, 500))}
+                    style={{
+                      background: "none", border: "none", cursor: "pointer",
+                      fontSize: 22, padding: "5px 0", lineHeight: 1, borderRadius: 8,
+                    }}
+                  >
+                    {e}
+                  </button>
+                ))}
+              </div>
+            )}
             <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+              <button
+                onClick={() => setEmojiOpen((v) => !v)}
+                aria-label={t("chat_emoji")}
+                style={{
+                  width: 42, height: 42, borderRadius: "50%", flexShrink: 0, cursor: "pointer",
+                  background: emojiOpen ? COLORS.sun : "#fff",
+                  border: `2px solid ${emojiOpen ? COLORS.sun : "#F0EADB"}`,
+                  fontSize: 20, lineHeight: 1, padding: 0,
+                }}
+              >
+                🙂
+              </button>
               <textarea
                 rows={1}
                 value={draft}
