@@ -7602,7 +7602,7 @@ export default function RecreApp() {
 
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
             {pika.user ? (
-              HEADER_ACTIONS.map((a) => {
+              HEADER_ACTIONS.filter((a) => a.id !== "creer").map((a) => {
                 const active = tab === a.id;
                 return (
                   <button
@@ -7612,13 +7612,19 @@ export default function RecreApp() {
                     title={a.label}
                     className="pika-header-action"
                     style={{
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      width: 36, height: 36, borderRadius: "50%", border: "none", cursor: "pointer",
+                      display: "flex", alignItems: "center", gap: 6, cursor: "pointer",
+                      borderRadius: 999, border: "none", padding: "7px 12px", flexShrink: 0,
                       background: active ? COLORS.ink : "#fff",
-                      boxShadow: active ? "none" : "0 0 0 2px #F0EADB inset", flexShrink: 0,
+                      boxShadow: active ? "none" : "0 0 0 2px #F0EADB inset",
                     }}
                   >
-                    <a.icon size={17} className="pika-header-action-icon" color={active ? "#fff" : COLORS.ink} />
+                    <a.icon size={16} className="pika-header-action-icon" color={active ? "#fff" : COLORS.ink} />
+                    <span className="pika-header-action-label" style={{
+                      fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
+                      color: active ? "#fff" : COLORS.ink, whiteSpace: "nowrap",
+                    }}>
+                      {a.label}
+                    </span>
                   </button>
                 );
               })
@@ -7843,6 +7849,26 @@ export default function RecreApp() {
         )}
       </div>
 
+      {/* Bouton flottant "Créer" : l'action principale de l'appli, toujours accessible */}
+      {pika.user && tab !== "creer" && (
+        <button
+          onClick={() => setTab("creer")}
+          aria-label={t("tab_creer")}
+          className="pika-fab"
+          style={{
+            position: "fixed", right: 18, bottom: "calc(84px + env(safe-area-inset-bottom))",
+            zIndex: 900, display: "flex", alignItems: "center", gap: 8,
+            background: COLORS.coral, color: "#fff", border: "none",
+            borderRadius: 999, padding: "14px 20px", cursor: "pointer",
+            fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15,
+            boxShadow: `0 4px 0 ${shade(COLORS.coral, -18)}, 0 8px 20px rgba(43,37,96,0.22)`,
+          }}
+        >
+          <PlusCircle size={20} />
+          <span className="pika-fab-label">{t("tab_creer")}</span>
+        </button>
+      )}
+
       {/* Bottom tab bar (mobile) */}
       <div
         className="mobile-nav"
@@ -7958,6 +7984,14 @@ export default function RecreApp() {
         @media (min-width: 768px) {
           .desktop-nav { display: flex !important; }
           .mobile-nav { display: none !important; }
+        }
+        @media (max-width: 460px) {
+          /* Sur petit écran : le bouton flottant devient rond (icône seule) et les
+             libellés d'en-tête sont masqués pour laisser la place au sélecteur de lieu. */
+          .pika-fab { padding: 15px !important; right: 14px !important; }
+          .pika-fab-label { display: none !important; }
+          .pika-header-action { padding: 7px !important; }
+          .pika-header-action-label { display: none !important; }
         }
         @media (max-width: 560px) {
           .pika-cover { min-height: 150px !important; }
