@@ -6988,12 +6988,30 @@ function usePikapikaData() {
     };
   };
 
-  const bySpace = (space) => rows.filter((r) => r.space === space).map(mapRow);
+  // Une sortie disparaît des listes 5h après son heure de début : elle reste visible
+  // pendant qu'elle se déroule, puis s'efface une fois clairement terminée.
+  const MASQUAGE_APRES_MS = 5 * 60 * 60 * 1000;
+  const estEncoreVisible = (row) => {
+    const debut = new Date(row.starts_at).getTime();
+    if (Number.isNaN(debut)) return true;
+    return Date.now() < debut + MASQUAGE_APRES_MS;
+  };
+
+  // Listes publiques (masquent les sorties terminées) et listes complètes (pour "Mes sorties",
+  // qui conserve l'historique en grisé).
+  const bySpace = (space) => rows.filter((r) => r.space === space && estEncoreVisible(r)).map(mapRow);
+  const bySpaceAll = (space) => rows.filter((r) => r.space === space).map(mapRow);
   const activities = useMemo(() => bySpace("kids"), [rows, regByActivity, kidsByActivity, ageStats, realParticipants, organiserProfiles]);
   const teenItems = useMemo(() => bySpace("teen"), [rows, regByActivity, kidsByActivity, ageStats, realParticipants, organiserProfiles]);
   const adultItems = useMemo(() => bySpace("adult"), [rows, regByActivity, kidsByActivity, ageStats, realParticipants, organiserProfiles]);
   const seniorItems = useMemo(() => bySpace("senior"), [rows, regByActivity, kidsByActivity, ageStats, realParticipants, organiserProfiles]);
   const assoItems = useMemo(() => bySpace("asso"), [rows, regByActivity, kidsByActivity, ageStats, realParticipants, organiserProfiles]);
+
+  const deps = [rows, regByActivity, kidsByActivity, ageStats, realParticipants, organiserProfiles];
+  const allActivities = useMemo(() => bySpaceAll("kids"), deps);
+  const allTeenItems = useMemo(() => bySpaceAll("teen"), deps);
+  const allAdultItems = useMemo(() => bySpaceAll("adult"), deps);
+  const allSeniorItems = useMemo(() => bySpaceAll("senior"), deps);
 
   const idsIn = (items, set) => items.filter((it) => set.has(it.id)).map((it) => it.id);
   const favorites = useMemo(() => idsIn(activities, myFavs), [activities, myFavs]);
@@ -7294,6 +7312,7 @@ function usePikapikaData() {
     role: profile.role, associationValidated: profile.associationValidated, avatarUrl: profile.avatarUrl, coverUrl: profile.coverUrl, nbEnfants: profile.nbEnfants, nbEnfantsMoins12: profile.nbEnfantsMoins12,
     isAdmin: profile.isAdmin, banned: profile.banned, commune: profile.commune, birthdate: profile.birthdate, bio: profile.bio, genre: profile.genre, situation: profile.situation, profession: profile.profession, interets: profile.interets, animaux: profile.animaux, coupDeCoeur: profile.coupDeCoeur,
     activities, teenItems, adultItems, seniorItems, assoItems,
+    allActivities, allTeenItems, allAdultItems, allSeniorItems,
     favorites, favTeen, favAdult, favSenior, favAsso,
     joined, joinedTeen, joinedAdult, joinedSenior, joinedAsso,
     toggleFav: toggleFavGeneric,
@@ -7614,21 +7633,21 @@ export default function RecreApp() {
             currentUserId={pika.user?.id}
             onViewProfile={openUserProfile}
             joined={joined}
-            activities={activities}
+            activities={pika.allActivities}
             onOpenKid={(item) => setSelectedId(item.id)}
             favorites={favorites}
             onToggleFavKid={toggleFav}
-            teenItems={teenItems}
+            teenItems={pika.allTeenItems}
             joinedTeen={joinedTeen}
             onOpenTeen={(item) => setSelectedCommunity({ id: item.id, kind: "teen" })}
             favTeen={favTeen}
             onToggleFavTeen={(id) => toggleFavCommunity("teen", id)}
-            adultItems={adultItems}
+            adultItems={pika.allAdultItems}
             joinedAdult={joinedAdult}
             onOpenAdult={(item) => setSelectedCommunity({ id: item.id, kind: "adult" })}
             favAdult={favAdult}
             onToggleFavAdult={(id) => toggleFavCommunity("adult", id)}
-            seniorItems={seniorItems}
+            seniorItems={pika.allSeniorItems}
             joinedSenior={joinedSenior}
             onOpenSenior={(item) => setSelectedCommunity({ id: item.id, kind: "senior" })}
             favSenior={favSenior}
@@ -7815,7 +7834,7 @@ export default function RecreApp() {
       </div>
 
       <DetailModal
-        activity={activities.find((a) => a.id === selectedId) || null} onClose={() => setSelectedId(null)} joined={joined} onJoin={join} onReport={openReport}
+        activity={(pika.allActivities || []).find((a) => a.id === selectedId) || null} onClose={() => setSelectedId(null)} joined={joined} onJoin={join} onReport={openReport}
         onViewProfile={openUserProfile} onShare={setShareTarget} currentUserId={pika.user?.id}
         onEdit={openEditKid} onCancelOuting={cancelOuting} onLeave={leave} onOpenDefi={() => setDefiOpen(true)}
         myNbEnfants={pika.nbEnfants || 0} myKidsHere={(pika.myRegsKids || {})[selectedId] || 0}
@@ -7823,9 +7842,9 @@ export default function RecreApp() {
 
       {(() => {
         const kindMeta = {
-          adult: { categories: ADULT_CATEGORIES, items: adultItems, joined: joinedAdult, joinLabel: t("join_label_adult"), genderMode: true },
-          teen: { categories: TEEN_CATEGORIES, items: teenItems, joined: joinedTeen, joinLabel: t("join_label_teen"), genderMode: true, genderLabels: { f: t("legend_girl"), m: t("legend_boy") } },
-          senior: { categories: SENIOR_CATEGORIES, items: seniorItems, joined: joinedSenior, joinLabel: t("join_label_senior"), genderMode: true },
+          adult: { categories: ADULT_CATEGORIES, items: pika.allAdultItems || [], joined: joinedAdult, joinLabel: t("join_label_adult"), genderMode: true },
+          teen: { categories: TEEN_CATEGORIES, items: pika.allTeenItems || [], joined: joinedTeen, joinLabel: t("join_label_teen"), genderMode: true, genderLabels: { f: t("legend_girl"), m: t("legend_boy") } },
+          senior: { categories: SENIOR_CATEGORIES, items: pika.allSeniorItems || [], joined: joinedSenior, joinLabel: t("join_label_senior"), genderMode: true },
           asso: { categories: ASSO_CATEGORIES, items: assoItems, joined: joinedAsso, joinLabel: t("join_label_asso"), genderMode: true },
         };
         const meta = kindMeta[selectedCommunity?.kind] || kindMeta.adult;
@@ -7860,7 +7879,7 @@ export default function RecreApp() {
         const kindMap = { teen: teenItems, adult: adultItems, senior: seniorItems, asso: assoItems };
         const current = selectedCommunity
           ? (kindMap[selectedCommunity.kind] || []).find((it) => it.id === selectedCommunity.id)
-          : activities.find((a) => a.id === selectedId);
+          : (pika.allActivities || []).find((a) => a.id === selectedId);
         if (!current) return null;
         return (
           <DefiWheel
