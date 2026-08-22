@@ -108,7 +108,7 @@ const TRANSLATIONS = {
     change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
     share_btn: "Partager", defi_btn: "La roue des défis", chat_btn: "Discussion du groupe", chat_open: "Discussion ouverte", chat_closed: "Discussion fermée", chat_placeholder: "Écrire un message…", chat_emoji: "Émoticônes", chat_insulte: "Ce message contient des propos inappropriés. Merci de rester bienveillant.", chat_empty: "Aucun message pour le moment.\nÉcrivez le premier pour organiser vos retrouvailles !", chat_closed_note: "La discussion est fermée (5h après le début de la sortie). Vous pouvez toujours relire les messages.", defi_btn_view: "Voir le défi du groupe", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", defi_validate: "Valider ce défi pour le groupe", defi_group_label: "Le défi du groupe", defi_group_subtitle: "Le défi a déjà été tiré pour cette sortie — le voici !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
     share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Regarde cette sortie sur Orée : {title}",
-    report_btn: "Signaler", report_user_btn: "Signaler cet utilisateur", report_user_title: "Signaler cet utilisateur", report_title: "Signaler cette annonce",
+    report_btn: "Signaler", report_user_btn: "Signaler cet utilisateur", pm_title: "Messages", pm_subtitle: "Vos échanges avec les personnes rencontrées lors de sorties.", pm_requests: "Demandes de contact", pm_conversations: "Conversations", pm_empty: "Aucune conversation pour le moment.", pm_no_message: "Aucun message", pm_accept: "Accepter", pm_refuse: "Refuser", pm_block: "Bloquer", pm_block_confirm: "Confirmer ?", pm_write_to: "Envoyer un message", pm_need_shared_outing: "Vous pourrez écrire à cette personne après avoir participé à une sortie ensemble.", pm_waiting_accept: "Votre demande est en attente. Vous pourrez continuer la discussion une fois acceptée.", pm_wait_reply: "En attente de la réponse de votre correspondant.", pm_refused: "Cette demande a été refusée.", pm_send_error: "Impossible d'envoyer ce message.", tab_messages: "Messages", report_user_title: "Signaler cet utilisateur", report_title: "Signaler cette annonce",
     report_reason_label: "Raison du signalement", report_details_label: "Détails (optionnel)",
     report_details_placeholder: "Expliquez ce qui vous a alerté…",
     report_reason_inapproprie: "Comportement inapproprié", report_reason_contenu: "Contenu inadapté",
@@ -4255,7 +4255,7 @@ function LegalModal({ doc, onClose }) {
 
 // Page profil publique d'un autre membre : même présentation que sa propre page profil
 // (couverture, grande photo, informations), en lecture seule et sans les données privées.
-function UserProfilePage({ userId, onClose, currentUserId, onReport }) {
+function UserProfilePage({ userId, onClose, currentUserId, onReport, onMessage, canMessage }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -4421,6 +4421,21 @@ function UserProfilePage({ userId, onClose, currentUserId, onReport }) {
               </>
             )}
 
+            {userId !== currentUserId && canMessage && (
+              <PillButton color={COLORS.sky} textColor="#fff" onClick={() => onMessage(userId)} style={{ width: "100%", marginBottom: 10 }}>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 7 }}>
+                  <Users size={16} /> {t("pm_write_to")}
+                </span>
+              </PillButton>
+            )}
+            {userId !== currentUserId && !canMessage && (
+              <p style={{
+                fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF",
+                textAlign: "center", lineHeight: 1.5, margin: "0 0 10px",
+              }}>
+                {t("pm_need_shared_outing")}
+              </p>
+            )}
             {userId !== currentUserId && (
               <button
                 onClick={() => onReport(userId)}
@@ -6355,6 +6370,245 @@ function CreatePage({ parentValidated, onCreateKid, onCreateTeen, onCreateAdult,
 // Une seule liste unifiée : toutes catégories confondues (Parent, Jeune, Adulte, Ainé),
 // créées ET rejointes, triées par date. Les sorties créées par la personne se distinguent
 // visuellement, et les sorties déjà passées sont grisées.
+// Messagerie privée : liste des conversations + fil de discussion.
+// Les demandes en attente sont clairement séparées, et chacun peut bloquer d'un clic.
+function MessagesPage({ pika, onViewProfile, openConvId, onClearOpen }) {
+  const [openId, setOpenId] = useState(openConvId || null);
+  const [messages, setMessages] = useState([]);
+  const [draft, setDraft] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [alerte, setAlerte] = useState("");
+  const [confirmBlock, setConfirmBlock] = useState(false);
+  const bottomRef = useRef(null);
+
+  const conv = pika.conversations.find((x) => x.id === openId) || null;
+  const enAttente = pika.conversations.filter((x) => x.status === "pending" && x.initiated_by !== pika.user?.id);
+  const actives = pika.conversations.filter((x) => x.status === "accepted"
+    || (x.status === "pending" && x.initiated_by === pika.user?.id));
+
+  useEffect(() => { if (openConvId) setOpenId(openConvId); }, [openConvId]);
+
+  const loadMessages = async (cid) => {
+    if (!cid) return;
+    const { data } = await supabase.from("private_messages")
+      .select("*").eq("conversation_id", cid).order("created_at", { ascending: true });
+    setMessages(data || []);
+  };
+
+  useEffect(() => {
+    if (!openId) { setMessages([]); return; }
+    setLoading(true);
+    loadMessages(openId).finally(() => setLoading(false));
+    const timer = setInterval(() => loadMessages(openId), 8000);
+    return () => clearInterval(timer);
+  }, [openId]);
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages.length]);
+
+  const send = async () => {
+    const texte = draft.trim();
+    if (!texte || !conv) return;
+    if (contientInsulte(texte)) {
+      setAlerte(t("chat_insulte"));
+      setTimeout(() => setAlerte(""), 4000);
+      return;
+    }
+    setAlerte("");
+    const ok = await pika.envoyerMessagePrive(conv.id, texte);
+    if (ok) { setDraft(""); await loadMessages(conv.id); await pika.loadConversations(); }
+    else setAlerte(t("pm_send_error"));
+  };
+
+  const heure = (iso) => new Date(iso).toLocaleTimeString(
+    LANG === "fr" ? "fr-FR" : LANG === "es" ? "es-ES" : "en-US", { hour: "2-digit", minute: "2-digit" });
+
+  const avatarOf = (cv, size = 42) => (
+    <div style={{
+      width: size, height: size, borderRadius: "50%", flexShrink: 0, overflow: "hidden",
+      background: cv.other_genre ? genreColor(cv.other_genre) : COLORS.sky,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      color: "#fff", fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: size * 0.42,
+    }}>
+      {cv.other_avatar
+        ? <img src={cv.other_avatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        : (cv.other_name || "?").charAt(0).toUpperCase()}
+    </div>
+  );
+
+  // ----- Fil de discussion ouvert -----
+  if (conv) {
+    const attenteDeMoi = conv.status === "pending" && conv.initiated_by === pika.user?.id;
+    const peutEcrire = conv.status === "accepted" || (attenteDeMoi && messages.length === 0);
+
+    return (
+      <div style={{ maxWidth: 640, margin: "0 auto", display: "flex", flexDirection: "column", minHeight: "60vh" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+          <button onClick={() => { setOpenId(null); onClearOpen?.(); }} style={{
+            width: 34, height: 34, borderRadius: "50%", background: "#fff", border: "2px solid #F0EADB",
+            display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0,
+          }}>
+            <ArrowLeft size={16} color={COLORS.ink} />
+          </button>
+          <button onClick={() => onViewProfile(conv.other_id)} style={{
+            display: "flex", alignItems: "center", gap: 10, background: "none", border: "none", cursor: "pointer", flex: 1, minWidth: 0, padding: 0,
+          }}>
+            {avatarOf(conv, 38)}
+            <span style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 17, color: COLORS.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {conv.other_name}
+            </span>
+          </button>
+          <button
+            onClick={() => {
+              if (confirmBlock) { pika.bloquerUtilisateur(conv.other_id); setOpenId(null); }
+              else { setConfirmBlock(true); setTimeout(() => setConfirmBlock(false), 4000); }
+            }}
+            style={{
+              background: confirmBlock ? COLORS.coral : "transparent", border: `2px solid ${COLORS.coral}`,
+              color: confirmBlock ? "#fff" : COLORS.coral, borderRadius: 10, padding: "6px 10px",
+              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, cursor: "pointer", flexShrink: 0,
+            }}
+          >
+            {confirmBlock ? t("pm_block_confirm") : t("pm_block")}
+          </button>
+        </div>
+
+        {attenteDeMoi && (
+          <div style={{
+            background: "#FFF4DD", border: `2px solid ${COLORS.sun}`, borderRadius: 14,
+            padding: "10px 14px", marginBottom: 12, fontFamily: "Nunito, sans-serif",
+            fontWeight: 700, fontSize: 12.5, color: COLORS.ink, lineHeight: 1.5,
+          }}>
+            {t("pm_waiting_accept")}
+          </div>
+        )}
+
+        <div style={{ flex: 1, overflowY: "auto", marginBottom: 12 }}>
+          {loading && <p style={{ textAlign: "center", fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#9A93AF" }}>{t("auth_loading")}</p>}
+          {messages.map((m) => {
+            const mine = m.sender_id === pika.user?.id;
+            return (
+              <div key={m.id} style={{ display: "flex", justifyContent: mine ? "flex-end" : "flex-start", marginBottom: 8 }}>
+                <div style={{ maxWidth: "76%" }}>
+                  <div style={{
+                    background: mine ? COLORS.ink : "#fff", color: mine ? "#fff" : COLORS.ink,
+                    border: mine ? "none" : "2px solid #F0EADB", borderRadius: 16, padding: "9px 13px",
+                    fontFamily: "Nunito, sans-serif", fontSize: 14, lineHeight: 1.45,
+                    overflowWrap: "anywhere", whiteSpace: "pre-wrap",
+                  }}>
+                    {masquerInsultes(m.content)}
+                  </div>
+                  <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 10, color: "#B7AF98", marginTop: 2, textAlign: mine ? "right" : "left" }}>
+                    {heure(m.created_at)}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          <div ref={bottomRef} />
+        </div>
+
+        {alerte && (
+          <div style={{
+            background: "#FFF0EC", border: `2px solid ${COLORS.coral}`, borderRadius: 12,
+            padding: "8px 12px", marginBottom: 8, fontFamily: "Nunito, sans-serif",
+            fontWeight: 700, fontSize: 12, color: COLORS.ink,
+          }}>
+            {alerte}
+          </div>
+        )}
+
+        {peutEcrire ? (
+          <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+            <textarea
+              rows={1} value={draft}
+              onChange={(e) => setDraft(e.target.value.slice(0, 1000))}
+              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+              placeholder={t("chat_placeholder")}
+              style={{
+                flex: 1, border: "2px solid #F0EADB", borderRadius: 18, padding: "10px 14px",
+                fontFamily: "Nunito, sans-serif", fontSize: 14, color: COLORS.ink, outline: "none",
+                resize: "none", maxHeight: 100, boxSizing: "border-box",
+              }}
+            />
+            <button onClick={send} disabled={!draft.trim()} style={{
+              width: 42, height: 42, borderRadius: "50%", border: "none", flexShrink: 0,
+              background: draft.trim() ? COLORS.coral : "#EDEAF4",
+              cursor: draft.trim() ? "pointer" : "default",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <ChevronRight size={20} color={draft.trim() ? "#fff" : "#B7AF98"} />
+            </button>
+          </div>
+        ) : (
+          <p style={{ textAlign: "center", fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", lineHeight: 1.5 }}>
+            {conv.status === "refused" ? t("pm_refused") : t("pm_wait_reply")}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  // ----- Liste des conversations -----
+  const ligne = (cv, demande = false) => (
+    <div key={cv.id} style={{
+      background: "#fff", border: `2px solid ${demande ? COLORS.sun : "#F0EADB"}`,
+      borderRadius: 16, padding: 12, marginBottom: 8,
+    }}>
+      <div onClick={() => setOpenId(cv.id)} style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }}>
+        {avatarOf(cv)}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15, color: COLORS.ink }}>
+            {cv.other_name}
+          </div>
+          <div style={{
+            fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF",
+            whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+          }}>
+            {cv.last_message ? masquerInsultes(cv.last_message) : t("pm_no_message")}
+          </div>
+        </div>
+        {!demande && <ChevronRight size={18} color="#C7C0AE" />}
+      </div>
+      {demande && (
+        <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+          <PillButton color={COLORS.grass} textColor="#fff" onClick={() => pika.repondreDemande(cv.id, true)} style={{ flex: 1, padding: "8px 12px", fontSize: 12.5 }}>
+            {t("pm_accept")}
+          </PillButton>
+          <button onClick={() => pika.repondreDemande(cv.id, false)} style={{
+            flex: 1, background: "transparent", border: "2px solid #F0EADB", borderRadius: 12,
+            fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5, color: "#9A93AF", cursor: "pointer",
+          }}>
+            {t("pm_refuse")}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div style={{ maxWidth: 640, margin: "0 auto" }}>
+      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
+        {t("pm_title")}
+      </h1>
+      <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 18px" }}>
+        {t("pm_subtitle")}
+      </p>
+
+      {enAttente.length > 0 && (
+        <>
+          <SectionLabel>{t("pm_requests")}</SectionLabel>
+          <div style={{ marginBottom: 20 }}>{enAttente.map((cv) => ligne(cv, true))}</div>
+        </>
+      )}
+
+      <SectionLabel>{t("pm_conversations")}</SectionLabel>
+      {actives.length === 0
+        ? <EmptyBox text={t("pm_empty")} />
+        : actives.map((cv) => ligne(cv))}
+    </div>
+  );
+}
+
 function MesSortiesPage({
   parentValidated, currentUserId, onViewProfile,
   joined, activities, onOpenKid, favorites, onToggleFavKid,
@@ -7761,6 +8015,77 @@ function usePikapikaData() {
     setProfile((p) => ({ ...p, coverUrl: null }));
   };
 
+  // ---------- Messages privés ----------
+  // Règles anti-harcèlement : on ne peut écrire qu'aux personnes rencontrées lors d'une
+  // sortie, le premier message doit être accepté, et le blocage coupe tout immédiatement.
+  const [conversations, setConversations] = useState([]);
+  const [blockedIds, setBlockedIds] = useState([]);
+
+  const loadConversations = async () => {
+    if (!user) return;
+    const [convRes, blockRes] = await Promise.all([
+      supabase.from("conversations_detailed").select("*").order("last_message_at", { ascending: false }),
+      supabase.from("blocks").select("blocked_id"),
+    ]);
+    setConversations(convRes.data || []);
+    setBlockedIds((blockRes.data || []).map((b) => b.blocked_id));
+  };
+
+  useEffect(() => {
+    if (user) loadConversations();
+    else { setConversations([]); setBlockedIds([]); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  // Peut-on écrire à cette personne ? (a-t-on partagé une sortie avec elle ?)
+  const peutEcrireA = async (otherId) => {
+    if (!user || otherId === user.id) return false;
+    const { data } = await supabase.rpc("ont_partage_sortie", { autre: otherId });
+    return !!data;
+  };
+
+  const ouvrirConversation = async (otherId) => {
+    if (!user) return null;
+    const [a, b] = [user.id, otherId].sort();
+    const existing = conversations.find((c) => c.other_id === otherId);
+    if (existing) return existing.id;
+    const { data, error } = await supabase.from("conversations")
+      .insert({ user_a: a, user_b: b, initiated_by: user.id }).select().single();
+    if (error) { console.error("Erreur ouverture conversation :", error); return null; }
+    await loadConversations();
+    return data.id;
+  };
+
+  const envoyerMessagePrive = async (conversationId, content) => {
+    if (!user) return false;
+    const { error } = await supabase.from("private_messages")
+      .insert({ conversation_id: conversationId, sender_id: user.id, content: content.slice(0, 1000) });
+    if (error) { console.error("Erreur envoi message privé :", error); return false; }
+    await supabase.from("conversations").update({ last_message_at: new Date().toISOString() }).eq("id", conversationId);
+    return true;
+  };
+
+  const repondreDemande = async (conversationId, accepte) => {
+    if (!user) return;
+    const { error } = await supabase.from("conversations")
+      .update({ status: accepte ? "accepted" : "refused" }).eq("id", conversationId);
+    if (error) { console.error("Erreur réponse demande :", error); return; }
+    await loadConversations();
+  };
+
+  const bloquerUtilisateur = async (otherId) => {
+    if (!user) return;
+    const { error } = await supabase.from("blocks").insert({ blocker_id: user.id, blocked_id: otherId });
+    if (error) { console.error("Erreur blocage :", error); return; }
+    await loadConversations();
+  };
+
+  const debloquerUtilisateur = async (otherId) => {
+    if (!user) return;
+    await supabase.from("blocks").delete().eq("blocker_id", user.id).eq("blocked_id", otherId);
+    await loadConversations();
+  };
+
   const submitReport = async ({ activityId, reportedUserId, reason, details }) => {
     if (!user) return false;
     const { error } = await supabase.from("reports").insert({
@@ -7850,6 +8175,8 @@ function usePikapikaData() {
     uploadAvatar,
     uploadCover, removeCover,
     submitReport,
+    conversations, blockedIds, loadConversations, peutEcrireA, ouvrirConversation,
+    envoyerMessagePrive, repondreDemande, bloquerUtilisateur, debloquerUtilisateur,
     reports, reportsDetailed, allProfiles, allActivitiesRaw: rows,
     toggleBanUser, deleteUserData, setUserCommune,
     resolveReport, handleReport,
@@ -7926,11 +8253,20 @@ export default function RecreApp() {
   const openReport = requireAuth((item) => setReportTarget({ id: item.id, createdBy: item.createdBy }));
 
   const [viewingUserId, setViewingUserId] = useState(null);
-  const openUserProfile = requireAuth((userId) => setViewingUserId(userId));
+  const openUserProfile = requireAuth(async (userId) => {
+    setViewingUserId(userId);
+    setCanMessageUser(false);
+    if (pika.user && userId !== pika.user.id) {
+      const ok = await pika.peutEcrireA(userId);
+      setCanMessageUser(ok);
+    }
+  });
 
   const [shareTarget, setShareTarget] = useState(null);
   const [legalDoc, setLegalDoc] = useState(null);
   const [defiOpen, setDefiOpen] = useState(false);
+  const [canMessageUser, setCanMessageUser] = useState(false);
+  const [openConvId, setOpenConvId] = useState(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
 
@@ -8102,49 +8438,99 @@ export default function RecreApp() {
             ))}
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            {pika.user ? (
-              HEADER_ACTIONS.filter((a) => a.id !== "creer").map((a) => {
-                const active = tab === a.id;
-                return (
-                  <button
-                    key={a.id}
-                    onClick={() => setTab(a.id)}
-                    aria-label={a.label}
-                    title={a.label}
-                    className="pika-header-action"
-                    style={{
-                      display: "flex", alignItems: "center", gap: 6, cursor: "pointer",
-                      borderRadius: 999, border: "none", padding: "7px 12px", flexShrink: 0,
-                      background: active ? COLORS.ink : "#fff",
-                      boxShadow: active ? "none" : "0 0 0 2px #F0EADB inset",
-                    }}
-                  >
-                    <a.icon size={16} className="pika-header-action-icon" color={active ? "#fff" : COLORS.ink} />
-                    <span className="pika-header-action-label" style={{
-                      fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
-                      color: active ? "#fff" : COLORS.ink, whiteSpace: "nowrap",
-                    }}>
-                      {a.label}
-                    </span>
-                  </button>
-                );
-              })
-            ) : (
+          <LocationFilter location={location} onChange={setLocation} />
+
+          {pika.user && (
+            <button
+              onClick={() => setTab("mes-sorties")}
+              aria-label={t("tab_mes_sorties")}
+              title={t("tab_mes_sorties")}
+              className="pika-header-action"
+              style={{
+                display: "flex", alignItems: "center", gap: 6, cursor: "pointer",
+                borderRadius: 999, border: "none", padding: "7px 12px", flexShrink: 0,
+                background: tab === "mes-sorties" ? COLORS.ink : "#fff",
+                boxShadow: tab === "mes-sorties" ? "none" : "0 0 0 2px #F0EADB inset",
+              }}
+            >
+              <BookMarked size={16} className="pika-header-action-icon" color={tab === "mes-sorties" ? "#fff" : COLORS.ink} />
+              <span className="pika-header-action-label" style={{
+                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
+                color: tab === "mes-sorties" ? "#fff" : COLORS.ink, whiteSpace: "nowrap",
+              }}>
+                {t("tab_mes_sorties")}
+              </span>
+            </button>
+          )}
+
+          {pika.user && (() => {
+            const enAttente = (pika.conversations || []).filter(
+              (cv) => cv.status === "pending" && cv.initiated_by !== pika.user?.id).length;
+            const active = tab === "messages";
+            return (
               <button
-                onClick={() => setAuthPrompt(true)}
+                onClick={() => { setOpenConvId(null); setTab("messages"); }}
+                aria-label={t("pm_title")}
+                title={t("pm_title")}
+                className="pika-header-action"
                 style={{
-                  background: COLORS.ink, color: "#fff", border: "none", borderRadius: 999,
-                  padding: "8px 14px", fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
-                  cursor: "pointer", whiteSpace: "nowrap",
+                  display: "flex", alignItems: "center", gap: 6, cursor: "pointer", position: "relative",
+                  borderRadius: 999, border: "none", padding: "7px 12px", flexShrink: 0,
+                  background: active ? COLORS.ink : "#fff",
+                  boxShadow: active ? "none" : "0 0 0 2px #F0EADB inset",
                 }}
               >
-                {t("auth_login_btn")}
+                <Users size={16} className="pika-header-action-icon" color={active ? "#fff" : COLORS.ink} />
+                <span className="pika-header-action-label" style={{
+                  fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
+                  color: active ? "#fff" : COLORS.ink, whiteSpace: "nowrap",
+                }}>
+                  {t("pm_title")}
+                </span>
+                {enAttente > 0 && (
+                  <span style={{
+                    position: "absolute", top: -3, right: -3, minWidth: 18, height: 18, borderRadius: 999,
+                    background: COLORS.coral, color: "#fff", fontFamily: "Nunito, sans-serif",
+                    fontWeight: 800, fontSize: 10.5, display: "flex", alignItems: "center",
+                    justifyContent: "center", padding: "0 5px", border: "2px solid #fff",
+                  }}>
+                    {enAttente}
+                  </span>
+                )}
               </button>
-            )}
-          </div>
+            );
+          })()}
 
-          <LocationFilter location={location} onChange={setLocation} />
+          {/* Compte, toujours tout à droite : la photo de profil le rend immédiatement reconnaissable */}
+          {pika.user ? (
+            <button
+              onClick={() => setTab("profil")}
+              aria-label={t("tab_profil")}
+              title={t("tab_profil")}
+              style={{
+                width: 44, height: 44, borderRadius: "50%", flexShrink: 0, padding: 0, overflow: "hidden",
+                border: `3px solid ${tab === "profil" ? COLORS.ink : "#F0EADB"}`,
+                background: pika.genre ? genreColor(pika.genre) : COLORS.sky,
+                cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                color: "#fff", fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 18,
+              }}
+            >
+              {pika.avatarUrl
+                ? <img src={pika.avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                : (displayName || "?").charAt(0).toUpperCase()}
+            </button>
+          ) : (
+            <button
+              onClick={() => setAuthPrompt(true)}
+              style={{
+                background: COLORS.ink, color: "#fff", border: "none", borderRadius: 999,
+                padding: "9px 16px", fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13,
+                cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
+              }}
+            >
+              {t("auth_login_btn")}
+            </button>
+          )}
         </div>
       </div>
 
@@ -8287,6 +8673,14 @@ export default function RecreApp() {
             reportsDetailed={pika.reportsDetailed}
             onHandleReport={pika.handleReport}
             onViewProfile={openUserProfile}
+          />
+        )}
+        {tab === "messages" && pika.user && (
+          <MessagesPage
+            pika={pika}
+            onViewProfile={openUserProfile}
+            openConvId={openConvId}
+            onClearOpen={() => setOpenConvId(null)}
           />
         )}
         {tab === "profil" && (
@@ -8496,6 +8890,12 @@ export default function RecreApp() {
           userId={viewingUserId}
           currentUserId={pika.user?.id}
           onReport={(uid) => setReportTarget({ userId: uid, isUser: true })}
+          canMessage={canMessageUser}
+          onMessage={async (uid) => {
+            const cid = await pika.ouvrirConversation(uid);
+            setViewingUserId(null);
+            if (cid) { setOpenConvId(cid); setTab("messages"); }
+          }}
           onClose={() => setViewingUserId(null)}
         />
       )}
