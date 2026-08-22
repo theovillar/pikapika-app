@@ -2973,8 +2973,9 @@ function Explorer({ activities, favorites, onToggleFav, onOpen, location }) {
 
 // Champ d'adresse avec suggestions en direct, via l'API officielle et gratuite du gouvernement
 // (Base Adresse Nationale) — aide à saisir une adresse réelle et bien formée, sans obliger à la choisir.
-// Recherche parmi toutes les communes françaises (API officielle geo.api.gouv.fr),
-// avec repli sur la liste locale si le réseau n'est pas disponible.
+// Recherche de villes dans notre propre base (table "cities" sur Supabase) :
+// couvre toute l'Europe, sans dépendre d'un service tiers qui pourrait nous limiter.
+// Replis successifs : base Supabase → API française → liste locale intégrée.
 function CommunePicker({ value, onSelect, placeholder }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -2984,28 +2985,46 @@ function CommunePicker({ value, onSelect, placeholder }) {
     const q = query.trim();
     if (q.length < 2) { setResults([]); return; }
     let cancelled = false;
-    const timer = setTimeout(() => {
-      // Repli local immédiat, remplacé par les résultats officiels dès qu'ils arrivent
-      const local = Object.entries(CITY_META)
-        .filter(([, v]) => v.label.toLowerCase().includes(q.toLowerCase()))
-        .slice(0, 6)
-        .map(([, v]) => ({ nom: v.label, dept: v.dept, lat: v.lat, lon: v.lon }));
-      if (!cancelled) setResults(local);
 
-      if (typeof fetch === "undefined") return;
-      fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(q)}&fields=nom,codeDepartement,centre&boost=population&limit=8`)
-        .then((r) => (r.ok ? r.json() : []))
-        .then((data) => {
-          if (cancelled || !Array.isArray(data) || data.length === 0) return;
-          setResults(data
-            .map((d) => ({
-              nom: d.nom, dept: d.codeDepartement,
-              lat: d.centre?.coordinates?.[1], lon: d.centre?.coordinates?.[0],
-            }))
-            .filter((d) => d.lat && d.lon));
-        })
-        .catch(() => {});
+    const timer = setTimeout(async () => {
+      // 1. Notre base de villes européennes
+      try {
+        const { data, error } = await supabase.rpc("search_cities", { q, lim: 8 });
+        if (!cancelled && !error && data && data.length > 0) {
+          setResults(data.map((d) => ({
+            nom: d.name, dept: d.country === "FR" ? (d.admin1 || "FR") : d.country,
+            lat: d.lat, lon: d.lon,
+          })));
+          return;
+        }
+      } catch (e) { /* on passe au repli suivant */ }
+
+      // 2. API officielle française (plus précise sur les petites communes)
+      try {
+        const r = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(q)}&fields=nom,codeDepartement,centre&boost=population&limit=8`);
+        if (r.ok) {
+          const data = await r.json();
+          if (!cancelled && Array.isArray(data) && data.length > 0) {
+            setResults(data
+              .map((d) => ({
+                nom: d.nom, dept: d.codeDepartement,
+                lat: d.centre?.coordinates?.[1], lon: d.centre?.coordinates?.[0],
+              }))
+              .filter((d) => d.lat && d.lon));
+            return;
+          }
+        }
+      } catch (e) { /* on passe au repli suivant */ }
+
+      // 3. Liste locale intégrée, en dernier recours
+      if (!cancelled) {
+        setResults(Object.entries(CITY_META)
+          .filter(([, v]) => v.label.toLowerCase().includes(q.toLowerCase()))
+          .slice(0, 6)
+          .map(([, v]) => ({ nom: v.label, dept: v.dept, lat: v.lat, lon: v.lon })));
+      }
     }, 300);
+
     return () => { cancelled = true; clearTimeout(timer); };
   }, [query]);
 
