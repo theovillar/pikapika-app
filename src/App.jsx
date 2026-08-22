@@ -101,14 +101,14 @@ const TRANSLATIONS = {
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", auth_pseudo: "Votre pseudo", auth_pseudo_note: "C'est ce nom qui sera visible par les autres membres sur les annonces.", auth_pseudo_required: "Merci de choisir un pseudo.", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_situation_label: "Situation familiale", profile_commune_label: "Votre commune", profile_commune_none: "Non renseignée", profile_commune_search: "Rechercher votre commune…", profile_commune_note: "Utilisée par défaut pour filtrer les sorties près de chez vous.", profile_profession_label: "Profession", profile_profession_ph: "Ex. Infirmière, enseignant, retraité…", profile_interets_label: "Centres d'intérêt", profile_interets_ph: "Ex. Randonnée, cuisine, lecture, jardinage…", profile_animaux_label: "Animaux", profile_animaux_ph: "Ex. Un chien, deux chats…", profile_coeur_label: "Ce que j'aime par-dessus tout", profile_coeur_ph: "Ex. Les balades en forêt le dimanche matin", profile_about_section: "À propos", situation_celibataire: "Célibataire", situation_en_couple: "En couple", situation_marie: "Marié(e)", situation_famille_mono: "Famille monoparentale", situation_autre: "Autre", situation_non_precise: "Je préfère ne pas préciser", profile_edit_title: "Modifier mon profil", btn_back: "Retour", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
+    auth_commune_placeholder: "Votre commune", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_situation_label: "Situation familiale", profile_commune_label: "Votre commune", profile_commune_none: "Non renseignée", profile_commune_search: "Rechercher votre commune…", profile_commune_note: "Utilisée par défaut pour filtrer les sorties près de chez vous.", profile_profession_label: "Profession", profile_profession_ph: "Ex. Infirmière, enseignant, retraité…", profile_interets_label: "Centres d'intérêt", profile_interets_ph: "Ex. Randonnée, cuisine, lecture, jardinage…", profile_animaux_label: "Animaux", profile_animaux_ph: "Ex. Un chien, deux chats…", profile_coeur_label: "Ce que j'aime par-dessus tout", profile_coeur_ph: "Ex. Les balades en forêt le dimanche matin", profile_about_section: "À propos", situation_celibataire: "Célibataire", situation_en_couple: "En couple", situation_marie: "Marié(e)", situation_famille_mono: "Famille monoparentale", situation_autre: "Autre", situation_non_precise: "Je préfère ne pas préciser", profile_edit_title: "Modifier mon profil", btn_back: "Retour", back_home: "Retour à l'accueil", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
     change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
-    share_btn: "Partager", defi_btn: "La roue des défis", chat_btn: "Discussion du groupe", chat_open: "Discussion ouverte", chat_closed: "Discussion fermée", chat_placeholder: "Écrire un message…", chat_emoji: "Émoticônes", chat_empty: "Aucun message pour le moment.\nÉcrivez le premier pour organiser vos retrouvailles !", chat_closed_note: "La discussion est fermée (5h après le début de la sortie). Vous pouvez toujours relire les messages.", defi_btn_view: "Voir le défi du groupe", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", defi_validate: "Valider ce défi pour le groupe", defi_group_label: "Le défi du groupe", defi_group_subtitle: "Le défi a déjà été tiré pour cette sortie — le voici !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
+    share_btn: "Partager", defi_btn: "La roue des défis", chat_btn: "Discussion du groupe", chat_open: "Discussion ouverte", chat_closed: "Discussion fermée", chat_placeholder: "Écrire un message…", chat_emoji: "Émoticônes", chat_insulte: "Ce message contient des propos inappropriés. Merci de rester bienveillant.", chat_empty: "Aucun message pour le moment.\nÉcrivez le premier pour organiser vos retrouvailles !", chat_closed_note: "La discussion est fermée (5h après le début de la sortie). Vous pouvez toujours relire les messages.", defi_btn_view: "Voir le défi du groupe", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", defi_validate: "Valider ce défi pour le groupe", defi_group_label: "Le défi du groupe", defi_group_subtitle: "Le défi a déjà été tiré pour cette sortie — le voici !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
     share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Regarde cette sortie sur Orée : {title}",
-    report_btn: "Signaler", report_title: "Signaler cette annonce",
+    report_btn: "Signaler", report_user_btn: "Signaler cet utilisateur", report_user_title: "Signaler cet utilisateur", report_title: "Signaler cette annonce",
     report_reason_label: "Raison du signalement", report_details_label: "Détails (optionnel)",
     report_details_placeholder: "Expliquez ce qui vous a alerté…",
     report_reason_inapproprie: "Comportement inapproprié", report_reason_contenu: "Contenu inadapté",
@@ -4255,7 +4255,7 @@ function LegalModal({ doc, onClose }) {
 
 // Page profil publique d'un autre membre : même présentation que sa propre page profil
 // (couverture, grande photo, informations), en lecture seule et sans les données privées.
-function UserProfilePage({ userId, onClose }) {
+function UserProfilePage({ userId, onClose, currentUserId, onReport }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -4420,6 +4420,19 @@ function UserProfilePage({ userId, onClose }) {
                 </div>
               </>
             )}
+
+            {userId !== currentUserId && (
+              <button
+                onClick={() => onReport(userId)}
+                style={{
+                  display: "block", width: "100%", textAlign: "center", background: "none", border: "none",
+                  color: "#B7AF98", fontWeight: 700, fontSize: 12, marginTop: 6, cursor: "pointer",
+                  fontFamily: "Nunito, sans-serif", textDecoration: "underline",
+                }}
+              >
+                {t("report_user_btn")}
+              </button>
+            )}
           </>
         )}
       </div>
@@ -4454,6 +4467,48 @@ const MAX_SPINS = 2;
 // Chat de groupe entre participants d'une même sortie : sert surtout à se retrouver
 // le jour J. L'écriture se ferme automatiquement 5h après le début de la sortie,
 // mais l'historique reste consultable.
+// Filtre anti-insultes du chat : masque les termes injurieux sans bloquer la conversation.
+// La détection ignore accents, majuscules et lettres répétées (ex. "coooon").
+// Ce filtre reste volontairement simple : il décourage les débordements sans prétendre
+// à l'exhaustivité — le signalement reste le vrai recours en cas de problème.
+const MOTS_INTERDITS = [
+  "connard", "connasse", "conard", "salope", "salaud", "encule", "enculee", "enfoire",
+  "batard", "batarde", "pute", "putain", "putes", "pd", "tapette", "tarlouze",
+  "negre", "bougnoule", "youpin", "bicot", "raton", "chinetoque",
+  "fdp", "ntm", "tg", "tafiole", "gouine", "trav",
+  "debile", "cretin", "abruti", "attarde", "mongol", "trisomique",
+  "cheh", "creve", "ferme ta gueule", "ta gueule", "va te faire",
+];
+
+function normaliserPourFiltre(texte) {
+  return texte
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")   // enlève les accents
+    .replace(/[0@]/g, "o").replace(/[1!|]/g, "i").replace(/3/g, "e")
+    .replace(/5/g, "s").replace(/4/g, "a").replace(/7/g, "t")
+    .replace(/(.)\1+/g, "$1")                             // "coooonnard" -> "conard"
+    .replace(/[^a-z\s]/g, " ");
+}
+
+function contientInsulte(texte) {
+  const n = normaliserPourFiltre(texte);
+  return MOTS_INTERDITS.some((mot) => {
+    const m = normaliserPourFiltre(mot).trim();
+    if (m.includes(" ")) return n.includes(m);
+    return new RegExp(`\\b${m}\\b`).test(n);
+  });
+}
+
+function masquerInsultes(texte) {
+  let sortie = texte;
+  MOTS_INTERDITS.forEach((mot) => {
+    if (mot.includes(" ")) return;
+    const re = new RegExp(`\\b${mot.split("").join("[\\W_]*")}\\w*`, "gi");
+    sortie = sortie.replace(re, (m) => "•".repeat(Math.max(3, m.length)));
+  });
+  return sortie;
+}
+
 // Sélection d'émojis utiles pour se retrouver et échanger simplement
 const EMOJIS = [
   "😀", "😄", "😉", "🙂", "😍", "🤗", "😂", "🥳",
@@ -4468,6 +4523,7 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const [alerte, setAlerte] = useState("");
   const bottomRef = useRef(null);
 
   const chatOuvert = activity.chatOpen;
@@ -4498,6 +4554,12 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
   const send = async () => {
     const texte = draft.trim();
     if (!texte || sending) return;
+    if (contientInsulte(texte)) {
+      setAlerte(t("chat_insulte"));
+      setTimeout(() => setAlerte(""), 4000);
+      return;
+    }
+    setAlerte("");
     setSending(true);
     const { error } = await supabase.from("messages").insert({
       activity_id: activity.id, user_id: currentUserId, content: texte.slice(0, 500),
@@ -4598,7 +4660,7 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
                     fontFamily: "Nunito, sans-serif", fontSize: 14, lineHeight: 1.45,
                     overflowWrap: "anywhere", whiteSpace: "pre-wrap",
                   }}>
-                    {m.content}
+                    {masquerInsultes(m.content)}
                   </div>
                   <div style={{
                     fontFamily: "Nunito, sans-serif", fontSize: 10, color: "#B7AF98",
@@ -4618,6 +4680,17 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
           padding: "10px 14px calc(14px + env(safe-area-inset-bottom))",
           borderTop: "2px solid #F0EADB", background: "#fff", flexShrink: 0,
         }}>
+          {alerte && (
+            <div style={{
+              background: "#FFF0EC", border: `2px solid ${COLORS.coral}`, borderRadius: 12,
+              padding: "8px 12px", marginBottom: 8, display: "flex", alignItems: "center", gap: 7,
+            }}>
+              <ShieldCheck size={15} color={COLORS.coral} style={{ flexShrink: 0 }} />
+              <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 12, color: COLORS.ink }}>
+                {alerte}
+              </span>
+            </div>
+          )}
           {chatOuvert ? (
             <>
             {emojiOpen && (
@@ -4901,7 +4974,7 @@ function ShareModal({ item, onClose }) {
   );
 }
 
-function ReportModal({ onClose, onSubmit }) {
+function ReportModal({ onClose, onSubmit, isUser = false }) {
   const [reason, setReason] = useState("inapproprie");
   const [details, setDetails] = useState("");
   const [sent, setSent] = useState(false);
@@ -4929,7 +5002,7 @@ function ReportModal({ onClose, onSubmit }) {
           <X size={15} color={COLORS.ink} />
         </button>
         <h3 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 18, color: COLORS.ink, margin: "0 0 14px" }}>
-          {t("report_title")}
+          {isUser ? t("report_user_title") : t("report_title")}
         </h3>
 
         {sent ? (
@@ -6274,15 +6347,6 @@ function CreatePage({ parentValidated, onCreateKid, onCreateTeen, onCreateAdult,
       {kind === "jeune" && parentValidated && <CreateMeetup categories={TEEN_CATEGORIES} onCreate={onCreateTeen} />}
       {kind === "adulte" && <CreateMeetup categories={ADULT_CATEGORIES} onCreate={onCreateAdult} />}
       {kind === "aine" && <CreateMeetup categories={SENIOR_CATEGORIES} onCreate={onCreateSenior} />}
-
-      {!parentValidated && (kind === "adulte" || kind === "aine") && (
-        <p style={{
-          fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF",
-          textAlign: "center", marginTop: 16,
-        }}>
-          {t("note_needs_validation")}
-        </p>
-      )}
     </div>
   );
 }
@@ -7999,12 +8063,25 @@ export default function RecreApp() {
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "18px 20px", maxWidth: 960, margin: "0 auto", flexWrap: "wrap", gap: 10,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <button
+          onClick={() => {
+            setTab(pika.user && parentValidated ? "explorer" : "adultes");
+            setSelectedId(null);
+            setSelectedCommunity(null);
+            setEditingProfile(false);
+          }}
+          aria-label={t("back_home")}
+          title={t("back_home")}
+          style={{
+            display: "flex", alignItems: "center", gap: 8,
+            background: "none", border: "none", padding: 0, cursor: "pointer",
+          }}
+        >
           <OreeMascot size={32} />
           <span style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink }}>
             Orée
           </span>
-        </div>
+        </button>
 
         {/* Desktop nav + sélecteur de ville + actions d'en-tête (Créer / Mes sorties / Profil) */}
         <div className="pika-header-right" style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -8414,14 +8491,26 @@ export default function RecreApp() {
         />
       )}
 
-      {viewingUserId && <UserProfilePage userId={viewingUserId} onClose={() => setViewingUserId(null)} />}
+      {viewingUserId && (
+        <UserProfilePage
+          userId={viewingUserId}
+          currentUserId={pika.user?.id}
+          onReport={(uid) => setReportTarget({ userId: uid, isUser: true })}
+          onClose={() => setViewingUserId(null)}
+        />
+      )}
 
       {shareTarget && <ShareModal item={shareTarget} onClose={() => setShareTarget(null)} />}
 
       {reportTarget && (
         <ReportModal
+          isUser={!!reportTarget.isUser}
           onClose={() => setReportTarget(null)}
-          onSubmit={({ reason, details }) => pika.submitReport({ activityId: reportTarget.id, reportedUserId: reportTarget.createdBy, reason, details })}
+          onSubmit={({ reason, details }) => pika.submitReport({
+            activityId: reportTarget.isUser ? null : reportTarget.id,
+            reportedUserId: reportTarget.isUser ? reportTarget.userId : reportTarget.createdBy,
+            reason, details,
+          })}
         />
       )}
 
