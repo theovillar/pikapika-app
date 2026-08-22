@@ -3988,23 +3988,36 @@ function LocationFilter({ location, onChange }) {
   const [query, setQuery] = useState("");
   const [remoteResults, setRemoteResults] = useState([]);
 
-  // Tentative de recherche nationale en direct (API officielle "geo.api.gouv.fr").
-  // Si le réseau n'est pas disponible ici, la recherche locale ci-dessous prend le relais.
+  // Recherche dans notre base de villes européennes (table "cities"), avec repli
+  // sur l'API française puis sur la liste locale intégrée.
   useEffect(() => {
     if (query.trim().length < 2) { setRemoteResults([]); return; }
     let cancelled = false;
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
+      // 1. Base de villes européennes
+      try {
+        const { data, error } = await supabase.rpc("search_cities", { q: query, lim: 6 });
+        if (!cancelled && !error && data && data.length > 0) {
+          setRemoteResults(data.map((d) => ({
+            nom: d.name, dept: d.country === "FR" ? (d.admin1 || "FR") : d.country,
+            lat: d.lat, lon: d.lon,
+          })));
+          return;
+        }
+      } catch (e) { /* repli suivant */ }
+
+      // 2. API officielle française
       if (typeof fetch === "undefined") return;
-      fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(query)}&fields=nom,code,codeDepartement,centre&boost=population&limit=6`)
-        .then((r) => (r.ok ? r.json() : []))
-        .then((data) => {
-          if (cancelled || !Array.isArray(data)) return;
+      try {
+        const r = await fetch(`https://geo.api.gouv.fr/communes?nom=${encodeURIComponent(query)}&fields=nom,code,codeDepartement,centre&boost=population&limit=6`);
+        const data = r.ok ? await r.json() : [];
+        if (!cancelled && Array.isArray(data)) {
           setRemoteResults(data.map((d) => ({
             nom: d.nom, dept: d.codeDepartement,
             lat: d.centre?.coordinates?.[1], lon: d.centre?.coordinates?.[0],
           })).filter((d) => d.lat && d.lon));
-        })
-        .catch(() => { if (!cancelled) setRemoteResults([]); });
+        }
+      } catch (e) { if (!cancelled) setRemoteResults([]); }
     }, 300);
     return () => { cancelled = true; clearTimeout(timer); };
   }, [query]);
