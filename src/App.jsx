@@ -4063,11 +4063,11 @@ function LocationFilter({ location, onChange }) {
     const lon = known ? known.lon : p.lon;
     const dept = known ? known.dept : p.dept;
     onChange({ type: "commune", nom: p.nom, lat, lon, dept, radius: 0 });
-    setQuery("");
+    setQuery(p.nom);
   };
   const pickDept = (d) => {
     onChange({ type: "departement", code: d.code, nom: d.nom });
-    setQuery("");
+    setQuery(d.nom);
     setOpen(false);
   };
 
@@ -4101,6 +4101,7 @@ function LocationFilter({ location, onChange }) {
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onFocus={() => { if (location && query === location.nom) setQuery(""); }}
               placeholder={t("loc_placeholder")}
               style={{
                 width: "100%", border: "2px solid #F0EADB", borderRadius: 12, padding: "9px 12px",
@@ -4112,7 +4113,7 @@ function LocationFilter({ location, onChange }) {
             <CityOption label={t("loc_all_france")} active={!location} onClick={() => { onChange(null); setQuery(""); setOpen(false); }} />
 
             {/* Le lieu choisi reste visible même quand la recherche est vide */}
-            {location && query.trim().length === 0 && (
+            {location && (query.trim().length === 0 || query.trim() === location.nom) && (
               <CityOption
                 label={location.type === "departement" ? `${location.nom} (${location.code})` : location.nom}
                 sub={location.type === "departement" ? t("loc_dept") : (location.dept ? t("loc_ville_dept", { d: location.dept }) : t("loc_ville"))}
@@ -4121,7 +4122,7 @@ function LocationFilter({ location, onChange }) {
               />
             )}
 
-            {query.trim().length > 0 && (
+            {query.trim().length > 0 && query.trim() !== (location?.nom || "") && (
               <div style={{ maxHeight: 220, overflowY: "auto" }}>
                 {deptSuggestions.map((d) => (
                   <CityOption key={d.code} label={`${d.nom} (${d.code})`} sub={t("loc_dept")}
