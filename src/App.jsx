@@ -145,7 +145,7 @@ const TRANSLATIONS = {
     preauth_bulk_submit: "Valider la liste", preauth_processing: "Traitement en cours…",
     preauth_result: "{added} email(s) ajouté(s) · {validated} compte(s) déjà existant(s) validé(s) immédiatement · {invalid} ignoré(s) (format invalide)",
     by_organiser: "Par {org}",
-    loc_placeholder: "Ville, code postal, département…", loc_all_france: "Toute la France",
+    loc_placeholder: "Ville, commune, département…", loc_all_france: "Partout",
     loc_no_result: 'Aucun résultat pour "{q}"', loc_dept: "Département", loc_ville: "Ville",
     loc_ville_dept: "Ville · dept. {d}", loc_radius_title: "Rayon autour de {ville}",
     map_centered_on: "Carte centrée sur {loc}", map_empty: "Aucune sortie géolocalisée pour ces filtres.",
@@ -286,7 +286,7 @@ const TRANSLATIONS = {
     preauth_bulk_submit: "Validate the list", preauth_processing: "Processing…",
     preauth_result: "{added} email(s) added · {validated} existing account(s) validated immediately · {invalid} ignored (invalid format)",
     by_organiser: "By {org}",
-    loc_placeholder: "City, postcode, department…", loc_all_france: "All of France",
+    loc_placeholder: "City, town, region…", loc_all_france: "Everywhere",
     loc_no_result: 'No result for "{q}"', loc_dept: "Department", loc_ville: "City",
     loc_ville_dept: "City · dept. {d}", loc_radius_title: "Radius around {ville}",
     map_centered_on: "Map centred on {loc}", map_empty: "No located outing for these filters.",
@@ -422,7 +422,7 @@ const TRANSLATIONS = {
     preauth_bulk_submit: "Validar la lista", preauth_processing: "Procesando…",
     preauth_result: "{added} email(s) añadido(s) · {validated} cuenta(s) existente(s) validada(s) al instante · {invalid} ignorado(s) (formato inválido)",
     by_organiser: "Por {org}",
-    loc_placeholder: "Ciudad, código postal, departamento…", loc_all_france: "Toda Francia",
+    loc_placeholder: "Ciudad, municipio, región…", loc_all_france: "En todas partes",
     loc_no_result: 'Sin resultados para "{q}"', loc_dept: "Departamento", loc_ville: "Ciudad",
     loc_ville_dept: "Ciudad · dpto. {d}", loc_radius_title: "Radio alrededor de {ville}",
     map_centered_on: "Mapa centrado en {loc}", map_empty: "Ninguna salida geolocalizada para estos filtros.",
@@ -2973,6 +2973,10 @@ function Explorer({ activities, favorites, onToggleFav, onOpen, location }) {
 
 // Champ d'adresse avec suggestions en direct, via l'API officielle et gratuite du gouvernement
 // (Base Adresse Nationale) — aide à saisir une adresse réelle et bien formée, sans obliger à la choisir.
+// Petite mémoire des recherches déjà faites : les villes ne changent jamais,
+// donc inutile d'interroger la base deux fois pour la même saisie.
+const cacheVilles = {};
+
 // Recherche de villes dans notre propre base (table "cities" sur Supabase) :
 // couvre toute l'Europe, sans dépendre d'un service tiers qui pourrait nous limiter.
 // Replis successifs : base Supabase → API française → liste locale intégrée.
@@ -2986,15 +2990,21 @@ function CommunePicker({ value, onSelect, placeholder }) {
     if (q.length < 2) { setResults([]); return; }
     let cancelled = false;
 
+    // Déjà cherché : réponse immédiate, sans aller-retour serveur
+    const cle = q.toLowerCase();
+    if (cacheVilles[cle]) { setResults(cacheVilles[cle]); return; }
+
     const timer = setTimeout(async () => {
       // 1. Notre base de villes européennes
       try {
         const { data, error } = await supabase.rpc("search_cities", { q, lim: 8 });
         if (!cancelled && !error && data && data.length > 0) {
-          setResults(data.map((d) => ({
+          const trouves = data.map((d) => ({
             nom: d.name, dept: d.country === "FR" ? (d.admin1 || "FR") : d.country,
             lat: d.lat, lon: d.lon,
-          })));
+          }));
+          cacheVilles[cle] = trouves;
+          setResults(trouves);
           return;
         }
       } catch (e) { /* on passe au repli suivant */ }
@@ -3023,7 +3033,7 @@ function CommunePicker({ value, onSelect, placeholder }) {
           .slice(0, 6)
           .map(([, v]) => ({ nom: v.label, dept: v.dept, lat: v.lat, lon: v.lon })));
       }
-    }, 300);
+    }, 150);
 
     return () => { cancelled = true; clearTimeout(timer); };
   }, [query]);
@@ -3993,15 +4003,20 @@ function LocationFilter({ location, onChange }) {
   useEffect(() => {
     if (query.trim().length < 2) { setRemoteResults([]); return; }
     let cancelled = false;
+    const cle = query.trim().toLowerCase();
+    if (cacheVilles[cle]) { setRemoteResults(cacheVilles[cle]); return; }
+
     const timer = setTimeout(async () => {
       // 1. Base de villes européennes
       try {
         const { data, error } = await supabase.rpc("search_cities", { q: query, lim: 6 });
         if (!cancelled && !error && data && data.length > 0) {
-          setRemoteResults(data.map((d) => ({
+          const trouves = data.map((d) => ({
             nom: d.name, dept: d.country === "FR" ? (d.admin1 || "FR") : d.country,
             lat: d.lat, lon: d.lon,
-          })));
+          }));
+          cacheVilles[cle] = trouves;
+          setRemoteResults(trouves);
           return;
         }
       } catch (e) { /* repli suivant */ }
@@ -4018,7 +4033,7 @@ function LocationFilter({ location, onChange }) {
           })).filter((d) => d.lat && d.lon));
         }
       } catch (e) { if (!cancelled) setRemoteResults([]); }
-    }, 300);
+    }, 150);
     return () => { cancelled = true; clearTimeout(timer); };
   }, [query]);
 
