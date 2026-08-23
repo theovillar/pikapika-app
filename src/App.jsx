@@ -4111,6 +4111,16 @@ function LocationFilter({ location, onChange }) {
 
             <CityOption label={t("loc_all_france")} active={!location} onClick={() => { onChange(null); setQuery(""); setOpen(false); }} />
 
+            {/* Le lieu choisi reste visible même quand la recherche est vide */}
+            {location && query.trim().length === 0 && (
+              <CityOption
+                label={location.type === "departement" ? `${location.nom} (${location.code})` : location.nom}
+                sub={location.type === "departement" ? t("loc_dept") : (location.dept ? t("loc_ville_dept", { d: location.dept }) : t("loc_ville"))}
+                active
+                onClick={() => {}}
+              />
+            )}
+
             {query.trim().length > 0 && (
               <div style={{ maxHeight: 220, overflowY: "auto" }}>
                 {deptSuggestions.map((d) => (
