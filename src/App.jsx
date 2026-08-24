@@ -31,7 +31,7 @@ const LANG = detectLang();
 
 const TRANSLATIONS = {
   fr: {
-    tab_enfants: "Parents", tab_ados: "Jeune", tab_adultes: "Adultes", tab_aine: "Ainé", tab_creer: "Créer",
+    tab_enfants: "Famille", tab_ados: "Jeune", tab_adultes: "Adultes", tab_aine: "Retraité", tab_creer: "Créer",
     tab_mes_sorties: "Mes sorties", tab_profil: "Profil",
     tab_creer_adulte: "Créer une sortie", tab_mes_adultes: "Mes sorties",
     greeting: "Bonjour {name} 👋",
@@ -53,7 +53,7 @@ const TRANSLATIONS = {
     label_categorie: "Catégorie", label_lieu: "Lieu", placeholder_lieu: "Parc, adresse…",
     label_date: "Date & heure", placeholder_date: "Sam. 9 août · 10h", label_heure: "Heure",
     label_age: "Âge conseillé", placeholder_age: "Ex. 4-8 ans",
-    label_places: "Places disponibles", label_places_parents: "Places parents", label_places_enfants: "Places enfants", detail_parents_count: "{a}/{b} parents", detail_kids_count: "{a}/{b} enfants", join_kids_question: "Combien d'enfants amenez-vous ?", join_kids_max: "Vous avez déclaré {n} enfant(s) sur votre profil.", profile_nb_enfants_label: "Nombre d'enfants", profile_nb_moins12_label: "Dont enfants de moins de 12 ans", access_parent_ok: "Vous avez accès aux sorties Parent et Jeune.", access_parent_locked: "Les sorties Parent et Jeune sont réservées aux personnes ayant au moins un enfant de moins de 12 ans.", auth_nb_moins12: "Combien ont moins de 12 ans ?", profile_nb_enfants_note: "Sert à limiter le nombre d'enfants que vous pouvez inscrire à une sortie.", label_description: "Description", label_signe: "Signe distinctif (optionnel)", placeholder_signe: "Ex. Je porterai une casquette rouge, poussette bleue",
+    label_places: "Places disponibles", label_places_parents: "Places parents", label_places_enfants: "Places enfants", detail_parents_count: "{a}/{b} parents", detail_kids_count: "{a}/{b} enfants", join_kids_question: "Combien d'enfants amenez-vous ?", join_kids_max: "Vous avez déclaré {n} enfant(s) sur votre profil.", profile_nb_enfants_label: "Nombre d'enfants", profile_nb_moins12_label: "Dont enfants de moins de 12 ans", access_parent_ok: "Vous avez accès aux sorties Famille et Jeune.", access_parent_locked: "Les sorties Famille et Jeune sont réservées aux personnes ayant au moins un enfant de moins de 12 ans.", auth_nb_moins12: "Combien ont moins de 12 ans ?", profile_nb_enfants_note: "Sert à limiter le nombre d'enfants que vous pouvez inscrire à une sortie.", label_description: "Description", label_signe: "Signe distinctif (optionnel)", placeholder_signe: "Ex. Je porterai une casquette rouge, poussette bleue",
     placeholder_description: "Que va-t-on faire ? Quoi apporter ?",
     label_payant: "Sortie payante ?", toggle_oui: "Oui", toggle_non: "Non",
     badge_payant: "Payant", badge_gratuit: "Gratuit",
@@ -94,7 +94,7 @@ const TRANSLATIONS = {
     auth_email: "Adresse email", auth_password: "Mot de passe", auth_name: "Votre prénom",
     auth_login_btn: "Se connecter", auth_signup_btn: "Créer mon compte",
     auth_switch_to_signup: "Pas encore de compte ? Inscrivez-vous",
-    auth_switch_to_login: "Déjà un compte ? Connectez-vous",
+    auth_switch_to_login: "Déjà un compte ? Connectez-vous", auth_forgot: "Mot de passe oublié ?", auth_forgot_need_email: "Saisissez d'abord votre adresse email.", auth_forgot_sent: "Un lien de réinitialisation vient de vous être envoyé par email.",
     auth_error_generic: "Une erreur est survenue. Vérifiez vos informations et réessayez.",
     auth_loading: "Chargement…",
     account_type_parent: "Particulier", account_type_association: "Association",
@@ -154,7 +154,7 @@ const TRANSLATIONS = {
     day_after_after_tomorrow: "Après-après-demain",
     legend_femme: "Femme", legend_homme: "Homme",
     accordion_empty: "Aucune sortie ce jour-là.",
-    create_toggle_child: "Parent", create_toggle_teen: "Jeune", create_toggle_adult: "Adulte", create_toggle_senior: "Ainé",
+    create_toggle_child: "Famille", create_toggle_teen: "Jeune", create_toggle_adult: "Adulte", create_toggle_senior: "Retraité",
     note_needs_validation: "Vous pourrez aussi proposer des sorties enfants une fois votre identité validée par la mairie (voir Profil).",
     section_kids_outings: "Sorties enfants", section_adult_meetups: "Sorties adultes",
     adult_sub_decouvrir: "Découvrir", adult_sub_creer: "Créer", adult_sub_mes: "Mes sorties",
@@ -169,10 +169,10 @@ const TRANSLATIONS = {
     my_created_label: "Sorties que j'ai créées", my_created_empty: "Vous n'avez encore créé aucune sortie ici.",
     my_joined_label: "Sorties que j'ai rejointes", my_joined_empty: "Vous n'avez encore rejoint aucune sortie ici.",
     my_teen_title: "Mes sorties jeune", my_teen_subtitle: "Les sorties que vous avez proposées ou rejointes.",
-    my_senior_title: "Mes sorties ainé", my_senior_subtitle: "Les sorties que vous avez proposées ou rejointes.",
+    my_senior_title: "Mes sorties retraité", my_senior_subtitle: "Les sorties que vous avez proposées ou rejointes.",
   },
   en: {
-    tab_enfants: "Kids", tab_ados: "Youth", tab_adultes: "Adults", tab_aine: "Seniors", tab_creer: "Create",
+    tab_enfants: "Family", tab_ados: "Youth", tab_adultes: "Adults", tab_aine: "Retired", tab_creer: "Create",
     tab_mes_sorties: "My outings", tab_profil: "Profile",
     tab_creer_adulte: "Create meetup", tab_mes_adultes: "My meetups",
     greeting: "Hi {name} 👋",
@@ -235,7 +235,7 @@ const TRANSLATIONS = {
     auth_email: "Email address", auth_password: "Password", auth_name: "Your first name",
     auth_login_btn: "Sign in", auth_signup_btn: "Create my account",
     auth_switch_to_signup: "No account yet? Sign up",
-    auth_switch_to_login: "Already have an account? Sign in",
+    auth_switch_to_login: "Already have an account? Sign in", auth_forgot: "Forgot password?", auth_forgot_need_email: "Enter your email address first.", auth_forgot_sent: "A reset link has just been sent to your email.",
     auth_error_generic: "Something went wrong. Check your details and try again.",
     auth_loading: "Loading…",
     account_type_parent: "Individual", account_type_association: "Association",
@@ -295,7 +295,7 @@ const TRANSLATIONS = {
     day_after_after_tomorrow: "In 3 days",
     legend_femme: "Woman", legend_homme: "Man",
     accordion_empty: "No meetup that day.",
-    create_toggle_child: "Parent", create_toggle_teen: "Youth", create_toggle_adult: "Adult", create_toggle_senior: "Senior",
+    create_toggle_child: "Family", create_toggle_teen: "Youth", create_toggle_adult: "Adult", create_toggle_senior: "Retired",
     note_needs_validation: "You'll also be able to propose kids outings once your identity is verified by the town hall (see Profile).",
     section_kids_outings: "Kids outings", section_adult_meetups: "Adult meetups",
     adult_sub_decouvrir: "Discover", adult_sub_creer: "Create", adult_sub_mes: "My meetups",
@@ -308,7 +308,7 @@ const TRANSLATIONS = {
     my_meetups_empty: "No meetups yet. Join one in Discover, or propose your own in Create!",
   },
   es: {
-    tab_enfants: "Niños", tab_ados: "Jóvenes", tab_adultes: "Adultos", tab_aine: "Mayores", tab_creer: "Crear",
+    tab_enfants: "Familia", tab_ados: "Jóvenes", tab_adultes: "Adultos", tab_aine: "Jubilados", tab_creer: "Crear",
     tab_mes_sorties: "Mis salidas", tab_profil: "Perfil",
     tab_creer_adulte: "Crear encuentro", tab_mes_adultes: "Mis encuentros",
     greeting: "Hola {name} 👋",
@@ -371,7 +371,7 @@ const TRANSLATIONS = {
     auth_email: "Correo electrónico", auth_password: "Contraseña", auth_name: "Tu nombre",
     auth_login_btn: "Iniciar sesión", auth_signup_btn: "Crear mi cuenta",
     auth_switch_to_signup: "¿Aún no tienes cuenta? Regístrate",
-    auth_switch_to_login: "¿Ya tienes cuenta? Inicia sesión",
+    auth_switch_to_login: "¿Ya tienes cuenta? Inicia sesión", auth_forgot: "¿Olvidaste tu contraseña?", auth_forgot_need_email: "Introduce primero tu correo electrónico.", auth_forgot_sent: "Se acaba de enviar un enlace de restablecimiento a tu correo.",
     auth_error_generic: "Algo salió mal. Comprueba tus datos e inténtalo de nuevo.",
     auth_loading: "Cargando…",
     account_type_parent: "Particular", account_type_association: "Asociación",
@@ -431,7 +431,7 @@ const TRANSLATIONS = {
     day_after_after_tomorrow: "En 3 días",
     legend_femme: "Mujer", legend_homme: "Hombre",
     accordion_empty: "Ningún encuentro ese día.",
-    create_toggle_child: "Padres", create_toggle_teen: "Jóvenes", create_toggle_adult: "Adultos", create_toggle_senior: "Mayores",
+    create_toggle_child: "Familia", create_toggle_teen: "Jóvenes", create_toggle_adult: "Adultos", create_toggle_senior: "Jubilados",
     note_needs_validation: "También podrás proponer salidas infantiles una vez que tu identidad sea validada por el ayuntamiento (ver Perfil).",
     section_kids_outings: "Salidas infantiles", section_adult_meetups: "Encuentros de adultos",
     adult_sub_decouvrir: "Descubrir", adult_sub_creer: "Crear", adult_sub_mes: "Mis encuentros",
@@ -6774,6 +6774,18 @@ function AuthScreen({ onClose, onOpenLegal }) {
     boxSizing: "border-box", background: "#fff", marginBottom: 12,
   };
 
+  // Envoi d'un lien de réinitialisation par email (Supabase gère le reste)
+  const resetPassword = async () => {
+    setError("");
+    if (!email.trim()) { setError(t("auth_forgot_need_email")); return; }
+    setLoading(true);
+    const { error: err } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: window.location.origin,
+    });
+    setLoading(false);
+    setError(err ? (err.message || t("auth_error_generic")) : t("auth_forgot_sent"));
+  };
+
   const submit = async () => {
     setError("");
     if (!email || !password || (mode === "signup" && !name)) return;
@@ -7009,6 +7021,19 @@ function AuthScreen({ onClose, onOpenLegal }) {
         >
           {mode === "signup" ? t("auth_switch_to_login") : t("auth_switch_to_signup")}
         </button>
+
+        {mode === "login" && (
+          <button
+            onClick={resetPassword}
+            style={{
+              display: "block", width: "100%", textAlign: "center", background: "none", border: "none",
+              color: "#9A93AF", fontWeight: 700, fontSize: 12, marginTop: 10, cursor: "pointer",
+              textDecoration: "underline",
+            }}
+          >
+            {t("auth_forgot")}
+          </button>
+        )}
       </div>
     </>
   );
@@ -8389,9 +8414,9 @@ export default function RecreApp() {
   }, [activities, teenItems, adultItems, seniorItems, assoItems]);
 
   const TABS_ALL = [
-    { id: "explorer", label: t("tab_enfants"), icon: Compass, kidsOnly: true, authRequired: true },
     { id: "ados", label: t("tab_ados"), icon: Gamepad2, kidsOnly: true, authRequired: true },
     { id: "adultes", label: t("tab_adultes"), icon: Coffee },
+    { id: "explorer", label: t("tab_enfants"), icon: Compass, kidsOnly: true, authRequired: true },
     { id: "aine", label: t("tab_aine"), icon: Flower2 },
     { id: "asso", label: t("tab_associations"), icon: Landmark, authRequired: true },
     { id: "mairie", label: t("tab_mairie"), icon: ShieldCheck, mairieOnly: true },
