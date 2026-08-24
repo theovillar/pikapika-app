@@ -50,7 +50,7 @@ const TRANSLATIONS = {
     create_title: "Proposer une sortie",
     create_subtitle: "Partagez une activité, d'autres parents pourront rejoindre avec leurs enfants.",
     label_titre: "Titre de la sortie", placeholder_titre: "Ex. Balade contée au parc", placeholder_kid_name: "Prénom de l'enfant", btn_ajouter: "Ajouter",
-    label_categorie: "Catégorie", label_lieu: "Lieu", placeholder_lieu: "Parc, adresse…",
+    label_categorie: "Catégorie", idees_titre: "Besoin d'inspiration ? Choisissez une idée", label_lieu: "Lieu", placeholder_lieu: "Parc, adresse…",
     label_date: "Date & heure", placeholder_date: "Sam. 9 août · 10h", label_heure: "Heure",
     label_age: "Âge conseillé", placeholder_age: "Ex. 4-8 ans",
     label_places: "Places disponibles", label_places_parents: "Places parents", label_places_enfants: "Places enfants", detail_parents_count: "{a}/{b} parents", detail_kids_count: "{a}/{b} enfants", join_kids_question: "Combien d'enfants amenez-vous ?", join_kids_max: "Vous avez déclaré {n} enfant(s) sur votre profil.", profile_nb_enfants_label: "Nombre d'enfants", profile_nb_moins12_label: "Dont enfants de moins de 12 ans", access_parent_ok: "Vous avez accès aux sorties Famille et Jeune.", access_parent_locked: "Les sorties Famille et Jeune sont réservées aux personnes ayant au moins un enfant de moins de 12 ans.", auth_nb_moins12: "Combien ont moins de 12 ans ?", profile_nb_enfants_note: "Sert à limiter le nombre d'enfants que vous pouvez inscrire à une sortie.", label_description: "Description", label_signe: "Signe distinctif (optionnel)", placeholder_signe: "Ex. Je porterai une casquette rouge, poussette bleue",
@@ -3169,6 +3169,67 @@ function AddressInput({ value, onChange, placeholder }) {
   );
 }
 
+// Idées de sorties proposées à la création : aide à démarrer quand on manque
+// d'inspiration. Un clic remplit le titre, qui reste librement modifiable.
+const IDEES_SORTIES = {
+  // Famille
+  nature: ["Balade au parc", "Chasse aux trésors en forêt", "Pique-nique au bord de l'eau", "Ramassage de feuilles et bricolage", "Observation des oiseaux"],
+  creatif: ["Atelier peinture", "Fabrication de cerfs-volants", "Après-midi pâte à modeler", "Décoration de galets", "Atelier origami"],
+  musique: ["Éveil musical", "Karaoké des enfants", "Fabrication d'instruments", "Petit concert improvisé"],
+  jeux: ["Après-midi jeux de société", "Grands jeux en plein air", "Parcours d'obstacles", "Cache-cache géant"],
+  sport: ["Sortie vélo en famille", "Initiation au foot", "Course d'orientation", "Après-midi trottinette"],
+  // Adultes
+  cafe: ["Café entre voisins", "Petit-déjeuner du dimanche", "Apéro de quartier", "Brunch entre parents"],
+  culture: ["Visite du musée", "Sortie cinéma", "Balade patrimoine", "Visite d'exposition"],
+  bienetre: ["Séance de yoga au parc", "Marche méditative", "Atelier relaxation", "Sophrologie en plein air"],
+  jeuxsociete: ["Soirée jeux de société", "Tournoi de belote", "Soirée quiz", "Initiation aux échecs"],
+  // Jeune
+  jeuxvideo: ["Tournoi Mario Kart", "Soirée jeux en réseau", "Découverte de jeux rétro"],
+  cinema: ["Sortie cinéma", "Ciné-club en plein air", "Marathon de films"],
+  // Retraité
+  marche: ["Marche douce du matin", "Randonnée tranquille", "Balade au bord du canal", "Marche nordique découverte"],
+  ateliers: ["Atelier mémoire", "Club de lecture", "Atelier informatique", "Atelier cuisine"],
+  jardinage: ["Jardinage partagé", "Bouturage entre voisins", "Entretien du jardin collectif", "Troc de graines"],
+  // Commune
+  mairie: ["Conseil de quartier", "Réunion d'information", "Cérémonie municipale"],
+  benevolat: ["Nettoyage du quartier", "Distribution solidaire", "Aide aux devoirs"],
+  fete: ["Fête des voisins", "Vide-grenier", "Marché de producteurs", "Kermesse"],
+};
+
+function IdeesSorties({ categorie, onChoisir }) {
+  const idees = IDEES_SORTIES[categorie];
+  if (!idees || idees.length === 0) return null;
+  return (
+    <div style={{
+      background: "#FFF9EC", border: `2px solid ${COLORS.sun}`, borderRadius: 14,
+      padding: "10px 12px", marginBottom: 4,
+    }}>
+      <div style={{
+        display: "flex", alignItems: "center", gap: 6, marginBottom: 8,
+        fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, color: COLORS.ink,
+      }}>
+        <Sparkles size={14} color={COLORS.sun} /> {t("idees_titre")}
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        {idees.map((idee) => (
+          <button
+            key={idee}
+            type="button"
+            onClick={() => onChoisir(idee)}
+            style={{
+              background: "#fff", border: "2px solid #F0EADB", borderRadius: 999,
+              padding: "5px 11px", cursor: "pointer", fontFamily: "Nunito, sans-serif",
+              fontWeight: 700, fontSize: 12, color: COLORS.ink,
+            }}
+          >
+            {idee}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function CreateActivity({ onCreate }) {
   const todayISO = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({
@@ -3212,12 +3273,16 @@ function CreateActivity({ onCreate }) {
           <input style={inputStyle} placeholder={t("placeholder_titre")} value={form.title} onChange={set("title")} />
         </div>
 
+        <IdeesSorties categorie={form.category} onChoisir={(idee) => setForm({ ...form, title: idee })} />
+
         <div>
           <label style={label}>{t("label_categorie")}</label>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {CATEGORIES.map((c) => (
               <Chip key={c.id} active={form.category === c.id} onClick={() => setForm({ ...form, category: c.id })} color={c.color}>
-                {c.label}
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                  <c.icon size={13} /> {c.label}
+                </span>
               </Chip>
             ))}
           </div>
@@ -6114,12 +6179,16 @@ function CreateMeetup({ categories, onCreate }) {
           <input style={inputStyle} placeholder={t("placeholder_titre")} value={form.title} onChange={set("title")} />
         </div>
 
+        <IdeesSorties categorie={form.category} onChoisir={(idee) => setForm({ ...form, title: idee })} />
+
         <div>
           <label style={label}>{t("label_categorie")}</label>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {categories.map((c) => (
               <Chip key={c.id} active={form.category === c.id} onClick={() => setForm({ ...form, category: c.id })} color={c.color}>
-                {c.label}
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                  <c.icon size={13} /> {c.label}
+                </span>
               </Chip>
             ))}
           </div>
@@ -6261,7 +6330,11 @@ function EditActivityModal({ activity, space, categories, onClose, onSave }) {
             <label style={label}>{t("label_categorie")}</label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {categories.map((c) => (
-                <Chip key={c.id} active={form.category === c.id} onClick={() => setForm({ ...form, category: c.id })} color={c.color}>{c.label}</Chip>
+                <Chip key={c.id} active={form.category === c.id} onClick={() => setForm({ ...form, category: c.id })} color={c.color}>
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                    <c.icon size={13} /> {c.label}
+                  </span>
+                </Chip>
               ))}
             </div>
           </div>
@@ -7002,7 +7075,8 @@ function AuthScreen({ onClose, onOpenLegal }) {
               marginTop: -6,
             }}
           >
-            {showPassword ? <EyeOff size={18} color="#9A93AF" /> : <Eye size={18} color="#9A93AF" />}
+            {/* Œil ouvert = mot de passe visible ; œil barré = masqué */}
+            {showPassword ? <Eye size={18} color="#9A93AF" /> : <EyeOff size={18} color="#9A93AF" />}
           </button>
         </div>
 
@@ -8658,11 +8732,11 @@ export default function RecreApp() {
         {tab === "creer" && (
           <CreatePage
             parentValidated={parentValidated}
-            onCreateKid={createActivity}
-            onCreateTeen={pika.createTeenMeetup}
-            onCreateAdult={createAdultMeetup}
-            onCreateSenior={pika.createSeniorMeetup}
-            onCreateAsso={pika.createAssoEvent}
+            onCreateKid={async (f) => { await createActivity(f); setTab("explorer"); }}
+            onCreateTeen={async (f) => { await pika.createTeenMeetup(f); setTab("ados"); }}
+            onCreateAdult={async (f) => { await createAdultMeetup(f); setTab("adultes"); }}
+            onCreateSenior={async (f) => { await pika.createSeniorMeetup(f); setTab("aine"); }}
+            onCreateAsso={async (f) => { await pika.createAssoEvent(f); setTab("asso"); }}
             role={pika.role}
           />
         )}
