@@ -4020,167 +4020,207 @@ function SectionLabel({ children }) {
 // Pensée pour paraître vivante plutôt que mécanique : corps souple qui se déforme
 // (squash & stretch), déplacements imprévisibles dans tout l'espace, pauses,
 // regard qui suit la direction, et petites lubies aléatoires.
+// Petite créature qui apparaît de temps en temps, joue une courte scène, puis repart.
+// Rythme volontairement espacé : elle est absente la plupart du temps, pour rester
+// une bonne surprise plutôt qu'une présence agitée en permanence.
 function PetitMonstre() {
-  const [visible, setVisible] = useState(true);
-  const [pos, setPos] = useState({ x: 20, y: 30 });     // en % de l'écran
-  const [etat, setEtat] = useState("repos");            // repos | glisse | bond | curieux | dodo | surprise
-  const [regarde, setRegarde] = useState({ x: 0, y: 0 }); // décalage des pupilles
+  const [present, setPresent] = useState(false);
+  const [abandonne, setAbandonne] = useState(false);   // si on l'a chassée d'un clic
+  const [pos, setPos] = useState({ x: 15, y: 25 });
+  const [etat, setEtat] = useState("arrive");          // arrive | pose | dodo | curieux | surprise | part
+  const [regarde, setRegarde] = useState({ x: 0, y: 0 });
   const [etirement, setEtirement] = useState({ sx: 1, sy: 1 });
   const [teinte, setTeinte] = useState(COLORS.grape);
-  const minuterie = useRef(null);
+  const [portePos, setPortePos] = useState({ x: 15, y: 25 });
+  const [porteOuverte, setPorteOuverte] = useState(false);
+  const minuteries = useRef([]);
 
-  // Chaque action programme la suivante avec un délai variable : rien n'est cadencé,
-  // donc le comportement ne devient jamais prévisible.
+  const planifier = (fn, delai) => {
+    const id = setTimeout(fn, delai);
+    minuteries.current.push(id);
+    return id;
+  };
+
+  // Cycle complet : la porte s'ouvre, la créature sort, joue sa scène,
+  // repart par la porte, puis tout disparaît pendant une vingtaine de secondes.
   useEffect(() => {
-    if (!visible) return;
+    if (abandonne) return;
 
-    const agir = () => {
-      const tirage = Math.random();
+    const lancerScene = () => {
+      // La porte apparaît à un endroit au hasard
+      const depart = { x: 8 + Math.random() * 70, y: 12 + Math.random() * 50 };
+      setPortePos(depart);
+      setPos(depart);
+      setPorteOuverte(true);
+      setPresent(true);
+      setEtat("arrive");
+      setEtirement({ sx: 0.6, sy: 0.6 });
 
-      if (tirage < 0.08) {
-        // Sieste : il s'aplatit doucement et ferme les yeux
-        setEtat("dodo");
-        setEtirement({ sx: 1.18, sy: 0.82 });
-        minuterie.current = setTimeout(agir, 3000 + Math.random() * 3000);
-        return;
+      // Elle sort de la porte
+      planifier(() => setEtirement({ sx: 1, sy: 1 }), 400);
+      planifier(() => setPorteOuverte(false), 1100);
+
+      // --- Sa petite scène : deux ou trois déplacements tranquilles ---
+      const nbEtapes = 2 + Math.floor(Math.random() * 2);
+      let instant = 1300;
+
+      for (let i = 0; i < nbEtapes; i++) {
+        planifier(() => {
+          const cible = { x: 8 + Math.random() * 72, y: 10 + Math.random() * 55 };
+          setRegarde({
+            x: Math.max(-5, Math.min(5, (cible.x - depart.x) * 0.1)),
+            y: Math.max(-4, Math.min(4, (cible.y - depart.y) * 0.08)),
+          });
+          setEtirement({ sx: 1.12, sy: 0.9 });
+          planifier(() => setEtirement({ sx: 1, sy: 1 }), 700);
+          setPos(cible);
+          setEtat("pose");
+        }, instant);
+        instant += 3200;
+
+        // Entre deux déplacements, une petite fantaisie
+        planifier(() => {
+          const tirage = Math.random();
+          if (tirage < 0.3) {
+            setEtat("dodo");
+            setEtirement({ sx: 1.15, sy: 0.85 });
+            planifier(() => { setEtat("pose"); setEtirement({ sx: 1, sy: 1 }); }, 2200);
+          } else if (tirage < 0.6) {
+            setEtat("surprise");
+            setEtirement({ sx: 0.85, sy: 1.2 });
+            setTeinte([COLORS.coral, COLORS.sky, COLORS.sun][Math.floor(Math.random() * 3)]);
+            planifier(() => {
+              setEtat("pose"); setEtirement({ sx: 1, sy: 1 }); setTeinte(COLORS.grape);
+            }, 900);
+          } else {
+            setEtat("curieux");
+            setRegarde({ x: (Math.random() - 0.5) * 6, y: (Math.random() - 0.5) * 4 });
+            planifier(() => setRegarde({ x: (Math.random() - 0.5) * 6, y: (Math.random() - 0.5) * 4 }), 900);
+            planifier(() => setEtat("pose"), 1900);
+          }
+        }, instant - 1600);
       }
 
-      if (tirage < 0.16) {
-        // Il sursaute sans raison et change de couleur un instant
-        setEtat("surprise");
-        setEtirement({ sx: 0.82, sy: 1.25 });
-        setTeinte([COLORS.coral, COLORS.sky, COLORS.sun, COLORS.grass][Math.floor(Math.random() * 4)]);
-        setTimeout(() => { setTeinte(COLORS.grape); setEtirement({ sx: 1, sy: 1 }); }, 700);
-        minuterie.current = setTimeout(agir, 1200 + Math.random() * 1500);
-        return;
-      }
+      // --- Le départ : elle retourne à sa porte et s'y engouffre ---
+      planifier(() => {
+        setPorteOuverte(true);
+        setPos(depart);
+        setEtat("part");
+        setRegarde({ x: 0, y: 0 });
+      }, instant);
 
-      if (tirage < 0.28) {
-        // Pause curieuse : il regarde autour de lui
-        setEtat("curieux");
+      planifier(() => setEtirement({ sx: 0.5, sy: 0.5 }), instant + 1400);
+      planifier(() => {
+        setPresent(false);
+        setPorteOuverte(false);
         setEtirement({ sx: 1, sy: 1 });
-        const scruter = () => setRegarde({ x: (Math.random() - 0.5) * 5, y: (Math.random() - 0.5) * 4 });
-        scruter();
-        setTimeout(scruter, 800);
-        setTimeout(scruter, 1600);
-        minuterie.current = setTimeout(agir, 2400 + Math.random() * 1800);
-        return;
-      }
+      }, instant + 1900);
 
-      // Déplacement : n'importe où dans l'espace, en glissant ou en bondissant
-      const bondit = Math.random() > 0.45;
-      const cible = {
-        x: 6 + Math.random() * 78,
-        y: 8 + Math.random() * 62,
-      };
-      const dx = cible.x - pos.x;
-      const dy = cible.y - pos.y;
-
-      // Le regard part vers la destination avant le corps
-      setRegarde({ x: Math.max(-5, Math.min(5, dx * 0.12)), y: Math.max(-4, Math.min(4, dy * 0.1)) });
-
-      setEtat(bondit ? "bond" : "glisse");
-      // Il s'écrase avant de partir, s'étire pendant, puis se repose
-      setEtirement(bondit ? { sx: 1.25, sy: 0.78 } : { sx: 1.08, sy: 0.94 });
-      setTimeout(() => setEtirement(bondit ? { sx: 0.82, sy: 1.22 } : { sx: 0.96, sy: 1.04 }), 180);
-      setTimeout(() => setEtirement({ sx: 1, sy: 1 }), 900);
-
-      setPos(cible);
-      setTimeout(() => setEtat("repos"), 1100);
-      minuterie.current = setTimeout(agir, 1400 + Math.random() * 2600);
+      // Absence prolongée avant la prochaine apparition
+      planifier(lancerScene, instant + 1900 + 18000 + Math.random() * 12000);
     };
 
-    minuterie.current = setTimeout(agir, 1200);
-    return () => clearTimeout(minuterie.current);
+    const depart = planifier(lancerScene, 4000);
+    return () => {
+      minuteries.current.forEach(clearTimeout);
+      minuteries.current = [];
+      clearTimeout(depart);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible, pos.x, pos.y]);
+  }, [abandonne]);
 
-  // Respiration continue : le corps gonfle et dégonfle légèrement
+  // Respiration légère
   const [souffle, setSouffle] = useState(0);
   useEffect(() => {
-    if (!visible) return;
-    const r = setInterval(() => setSouffle((s) => (s + 1) % 2), 1500);
+    if (!present) return;
+    const r = setInterval(() => setSouffle((s) => (s + 1) % 2), 1600);
     return () => clearInterval(r);
-  }, [visible]);
+  }, [present]);
 
-  if (!visible) return null;
+  if (abandonne || (!present && !porteOuverte)) return null;
 
   const dort = etat === "dodo";
   const surpris = etat === "surprise";
-  const bondit = etat === "bond";
-  const respire = souffle === 0 ? 1 : 1.03;
+  const respire = souffle === 0 ? 1 : 1.025;
 
   return (
-    <div
-      onClick={() => setVisible(false)}
-      title={t("monstre_bye")}
-      style={{
-        position: "fixed",
-        left: `${pos.x}%`,
-        bottom: `${pos.y}%`,
-        zIndex: 400,
-        cursor: "pointer",
-        // Le bond est vif et rebondissant, le glissement est fluide
-        transition: bondit
-          ? "left .75s cubic-bezier(.34,1.56,.64,1), bottom .75s cubic-bezier(.34,1.56,.64,1), transform .18s ease-out"
-          : "left 1.6s cubic-bezier(.4,0,.2,1), bottom 1.6s cubic-bezier(.4,0,.2,1), transform .25s ease-out",
-        transform: `scale(${etirement.sx * respire}, ${etirement.sy})`,
-      }}
-    >
-      <svg width="46" height="46" viewBox="0 0 50 50" style={{ overflow: "visible" }}>
-        {/* Ombre portée au sol, qui rétrécit quand il saute */}
-        <ellipse cx="25" cy="46" rx={bondit ? 8 : 13} ry="3" fill="#2B2560" opacity={bondit ? 0.08 : 0.14} />
+    <>
+      {/* La petite porte par laquelle elle va et vient */}
+      {porteOuverte && (
+        <div style={{
+          position: "fixed", left: `${portePos.x}%`, bottom: `${portePos.y}%`,
+          zIndex: 399, pointerEvents: "none", transition: "opacity .4s",
+        }}>
+          <svg width="40" height="52" viewBox="0 0 40 52">
+            <path d="M6 50 L6 16 Q6 4 20 4 Q34 4 34 16 L34 50 Z" fill={shade(COLORS.grape, -30)} />
+            <path d="M9 50 L9 17 Q9 7 20 7 Q31 7 31 17 L31 50 Z" fill="#2B2560" opacity="0.55" />
+            <circle cx="27" cy="31" r="1.8" fill={COLORS.sun} />
+          </svg>
+        </div>
+      )}
 
-        {/* Petites antennes souples avec un pompon au bout */}
-        <path d="M18 12 Q15 4 11 3" stroke={teinte} strokeWidth="2.4" fill="none" strokeLinecap="round" />
-        <circle cx="10.5" cy="2.5" r="3" fill={COLORS.sun} />
-        <path d="M32 12 Q35 4 39 3" stroke={teinte} strokeWidth="2.4" fill="none" strokeLinecap="round" />
-        <circle cx="39.5" cy="2.5" r="3" fill={COLORS.sun} />
+      {present && (
+        <div
+          onClick={() => setAbandonne(true)}
+          title={t("monstre_bye")}
+          style={{
+            position: "fixed",
+            left: `${pos.x}%`,
+            bottom: `${pos.y}%`,
+            zIndex: 400,
+            cursor: "pointer",
+            // Déplacement lent et posé : la créature flâne, elle ne fuse pas
+            transition: "left 2.8s cubic-bezier(.45,.05,.35,1), bottom 2.8s cubic-bezier(.45,.05,.35,1), transform .5s ease-out, opacity .4s",
+            transform: `scale(${etirement.sx * respire}, ${etirement.sy})`,
+            opacity: etat === "part" || etat === "arrive" ? 0.9 : 1,
+          }}
+        >
+          <svg width="44" height="44" viewBox="0 0 50 50" style={{ overflow: "visible" }}>
+            <ellipse cx="25" cy="46" rx="12" ry="2.8" fill="#2B2560" opacity="0.12" />
 
-        {/* Corps : une goutte toute ronde, sans membres rigides */}
-        <path
-          d="M25 8 C37 8 43 17 43 27 C43 37 35 43 25 43 C15 43 7 37 7 27 C7 17 13 8 25 8 Z"
-          fill={teinte}
-          stroke="#fff"
-          strokeWidth="2.5"
-          style={{ transition: "fill .4s" }}
-        />
+            <path d="M18 12 Q15 4 11 3" stroke={teinte} strokeWidth="2.4" fill="none" strokeLinecap="round" />
+            <circle cx="10.5" cy="2.5" r="3" fill={COLORS.sun} />
+            <path d="M32 12 Q35 4 39 3" stroke={teinte} strokeWidth="2.4" fill="none" strokeLinecap="round" />
+            <circle cx="39.5" cy="2.5" r="3" fill={COLORS.sun} />
 
-        {/* Joues */}
-        <ellipse cx="12" cy="30" rx="3.6" ry="2.8" fill={COLORS.girl} opacity="0.5" />
-        <ellipse cx="38" cy="30" rx="3.6" ry="2.8" fill={COLORS.girl} opacity="0.5" />
+            <path
+              d="M25 8 C37 8 43 17 43 27 C43 37 35 43 25 43 C15 43 7 37 7 27 C7 17 13 8 25 8 Z"
+              fill={teinte} stroke="#fff" strokeWidth="2.5"
+              style={{ transition: "fill .4s" }}
+            />
 
-        {dort ? (
-          <>
-            {/* Yeux fermés et petit "z" de sommeil */}
-            <path d="M14 25 Q18 29 22 25" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-            <path d="M28 25 Q32 29 36 25" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" />
-            <path d="M22 34 Q25 36 28 34" stroke="#2B2560" strokeWidth="1.8" fill="none" strokeLinecap="round" />
-            <text x="40" y="14" fontSize="11" fill={COLORS.sky} fontFamily="Fredoka, sans-serif">z</text>
-          </>
-        ) : (
-          <>
-            {/* Grands yeux brillants, pupilles qui suivent la direction */}
-            <ellipse cx="18" cy="25" rx={surpris ? 7 : 6} ry={surpris ? 8 : 7} fill="#fff" />
-            <ellipse cx="32" cy="25" rx={surpris ? 7 : 6} ry={surpris ? 8 : 7} fill="#fff" />
-            <circle cx={18 + regarde.x} cy={25 + regarde.y} r={surpris ? 2.6 : 3.4} fill="#2B2560"
-              style={{ transition: "cx .4s, cy .4s, r .2s" }} />
-            <circle cx={32 + regarde.x} cy={25 + regarde.y} r={surpris ? 2.6 : 3.4} fill="#2B2560"
-              style={{ transition: "cx .4s, cy .4s, r .2s" }} />
-            {/* Reflets : c'est ce qui donne le regard vivant */}
-            <circle cx={19.4 + regarde.x} cy={23.4 + regarde.y} r="1.3" fill="#fff" opacity="0.95" />
-            <circle cx={33.4 + regarde.x} cy={23.4 + regarde.y} r="1.3" fill="#fff" opacity="0.95" />
+            <ellipse cx="12" cy="30" rx="3.6" ry="2.8" fill={COLORS.girl} opacity="0.5" />
+            <ellipse cx="38" cy="30" rx="3.6" ry="2.8" fill={COLORS.girl} opacity="0.5" />
 
-            {/* Bouche */}
-            {surpris ? (
-              <ellipse cx="25" cy="36" rx="3" ry="3.6" fill="#2B2560" />
+            {dort ? (
+              <>
+                <path d="M14 25 Q18 29 22 25" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+                <path d="M28 25 Q32 29 36 25" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+                <path d="M22 34 Q25 36 28 34" stroke="#2B2560" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+                <text x="40" y="14" fontSize="11" fill={COLORS.sky} fontFamily="Fredoka, sans-serif">z</text>
+              </>
             ) : (
-              <path d="M21 35 Q25 39 29 35" stroke="#2B2560" strokeWidth="2" fill="none" strokeLinecap="round" />
+              <>
+                <ellipse cx="18" cy="25" rx={surpris ? 7 : 6} ry={surpris ? 8 : 7} fill="#fff" />
+                <ellipse cx="32" cy="25" rx={surpris ? 7 : 6} ry={surpris ? 8 : 7} fill="#fff" />
+                <circle cx={18 + regarde.x} cy={25 + regarde.y} r={surpris ? 2.6 : 3.4} fill="#2B2560"
+                  style={{ transition: "cx .6s, cy .6s, r .3s" }} />
+                <circle cx={32 + regarde.x} cy={25 + regarde.y} r={surpris ? 2.6 : 3.4} fill="#2B2560"
+                  style={{ transition: "cx .6s, cy .6s, r .3s" }} />
+                <circle cx={19.4 + regarde.x} cy={23.4 + regarde.y} r="1.3" fill="#fff" opacity="0.95" />
+                <circle cx={33.4 + regarde.x} cy={23.4 + regarde.y} r="1.3" fill="#fff" opacity="0.95" />
+
+                {surpris ? (
+                  <ellipse cx="25" cy="36" rx="3" ry="3.6" fill="#2B2560" />
+                ) : (
+                  <path d="M21 35 Q25 39 29 35" stroke="#2B2560" strokeWidth="2" fill="none" strokeLinecap="round" />
+                )}
+              </>
             )}
-          </>
-        )}
-      </svg>
-    </div>
+          </svg>
+        </div>
+      )}
+    </>
   );
 }
 
