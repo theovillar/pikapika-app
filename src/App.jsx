@@ -673,7 +673,15 @@ function locationLabel(location) {
   return `${location.nom} · ${location.radius} km`;
 }
 
-const villeName = (id) => (CITY_META[id] || {}).label || "";
+// Retourne le nom affichable d'une ville : soit depuis la liste intégrée (anciens
+// identifiants type "grenoble"), soit le nom tel quel pour les villes européennes.
+const villeName = (id) => {
+  if (!id) return "";
+  const connue = CITY_META[id];
+  if (connue) return connue.label;
+  // Ville libre enregistrée directement sous son nom
+  return String(id);
+};
 
 // Calcule un âge à partir d'une date de naissance, sans jamais avoir besoin d'afficher
 // la date exacte ailleurs dans l'appli (plus respectueux de la vie privée).
@@ -5578,9 +5586,20 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
           }}>
             {item.time ? item.time : displayDate(item)}
           </span>
-          <span style={{ fontFamily: "Nunito, sans-serif", color: "#8A8399", overflow: "hidden", textOverflow: "ellipsis" }}>
-            {lieuAvecVille(item)}
+          {/* L'adresse peut être tronquée, mais la ville reste toujours lisible :
+              c'est l'information la plus utile pour savoir si la sortie est proche. */}
+          <span style={{ fontFamily: "Nunito, sans-serif", color: "#8A8399", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>
+            {item.lieu}
           </span>
+          {villeName(item.ville) && (
+            <span style={{
+              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 10.5, flexShrink: 0,
+              background: "#EDEAF4", color: COLORS.grape, padding: "2px 7px", borderRadius: 8,
+              maxWidth: 110, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+            }}>
+              {villeName(item.ville)}
+            </span>
+          )}
           <PriceBadge payant={item.payant} size={12} />
         </div>
         {item.organisateur && (
