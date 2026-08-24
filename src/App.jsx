@@ -4016,145 +4016,99 @@ function SectionLabel({ children }) {
 // Petit compagnon qui se promène en bas de l'écran et fait des grimaces.
 // Volontairement discret : il ne gêne aucun clic (pointerEvents: none sauf sur lui-même),
 // et un clic le fait partir pour la session si on préfère être tranquille.
-const HUMEURS = ["normal", "clin", "langue", "surpris", "endormi", "content"];
-
+// Petite créature vivante qui explore librement la page.
+// Pensée pour paraître vivante plutôt que mécanique : corps souple qui se déforme
+// (squash & stretch), déplacements imprévisibles dans tout l'espace, pauses,
+// regard qui suit la direction, et petites lubies aléatoires.
 function PetitMonstre() {
   const [visible, setVisible] = useState(true);
-  const [x, setX] = useState(12);              // position horizontale, en % de la largeur
-  const [y, setY] = useState(0);               // hauteur au-dessus du sol, en pixels
-  const [direction, setDirection] = useState(1);
-  const [humeur, setHumeur] = useState("normal");
-  const [pose, setPose] = useState("marche");  // marche | dos | saut | coucou | accroche | chute | assis
-  const [pas, setPas] = useState(0);
-  const [balance, setBalance] = useState(0);   // oscillation quand il est accroché
+  const [pos, setPos] = useState({ x: 20, y: 30 });     // en % de l'écran
+  const [etat, setEtat] = useState("repos");            // repos | glisse | bond | curieux | dodo | surprise
+  const [regarde, setRegarde] = useState({ x: 0, y: 0 }); // décalage des pupilles
+  const [etirement, setEtirement] = useState({ sx: 1, sy: 1 });
+  const [teinte, setTeinte] = useState(COLORS.grape);
+  const minuterie = useRef(null);
 
-  // Balancement des membres pendant la marche
+  // Chaque action programme la suivante avec un délai variable : rien n'est cadencé,
+  // donc le comportement ne devient jamais prévisible.
   useEffect(() => {
     if (!visible) return;
-    const anim = setInterval(() => setPas((p) => (p + 1) % 2), 320);
-    return () => clearInterval(anim);
-  }, [visible]);
 
-  // Oscillation quand il est suspendu
-  useEffect(() => {
-    if (pose !== "accroche") { setBalance(0); return; }
-    const osc = setInterval(() => setBalance((b) => (b === 0 ? 1 : 0)), 700);
-    return () => clearInterval(osc);
-  }, [pose]);
-
-  // Petite mise en scène : il grimpe sur une annonce, s'y accroche, se balance, puis tombe.
-  const grimpette = () => {
-    setPose("saut");
-    setY(150);                                   // il bondit vers une annonce plus haut
-    setTimeout(() => setPose("accroche"), 550);  // il s'agrippe au bord
-    setTimeout(() => {                           // la prise lâche…
-      setPose("chute");
-      setY(0);
-    }, 4200);
-    setTimeout(() => {                           // atterrissage sur les fesses
-      setPose("assis");
-      setHumeur("surpris");
-    }, 4900);
-    setTimeout(() => {                           // il se relève, un peu vexé
-      setPose("marche");
-      setHumeur("content");
-    }, 6400);
-  };
-
-  // Déplacement : allers-retours, avec demi-tour de dos
-  useEffect(() => {
-    if (!visible) return;
-    const marche = setInterval(() => {
-      if (pose !== "marche") return;             // pas de déplacement pendant une cascade
-      setX((pos) => {
-        const suivant = pos + direction * (4 + Math.random() * 5);
-        if (suivant > 84 || suivant < 4) {
-          setPose("dos");
-          setTimeout(() => { setDirection((d) => -d); setPose("marche"); }, 900);
-          return suivant > 84 ? 84 : 4;
-        }
-        return suivant;
-      });
-    }, 2600);
-    return () => clearInterval(marche);
-  }, [visible, direction, pose]);
-
-  // Bêtises au hasard
-  useEffect(() => {
-    if (!visible) return;
-    const betises = setInterval(() => {
-      if (pose !== "marche") return;
+    const agir = () => {
       const tirage = Math.random();
-      if (tirage > 0.75) {
-        grimpette();
-      } else if (tirage > 0.55) {
-        setPose("coucou");
-        setTimeout(() => setPose("marche"), 1600);
-      } else if (tirage > 0.35) {
-        setPose("saut");
-        setTimeout(() => setPose("marche"), 700);
+
+      if (tirage < 0.08) {
+        // Sieste : il s'aplatit doucement et ferme les yeux
+        setEtat("dodo");
+        setEtirement({ sx: 1.18, sy: 0.82 });
+        minuterie.current = setTimeout(agir, 3000 + Math.random() * 3000);
+        return;
       }
-      setHumeur(HUMEURS[Math.floor(Math.random() * HUMEURS.length)]);
-      setTimeout(() => setHumeur("normal"), 1800);
-    }, 5200);
-    return () => clearInterval(betises);
-  }, [visible, pose]);
+
+      if (tirage < 0.16) {
+        // Il sursaute sans raison et change de couleur un instant
+        setEtat("surprise");
+        setEtirement({ sx: 0.82, sy: 1.25 });
+        setTeinte([COLORS.coral, COLORS.sky, COLORS.sun, COLORS.grass][Math.floor(Math.random() * 4)]);
+        setTimeout(() => { setTeinte(COLORS.grape); setEtirement({ sx: 1, sy: 1 }); }, 700);
+        minuterie.current = setTimeout(agir, 1200 + Math.random() * 1500);
+        return;
+      }
+
+      if (tirage < 0.28) {
+        // Pause curieuse : il regarde autour de lui
+        setEtat("curieux");
+        setEtirement({ sx: 1, sy: 1 });
+        const scruter = () => setRegarde({ x: (Math.random() - 0.5) * 5, y: (Math.random() - 0.5) * 4 });
+        scruter();
+        setTimeout(scruter, 800);
+        setTimeout(scruter, 1600);
+        minuterie.current = setTimeout(agir, 2400 + Math.random() * 1800);
+        return;
+      }
+
+      // Déplacement : n'importe où dans l'espace, en glissant ou en bondissant
+      const bondit = Math.random() > 0.45;
+      const cible = {
+        x: 6 + Math.random() * 78,
+        y: 8 + Math.random() * 62,
+      };
+      const dx = cible.x - pos.x;
+      const dy = cible.y - pos.y;
+
+      // Le regard part vers la destination avant le corps
+      setRegarde({ x: Math.max(-5, Math.min(5, dx * 0.12)), y: Math.max(-4, Math.min(4, dy * 0.1)) });
+
+      setEtat(bondit ? "bond" : "glisse");
+      // Il s'écrase avant de partir, s'étire pendant, puis se repose
+      setEtirement(bondit ? { sx: 1.25, sy: 0.78 } : { sx: 1.08, sy: 0.94 });
+      setTimeout(() => setEtirement(bondit ? { sx: 0.82, sy: 1.22 } : { sx: 0.96, sy: 1.04 }), 180);
+      setTimeout(() => setEtirement({ sx: 1, sy: 1 }), 900);
+
+      setPos(cible);
+      setTimeout(() => setEtat("repos"), 1100);
+      minuterie.current = setTimeout(agir, 1400 + Math.random() * 2600);
+    };
+
+    minuterie.current = setTimeout(agir, 1200);
+    return () => clearTimeout(minuterie.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, pos.x, pos.y]);
+
+  // Respiration continue : le corps gonfle et dégonfle légèrement
+  const [souffle, setSouffle] = useState(0);
+  useEffect(() => {
+    if (!visible) return;
+    const r = setInterval(() => setSouffle((s) => (s + 1) % 2), 1500);
+    return () => clearInterval(r);
+  }, [visible]);
 
   if (!visible) return null;
 
-  const deDos = pose === "dos";
-  const saute = pose === "saut";
-  const faitCoucou = pose === "coucou";
-  const accroche = pose === "accroche";
-  const tombe = pose === "chute";
-  const assis = pose === "assis";
-
-  // Position des membres selon la pose
-  const sens = pas === 0 ? 1 : -1;
-  let jambeG, jambeD, brasG, brasD, inclinaison = 0;
-
-  if (accroche) {
-    // Suspendu par les bras, jambes qui pendouillent et se balancent
-    brasG = -155; brasD = 155;
-    jambeG = balance ? 18 : -8;
-    jambeD = balance ? 8 : -18;
-    inclinaison = balance ? 6 : -6;
-  } else if (tombe) {
-    // Chute : bras et jambes écartés en tous sens
-    brasG = -100; brasD = 100;
-    jambeG = -35; jambeD = 35;
-    inclinaison = 22;
-  } else if (assis) {
-    // Assis par terre, jambes tendues devant
-    brasG = -30; brasD = 30;
-    jambeG = -75; jambeD = -75;
-    inclinaison = 0;
-  } else if (saute) {
-    brasG = -50; brasD = -50;
-    jambeG = -18; jambeD = -18;
-  } else {
-    jambeG = sens * 14; jambeD = -sens * 14;
-    brasG = faitCoucou ? -120 : -sens * 22;
-    brasD = sens * 22;
-  }
-
-  const yeux = {
-    normal:   <><circle cx="17" cy="22" r="3" fill="#2B2560" /><circle cx="31" cy="22" r="3" fill="#2B2560" /></>,
-    clin:     <><path d="M14 22 Q17 19 20 22" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /><circle cx="31" cy="22" r="3" fill="#2B2560" /></>,
-    langue:   <><circle cx="17" cy="21" r="3.2" fill="#2B2560" /><circle cx="31" cy="21" r="3.2" fill="#2B2560" /></>,
-    surpris:  <><circle cx="17" cy="21" r="4" fill="#fff" stroke="#2B2560" strokeWidth="1.5" /><circle cx="17" cy="21" r="1.9" fill="#2B2560" /><circle cx="31" cy="21" r="4" fill="#fff" stroke="#2B2560" strokeWidth="1.5" /><circle cx="31" cy="21" r="1.9" fill="#2B2560" /></>,
-    endormi:  <><path d="M13 22 Q17 25 21 22" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /><path d="M27 22 Q31 25 35 22" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /></>,
-    content:  <><path d="M13 23 Q17 19 21 23" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /><path d="M27 23 Q31 19 35 23" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /></>,
-  }[humeur];
-
-  const bouche = {
-    normal:   <path d="M19 30 Q24 34 29 30" stroke="#2B2560" strokeWidth="2" fill="none" strokeLinecap="round" />,
-    clin:     <path d="M19 30 Q24 35 29 30" stroke="#2B2560" strokeWidth="2" fill="none" strokeLinecap="round" />,
-    langue:   <><path d="M19 30 Q24 34 29 30" stroke="#2B2560" strokeWidth="2" fill="none" strokeLinecap="round" /><ellipse cx="24" cy="34" rx="3.6" ry="4.6" fill={COLORS.girl} /></>,
-    surpris:  <ellipse cx="24" cy="31" rx="3.6" ry="4.6" fill="#2B2560" />,
-    endormi:  <ellipse cx="24" cy="31" rx="2.8" ry="3.2" fill="#2B2560" opacity="0.7" />,
-    content:  <path d="M17 29 Q24 36 31 29" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" />,
-  }[humeur];
+  const dort = etat === "dodo";
+  const surpris = etat === "surprise";
+  const bondit = etat === "bond";
+  const respire = souffle === 0 ? 1 : 1.03;
 
   return (
     <div
@@ -4162,71 +4116,68 @@ function PetitMonstre() {
       title={t("monstre_bye")}
       style={{
         position: "fixed",
-        left: `${x}%`,
-        bottom: `calc(72px + env(safe-area-inset-bottom) + ${y}px)`,
+        left: `${pos.x}%`,
+        bottom: `${pos.y}%`,
         zIndex: 400,
         cursor: "pointer",
-        transition: tombe
-          ? "bottom .55s cubic-bezier(.6,.05,.9,.5), left 2.4s ease-in-out, transform .3s"
-          : "bottom .5s cubic-bezier(.2,.9,.3,1), left 2.4s ease-in-out, transform .35s ease-out",
-        transform: `scaleX(${direction}) translateY(${saute ? -12 : 0}px) rotate(${inclinaison}deg)`,
+        // Le bond est vif et rebondissant, le glissement est fluide
+        transition: bondit
+          ? "left .75s cubic-bezier(.34,1.56,.64,1), bottom .75s cubic-bezier(.34,1.56,.64,1), transform .18s ease-out"
+          : "left 1.6s cubic-bezier(.4,0,.2,1), bottom 1.6s cubic-bezier(.4,0,.2,1), transform .25s ease-out",
+        transform: `scale(${etirement.sx * respire}, ${etirement.sy})`,
       }}
     >
-      <svg width="52" height="60" viewBox="0 0 48 58">
-        {/* --- Jambes --- */}
-        <g style={{ transition: "transform .3s ease-in-out" }}>
-          <g transform={`rotate(${jambeG} 19 42)`}>
-            <rect x="16.5" y="40" width="5" height="12" rx="2.5" fill={shade(COLORS.grape, -12)} />
-            <ellipse cx="19" cy="53" rx="4.5" ry="2.8" fill={shade(COLORS.grape, -20)} />
-          </g>
-          <g transform={`rotate(${jambeD} 29 42)`}>
-            <rect x="26.5" y="40" width="5" height="12" rx="2.5" fill={shade(COLORS.grape, -12)} />
-            <ellipse cx="29" cy="53" rx="4.5" ry="2.8" fill={shade(COLORS.grape, -20)} />
-          </g>
-        </g>
+      <svg width="46" height="46" viewBox="0 0 50 50" style={{ overflow: "visible" }}>
+        {/* Ombre portée au sol, qui rétrécit quand il saute */}
+        <ellipse cx="25" cy="46" rx={bondit ? 8 : 13} ry="3" fill="#2B2560" opacity={bondit ? 0.08 : 0.14} />
 
-        {/* --- Bras --- */}
-        <g style={{ transition: "transform .3s ease-in-out" }}>
-          <g transform={`rotate(${brasG} 11 26)`}>
-            <rect x="8.5" y="24" width="4.5" height="14" rx="2.2" fill={shade(COLORS.grape, -8)} />
-            <circle cx="10.7" cy="39" r="3.2" fill={shade(COLORS.grape, -16)} />
-          </g>
-          <g transform={`rotate(${brasD} 37 26)`}>
-            <rect x="35" y="24" width="4.5" height="14" rx="2.2" fill={shade(COLORS.grape, -8)} />
-            <circle cx="37.2" cy="39" r="3.2" fill={shade(COLORS.grape, -16)} />
-          </g>
-        </g>
+        {/* Petites antennes souples avec un pompon au bout */}
+        <path d="M18 12 Q15 4 11 3" stroke={teinte} strokeWidth="2.4" fill="none" strokeLinecap="round" />
+        <circle cx="10.5" cy="2.5" r="3" fill={COLORS.sun} />
+        <path d="M32 12 Q35 4 39 3" stroke={teinte} strokeWidth="2.4" fill="none" strokeLinecap="round" />
+        <circle cx="39.5" cy="2.5" r="3" fill={COLORS.sun} />
 
-        {/* --- Cornes --- */}
-        <path d="M14 10 L16 16 L11 15 Z" fill={shade(COLORS.grape, -18)} />
-        <path d="M34 10 L32 16 L37 15 Z" fill={shade(COLORS.grape, -18)} />
+        {/* Corps : une goutte toute ronde, sans membres rigides */}
+        <path
+          d="M25 8 C37 8 43 17 43 27 C43 37 35 43 25 43 C15 43 7 37 7 27 C7 17 13 8 25 8 Z"
+          fill={teinte}
+          stroke="#fff"
+          strokeWidth="2.5"
+          style={{ transition: "fill .4s" }}
+        />
 
-        {/* --- Corps --- */}
-        <ellipse cx="24" cy="26" rx="15" ry="16" fill={COLORS.grape} />
-        <ellipse cx="24" cy="26" rx="15" ry="16" fill="none" stroke="#fff" strokeWidth="2" />
+        {/* Joues */}
+        <ellipse cx="12" cy="30" rx="3.6" ry="2.8" fill={COLORS.girl} opacity="0.5" />
+        <ellipse cx="38" cy="30" rx="3.6" ry="2.8" fill={COLORS.girl} opacity="0.5" />
 
-        {deDos ? (
+        {dort ? (
           <>
-            <path d="M24 14 L24 40" stroke={shade(COLORS.grape, -20)} strokeWidth="2" strokeLinecap="round" />
-            <path d="M20 19 L28 19 M19 25 L29 25 M20 31 L28 31" stroke={shade(COLORS.grape, -20)} strokeWidth="1.6" strokeLinecap="round" />
-            <path d="M38 32 Q46 30 44 22" stroke={shade(COLORS.grape, -14)} strokeWidth="3.5" fill="none" strokeLinecap="round" />
+            {/* Yeux fermés et petit "z" de sommeil */}
+            <path d="M14 25 Q18 29 22 25" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+            <path d="M28 25 Q32 29 36 25" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+            <path d="M22 34 Q25 36 28 34" stroke="#2B2560" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+            <text x="40" y="14" fontSize="11" fill={COLORS.sky} fontFamily="Fredoka, sans-serif">z</text>
           </>
         ) : (
           <>
-            <ellipse cx="24" cy="33" rx="8" ry="6" fill="#fff" opacity="0.18" />
-            <circle cx="10" cy="29" r="2.8" fill={COLORS.girl} opacity="0.55" />
-            <circle cx="38" cy="29" r="2.8" fill={COLORS.girl} opacity="0.55" />
-            {yeux}
-            {bouche}
-          </>
-        )}
+            {/* Grands yeux brillants, pupilles qui suivent la direction */}
+            <ellipse cx="18" cy="25" rx={surpris ? 7 : 6} ry={surpris ? 8 : 7} fill="#fff" />
+            <ellipse cx="32" cy="25" rx={surpris ? 7 : 6} ry={surpris ? 8 : 7} fill="#fff" />
+            <circle cx={18 + regarde.x} cy={25 + regarde.y} r={surpris ? 2.6 : 3.4} fill="#2B2560"
+              style={{ transition: "cx .4s, cy .4s, r .2s" }} />
+            <circle cx={32 + regarde.x} cy={25 + regarde.y} r={surpris ? 2.6 : 3.4} fill="#2B2560"
+              style={{ transition: "cx .4s, cy .4s, r .2s" }} />
+            {/* Reflets : c'est ce qui donne le regard vivant */}
+            <circle cx={19.4 + regarde.x} cy={23.4 + regarde.y} r="1.3" fill="#fff" opacity="0.95" />
+            <circle cx={33.4 + regarde.x} cy={23.4 + regarde.y} r="1.3" fill="#fff" opacity="0.95" />
 
-        {/* Petites étoiles quand il tombe sur les fesses */}
-        {assis && (
-          <g opacity="0.9">
-            <text x="4" y="14" fontSize="9" fill={COLORS.sun}>✦</text>
-            <text x="40" y="12" fontSize="7" fill={COLORS.sun}>✦</text>
-          </g>
+            {/* Bouche */}
+            {surpris ? (
+              <ellipse cx="25" cy="36" rx="3" ry="3.6" fill="#2B2560" />
+            ) : (
+              <path d="M21 35 Q25 39 29 35" stroke="#2B2560" strokeWidth="2" fill="none" strokeLinecap="round" />
+            )}
+          </>
         )}
       </svg>
     </div>
