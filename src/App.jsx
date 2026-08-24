@@ -101,7 +101,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", auth_pseudo: "Votre pseudo", auth_pseudo_note: "C'est ce nom qui sera visible par les autres membres sur les annonces.", auth_pseudo_required: "Merci de choisir un pseudo.", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_situation_label: "Situation familiale", profile_commune_label: "Votre commune", profile_commune_none: "Non renseignée", profile_commune_search: "Rechercher votre commune…", profile_commune_note: "Utilisée par défaut pour filtrer les sorties près de chez vous.", profile_profession_label: "Profession", profile_profession_ph: "Ex. Infirmière, enseignant, retraité…", profile_interets_label: "Centres d'intérêt", profile_interets_ph: "Ex. Randonnée, cuisine, lecture, jardinage…", profile_animaux_label: "Animaux", profile_animaux_ph: "Ex. Un chien, deux chats…", profile_coeur_label: "Ce que j'aime par-dessus tout", profile_coeur_ph: "Ex. Les balades en forêt le dimanche matin", profile_about_section: "À propos", situation_celibataire: "Célibataire", situation_en_couple: "En couple", situation_marie: "Marié(e)", situation_famille_mono: "Famille monoparentale", situation_autre: "Autre", situation_non_precise: "Je préfère ne pas préciser", profile_edit_title: "Modifier mon profil", btn_back: "Retour", back_home: "Retour à l'accueil", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
+    auth_commune_placeholder: "Votre commune", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_situation_label: "Situation familiale", profile_commune_label: "Votre commune", profile_commune_none: "Non renseignée", profile_commune_search: "Rechercher votre commune…", profile_commune_note: "Utilisée par défaut pour filtrer les sorties près de chez vous.", profile_profession_label: "Profession", profile_profession_ph: "Ex. Infirmière, enseignant, retraité…", profile_interets_label: "Centres d'intérêt", profile_interets_ph: "Ex. Randonnée, cuisine, lecture, jardinage…", profile_animaux_label: "Animaux", profile_animaux_ph: "Ex. Un chien, deux chats…", profile_coeur_label: "Ce que j'aime par-dessus tout", profile_coeur_ph: "Ex. Les balades en forêt le dimanche matin", profile_about_section: "À propos", situation_celibataire: "Célibataire", situation_en_couple: "En couple", situation_marie: "Marié(e)", situation_famille_mono: "Famille monoparentale", situation_autre: "Autre", situation_non_precise: "Je préfère ne pas préciser", profile_edit_title: "Modifier mon profil", btn_back: "Retour", back_home: "Retour à l'accueil", monstre_bye: "Clique pour me faire partir !", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
@@ -4013,6 +4013,101 @@ function SectionLabel({ children }) {
 
 // Mascotte originale pour "Orée" — un soleil levant qui perce derrière une lisière
 // de collines/arbres arrondis, avec une petite feuille qui s'envole en accent.
+// Petit compagnon qui se promène en bas de l'écran et fait des grimaces.
+// Volontairement discret : il ne gêne aucun clic (pointerEvents: none sauf sur lui-même),
+// et un clic le fait partir pour la session si on préfère être tranquille.
+const HUMEURS = ["normal", "clin", "langue", "surpris", "endormi", "content"];
+
+function PetitMonstre() {
+  const [visible, setVisible] = useState(true);
+  const [x, setX] = useState(12);          // position en % de la largeur
+  const [direction, setDirection] = useState(1);
+  const [humeur, setHumeur] = useState("normal");
+  const [saute, setSaute] = useState(false);
+
+  // Déplacement : il fait des allers-retours tranquilles
+  useEffect(() => {
+    if (!visible) return;
+    const marche = setInterval(() => {
+      setX((pos) => {
+        const suivant = pos + direction * (4 + Math.random() * 5);
+        if (suivant > 84) { setDirection(-1); return 84; }
+        if (suivant < 4) { setDirection(1); return 4; }
+        return suivant;
+      });
+    }, 2600);
+    return () => clearInterval(marche);
+  }, [visible, direction]);
+
+  // Bêtises : grimaces et petits sauts au hasard
+  useEffect(() => {
+    if (!visible) return;
+    const betises = setInterval(() => {
+      setHumeur(HUMEURS[Math.floor(Math.random() * HUMEURS.length)]);
+      if (Math.random() > 0.6) {
+        setSaute(true);
+        setTimeout(() => setSaute(false), 600);
+      }
+      setTimeout(() => setHumeur("normal"), 1800);
+    }, 4200);
+    return () => clearInterval(betises);
+  }, [visible]);
+
+  if (!visible) return null;
+
+  // Les yeux et la bouche changent selon l'humeur
+  const yeux = {
+    normal:   <><circle cx="15" cy="20" r="3.2" fill="#2B2560" /><circle cx="29" cy="20" r="3.2" fill="#2B2560" /></>,
+    clin:     <><path d="M12 20 Q15 17 18 20" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /><circle cx="29" cy="20" r="3.2" fill="#2B2560" /></>,
+    langue:   <><circle cx="15" cy="19" r="3.4" fill="#2B2560" /><circle cx="29" cy="19" r="3.4" fill="#2B2560" /></>,
+    surpris:  <><circle cx="15" cy="19" r="4.2" fill="#fff" stroke="#2B2560" strokeWidth="1.6" /><circle cx="15" cy="19" r="2" fill="#2B2560" /><circle cx="29" cy="19" r="4.2" fill="#fff" stroke="#2B2560" strokeWidth="1.6" /><circle cx="29" cy="19" r="2" fill="#2B2560" /></>,
+    endormi:  <><path d="M11 20 Q15 23 19 20" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /><path d="M25 20 Q29 23 33 20" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /></>,
+    content:  <><path d="M11 21 Q15 17 19 21" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /><path d="M25 21 Q29 17 33 21" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /></>,
+  }[humeur];
+
+  const bouche = {
+    normal:   <path d="M16 28 Q22 32 28 28" stroke="#2B2560" strokeWidth="2" fill="none" strokeLinecap="round" />,
+    clin:     <path d="M16 28 Q22 33 28 28" stroke="#2B2560" strokeWidth="2" fill="none" strokeLinecap="round" />,
+    langue:   <><path d="M16 28 Q22 32 28 28" stroke="#2B2560" strokeWidth="2" fill="none" strokeLinecap="round" /><ellipse cx="22" cy="32" rx="4" ry="5" fill="#FF8FB1" /></>,
+    surpris:  <ellipse cx="22" cy="29" rx="4" ry="5" fill="#2B2560" />,
+    endormi:  <ellipse cx="22" cy="29" rx="3" ry="3.5" fill="#2B2560" opacity="0.7" />,
+    content:  <path d="M14 27 Q22 34 30 27" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" />,
+  }[humeur];
+
+  return (
+    <div
+      onClick={() => setVisible(false)}
+      title={t("monstre_bye")}
+      style={{
+        position: "fixed",
+        left: `${x}%`,
+        bottom: "calc(72px + env(safe-area-inset-bottom))",
+        zIndex: 400,
+        cursor: "pointer",
+        transition: "left 2.4s ease-in-out, transform .35s ease-out",
+        transform: `scaleX(${direction}) translateY(${saute ? -14 : 0}px)`,
+      }}
+    >
+      <svg width="44" height="44" viewBox="0 0 44 44">
+        {/* petites cornes */}
+        <path d="M12 8 L14 14 L9 13 Z" fill={COLORS.grape} />
+        <path d="M32 8 L30 14 L35 13 Z" fill={COLORS.grape} />
+        {/* corps */}
+        <circle cx="22" cy="23" r="15" fill={COLORS.grape} />
+        <circle cx="22" cy="23" r="15" fill="none" stroke="#fff" strokeWidth="2" />
+        {/* joues */}
+        <circle cx="9" cy="26" r="3" fill={COLORS.girl} opacity="0.55" />
+        <circle cx="35" cy="26" r="3" fill={COLORS.girl} opacity="0.55" />
+        {yeux}
+        {bouche}
+        {/* petits pieds */}
+        <ellipse cx="15" cy="38" rx="4" ry="2.6" fill={COLORS.grape} />
+        <ellipse cx="29" cy="38" rx="4" ry="2.6" fill={COLORS.grape} />
+      </svg>
+    </div>
+  );
+}
+
 function OreeMascot({ size = 28, rotate = -6 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" style={{ transform: `rotate(${rotate}deg)`, flexShrink: 0 }}>
@@ -8947,6 +9042,10 @@ export default function RecreApp() {
           )
         )}
       </div>
+
+      {/* Petit compagnon qui se balade en bas de l'écran (uniquement quand on navigue
+          dans les listes : il ne vient pas déranger la lecture d'un formulaire). */}
+      {["explorer", "ados", "adultes", "aine", "asso"].includes(tab) && <PetitMonstre />}
 
       {/* Bouton flottant "Créer" : l'action principale de l'appli, toujours accessible */}
       {pika.user && tab !== "creer" && (
