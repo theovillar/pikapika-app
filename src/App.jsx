@@ -108,7 +108,7 @@ const TRANSLATIONS = {
     change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
     share_btn: "Partager", defi_btn: "La roue des défis", chat_btn: "Discussion du groupe", chat_open: "Discussion ouverte", chat_closed: "Discussion fermée", chat_placeholder: "Écrire un message…", chat_emoji: "Émoticônes", chat_insulte: "Ce message contient des propos inappropriés. Merci de rester bienveillant.", chat_empty: "Aucun message pour le moment.\nÉcrivez le premier pour organiser vos retrouvailles !", chat_closed_note: "La discussion est fermée (5h après le début de la sortie). Vous pouvez toujours relire les messages.", defi_btn_view: "Voir le défi du groupe", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", defi_validate: "Valider ce défi pour le groupe", defi_group_label: "Le défi du groupe", defi_group_subtitle: "Le défi a déjà été tiré pour cette sortie — le voici !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
     share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Regarde cette sortie sur Orée : {title}",
-    report_btn: "Signaler", report_user_btn: "Signaler cet utilisateur", pm_title: "Messages", pm_subtitle: "Vos échanges avec les personnes rencontrées lors de sorties.", pm_requests: "Demandes de contact", pm_conversations: "Conversations", pm_empty: "Aucune conversation pour le moment.", pm_no_message: "Aucun message", pm_accept: "Accepter", pm_refuse: "Refuser", pm_block: "Bloquer", pm_block_confirm: "Confirmer ?", pm_write_to: "Envoyer un message", pm_need_shared_outing: "Vous pourrez écrire à cette personne après avoir participé à une sortie ensemble.", pm_waiting_accept: "Votre demande est en attente. Vous pourrez continuer la discussion une fois acceptée.", pm_wait_reply: "En attente de la réponse de votre correspondant.", pm_refused: "Cette demande a été refusée.", pm_refused_section: "Demandes refusées", pm_refused_by_me: "Vous avez refusé cette demande", pm_refused_by_them: "Votre demande a été refusée", pm_change_mind: "Finalement, accepter la discussion", pm_send_error: "Impossible d'envoyer ce message.", tab_messages: "Messages", report_user_title: "Signaler cet utilisateur", report_title: "Signaler cette annonce",
+    report_btn: "Signaler", report_user_btn: "Signaler cet utilisateur", pm_title: "Messages", pm_subtitle: "Vos échanges avec les personnes rencontrées lors de sorties.", pm_requests: "Demandes de contact", pm_conversations: "Conversations", pm_empty: "Aucune conversation pour le moment.", pm_no_message: "Aucun message", pm_accept: "Accepter", pm_refuse: "Refuser", pm_block: "Bloquer", pm_block_confirm: "Confirmer ?", pm_write_to: "Envoyer un message", pm_need_shared_outing: "Vous pourrez écrire à cette personne après avoir participé à une sortie ensemble.", pm_waiting_accept: "Votre demande est en attente. Vous pourrez continuer la discussion une fois acceptée.", pm_wait_reply: "En attente de la réponse de votre correspondant.", pm_refused: "Cette demande a été refusée.", pm_open_error: "Impossible d'ouvrir la discussion pour le moment. Réessayez dans un instant.", pm_refused_section: "Demandes refusées", pm_refused_by_me: "Vous avez refusé cette demande", pm_refused_by_them: "Votre demande a été refusée", pm_change_mind: "Finalement, accepter la discussion", pm_send_error: "Impossible d'envoyer ce message.", tab_messages: "Messages", report_user_title: "Signaler cet utilisateur", report_title: "Signaler cette annonce",
     report_reason_label: "Raison du signalement", report_details_label: "Détails (optionnel)",
     report_details_placeholder: "Expliquez ce qui vous a alerté…",
     report_reason_inapproprie: "Comportement inapproprié", report_reason_contenu: "Contenu inadapté",
@@ -8452,11 +8452,26 @@ function usePikapikaData() {
   const ouvrirConversation = async (otherId) => {
     if (!user) return null;
     const [a, b] = [user.id, otherId].sort();
-    const existing = conversations.find((c) => c.other_id === otherId);
-    if (existing) return existing.id;
+
+    // Déjà connue localement (y compris refusée) : on la rouvre simplement
+    const connue = conversations.find((cv) => cv.other_id === otherId);
+    if (connue) return connue.id;
+
+    // Sinon on vérifie en base : une conversation peut exister sans être encore chargée
+    const { data: deja } = await supabase.from("conversations")
+      .select("id").eq("user_a", a).eq("user_b", b).maybeSingle();
+    if (deja) { await loadConversations(); return deja.id; }
+
     const { data, error } = await supabase.from("conversations")
       .insert({ user_a: a, user_b: b, initiated_by: user.id }).select().single();
-    if (error) { console.error("Erreur ouverture conversation :", error); return null; }
+    if (error) {
+      console.error("Erreur ouverture conversation :", error);
+      // En cas de doublon créé entre-temps, on récupère la conversation existante
+      const { data: secours } = await supabase.from("conversations")
+        .select("id").eq("user_a", a).eq("user_b", b).maybeSingle();
+      if (secours) { await loadConversations(); return secours.id; }
+      return null;
+    }
     await loadConversations();
     return data.id;
   };
@@ -9308,8 +9323,14 @@ export default function RecreApp() {
           canMessage={canMessageUser}
           onMessage={async (uid) => {
             const cid = await pika.ouvrirConversation(uid);
-            setViewingUserId(null);
-            if (cid) { setOpenConvId(cid); setTab("messages"); }
+            if (cid) {
+              setViewingUserId(null);
+              setOpenConvId(cid);
+              setTab("messages");
+            } else {
+              // On reste sur le profil plutôt que de renvoyer ailleurs sans explication
+              alert(t("pm_open_error"));
+            }
           }}
           onClose={() => setViewingUserId(null)}
         />
