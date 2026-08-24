@@ -8570,10 +8570,15 @@ export default function RecreApp() {
         }
       `}</style>
 
-      {/* Top bar (desktop) / logo (mobile) */}
+      {/* Top bar (desktop) / logo (mobile) — reste visible pendant le défilement,
+          pour pouvoir changer de lieu à tout moment. */}
+      <div className="pika-header-sticky" style={{
+        position: "sticky", top: 0, zIndex: 500,
+        background: COLORS.cloud, borderBottom: "2px solid #F0EADB",
+      }}>
       <div className="pika-header-row" style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "18px 20px", maxWidth: 960, margin: "0 auto", flexWrap: "wrap", gap: 10,
+        padding: "14px 20px", maxWidth: 960, margin: "0 auto", flexWrap: "wrap", gap: 10,
       }}>
         <button
           onClick={() => {
@@ -8709,9 +8714,10 @@ export default function RecreApp() {
           )}
         </div>
       </div>
+      </div>
 
       <div style={{
-        maxWidth: 960, margin: "0 auto", padding: "0 20px 110px",
+        maxWidth: 960, margin: "0 auto", padding: "18px 20px 110px",
       }}>
         {tab === "explorer" && parentValidated && (
           <CommunityExplorer
