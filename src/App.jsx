@@ -100,7 +100,7 @@ const TRANSLATIONS = {
     account_type_parent: "Particulier", account_type_association: "Association",
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
-    auth_last_name: "Votre nom de famille", auth_pseudo: "Votre pseudo", auth_pseudo_note: "C'est ce nom qui sera visible par les autres membres sur les annonces.", auth_pseudo_required: "Merci de choisir un pseudo.", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
+    auth_last_name: "Votre nom de famille", auth_pseudo: "Votre pseudo", auth_pseudo_note: "C'est ce nom qui sera visible par les autres membres sur les annonces.", auth_pseudo_required: "Merci de choisir un pseudo.", pseudo_pris: "Ce pseudo est déjà utilisé, choisissez-en un autre.", pseudo_libre: "Ce pseudo est disponible.", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
     auth_commune_placeholder: "Votre commune", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_situation_label: "Situation familiale", profile_commune_label: "Votre commune", profile_commune_none: "Non renseignée", profile_commune_search: "Rechercher votre commune…", profile_commune_note: "Utilisée par défaut pour filtrer les sorties près de chez vous.", profile_profession_label: "Profession", profile_profession_ph: "Ex. Infirmière, enseignant, retraité…", profile_interets_label: "Centres d'intérêt", profile_interets_ph: "Ex. Randonnée, cuisine, lecture, jardinage…", profile_animaux_label: "Animaux", profile_animaux_ph: "Ex. Un chien, deux chats…", profile_coeur_label: "Ce que j'aime par-dessus tout", profile_coeur_ph: "Ex. Les balades en forêt le dimanche matin", profile_about_section: "À propos", situation_celibataire: "Célibataire", situation_en_couple: "En couple", situation_marie: "Marié(e)", situation_famille_mono: "Famille monoparentale", situation_autre: "Autre", situation_non_precise: "Je préfère ne pas préciser", profile_edit_title: "Modifier mon profil", btn_back: "Retour", back_home: "Retour à l'accueil", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
@@ -108,7 +108,7 @@ const TRANSLATIONS = {
     change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
     share_btn: "Partager", defi_btn: "La roue des défis", chat_btn: "Discussion du groupe", chat_open: "Discussion ouverte", chat_closed: "Discussion fermée", chat_placeholder: "Écrire un message…", chat_emoji: "Émoticônes", chat_insulte: "Ce message contient des propos inappropriés. Merci de rester bienveillant.", chat_empty: "Aucun message pour le moment.\nÉcrivez le premier pour organiser vos retrouvailles !", chat_closed_note: "La discussion est fermée (5h après le début de la sortie). Vous pouvez toujours relire les messages.", defi_btn_view: "Voir le défi du groupe", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", defi_validate: "Valider ce défi pour le groupe", defi_group_label: "Le défi du groupe", defi_group_subtitle: "Le défi a déjà été tiré pour cette sortie — le voici !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
     share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Regarde cette sortie sur Orée : {title}",
-    report_btn: "Signaler", report_user_btn: "Signaler cet utilisateur", pm_title: "Messages", pm_subtitle: "Vos échanges avec les personnes rencontrées lors de sorties.", pm_requests: "Demandes de contact", pm_conversations: "Conversations", pm_empty: "Aucune conversation pour le moment.", pm_no_message: "Aucun message", pm_accept: "Accepter", pm_refuse: "Refuser", pm_block: "Bloquer", pm_block_confirm: "Confirmer ?", pm_write_to: "Envoyer un message", pm_need_shared_outing: "Vous pourrez écrire à cette personne après avoir participé à une sortie ensemble.", pm_waiting_accept: "Votre demande est en attente. Vous pourrez continuer la discussion une fois acceptée.", pm_wait_reply: "En attente de la réponse de votre correspondant.", pm_refused: "Cette demande a été refusée.", pm_open_error: "Impossible d'ouvrir la discussion pour le moment. Réessayez dans un instant.", pm_refused_section: "Demandes refusées", pm_refused_by_me: "Vous avez refusé cette demande", pm_refused_by_them: "Votre demande a été refusée", pm_change_mind: "Finalement, accepter la discussion", pm_send_error: "Impossible d'envoyer ce message.", tab_messages: "Messages", report_user_title: "Signaler cet utilisateur", report_title: "Signaler cette annonce",
+    report_btn: "Signaler", report_user_btn: "Signaler cet utilisateur", pm_title: "Messages", pm_subtitle: "Vos échanges avec les personnes rencontrées lors de sorties.", pm_requests: "Demandes de contact", pm_conversations: "Conversations", pm_search_placeholder: "Rechercher un membre par pseudo…", pm_search_empty: "Aucun membre trouvé avec ce pseudo.", pm_empty: "Aucune conversation pour le moment.", pm_no_message: "Aucun message", pm_accept: "Accepter", pm_refuse: "Refuser", pm_block: "Bloquer", pm_block_confirm: "Confirmer ?", pm_write_to: "Envoyer un message", pm_need_shared_outing: "Vous pourrez écrire à cette personne après avoir participé à une sortie ensemble.", pm_waiting_accept: "Votre demande est en attente. Vous pourrez continuer la discussion une fois acceptée.", pm_wait_reply: "En attente de la réponse de votre correspondant.", pm_refused: "Cette demande a été refusée.", pm_open_error: "Impossible d'ouvrir la discussion pour le moment. Réessayez dans un instant.", pm_refused_section: "Demandes refusées", pm_refused_by_me: "Vous avez refusé cette demande", pm_refused_by_them: "Votre demande a été refusée", pm_change_mind: "Finalement, accepter la discussion", pm_send_error: "Impossible d'envoyer ce message.", tab_messages: "Messages", report_user_title: "Signaler cet utilisateur", report_title: "Signaler cette annonce",
     report_reason_label: "Raison du signalement", report_details_label: "Détails (optionnel)",
     report_details_placeholder: "Expliquez ce qui vous a alerté…",
     report_reason_inapproprie: "Comportement inapproprié", report_reason_contenu: "Contenu inadapté",
@@ -3632,6 +3632,7 @@ function ProfileEdit({ onBack,  joinedCount, validated, displayName, email, nbEn
   const [genreSaving, setGenreSaving] = useState(false);
   const [pseudoInput, setPseudoInput] = useState(displayName || "");
   const [pseudoSaved, setPseudoSaved] = useState(false);
+  const [pseudoErreur, setPseudoErreur] = useState("");
   const fileInputRef = useRef(null);
   const coverInputRef = useRef(null);
   const [coverUploading, setCoverUploading] = useState(false);
@@ -3659,7 +3660,9 @@ function ProfileEdit({ onBack,  joinedCount, validated, displayName, email, nbEn
 
   const savePseudo = async () => {
     if (!pseudoInput.trim()) return;
-    await onUpdatePseudo(pseudoInput);
+    setPseudoErreur("");
+    const res = await onUpdatePseudo(pseudoInput);
+    if (res && res.error) { setPseudoErreur(res.error); return; }
     setPseudoSaved(true);
     setTimeout(() => setPseudoSaved(false), 2000);
   };
@@ -3785,8 +3788,12 @@ function ProfileEdit({ onBack,  joinedCount, validated, displayName, email, nbEn
           {pseudoSaved ? <Check size={16} /> : t("btn_enregistrer")}
         </PillButton>
       </div>
-      <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF", margin: "0 0 22px" }}>
-        {t("auth_pseudo_note")}
+      <p style={{
+        fontFamily: "Nunito, sans-serif", fontSize: 11.5,
+        color: pseudoErreur ? COLORS.coral : "#9A93AF",
+        fontWeight: pseudoErreur ? 700 : 400, margin: "0 0 22px",
+      }}>
+        {pseudoErreur || t("auth_pseudo_note")}
       </p>
 
       <SectionLabel>{t("profile_genre_label")}</SectionLabel>
@@ -6507,7 +6514,27 @@ function MessagesPage({ pika, onViewProfile, openConvId, onClearOpen }) {
   const [loading, setLoading] = useState(false);
   const [alerte, setAlerte] = useState("");
   const [confirmBlock, setConfirmBlock] = useState(false);
+  const [rechercheQ, setRechercheQ] = useState("");
+  const [resultats, setResultats] = useState([]);
+  const [recherchant, setRecherchant] = useState(false);
   const bottomRef = useRef(null);
+
+  // Recherche de membres par pseudo, déclenchée après une courte pause de frappe
+  useEffect(() => {
+    const q = rechercheQ.trim();
+    if (q.length < 2) { setResultats([]); return; }
+    let annule = false;
+    setRecherchant(true);
+    const timer = setTimeout(async () => {
+      const trouves = await pika.rechercherMembres(q);
+      if (!annule) {
+        setResultats((trouves || []).filter((u) => u.id !== pika.user?.id));
+        setRecherchant(false);
+      }
+    }, 300);
+    return () => { annule = true; clearTimeout(timer); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rechercheQ]);
 
   const conv = pika.conversations.find((x) => x.id === openId) || null;
   const enAttente = pika.conversations.filter((x) => x.status === "pending" && x.initiated_by !== pika.user?.id);
@@ -6728,9 +6755,77 @@ function MessagesPage({ pika, onViewProfile, openConvId, onClearOpen }) {
       <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
         {t("pm_title")}
       </h1>
-      <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 18px" }}>
+      <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 14px" }}>
         {t("pm_subtitle")}
       </p>
+
+      {/* Recherche de membres par pseudo */}
+      <div style={{ position: "relative", marginBottom: 20 }}>
+        <div style={{
+          display: "flex", alignItems: "center", gap: 8, background: "#fff",
+          border: "2px solid #F0EADB", borderRadius: 16, padding: "10px 14px",
+        }}>
+          <Search size={16} color="#B7AF98" style={{ flexShrink: 0 }} />
+          <input
+            value={rechercheQ}
+            onChange={(e) => setRechercheQ(e.target.value)}
+            placeholder={t("pm_search_placeholder")}
+            style={{
+              border: "none", outline: "none", flex: 1, background: "transparent",
+              fontFamily: "Nunito, sans-serif", fontSize: 14, color: COLORS.ink,
+            }}
+          />
+          {rechercheQ && (
+            <button onClick={() => { setRechercheQ(""); setResultats([]); }} style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+              <X size={15} color="#B7AF98" />
+            </button>
+          )}
+        </div>
+
+        {resultats.length > 0 && (
+          <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 6 }}>
+            {resultats.map((u) => (
+              <button
+                key={u.id}
+                onClick={() => { onViewProfile(u.id); setRechercheQ(""); setResultats([]); }}
+                style={{
+                  display: "flex", alignItems: "center", gap: 10, width: "100%", textAlign: "left",
+                  background: "#fff", border: "2px solid #F0EADB", borderRadius: 14,
+                  padding: "9px 12px", cursor: "pointer",
+                }}
+              >
+                <div style={{
+                  width: 34, height: 34, borderRadius: "50%", flexShrink: 0, overflow: "hidden",
+                  background: u.genre ? genreColor(u.genre) : COLORS.sky,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  color: "#fff", fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14,
+                }}>
+                  {u.avatar_url
+                    ? <img src={u.avatar_url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : (u.display_name || "?").charAt(0).toUpperCase()}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13.5, color: COLORS.ink }}>
+                    {u.display_name}
+                  </div>
+                  {u.commune_nom && (
+                    <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF" }}>
+                      {u.commune_nom}
+                    </div>
+                  )}
+                </div>
+                <ChevronRight size={16} color="#C7C0AE" />
+              </button>
+            ))}
+          </div>
+        )}
+
+        {rechercheQ.trim().length >= 2 && resultats.length === 0 && !recherchant && (
+          <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", marginTop: 8, paddingLeft: 4 }}>
+            {t("pm_search_empty")}
+          </p>
+        )}
+      </div>
 
       {enAttente.length > 0 && (
         <>
@@ -6905,6 +7000,11 @@ function AuthScreen({ onClose, onOpenLegal }) {
     if (mode === "signup" && accountType === "parent" && !pseudo.trim()) {
       setError(t("auth_pseudo_required"));
       return;
+    }
+    // Le pseudo est public et sert à identifier chacun : il doit être unique
+    if (mode === "signup" && accountType === "parent") {
+      const { data: libre } = await supabase.rpc("pseudo_disponible", { p: pseudo.trim() });
+      if (libre === false) { setError(t("pseudo_pris")); return; }
     }
     setLoading(true);
     try {
@@ -8084,14 +8184,36 @@ function usePikapikaData() {
   };
 
   // Le pseudo est le nom public : on met à jour les deux colonnes pour rester cohérent partout.
+  // Vérifie qu'un pseudo n'est pas déjà pris (insensible à la casse)
+  const pseudoDisponible = async (p) => {
+    if (!p || !p.trim()) return false;
+    const { data, error } = await supabase.rpc("pseudo_disponible", { p: p.trim() });
+    if (error) { console.error("Erreur vérification pseudo :", error); return true; }
+    return !!data;
+  };
+
+  // Recherche de membres par pseudo (aucune donnée privée transmise)
+  const rechercherMembres = async (q) => {
+    if (!q || q.trim().length < 2) return [];
+    const { data, error } = await supabase.rpc("search_users", { q: q.trim(), lim: 10 });
+    if (error) { console.error("Erreur recherche membres :", error); return []; }
+    return data || [];
+  };
+
   const updatePseudo = async (pseudo) => {
-    if (!user || !pseudo.trim()) return;
+    if (!user || !pseudo.trim()) return { error: null };
     const clean = pseudo.trim();
+    const libre = await pseudoDisponible(clean);
+    if (!libre) return { error: t("pseudo_pris") };
     const { error } = await supabase.from("profiles").update({ pseudo: clean, display_name: clean }).eq("id", user.id);
-    if (error) { console.error("Erreur pseudo :", error); return; }
+    if (error) {
+      console.error("Erreur pseudo :", error);
+      return { error: error.code === "23505" ? t("pseudo_pris") : t("auth_error_generic") };
+    }
     setProfile((p) => ({ ...p, displayName: clean }));
     // Répercute aussitôt sur toutes les annonces affichées, sans attendre un rechargement
     setOrganiserProfiles((m) => ({ ...m, [user.id]: { ...(m[user.id] || {}), displayName: clean } }));
+    return { error: null };
   };
 
   const updateGenre = async (genre) => {
@@ -8377,7 +8499,7 @@ function usePikapikaData() {
     updateBirthdate,
     updateGenre,
     updateBio,
-    updatePseudo,
+    updatePseudo, pseudoDisponible, rechercherMembres,
     updateSituation,
     updateNbEnfants,
     updateNbEnfantsMoins12,
