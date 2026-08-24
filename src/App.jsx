@@ -100,15 +100,15 @@ const TRANSLATIONS = {
     account_type_parent: "Particulier", account_type_association: "Association",
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
-    auth_last_name: "Votre nom de famille", auth_pseudo: "Votre pseudo", auth_pseudo_note: "C'est ce nom qui sera visible par les autres membres sur les annonces.", auth_pseudo_required: "Merci de choisir un pseudo.", pseudo_pris: "Ce pseudo est déjà utilisé, choisissez-en un autre.", pseudo_libre: "Ce pseudo est disponible.", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
-    auth_commune_placeholder: "Votre commune", auth_birthdate_label: "Date de naissance (optionnel)", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_situation_label: "Situation familiale", profile_commune_label: "Votre commune", profile_commune_none: "Non renseignée", profile_commune_search: "Rechercher votre commune…", profile_commune_note: "Utilisée par défaut pour filtrer les sorties près de chez vous.", profile_profession_label: "Profession", profile_profession_ph: "Ex. Infirmière, enseignant, retraité…", profile_interets_label: "Centres d'intérêt", profile_interets_ph: "Ex. Randonnée, cuisine, lecture, jardinage…", profile_animaux_label: "Animaux", profile_animaux_ph: "Ex. Un chien, deux chats…", profile_coeur_label: "Ce que j'aime par-dessus tout", profile_coeur_ph: "Ex. Les balades en forêt le dimanche matin", profile_about_section: "À propos", situation_celibataire: "Célibataire", situation_en_couple: "En couple", situation_marie: "Marié(e)", situation_famille_mono: "Famille monoparentale", situation_autre: "Autre", situation_non_precise: "Je préfère ne pas préciser", profile_edit_title: "Modifier mon profil", btn_back: "Retour", back_home: "Retour à l'accueil", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
+    auth_last_name: "Votre nom de famille", auth_pseudo: "Votre pseudo", auth_pseudo_note: "C'est ce nom qui sera visible par les autres membres sur les annonces.", auth_pseudo_required: "Merci de choisir un pseudo.", auth_birthdate_required: "Merci d'indiquer votre date de naissance.", pseudo_pris: "Ce pseudo est déjà utilisé, choisissez-en un autre.", pseudo_libre: "Ce pseudo est disponible.", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
+    auth_commune_placeholder: "Votre commune", auth_birthdate_label: "Date de naissance", avg_age_badge: "~{age} ans", btn_enregistrer: "Enregistrer", legal_mentions_title: "Mentions légales", legal_cgu_title: "Conditions générales d'utilisation", legal_confidentialite_title: "Politique de confidentialité", legal_links_signup: "En créant un compte, vous acceptez nos {cgu} et notre {conf}.", profile_bio_label: "Un petit mot sur vous", profile_bio_placeholder: "Ex. Maman de deux enfants, toujours partante pour une balade ou un café !", profile_genre_label: "Vous êtes", profile_situation_label: "Situation familiale", profile_commune_label: "Votre commune", profile_commune_none: "Non renseignée", profile_commune_search: "Rechercher votre commune…", profile_commune_note: "Utilisée par défaut pour filtrer les sorties près de chez vous.", profile_profession_label: "Profession", profile_profession_ph: "Ex. Infirmière, enseignant, retraité…", profile_interets_label: "Centres d'intérêt", profile_interets_ph: "Ex. Randonnée, cuisine, lecture, jardinage…", profile_animaux_label: "Animaux", profile_animaux_ph: "Ex. Un chien, deux chats…", profile_coeur_label: "Ce que j'aime par-dessus tout", profile_coeur_ph: "Ex. Les balades en forêt le dimanche matin", profile_about_section: "À propos", situation_celibataire: "Célibataire", situation_en_couple: "En couple", situation_marie: "Marié(e)", situation_famille_mono: "Famille monoparentale", situation_autre: "Autre", situation_non_precise: "Je préfère ne pas préciser", profile_edit_title: "Modifier mon profil", btn_back: "Retour", back_home: "Retour à l'accueil", btn_edit_profile: "Modifier mon profil", profile_not_filled: "Non renseigné", profile_private_info: "Informations privées", profile_no_child: "Aucun enfant renseigné.", profile_count_created: "Sorties créées", profile_count_joined: "Sorties rejointes", edit_title: "Modifier la sortie", edit_warning: "Toute modification retirera les personnes déjà inscrites (vous restez inscrit).", edit_save: "Enregistrer les modifications", btn_edit: "Modifier", btn_cancel_outing: "Annuler la sortie", btn_delete: "Supprimer", leave_confirm: "Confirmer : ne plus participer ?", cancel_outing_confirm: "Confirmer l'annulation ?",
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
     change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
     share_btn: "Partager", defi_btn: "La roue des défis", chat_btn: "Discussion du groupe", chat_open: "Discussion ouverte", chat_closed: "Discussion fermée", chat_placeholder: "Écrire un message…", chat_emoji: "Émoticônes", chat_insulte: "Ce message contient des propos inappropriés. Merci de rester bienveillant.", chat_empty: "Aucun message pour le moment.\nÉcrivez le premier pour organiser vos retrouvailles !", chat_closed_note: "La discussion est fermée (5h après le début de la sortie). Vous pouvez toujours relire les messages.", defi_btn_view: "Voir le défi du groupe", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", defi_validate: "Valider ce défi pour le groupe", defi_group_label: "Le défi du groupe", defi_group_subtitle: "Le défi a déjà été tiré pour cette sortie — le voici !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
     share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Regarde cette sortie sur Orée : {title}",
-    report_btn: "Signaler", report_user_btn: "Signaler cet utilisateur", pm_title: "Messages", pm_subtitle: "Vos échanges avec les personnes rencontrées lors de sorties.", pm_requests: "Demandes de contact", pm_conversations: "Conversations", pm_search_placeholder: "Rechercher un membre par pseudo…", pm_search_empty: "Aucun membre trouvé avec ce pseudo.", pm_empty: "Aucune conversation pour le moment.", pm_no_message: "Aucun message", pm_accept: "Accepter", pm_refuse: "Refuser", pm_block: "Bloquer", pm_block_confirm: "Confirmer ?", pm_write_to: "Envoyer un message", pm_need_shared_outing: "Vous pourrez écrire à cette personne après avoir participé à une sortie ensemble.", pm_waiting_accept: "Votre demande est en attente. Vous pourrez continuer la discussion une fois acceptée.", pm_wait_reply: "En attente de la réponse de votre correspondant.", pm_refused: "Cette demande a été refusée.", pm_open_error: "Impossible d'ouvrir la discussion pour le moment. Réessayez dans un instant.", pm_refused_section: "Demandes refusées", pm_refused_by_me: "Vous avez refusé cette demande", pm_refused_by_them: "Votre demande a été refusée", pm_change_mind: "Finalement, accepter la discussion", pm_send_error: "Impossible d'envoyer ce message.", tab_messages: "Messages", report_user_title: "Signaler cet utilisateur", report_title: "Signaler cette annonce",
+    report_btn: "Signaler", report_user_btn: "Signaler cet utilisateur", pm_title: "Messages", pm_subtitle: "Vos échanges avec les personnes rencontrées lors de sorties.", pm_requests: "Demandes de contact", pm_conversations: "Conversations", pm_search_placeholder: "Rechercher un membre par pseudo…", pm_search_empty: "Aucun membre trouvé avec ce pseudo.", pm_quota_atteint: "Vous avez atteint la limite de 3 demandes par jour. Réessayez demain.", pm_age_bloque: "Pour la sécurité des plus jeunes, les échanges se font entre personnes de la même tranche d'âge.", pm_ask: "Demander à discuter", pm_asked: "Demande envoyée", pm_quota_reste: "{n} demande(s) restante(s) aujourd'hui", pm_retry: "Refaire une demande", pm_empty: "Aucune conversation pour le moment.", pm_no_message: "Aucun message", pm_accept: "Accepter", pm_refuse: "Refuser", pm_block: "Bloquer", pm_block_confirm: "Confirmer ?", pm_write_to: "Envoyer un message", pm_need_shared_outing: "Pour la sécurité des plus jeunes, les échanges se font entre personnes de la même tranche d'âge.", pm_waiting_accept: "Votre demande est en attente. Vous pourrez continuer la discussion une fois acceptée.", pm_wait_reply: "En attente de la réponse de votre correspondant.", pm_refused: "Cette demande a été refusée.", pm_open_error: "Impossible d'ouvrir la discussion pour le moment. Réessayez dans un instant.", pm_refused_section: "Demandes refusées", pm_refused_by_me: "Vous avez refusé cette demande", pm_refused_by_them: "Votre demande a été refusée", pm_change_mind: "Finalement, accepter la discussion", pm_send_error: "Impossible d'envoyer ce message.", tab_messages: "Messages", report_user_title: "Signaler cet utilisateur", report_title: "Signaler cette annonce",
     report_reason_label: "Raison du signalement", report_details_label: "Détails (optionnel)",
     report_details_placeholder: "Expliquez ce qui vous a alerté…",
     report_reason_inapproprie: "Comportement inapproprié", report_reason_contenu: "Contenu inadapté",
@@ -242,7 +242,7 @@ const TRANSLATIONS = {
     auth_association_name: "Association name",
     auth_association_note: "Your account will be activated after town hall validation.",
     auth_last_name: "Your last name", show_password: "Show password", hide_password: "Hide password",
-    auth_commune_placeholder: "Your town (optional)", auth_birthdate_label: "Date of birth (optional)", avg_age_badge: "~{age} yo", btn_enregistrer: "Save",
+    auth_commune_placeholder: "Your town (optional)", auth_birthdate_label: "Date of birth", avg_age_badge: "~{age} yo", btn_enregistrer: "Save",
     mairie_no_commune: "No town assigned to this town hall account — contact the site administrator.",
     mairie_territory: "Territory: {commune}",
     profile_not_found: "This profile is not available.", member_since: "Member since {date}",
@@ -378,7 +378,7 @@ const TRANSLATIONS = {
     auth_association_name: "Nombre de la asociación",
     auth_association_note: "Tu cuenta se activará tras la validación del ayuntamiento.",
     auth_last_name: "Tu apellido", show_password: "Mostrar contraseña", hide_password: "Ocultar contraseña",
-    auth_commune_placeholder: "Tu localidad (opcional)", auth_birthdate_label: "Fecha de nacimiento (opcional)", avg_age_badge: "~{age} años", btn_enregistrer: "Guardar",
+    auth_commune_placeholder: "Tu localidad (opcional)", auth_birthdate_label: "Fecha de nacimiento", avg_age_badge: "~{age} años", btn_enregistrer: "Guardar",
     mairie_no_commune: "Ningún municipio asignado a esta cuenta de ayuntamiento — contacta con el administrador del sitio.",
     mairie_territory: "Territorio: {commune}",
     profile_not_found: "Este perfil no está disponible.", member_since: "Miembro desde {date}",
@@ -6517,7 +6517,26 @@ function MessagesPage({ pika, onViewProfile, openConvId, onClearOpen }) {
   const [rechercheQ, setRechercheQ] = useState("");
   const [resultats, setResultats] = useState([]);
   const [recherchant, setRecherchant] = useState(false);
+  const [demandesEnvoyees, setDemandesEnvoyees] = useState([]);
+  const [quotaReste, setQuotaReste] = useState(null);
   const bottomRef = useRef(null);
+
+  // Combien de demandes reste-t-il aujourd'hui ?
+  useEffect(() => {
+    if (!pika.user) return;
+    pika.demandesRestantes().then(setQuotaReste);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pika.conversations.length]);
+
+  const demanderDiscussion = async (uid) => {
+    if (demandesEnvoyees.includes(uid)) return;
+    const res = await pika.ouvrirConversation(uid);
+    if (res && res.erreur) { setAlerte(res.erreur); setTimeout(() => setAlerte(""), 5000); return; }
+    if (res) {
+      setDemandesEnvoyees((l) => [...l, uid]);
+      pika.demandesRestantes().then(setQuotaReste);
+    }
+  };
 
   // Recherche de membres par pseudo, déclenchée après une courte pause de frappe
   useEffect(() => {
@@ -6814,6 +6833,20 @@ function MessagesPage({ pika, onViewProfile, openConvId, onClearOpen }) {
                     </div>
                   )}
                 </div>
+                {u.contactable && (
+                  <span
+                    onClick={(e) => { e.stopPropagation(); demanderDiscussion(u.id); }}
+                    style={{
+                      background: demandesEnvoyees.includes(u.id) ? "#EAF8ED" : COLORS.sky,
+                      color: demandesEnvoyees.includes(u.id) ? COLORS.grass : "#fff",
+                      border: "none", borderRadius: 999, padding: "6px 12px", flexShrink: 0,
+                      fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5,
+                      cursor: demandesEnvoyees.includes(u.id) ? "default" : "pointer",
+                    }}
+                  >
+                    {demandesEnvoyees.includes(u.id) ? t("pm_asked") : t("pm_ask")}
+                  </span>
+                )}
                 <ChevronRight size={16} color="#C7C0AE" />
               </button>
             ))}
@@ -6823,6 +6856,22 @@ function MessagesPage({ pika, onViewProfile, openConvId, onClearOpen }) {
         {rechercheQ.trim().length >= 2 && resultats.length === 0 && !recherchant && (
           <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", marginTop: 8, paddingLeft: 4 }}>
             {t("pm_search_empty")}
+          </p>
+        )}
+
+        {alerte && (
+          <div style={{
+            background: "#FFF0EC", border: `2px solid ${COLORS.coral}`, borderRadius: 12,
+            padding: "9px 12px", marginTop: 8, fontFamily: "Nunito, sans-serif",
+            fontWeight: 700, fontSize: 12, color: COLORS.ink, lineHeight: 1.45,
+          }}>
+            {alerte}
+          </div>
+        )}
+
+        {quotaReste !== null && rechercheQ.trim().length >= 2 && (
+          <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 11, color: "#B7AF98", marginTop: 6, paddingLeft: 4 }}>
+            {t("pm_quota_reste", { n: quotaReste })}
           </p>
         )}
       </div>
@@ -6858,13 +6907,21 @@ function MessagesPage({ pika, onViewProfile, openConvId, onClearOpen }) {
                   {cv.initiated_by === pika.user?.id ? t("pm_refused_by_them") : t("pm_refused_by_me")}
                 </div>
               </div>
-              {cv.initiated_by !== pika.user?.id && (
+              {cv.initiated_by !== pika.user?.id ? (
                 <button onClick={() => pika.repondreDemande(cv.id, true)} style={{
                   background: "transparent", border: `2px solid ${COLORS.grass}`, borderRadius: 10,
                   padding: "6px 12px", color: COLORS.grass, cursor: "pointer",
                   fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, flexShrink: 0,
                 }}>
                   {t("pm_accept")}
+                </button>
+              ) : (
+                <button onClick={() => pika.retirerDemande(cv.id)} style={{
+                  background: "transparent", border: "2px solid #D8D2C2", borderRadius: 10,
+                  padding: "6px 12px", color: "#8A8399", cursor: "pointer",
+                  fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, flexShrink: 0,
+                }}>
+                  {t("pm_retry")}
                 </button>
               )}
             </div>
@@ -7003,6 +7060,8 @@ function AuthScreen({ onClose, onOpenLegal }) {
     }
     // Le pseudo est public et sert à identifier chacun : il doit être unique
     if (mode === "signup" && accountType === "parent") {
+      // La date de naissance conditionne l'accès à la messagerie (mineurs séparés des majeurs)
+      if (!birthdate) { setError(t("auth_birthdate_required")); return; }
       const { data: libre } = await supabase.rpc("pseudo_disponible", { p: pseudo.trim() });
       if (libre === false) { setError(t("pseudo_pris")); return; }
     }
@@ -8356,11 +8415,19 @@ function usePikapikaData() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  // Peut-on écrire à cette personne ? (a-t-on partagé une sortie avec elle ?)
+  // Peut-on écrire à cette personne ? Les mineurs n'échangent qu'entre mineurs,
+  // les majeurs entre majeurs — c'est la protection principale.
   const peutEcrireA = async (otherId) => {
     if (!user || otherId === user.id) return false;
-    const { data } = await supabase.rpc("ont_partage_sortie", { autre: otherId });
+    const { data } = await supabase.rpc("meme_tranche_age", { autre: otherId });
     return !!data;
+  };
+
+  // Nombre de nouvelles demandes encore possibles aujourd'hui (3 par jour)
+  const demandesRestantes = async () => {
+    if (!user) return 0;
+    const { data } = await supabase.rpc("demandes_restantes");
+    return typeof data === "number" ? data : 0;
   };
 
   const ouvrirConversation = async (otherId) => {
@@ -8384,7 +8451,9 @@ function usePikapikaData() {
       const { data: secours } = await supabase.from("conversations")
         .select("id").eq("user_a", a).eq("user_b", b).maybeSingle();
       if (secours) { await loadConversations(); return secours.id; }
-      return null;
+      // Sinon c'est le quota quotidien ou la règle d'âge qui a bloqué
+      const reste = await demandesRestantes();
+      return { erreur: reste === 0 ? t("pm_quota_atteint") : t("pm_age_bloque") };
     }
     await loadConversations();
     return data.id;
@@ -8404,6 +8473,13 @@ function usePikapikaData() {
     const { error } = await supabase.from("conversations")
       .update({ status: accepte ? "accepted" : "refused" }).eq("id", conversationId);
     if (error) { console.error("Erreur réponse demande :", error); return; }
+    await loadConversations();
+  };
+
+  // Retire une demande refusée pour pouvoir la retenter plus tard
+  const retirerDemande = async (conversationId) => {
+    if (!user) return;
+    await supabase.from("conversations").delete().eq("id", conversationId).eq("initiated_by", user.id);
     await loadConversations();
   };
 
@@ -8509,8 +8585,8 @@ function usePikapikaData() {
     uploadAvatar,
     uploadCover, removeCover,
     submitReport,
-    conversations, blockedIds, loadConversations, peutEcrireA, ouvrirConversation,
-    envoyerMessagePrive, repondreDemande, bloquerUtilisateur, debloquerUtilisateur,
+    conversations, blockedIds, loadConversations, peutEcrireA, demandesRestantes, ouvrirConversation,
+    envoyerMessagePrive, repondreDemande, retirerDemande, bloquerUtilisateur, debloquerUtilisateur,
     reports, reportsDetailed, allProfiles, allActivitiesRaw: rows,
     toggleBanUser, deleteUserData, setUserCommune,
     resolveReport, handleReport,
@@ -9232,10 +9308,11 @@ export default function RecreApp() {
           onReport={(uid) => setReportTarget({ userId: uid, isUser: true })}
           canMessage={canMessageUser}
           onMessage={async (uid) => {
-            const cid = await pika.ouvrirConversation(uid);
-            if (cid) {
+            const res = await pika.ouvrirConversation(uid);
+            if (res && res.erreur) { alert(res.erreur); return; }
+            if (res) {
               setViewingUserId(null);
-              setOpenConvId(cid);
+              setOpenConvId(res);
               setTab("messages");
             } else {
               // On reste sur le profil plutôt que de renvoyer ailleurs sans explication
