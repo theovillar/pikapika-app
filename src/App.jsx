@@ -4020,34 +4020,53 @@ const HUMEURS = ["normal", "clin", "langue", "surpris", "endormi", "content"];
 
 function PetitMonstre() {
   const [visible, setVisible] = useState(true);
-  const [x, setX] = useState(12);          // position en % de la largeur
+  const [x, setX] = useState(12);              // position en % de la largeur
   const [direction, setDirection] = useState(1);
   const [humeur, setHumeur] = useState("normal");
-  const [saute, setSaute] = useState(false);
+  const [pose, setPose] = useState("marche");  // marche | dos | saut | coucou
+  const [pas, setPas] = useState(0);           // alterne le balancement des jambes
 
-  // Déplacement : il fait des allers-retours tranquilles
+  // Balancement des bras et des jambes pendant la marche
+  useEffect(() => {
+    if (!visible) return;
+    const anim = setInterval(() => setPas((p) => (p + 1) % 2), 320);
+    return () => clearInterval(anim);
+  }, [visible]);
+
+  // Déplacement : allers-retours, avec un demi-tour où il montre son dos
   useEffect(() => {
     if (!visible) return;
     const marche = setInterval(() => {
       setX((pos) => {
         const suivant = pos + direction * (4 + Math.random() * 5);
-        if (suivant > 84) { setDirection(-1); return 84; }
-        if (suivant < 4) { setDirection(1); return 4; }
+        if (suivant > 84 || suivant < 4) {
+          // Demi-tour : il se tourne de dos un instant avant de repartir
+          setPose("dos");
+          setTimeout(() => {
+            setDirection((d) => -d);
+            setPose("marche");
+          }, 900);
+          return suivant > 84 ? 84 : 4;
+        }
         return suivant;
       });
     }, 2600);
     return () => clearInterval(marche);
   }, [visible, direction]);
 
-  // Bêtises : grimaces et petits sauts au hasard
+  // Bêtises : grimaces, sauts, et parfois il se retourne pour faire coucou
   useEffect(() => {
     if (!visible) return;
     const betises = setInterval(() => {
-      setHumeur(HUMEURS[Math.floor(Math.random() * HUMEURS.length)]);
-      if (Math.random() > 0.6) {
-        setSaute(true);
-        setTimeout(() => setSaute(false), 600);
+      const tirage = Math.random();
+      if (tirage > 0.82) {
+        setPose("coucou");
+        setTimeout(() => setPose("marche"), 1600);
+      } else if (tirage > 0.6) {
+        setPose("saut");
+        setTimeout(() => setPose("marche"), 700);
       }
+      setHumeur(HUMEURS[Math.floor(Math.random() * HUMEURS.length)]);
       setTimeout(() => setHumeur("normal"), 1800);
     }, 4200);
     return () => clearInterval(betises);
@@ -4055,23 +4074,33 @@ function PetitMonstre() {
 
   if (!visible) return null;
 
-  // Les yeux et la bouche changent selon l'humeur
+  const deDos = pose === "dos";
+  const saute = pose === "saut";
+  const faitCoucou = pose === "coucou";
+
+  // Balancement : les membres alternent à chaque pas
+  const sens = pas === 0 ? 1 : -1;
+  const jambeG = saute ? -18 : sens * 14;
+  const jambeD = saute ? -18 : -sens * 14;
+  const brasG = faitCoucou ? -120 : (saute ? -50 : -sens * 22);
+  const brasD = saute ? -50 : sens * 22;
+
   const yeux = {
-    normal:   <><circle cx="15" cy="20" r="3.2" fill="#2B2560" /><circle cx="29" cy="20" r="3.2" fill="#2B2560" /></>,
-    clin:     <><path d="M12 20 Q15 17 18 20" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /><circle cx="29" cy="20" r="3.2" fill="#2B2560" /></>,
-    langue:   <><circle cx="15" cy="19" r="3.4" fill="#2B2560" /><circle cx="29" cy="19" r="3.4" fill="#2B2560" /></>,
-    surpris:  <><circle cx="15" cy="19" r="4.2" fill="#fff" stroke="#2B2560" strokeWidth="1.6" /><circle cx="15" cy="19" r="2" fill="#2B2560" /><circle cx="29" cy="19" r="4.2" fill="#fff" stroke="#2B2560" strokeWidth="1.6" /><circle cx="29" cy="19" r="2" fill="#2B2560" /></>,
-    endormi:  <><path d="M11 20 Q15 23 19 20" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /><path d="M25 20 Q29 23 33 20" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /></>,
-    content:  <><path d="M11 21 Q15 17 19 21" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /><path d="M25 21 Q29 17 33 21" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /></>,
+    normal:   <><circle cx="17" cy="22" r="3" fill="#2B2560" /><circle cx="31" cy="22" r="3" fill="#2B2560" /></>,
+    clin:     <><path d="M14 22 Q17 19 20 22" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /><circle cx="31" cy="22" r="3" fill="#2B2560" /></>,
+    langue:   <><circle cx="17" cy="21" r="3.2" fill="#2B2560" /><circle cx="31" cy="21" r="3.2" fill="#2B2560" /></>,
+    surpris:  <><circle cx="17" cy="21" r="4" fill="#fff" stroke="#2B2560" strokeWidth="1.5" /><circle cx="17" cy="21" r="1.9" fill="#2B2560" /><circle cx="31" cy="21" r="4" fill="#fff" stroke="#2B2560" strokeWidth="1.5" /><circle cx="31" cy="21" r="1.9" fill="#2B2560" /></>,
+    endormi:  <><path d="M13 22 Q17 25 21 22" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /><path d="M27 22 Q31 25 35 22" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /></>,
+    content:  <><path d="M13 23 Q17 19 21 23" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /><path d="M27 23 Q31 19 35 23" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" /></>,
   }[humeur];
 
   const bouche = {
-    normal:   <path d="M16 28 Q22 32 28 28" stroke="#2B2560" strokeWidth="2" fill="none" strokeLinecap="round" />,
-    clin:     <path d="M16 28 Q22 33 28 28" stroke="#2B2560" strokeWidth="2" fill="none" strokeLinecap="round" />,
-    langue:   <><path d="M16 28 Q22 32 28 28" stroke="#2B2560" strokeWidth="2" fill="none" strokeLinecap="round" /><ellipse cx="22" cy="32" rx="4" ry="5" fill="#FF8FB1" /></>,
-    surpris:  <ellipse cx="22" cy="29" rx="4" ry="5" fill="#2B2560" />,
-    endormi:  <ellipse cx="22" cy="29" rx="3" ry="3.5" fill="#2B2560" opacity="0.7" />,
-    content:  <path d="M14 27 Q22 34 30 27" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" />,
+    normal:   <path d="M19 30 Q24 34 29 30" stroke="#2B2560" strokeWidth="2" fill="none" strokeLinecap="round" />,
+    clin:     <path d="M19 30 Q24 35 29 30" stroke="#2B2560" strokeWidth="2" fill="none" strokeLinecap="round" />,
+    langue:   <><path d="M19 30 Q24 34 29 30" stroke="#2B2560" strokeWidth="2" fill="none" strokeLinecap="round" /><ellipse cx="24" cy="34" rx="3.6" ry="4.6" fill={COLORS.girl} /></>,
+    surpris:  <ellipse cx="24" cy="31" rx="3.6" ry="4.6" fill="#2B2560" />,
+    endormi:  <ellipse cx="24" cy="31" rx="2.8" ry="3.2" fill="#2B2560" opacity="0.7" />,
+    content:  <path d="M17 29 Q24 36 31 29" stroke="#2B2560" strokeWidth="2.2" fill="none" strokeLinecap="round" />,
   }[humeur];
 
   return (
@@ -4085,24 +4114,59 @@ function PetitMonstre() {
         zIndex: 400,
         cursor: "pointer",
         transition: "left 2.4s ease-in-out, transform .35s ease-out",
-        transform: `scaleX(${direction}) translateY(${saute ? -14 : 0}px)`,
+        transform: `scaleX(${direction}) translateY(${saute ? -16 : 0}px)`,
       }}
     >
-      <svg width="44" height="44" viewBox="0 0 44 44">
-        {/* petites cornes */}
-        <path d="M12 8 L14 14 L9 13 Z" fill={COLORS.grape} />
-        <path d="M32 8 L30 14 L35 13 Z" fill={COLORS.grape} />
-        {/* corps */}
-        <circle cx="22" cy="23" r="15" fill={COLORS.grape} />
-        <circle cx="22" cy="23" r="15" fill="none" stroke="#fff" strokeWidth="2" />
-        {/* joues */}
-        <circle cx="9" cy="26" r="3" fill={COLORS.girl} opacity="0.55" />
-        <circle cx="35" cy="26" r="3" fill={COLORS.girl} opacity="0.55" />
-        {yeux}
-        {bouche}
-        {/* petits pieds */}
-        <ellipse cx="15" cy="38" rx="4" ry="2.6" fill={COLORS.grape} />
-        <ellipse cx="29" cy="38" rx="4" ry="2.6" fill={COLORS.grape} />
+      <svg width="52" height="60" viewBox="0 0 48 58">
+        {/* --- Jambes (derrière le corps) --- */}
+        <g style={{ transition: "transform .3s ease-in-out" }}>
+          <g transform={`rotate(${jambeG} 19 42)`}>
+            <rect x="16.5" y="40" width="5" height="12" rx="2.5" fill={shade(COLORS.grape, -12)} />
+            <ellipse cx="19" cy="53" rx="4.5" ry="2.8" fill={shade(COLORS.grape, -20)} />
+          </g>
+          <g transform={`rotate(${jambeD} 29 42)`}>
+            <rect x="26.5" y="40" width="5" height="12" rx="2.5" fill={shade(COLORS.grape, -12)} />
+            <ellipse cx="29" cy="53" rx="4.5" ry="2.8" fill={shade(COLORS.grape, -20)} />
+          </g>
+        </g>
+
+        {/* --- Bras --- */}
+        <g style={{ transition: "transform .3s ease-in-out" }}>
+          <g transform={`rotate(${brasG} 11 26)`}>
+            <rect x="8.5" y="24" width="4.5" height="14" rx="2.2" fill={shade(COLORS.grape, -8)} />
+            <circle cx="10.7" cy="39" r="3.2" fill={shade(COLORS.grape, -16)} />
+          </g>
+          <g transform={`rotate(${brasD} 37 26)`}>
+            <rect x="35" y="24" width="4.5" height="14" rx="2.2" fill={shade(COLORS.grape, -8)} />
+            <circle cx="37.2" cy="39" r="3.2" fill={shade(COLORS.grape, -16)} />
+          </g>
+        </g>
+
+        {/* --- Cornes --- */}
+        <path d="M14 10 L16 16 L11 15 Z" fill={shade(COLORS.grape, -18)} />
+        <path d="M34 10 L32 16 L37 15 Z" fill={shade(COLORS.grape, -18)} />
+
+        {/* --- Corps --- */}
+        <ellipse cx="24" cy="26" rx="15" ry="16" fill={COLORS.grape} />
+        <ellipse cx="24" cy="26" rx="15" ry="16" fill="none" stroke="#fff" strokeWidth="2" />
+
+        {deDos ? (
+          <>
+            {/* Vu de dos : petites écailles sur la colonne et queue qui dépasse */}
+            <path d="M24 14 L24 40" stroke={shade(COLORS.grape, -20)} strokeWidth="2" strokeLinecap="round" />
+            <path d="M20 19 L28 19 M19 25 L29 25 M20 31 L28 31" stroke={shade(COLORS.grape, -20)} strokeWidth="1.6" strokeLinecap="round" />
+            <path d="M38 32 Q46 30 44 22" stroke={shade(COLORS.grape, -14)} strokeWidth="3.5" fill="none" strokeLinecap="round" />
+          </>
+        ) : (
+          <>
+            {/* Vu de face : joues, yeux, bouche, petit ventre */}
+            <ellipse cx="24" cy="33" rx="8" ry="6" fill="#fff" opacity="0.18" />
+            <circle cx="10" cy="29" r="2.8" fill={COLORS.girl} opacity="0.55" />
+            <circle cx="38" cy="29" r="2.8" fill={COLORS.girl} opacity="0.55" />
+            {yeux}
+            {bouche}
+          </>
+        )}
       </svg>
     </div>
   );
