@@ -2538,63 +2538,38 @@ function PlainAvatar({ participant, color, size, overlap = false, genderMode = f
   return <div title={label} style={style}>{content}</div>;
 }
 
-// Affiche autant d'avatars que la place le permet réellement (mesurée via ResizeObserver),
-// avec un maximum de `max`, et un "…" explicite dès que ça ne rentre plus — plutôt qu'un
-// nombre de bulles qui varie silencieusement selon la taille de l'écran.
-function PlainParticipantsRow({ names, color, max = 8, genderMode = false, onViewProfile }) {
-  const containerRef = useRef(null);
-  const [visibleCount, setVisibleCount] = useState(max);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el || typeof ResizeObserver === "undefined" || !names || names.length === 0) return;
-    // La bulle mesure 26px + 2px de bordure de chaque côté = 30px de large.
-    // Avec un chevauchement de -10px, chaque bulle suivante n'ajoute que 20px.
-    const AVATAR_SIZE = 30, STEP = 20, ELLIPSIS_WIDTH = 30;
-
-    const compute = (width) => {
-      if (names.length <= max) {
-        // Tout tient dans le maximum autorisé : voir si ça rentre sans "…"
-        const neededAll = AVATAR_SIZE + (names.length - 1) * STEP;
-        if (neededAll <= width) return names.length;
-      }
-      // Cherche le plus grand nombre d'avatars + "…" qui rentre dans la largeur
-      let n = Math.min(max, names.length);
-      while (n > 1) {
-        const needed = AVATAR_SIZE + (n - 1) * STEP + (n < names.length ? ELLIPSIS_WIDTH : 0);
-        if (needed <= width) break;
-        n -= 1;
-      }
-      return n;
-    };
-
-    const ro = new ResizeObserver((entries) => {
-      const width = entries[0].contentRect.width;
-      if (width > 0) setVisibleCount(compute(width));
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [names, max]);
-
+// Affiche les participants sous forme de pastilles qui se chevauchent.
+// Approche entièrement CSS : plus de mesure du conteneur (source de débordements),
+// c'est le navigateur qui gère la largeur disponible.
+function PlainParticipantsRow({ names, color, max = 5, genderMode = false, onViewProfile }) {
   if (!names || names.length === 0) return null;
-  const shown = names.slice(0, visibleCount);
+  const shown = names.slice(0, max);
   const extra = names.length - shown.length;
 
   return (
-    <div ref={containerRef} style={{ display: "flex", alignItems: "center", marginTop: 2, minWidth: 0, flexShrink: 1, paddingLeft: 2 }}>
+    <div
+      className="pika-avatars"
+      style={{
+        display: "flex", alignItems: "center", marginTop: 2,
+        flexShrink: 0, paddingLeft: 2,
+      }}
+    >
       {shown.map((p, i) => (
         <PlainAvatar key={i} participant={p} color={color} overlap={i > 0} genderMode={genderMode} onViewProfile={onViewProfile} />
       ))}
       {extra > 0 && (
-        <div style={{
-          width: "var(--pika-avatar-size, 26px)", height: "var(--pika-avatar-size, 26px)",
-          minWidth: "var(--pika-avatar-size, 26px)",
-          borderRadius: "50%", background: "#EDEAF4",
-          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-          color: COLORS.ink, fontFamily: "Nunito, sans-serif", fontWeight: 800, lineHeight: 1,
-          fontSize: 13, border: "2px solid #fff", boxSizing: "content-box", marginLeft: -10,
-        }}>
-          …
+        <div
+          title={`+${extra}`}
+          style={{
+            width: "var(--pika-avatar-size, 26px)", height: "var(--pika-avatar-size, 26px)",
+            minWidth: "var(--pika-avatar-size, 26px)",
+            borderRadius: "50%", background: "#EDEAF4",
+            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+            color: "#6B6485", fontFamily: "Nunito, sans-serif", fontWeight: 800, lineHeight: 1,
+            fontSize: 10.5, border: "2px solid #fff", boxSizing: "content-box", marginLeft: -10,
+          }}
+        >
+          +{extra}
         </div>
       )}
     </div>
@@ -9101,13 +9076,29 @@ export default function RecreApp() {
           .desktop-nav { display: flex !important; }
           .mobile-nav { display: none !important; }
         }
+        /* Sur écran étroit, on masque les dernières pastilles plutôt que de déborder.
+           Le compteur "+N" reste toujours visible, lui. */
+        @media (max-width: 560px) {
+          .pika-avatars > *:nth-child(n+4):not(:last-child) { display: none !important; }
+        }
+        @media (max-width: 420px) {
+          .pika-avatars > *:nth-child(n+3):not(:last-child) { display: none !important; }
+        }
         @media (max-width: 460px) {
           /* Sur petit écran : le bouton flottant devient rond (icône seule) et les
              libellés d'en-tête sont masqués pour laisser la place au sélecteur de lieu. */
           .pika-fab { padding: 16px !important; right: 14px !important; }
           .pika-fab-label { display: none !important; }
           .pika-fab-icon { width: 30px !important; height: 30px !important; }
-          .pika-header-action { padding: 7px !important; }
+          /* Libellé masqué : le bouton devient un carré parfait avec l'icône centrée
+             (sans le gap résiduel qui la décalait vers la gauche). */
+          .pika-header-action {
+            padding: 0 !important;
+            gap: 0 !important;
+            width: 40px !important;
+            height: 40px !important;
+            justify-content: center !important;
+          }
           .pika-header-action-label { display: none !important; }
         }
         @media (max-width: 560px) {
