@@ -108,7 +108,7 @@ const TRANSLATIONS = {
     change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
     share_btn: "Partager", defi_btn: "La roue des défis", chat_btn: "Discussion du groupe", chat_open: "Discussion ouverte", chat_closed: "Discussion fermée", chat_placeholder: "Écrire un message…", chat_emoji: "Émoticônes", chat_insulte: "Ce message contient des propos inappropriés. Merci de rester bienveillant.", chat_empty: "Aucun message pour le moment.\nÉcrivez le premier pour organiser vos retrouvailles !", chat_closed_note: "La discussion est fermée (5h après le début de la sortie). Vous pouvez toujours relire les messages.", defi_btn_view: "Voir le défi du groupe", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", defi_validate: "Valider ce défi pour le groupe", defi_group_label: "Le défi du groupe", defi_group_subtitle: "Le défi a déjà été tiré pour cette sortie — le voici !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
     share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Regarde cette sortie sur Orée : {title}",
-    report_btn: "Signaler", report_user_btn: "Signaler cet utilisateur", pm_title: "Messages", pm_subtitle: "Vos échanges avec les personnes rencontrées lors de sorties.", pm_requests: "Demandes de contact", pm_conversations: "Conversations", pm_empty: "Aucune conversation pour le moment.", pm_no_message: "Aucun message", pm_accept: "Accepter", pm_refuse: "Refuser", pm_block: "Bloquer", pm_block_confirm: "Confirmer ?", pm_write_to: "Envoyer un message", pm_need_shared_outing: "Vous pourrez écrire à cette personne après avoir participé à une sortie ensemble.", pm_waiting_accept: "Votre demande est en attente. Vous pourrez continuer la discussion une fois acceptée.", pm_wait_reply: "En attente de la réponse de votre correspondant.", pm_refused: "Cette demande a été refusée.", pm_send_error: "Impossible d'envoyer ce message.", tab_messages: "Messages", report_user_title: "Signaler cet utilisateur", report_title: "Signaler cette annonce",
+    report_btn: "Signaler", report_user_btn: "Signaler cet utilisateur", pm_title: "Messages", pm_subtitle: "Vos échanges avec les personnes rencontrées lors de sorties.", pm_requests: "Demandes de contact", pm_conversations: "Conversations", pm_empty: "Aucune conversation pour le moment.", pm_no_message: "Aucun message", pm_accept: "Accepter", pm_refuse: "Refuser", pm_block: "Bloquer", pm_block_confirm: "Confirmer ?", pm_write_to: "Envoyer un message", pm_need_shared_outing: "Vous pourrez écrire à cette personne après avoir participé à une sortie ensemble.", pm_waiting_accept: "Votre demande est en attente. Vous pourrez continuer la discussion une fois acceptée.", pm_wait_reply: "En attente de la réponse de votre correspondant.", pm_refused: "Cette demande a été refusée.", pm_refused_section: "Demandes refusées", pm_refused_by_me: "Vous avez refusé cette demande", pm_refused_by_them: "Votre demande a été refusée", pm_change_mind: "Finalement, accepter la discussion", pm_send_error: "Impossible d'envoyer ce message.", tab_messages: "Messages", report_user_title: "Signaler cet utilisateur", report_title: "Signaler cette annonce",
     report_reason_label: "Raison du signalement", report_details_label: "Détails (optionnel)",
     report_details_placeholder: "Expliquez ce qui vous a alerté…",
     report_reason_inapproprie: "Comportement inapproprié", report_reason_contenu: "Contenu inadapté",
@@ -6510,6 +6510,9 @@ function MessagesPage({ pika, onViewProfile, openConvId, onClearOpen }) {
   const enAttente = pika.conversations.filter((x) => x.status === "pending" && x.initiated_by !== pika.user?.id);
   const actives = pika.conversations.filter((x) => x.status === "accepted"
     || (x.status === "pending" && x.initiated_by === pika.user?.id));
+  // Les refus restent visibles : on peut toujours changer d'avis (un refus par
+  // mégarde ne doit pas fermer la porte définitivement).
+  const refusees = pika.conversations.filter((x) => x.status === "refused");
 
   useEffect(() => { if (openConvId) setOpenId(openConvId); }, [openConvId]);
 
@@ -6665,9 +6668,16 @@ function MessagesPage({ pika, onViewProfile, openConvId, onClearOpen }) {
             </button>
           </div>
         ) : (
-          <p style={{ textAlign: "center", fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", lineHeight: 1.5 }}>
-            {conv.status === "refused" ? t("pm_refused") : t("pm_wait_reply")}
-          </p>
+          <div style={{ textAlign: "center" }}>
+            <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", lineHeight: 1.5, margin: "0 0 10px" }}>
+              {conv.status === "refused" ? t("pm_refused") : t("pm_wait_reply")}
+            </p>
+            {conv.status === "refused" && conv.initiated_by !== pika.user?.id && (
+              <PillButton color={COLORS.grass} textColor="#fff" onClick={() => pika.repondreDemande(conv.id, true)} style={{ padding: "9px 18px", fontSize: 13 }}>
+                {t("pm_change_mind")}
+              </PillButton>
+            )}
+          </div>
         )}
       </div>
     );
@@ -6730,6 +6740,39 @@ function MessagesPage({ pika, onViewProfile, openConvId, onClearOpen }) {
       {actives.length === 0
         ? <EmptyBox text={t("pm_empty")} />
         : actives.map((cv) => ligne(cv))}
+
+      {refusees.length > 0 && (
+        <>
+          <div style={{ marginTop: 24 }}>
+            <SectionLabel>{t("pm_refused_section")}</SectionLabel>
+          </div>
+          {refusees.map((cv) => (
+            <div key={cv.id} style={{
+              background: "#F7F5F0", border: "2px solid #E8E4DA", borderRadius: 16,
+              padding: 12, marginBottom: 8, display: "flex", alignItems: "center", gap: 12,
+            }}>
+              {avatarOf(cv, 36)}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: "#8A8399" }}>
+                  {cv.other_name}
+                </div>
+                <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#9A93AF" }}>
+                  {cv.initiated_by === pika.user?.id ? t("pm_refused_by_them") : t("pm_refused_by_me")}
+                </div>
+              </div>
+              {cv.initiated_by !== pika.user?.id && (
+                <button onClick={() => pika.repondreDemande(cv.id, true)} style={{
+                  background: "transparent", border: `2px solid ${COLORS.grass}`, borderRadius: 10,
+                  padding: "6px 12px", color: COLORS.grass, cursor: "pointer",
+                  fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, flexShrink: 0,
+                }}>
+                  {t("pm_accept")}
+                </button>
+              )}
+            </div>
+          ))}
+        </>
+      )}
     </div>
   );
 }
