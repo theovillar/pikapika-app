@@ -4020,70 +4020,123 @@ const HUMEURS = ["normal", "clin", "langue", "surpris", "endormi", "content"];
 
 function PetitMonstre() {
   const [visible, setVisible] = useState(true);
-  const [x, setX] = useState(12);              // position en % de la largeur
+  const [x, setX] = useState(12);              // position horizontale, en % de la largeur
+  const [y, setY] = useState(0);               // hauteur au-dessus du sol, en pixels
   const [direction, setDirection] = useState(1);
   const [humeur, setHumeur] = useState("normal");
-  const [pose, setPose] = useState("marche");  // marche | dos | saut | coucou
-  const [pas, setPas] = useState(0);           // alterne le balancement des jambes
+  const [pose, setPose] = useState("marche");  // marche | dos | saut | coucou | accroche | chute | assis
+  const [pas, setPas] = useState(0);
+  const [balance, setBalance] = useState(0);   // oscillation quand il est accroché
 
-  // Balancement des bras et des jambes pendant la marche
+  // Balancement des membres pendant la marche
   useEffect(() => {
     if (!visible) return;
     const anim = setInterval(() => setPas((p) => (p + 1) % 2), 320);
     return () => clearInterval(anim);
   }, [visible]);
 
-  // Déplacement : allers-retours, avec un demi-tour où il montre son dos
+  // Oscillation quand il est suspendu
+  useEffect(() => {
+    if (pose !== "accroche") { setBalance(0); return; }
+    const osc = setInterval(() => setBalance((b) => (b === 0 ? 1 : 0)), 700);
+    return () => clearInterval(osc);
+  }, [pose]);
+
+  // Petite mise en scène : il grimpe sur une annonce, s'y accroche, se balance, puis tombe.
+  const grimpette = () => {
+    setPose("saut");
+    setY(150);                                   // il bondit vers une annonce plus haut
+    setTimeout(() => setPose("accroche"), 550);  // il s'agrippe au bord
+    setTimeout(() => {                           // la prise lâche…
+      setPose("chute");
+      setY(0);
+    }, 4200);
+    setTimeout(() => {                           // atterrissage sur les fesses
+      setPose("assis");
+      setHumeur("surpris");
+    }, 4900);
+    setTimeout(() => {                           // il se relève, un peu vexé
+      setPose("marche");
+      setHumeur("content");
+    }, 6400);
+  };
+
+  // Déplacement : allers-retours, avec demi-tour de dos
   useEffect(() => {
     if (!visible) return;
     const marche = setInterval(() => {
+      if (pose !== "marche") return;             // pas de déplacement pendant une cascade
       setX((pos) => {
         const suivant = pos + direction * (4 + Math.random() * 5);
         if (suivant > 84 || suivant < 4) {
-          // Demi-tour : il se tourne de dos un instant avant de repartir
           setPose("dos");
-          setTimeout(() => {
-            setDirection((d) => -d);
-            setPose("marche");
-          }, 900);
+          setTimeout(() => { setDirection((d) => -d); setPose("marche"); }, 900);
           return suivant > 84 ? 84 : 4;
         }
         return suivant;
       });
     }, 2600);
     return () => clearInterval(marche);
-  }, [visible, direction]);
+  }, [visible, direction, pose]);
 
-  // Bêtises : grimaces, sauts, et parfois il se retourne pour faire coucou
+  // Bêtises au hasard
   useEffect(() => {
     if (!visible) return;
     const betises = setInterval(() => {
+      if (pose !== "marche") return;
       const tirage = Math.random();
-      if (tirage > 0.82) {
+      if (tirage > 0.75) {
+        grimpette();
+      } else if (tirage > 0.55) {
         setPose("coucou");
         setTimeout(() => setPose("marche"), 1600);
-      } else if (tirage > 0.6) {
+      } else if (tirage > 0.35) {
         setPose("saut");
         setTimeout(() => setPose("marche"), 700);
       }
       setHumeur(HUMEURS[Math.floor(Math.random() * HUMEURS.length)]);
       setTimeout(() => setHumeur("normal"), 1800);
-    }, 4200);
+    }, 5200);
     return () => clearInterval(betises);
-  }, [visible]);
+  }, [visible, pose]);
 
   if (!visible) return null;
 
   const deDos = pose === "dos";
   const saute = pose === "saut";
   const faitCoucou = pose === "coucou";
+  const accroche = pose === "accroche";
+  const tombe = pose === "chute";
+  const assis = pose === "assis";
 
-  // Balancement : les membres alternent à chaque pas
+  // Position des membres selon la pose
   const sens = pas === 0 ? 1 : -1;
-  const jambeG = saute ? -18 : sens * 14;
-  const jambeD = saute ? -18 : -sens * 14;
-  const brasG = faitCoucou ? -120 : (saute ? -50 : -sens * 22);
-  const brasD = saute ? -50 : sens * 22;
+  let jambeG, jambeD, brasG, brasD, inclinaison = 0;
+
+  if (accroche) {
+    // Suspendu par les bras, jambes qui pendouillent et se balancent
+    brasG = -155; brasD = 155;
+    jambeG = balance ? 18 : -8;
+    jambeD = balance ? 8 : -18;
+    inclinaison = balance ? 6 : -6;
+  } else if (tombe) {
+    // Chute : bras et jambes écartés en tous sens
+    brasG = -100; brasD = 100;
+    jambeG = -35; jambeD = 35;
+    inclinaison = 22;
+  } else if (assis) {
+    // Assis par terre, jambes tendues devant
+    brasG = -30; brasD = 30;
+    jambeG = -75; jambeD = -75;
+    inclinaison = 0;
+  } else if (saute) {
+    brasG = -50; brasD = -50;
+    jambeG = -18; jambeD = -18;
+  } else {
+    jambeG = sens * 14; jambeD = -sens * 14;
+    brasG = faitCoucou ? -120 : -sens * 22;
+    brasD = sens * 22;
+  }
 
   const yeux = {
     normal:   <><circle cx="17" cy="22" r="3" fill="#2B2560" /><circle cx="31" cy="22" r="3" fill="#2B2560" /></>,
@@ -4110,15 +4163,17 @@ function PetitMonstre() {
       style={{
         position: "fixed",
         left: `${x}%`,
-        bottom: "calc(72px + env(safe-area-inset-bottom))",
+        bottom: `calc(72px + env(safe-area-inset-bottom) + ${y}px)`,
         zIndex: 400,
         cursor: "pointer",
-        transition: "left 2.4s ease-in-out, transform .35s ease-out",
-        transform: `scaleX(${direction}) translateY(${saute ? -16 : 0}px)`,
+        transition: tombe
+          ? "bottom .55s cubic-bezier(.6,.05,.9,.5), left 2.4s ease-in-out, transform .3s"
+          : "bottom .5s cubic-bezier(.2,.9,.3,1), left 2.4s ease-in-out, transform .35s ease-out",
+        transform: `scaleX(${direction}) translateY(${saute ? -12 : 0}px) rotate(${inclinaison}deg)`,
       }}
     >
       <svg width="52" height="60" viewBox="0 0 48 58">
-        {/* --- Jambes (derrière le corps) --- */}
+        {/* --- Jambes --- */}
         <g style={{ transition: "transform .3s ease-in-out" }}>
           <g transform={`rotate(${jambeG} 19 42)`}>
             <rect x="16.5" y="40" width="5" height="12" rx="2.5" fill={shade(COLORS.grape, -12)} />
@@ -4152,20 +4207,26 @@ function PetitMonstre() {
 
         {deDos ? (
           <>
-            {/* Vu de dos : petites écailles sur la colonne et queue qui dépasse */}
             <path d="M24 14 L24 40" stroke={shade(COLORS.grape, -20)} strokeWidth="2" strokeLinecap="round" />
             <path d="M20 19 L28 19 M19 25 L29 25 M20 31 L28 31" stroke={shade(COLORS.grape, -20)} strokeWidth="1.6" strokeLinecap="round" />
             <path d="M38 32 Q46 30 44 22" stroke={shade(COLORS.grape, -14)} strokeWidth="3.5" fill="none" strokeLinecap="round" />
           </>
         ) : (
           <>
-            {/* Vu de face : joues, yeux, bouche, petit ventre */}
             <ellipse cx="24" cy="33" rx="8" ry="6" fill="#fff" opacity="0.18" />
             <circle cx="10" cy="29" r="2.8" fill={COLORS.girl} opacity="0.55" />
             <circle cx="38" cy="29" r="2.8" fill={COLORS.girl} opacity="0.55" />
             {yeux}
             {bouche}
           </>
+        )}
+
+        {/* Petites étoiles quand il tombe sur les fesses */}
+        {assis && (
+          <g opacity="0.9">
+            <text x="4" y="14" fontSize="9" fill={COLORS.sun}>✦</text>
+            <text x="40" y="12" fontSize="7" fill={COLORS.sun}>✦</text>
+          </g>
         )}
       </svg>
     </div>
