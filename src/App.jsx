@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import {
   Compass, PlusCircle, BookMarked, UserCircle2, Search, MapPin,
-  CalendarDays, Users, X, ChevronRight, Sparkles, Heart, Check,
+  CalendarDays, Users, X, ChevronRight, Sparkles, Heart, Check, Mail,
   Baby, Trees, Palette, Music4, Puzzle, Bike, Coffee, Dumbbell,
   Landmark, Gamepad2, Film, Clock, ShieldCheck, Lock, ChevronDown, List, Map,
   Footprints, BookOpen, Flower2, PartyPopper, HeartHandshake, Trophy, Eye, EyeOff, Share2, Link2,
@@ -4555,7 +4555,7 @@ function UserProfilePage({ userId, onClose, currentUserId, onReport, onMessage, 
             {userId !== currentUserId && canMessage && (
               <PillButton color={COLORS.sky} textColor="#fff" onClick={() => onMessage(userId)} style={{ width: "100%", marginBottom: 10 }}>
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 7 }}>
-                  <Users size={16} /> {t("pm_write_to")}
+                  <Mail size={16} /> {t("pm_write_to")}
                 </span>
               </PillButton>
             )}
@@ -8661,7 +8661,7 @@ export default function RecreApp() {
                   boxShadow: active ? "none" : "0 0 0 2px #F0EADB inset",
                 }}
               >
-                <Users size={16} className="pika-header-action-icon" color={active ? "#fff" : COLORS.ink} />
+                <Mail size={17} className="pika-header-action-icon" color={active ? "#fff" : COLORS.ink} />
                 <span className="pika-header-action-label" style={{
                   fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
                   color: active ? "#fff" : COLORS.ink, whiteSpace: "nowrap",
