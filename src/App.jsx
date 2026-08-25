@@ -105,7 +105,7 @@ const TRANSLATIONS = {
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
-    change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", photo_refusee: "Cette photo ne peut pas être utilisée : elle contient un contenu inapproprié. Merci d'en choisir une autre.", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
+    change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", photo_refusee: "Cette photo ne peut pas être utilisée : elle contient un contenu inapproprié. Merci d'en choisir une autre.", photo_verif_indispo: "La vérification des photos est momentanément indisponible. Merci de réessayer plus tard.", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
     share_btn: "Partager", defi_btn: "La roue des défis", chat_btn: "Discussion du groupe", chat_open: "Discussion ouverte", chat_closed: "Discussion fermée", chat_placeholder: "Écrire un message…", chat_emoji: "Émoticônes", chat_insulte: "Ce message contient des propos inappropriés. Merci de rester bienveillant.", chat_empty: "Aucun message pour le moment.\nÉcrivez le premier pour organiser vos retrouvailles !", chat_closed_note: "La discussion est fermée (5h après le début de la sortie). Vous pouvez toujours relire les messages.", defi_btn_view: "Voir le défi du groupe", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", defi_validate: "Valider ce défi pour le groupe", defi_group_label: "Le défi du groupe", defi_group_subtitle: "Le défi a déjà été tiré pour cette sortie — le voici !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
     share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Regarde cette sortie sur Orée : {title}",
     report_btn: "Signaler", report_user_btn: "Signaler cet utilisateur", pm_title: "Messages", pm_subtitle: "Vos échanges avec les personnes rencontrées lors de sorties.", pm_requests: "Demandes de contact", pm_conversations: "Conversations", pm_search_placeholder: "Rechercher un membre par pseudo…", pm_search_empty: "Aucun membre trouvé avec ce pseudo.", pm_quota_atteint: "Vous avez atteint la limite de 3 demandes par jour. Réessayez demain.", pm_age_bloque: "Pour la sécurité des plus jeunes, les échanges se font entre personnes de la même tranche d'âge.", pm_ask: "Demander à discuter", pm_asked: "Demande envoyée", pm_quota_reste: "{n} demande(s) restante(s) aujourd'hui", pm_retry: "Refaire une demande", pm_empty: "Aucune conversation pour le moment.", pm_no_message: "Aucun message", pm_wants_to_talk: "Souhaite discuter avec vous", pm_accept: "Accepter", pm_refuse: "Refuser", pm_block: "Bloquer", pm_block_confirm: "Confirmer ?", pm_write_to: "Envoyer un message", pm_need_shared_outing: "Pour la sécurité des plus jeunes, les échanges se font entre personnes de la même tranche d'âge.", pm_waiting_accept: "Votre demande est en attente. Vous pourrez écrire dès qu'elle sera acceptée.", pm_wait_reply: "En attente de la réponse de votre correspondant.", pm_refused: "Cette demande a été refusée.", pm_open_error: "Impossible d'ouvrir la discussion pour le moment. Réessayez dans un instant.", pm_refused_section: "Demandes refusées", pm_blocked_section: "Personnes bloquées", pm_blocked_note: "Cette personne ne peut plus vous écrire", pm_unblock: "Débloquer", pm_refused_by_me: "Vous avez refusé cette demande", pm_refused_by_them: "Votre demande a été refusée", pm_change_mind: "Finalement, accepter la discussion", pm_send_error: "Impossible d'envoyer ce message.", tab_messages: "Messages", orga_btn: "Écrire à l'organisateur", orga_btn_owner: "Questions reçues", orga_title: "Contacter l'organisateur", orga_title_owner: "Questions sur votre sortie", orga_badge: "organisateur", orga_placeholder: "Poser une question sur la sortie…", orga_reply_placeholder: "Répondre…", orga_empty: "Une question sur cette sortie ? Écrivez à l'organisateur.", orga_empty_owner: "Aucune question pour le moment.", orga_closed: "Les échanges sont clos (5h après le début de la sortie).", report_user_title: "Signaler cet utilisateur", report_title: "Signaler cette annonce",
@@ -4030,6 +4030,36 @@ function SectionLabel({ children }) {
 // Petit compagnon qui se promène en bas de l'écran et fait des grimaces.
 // Volontairement discret : il ne gêne aucun clic (pointerEvents: none sauf sur lui-même),
 // et un clic le fait partir pour la session si on préfère être tranquille.
+// Icône "Famille" : un adulte tenant la main d'un enfant.
+// Dessinée sur mesure pour représenter clairement les sorties parent-enfant,
+// avec la même épaisseur de trait que les icônes de la bibliothèque.
+function FamilyIcon({ size = 20, color = "currentColor", strokeWidth = 2, className, style }) {
+  return (
+    <svg
+      width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke={color} strokeWidth={strokeWidth}
+      strokeLinecap="round" strokeLinejoin="round"
+      className={className} style={style}
+    >
+      {/* Adulte : tête, corps, jambes */}
+      <circle cx="8" cy="4.5" r="2.2" />
+      <path d="M8 6.7 L8 14" />
+      <path d="M8 14 L6.5 21" />
+      <path d="M8 14 L9.5 21" />
+      {/* Bras de l'adulte qui descend vers l'enfant */}
+      <path d="M8 9 L12.5 13.5" />
+
+      {/* Enfant : plus petit, à droite */}
+      <circle cx="16.5" cy="10.5" r="1.8" />
+      <path d="M16.5 12.3 L16.5 17.5" />
+      <path d="M16.5 17.5 L15.3 21" />
+      <path d="M16.5 17.5 L17.7 21" />
+      {/* Bras de l'enfant qui rejoint celui de l'adulte */}
+      <path d="M16.5 14 L12.5 13.5" />
+    </svg>
+  );
+}
+
 function OreeMascot({ size = 28, rotate = -6 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" style={{ transform: `rotate(${rotate}deg)`, flexShrink: 0 }}>
@@ -5980,7 +6010,7 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
 
       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 1, flexShrink: 0 }}>
         <span style={{
-          fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11,
+          fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12,
           color: full ? COLORS.coral : COLORS.grass,
         }}>
           {item.inscrits}/{item.places}
@@ -5988,11 +6018,11 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
         {/* Places enfants : n'apparaît que sur les sorties Famille, qui sont les seules à en définir */}
         {item.placesEnfants != null && item.placesEnfants > 0 && (
           <span style={{
-            display: "inline-flex", alignItems: "center", gap: 2,
-            fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 10,
+            display: "inline-flex", alignItems: "center", gap: 3,
+            fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12,
             color: (item.inscritsEnfants || 0) >= item.placesEnfants ? COLORS.coral : shade(COLORS.grape, -22),
           }}>
-            <Baby size={10} /> {item.inscritsEnfants || 0}/{item.placesEnfants}
+            <Baby size={13} /> {item.inscritsEnfants || 0}/{item.placesEnfants}
           </span>
         )}
       </div>
@@ -8367,7 +8397,10 @@ function usePikapikaData() {
       const { data, error } = await supabase.functions.invoke("moderer-image", {
         body: { imageUrl },
       });
-      if (error) { console.error("Vérification photo indisponible :", error); return { autorise: true }; }
+      if (error) {
+        console.error("Vérification photo indisponible :", error);
+        return { autorise: false, indisponible: true };
+      }
 
       // Cas limite : la photo passe, mais on la signale pour un contrôle humain
       if (data?.aVerifier && user) {
@@ -8376,10 +8409,11 @@ function usePikapikaData() {
           score_sexual: data?.scores?.sexual ?? null,
         });
       }
-      return data || { autorise: true };
+      return data || { autorise: false, indisponible: true };
     } catch (e) {
       console.error("Erreur vérification photo :", e);
-      return { autorise: true };   // on ne bloque pas en cas de panne technique
+      // On refuse par prudence : une photo non vérifiée ne doit pas être publiée
+      return { autorise: false, indisponible: true };
     }
   };
 
@@ -8399,7 +8433,7 @@ function usePikapikaData() {
       const verif = await verifierPhoto(avatarUrl, "avatar");
       if (!verif.autorise) {
         await supabase.storage.from("avatars").remove([path]);
-        return { error: t("photo_refusee") };
+        return { error: verif.indisponible ? t("photo_verif_indispo") : t("photo_refusee") };
       }
 
       await supabase.from("profiles").update({ avatar_url: avatarUrl }).eq("id", user.id);
@@ -8428,7 +8462,7 @@ function usePikapikaData() {
       const verif = await verifierPhoto(coverUrl, "cover");
       if (!verif.autorise) {
         await supabase.storage.from("covers").remove([path]);
-        return { error: t("photo_refusee") };
+        return { error: verif.indisponible ? t("photo_verif_indispo") : t("photo_refusee") };
       }
 
       await supabase.from("profiles").update({ cover_url: coverUrl }).eq("id", user.id);
@@ -8697,7 +8731,7 @@ export default function RecreApp() {
   const TABS_ALL = [
     { id: "ados", label: t("tab_ados"), icon: Gamepad2, kidsOnly: true, authRequired: true },
     { id: "adultes", label: t("tab_adultes"), icon: Coffee },
-    { id: "explorer", label: t("tab_enfants"), icon: Baby, kidsOnly: true, authRequired: true },
+    { id: "explorer", label: t("tab_enfants"), icon: FamilyIcon, kidsOnly: true, authRequired: true },
     { id: "aine", label: t("tab_aine"), icon: Flower2 },
     { id: "asso", label: t("tab_associations"), icon: Landmark, authRequired: true },
     { id: "mairie", label: t("tab_mairie"), icon: ShieldCheck, mairieOnly: true },
