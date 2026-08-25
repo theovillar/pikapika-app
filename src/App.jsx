@@ -41,7 +41,7 @@ const TRANSLATIONS = {
     chip_all: "Toutes", voir_plus: "Voir plus ({n} restantes)", view_liste: "Liste", view_carte: "Carte",
     empty_kids: "Aucune sortie ne correspond. Essayez une autre recherche !",
     fav_aria: "Ajouter aux favoris",
-    card_full: "Complet", card_places_left: "{n} place(s) libre(s)",
+    card_full: "Complet", card_places_left: "{n} place(s) libre(s)", card_kids_left: "{n} place(s) enfant",
     cat_nature: "Nature", cat_creatif: "Créatif", cat_musique: "Musique", cat_jeux: "Jeux", cat_sport: "Sport",
     cat_cafe: "Café / Brunch", cat_culture: "Sorties culture", cat_bienetre: "Bien-être", cat_jeuxsociete: "Jeux de société",
     cat_jeuxvideo: "Jeux vidéo", cat_cinema: "Ciné / Sorties",
@@ -150,7 +150,7 @@ const TRANSLATIONS = {
     loc_ville_dept: "Ville · dept. {d}", loc_radius_title: "Rayon autour de {ville}",
     map_centered_on: "Carte centrée sur {loc}", map_empty: "Aucune sortie géolocalisée pour ces filtres.",
     map_see_detail: "Voir la fiche",
-    day_today: "Aujourd'hui", day_tomorrow: "Demain", day_after_tomorrow: "Après-demain",
+    day_today: "Aujourd'hui", day_tomorrow: "Demain", day_yesterday: "Hier", day_after_tomorrow: "Après-demain",
     day_after_after_tomorrow: "Après-après-demain",
     legend_femme: "Femme", legend_homme: "Homme",
     accordion_empty: "Aucune sortie ce jour-là.",
@@ -291,7 +291,7 @@ const TRANSLATIONS = {
     loc_ville_dept: "City · dept. {d}", loc_radius_title: "Radius around {ville}",
     map_centered_on: "Map centred on {loc}", map_empty: "No located outing for these filters.",
     map_see_detail: "See details",
-    day_today: "Today", day_tomorrow: "Tomorrow", day_after_tomorrow: "Day after tomorrow",
+    day_today: "Today", day_tomorrow: "Tomorrow", day_yesterday: "Yesterday", day_after_tomorrow: "Day after tomorrow",
     day_after_after_tomorrow: "In 3 days",
     legend_femme: "Woman", legend_homme: "Man",
     accordion_empty: "No meetup that day.",
@@ -427,7 +427,7 @@ const TRANSLATIONS = {
     loc_ville_dept: "Ciudad · dpto. {d}", loc_radius_title: "Radio alrededor de {ville}",
     map_centered_on: "Mapa centrado en {loc}", map_empty: "Ninguna salida geolocalizada para estos filtros.",
     map_see_detail: "Ver la ficha",
-    day_today: "Hoy", day_tomorrow: "Mañana", day_after_tomorrow: "Pasado mañana",
+    day_today: "Hoy", day_tomorrow: "Mañana", day_yesterday: "Ayer", day_after_tomorrow: "Pasado mañana",
     day_after_after_tomorrow: "En 3 días",
     legend_femme: "Mujer", legend_homme: "Hombre",
     accordion_empty: "Ningún encuentro ese día.",
@@ -476,10 +476,15 @@ const adultGenreLabel = (genre) => (genre === "F" ? t("legend_femme") : t("legen
 function relativeDayLabel(offsetDays) {
   if (offsetDays === 0) return t("day_today");
   if (offsetDays === 1) return t("day_tomorrow");
+  if (offsetDays === -1) return t("day_yesterday");
   const d = new Date();
   d.setDate(d.getDate() + offsetDays);
   const locale = LANG === "fr" ? "fr-FR" : LANG === "es" ? "es-ES" : "en-US";
-  const label = d.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" });
+  // Au-delà d'un an d'écart, on précise l'année pour éviter toute confusion
+  const options = Math.abs(offsetDays) > 330
+    ? { weekday: "long", day: "numeric", month: "long", year: "numeric" }
+    : { weekday: "long", day: "numeric", month: "long" };
+  const label = d.toLocaleDateString(locale, options);
   return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
@@ -5818,11 +5823,25 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
       <PlainParticipantsRow names={item.participants} color={meta.color} genderMode={genderMode} onViewProfile={onViewProfile} />
 
       <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <Users size={14} color={full ? COLORS.coral : COLORS.grass} />
-          <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5, color: full ? COLORS.coral : COLORS.ink }}>
-            {full ? t("card_full") : t("card_places_left", { n: item.places - item.inscrits })}
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <Users size={14} color={full ? COLORS.coral : COLORS.grass} />
+            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5, color: full ? COLORS.coral : COLORS.ink }}>
+              {full ? t("card_full") : t("card_places_left", { n: item.places - item.inscrits })}
+            </span>
           </span>
+          {/* Places enfants : uniquement sur les sorties Famille */}
+          {item.placesEnfants != null && item.placesEnfants > 0 && (
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+              <Baby size={14} color={(item.inscritsEnfants || 0) >= item.placesEnfants ? COLORS.coral : COLORS.sun} />
+              <span style={{
+                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
+                color: (item.inscritsEnfants || 0) >= item.placesEnfants ? COLORS.coral : COLORS.ink,
+              }}>
+                {t("card_kids_left", { n: Math.max(0, item.placesEnfants - (item.inscritsEnfants || 0)) })}
+              </span>
+            </span>
+          )}
         </div>
         <ChevronRight size={18} color="#C7C0AE" />
       </div>
@@ -5925,9 +5944,11 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
         <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, whiteSpace: "nowrap", overflow: "hidden", marginTop: 3 }}>
           <span style={{
             fontFamily: "Nunito, sans-serif", fontWeight: 800, color: COLORS.ink, flexShrink: 0,
-            background: COLORS.sun, padding: "2px 7px", borderRadius: 8, fontSize: 11.5,
+            background: isPast ? "#E8E4DA" : COLORS.sun, padding: "2px 7px", borderRadius: 8, fontSize: 11.5,
           }}>
-            {item.time ? item.time : displayDate(item)}
+            {/* Dans "Mes sorties" (repérable au libellé de catégorie), les jours se mélangent :
+                on affiche la date en plus de l'heure pour s'y retrouver. */}
+            {spaceLabel ? displayDate(item) : (item.time ? item.time : displayDate(item))}
           </span>
           {/* L'adresse peut être tronquée, mais la ville reste toujours lisible :
               c'est l'information la plus utile pour savoir si la sortie est proche. */}
@@ -5955,12 +5976,24 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
 
       <PlainParticipantsRow names={item.participants} color={meta.color} max={8} genderMode={genderMode} onViewProfile={onViewProfile} />
 
-      <span style={{
-        fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11, flexShrink: 0,
-        color: full ? COLORS.coral : COLORS.grass,
-      }}>
-        {item.inscrits}/{item.places}
-      </span>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 1, flexShrink: 0 }}>
+        <span style={{
+          fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11,
+          color: full ? COLORS.coral : COLORS.grass,
+        }}>
+          {item.inscrits}/{item.places}
+        </span>
+        {/* Places enfants : n'apparaît que sur les sorties Famille, qui sont les seules à en définir */}
+        {item.placesEnfants != null && item.placesEnfants > 0 && (
+          <span style={{
+            display: "inline-flex", alignItems: "center", gap: 2,
+            fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 10,
+            color: (item.inscritsEnfants || 0) >= item.placesEnfants ? COLORS.coral : COLORS.sun,
+          }}>
+            <Baby size={10} /> {item.inscritsEnfants || 0}/{item.placesEnfants}
+          </span>
+        )}
+      </div>
 
       <button
         onClick={(e) => { e.stopPropagation(); onToggleFav(item.id); }}
