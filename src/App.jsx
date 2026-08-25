@@ -4031,31 +4031,28 @@ function SectionLabel({ children }) {
 // Volontairement discret : il ne gêne aucun clic (pointerEvents: none sauf sur lui-même),
 // et un clic le fait partir pour la session si on préfère être tranquille.
 // Icône "Famille" : un adulte tenant la main d'un enfant.
-// Dessinée sur mesure pour représenter clairement les sorties parent-enfant,
-// avec la même épaisseur de trait que les icônes de la bibliothèque.
-function FamilyIcon({ size = 20, color = "currentColor", strokeWidth = 2, className, style }) {
+// Silhouettes pleines plutôt que des traits fins : bien plus lisible en petit,
+// et les deux personnages occupent tout le cadre.
+function FamilyIcon({ size = 20, color = "currentColor", className, style }) {
   return (
     <svg
-      width={size} height={size} viewBox="0 0 24 24" fill="none"
-      stroke={color} strokeWidth={strokeWidth}
-      strokeLinecap="round" strokeLinejoin="round"
+      width={size} height={size} viewBox="0 0 24 24" fill={color}
       className={className} style={style}
     >
-      {/* Adulte : tête, corps, jambes */}
-      <circle cx="8" cy="4.5" r="2.2" />
-      <path d="M8 6.7 L8 14" />
-      <path d="M8 14 L6.5 21" />
-      <path d="M8 14 L9.5 21" />
-      {/* Bras de l'adulte qui descend vers l'enfant */}
-      <path d="M8 9 L12.5 13.5" />
+      {/* Adulte */}
+      <circle cx="7" cy="4" r="3" />
+      <path d="M7 8.2 C4.5 8.2 3.4 10 3.4 12.6 L3.4 15.4 L4.8 15.4 L4.8 22 L9.2 22 L9.2 15.4 L10.6 15.4 L10.6 12.6 C10.6 10 9.5 8.2 7 8.2 Z" />
 
-      {/* Enfant : plus petit, à droite */}
-      <circle cx="16.5" cy="10.5" r="1.8" />
-      <path d="M16.5 12.3 L16.5 17.5" />
-      <path d="M16.5 17.5 L15.3 21" />
-      <path d="M16.5 17.5 L17.7 21" />
-      {/* Bras de l'enfant qui rejoint celui de l'adulte */}
-      <path d="M16.5 14 L12.5 13.5" />
+      {/* Enfant */}
+      <circle cx="17.5" cy="9.5" r="2.4" />
+      <path d="M17.5 12.8 C15.6 12.8 14.8 14.2 14.8 16.1 L14.8 18.2 L15.9 18.2 L15.9 22 L19.1 22 L19.1 18.2 L20.2 18.2 L20.2 16.1 C20.2 14.2 19.4 12.8 17.5 12.8 Z" />
+
+      {/* Les mains qui se tiennent, bien visibles au centre */}
+      <path
+        d="M10 12.5 L14.5 15"
+        stroke={color} strokeWidth="2.6" strokeLinecap="round" fill="none"
+      />
+      <circle cx="12.3" cy="13.8" r="1.6" />
     </svg>
   );
 }
