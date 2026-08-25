@@ -754,7 +754,7 @@ const metaFrom = (categories, id) => categories.find((c) => c.id === id) || cate
 // Repère visuel des annonces de l'onglet Commune : chaque type de structure
 // a sa couleur, pour distinguer d'un coup d'œil mairie, association et commerce.
 const STRUCTURE_META = {
-  mairie:      { couleur: COLORS.ink,   label: () => t("badge_mairie") },
+  mairie:      { couleur: COLORS.grape, label: () => t("badge_mairie") },
   association: { couleur: COLORS.grass, label: () => t("badge_association") },
   commercant:  { couleur: COLORS.sky,   label: () => t("badge_commerce") },
 };
@@ -2504,9 +2504,10 @@ function ProfileHoverCard({ userId, children }) {
   );
 }
 
-function OrganiserBadge({ name, genre, size = 14, userId, onClick, age }) {
+function OrganiserBadge({ name, genre, size = 14, userId, onClick, age, couleurStructure = null }) {
   if (!name) return null;
-  const color = genre ? genreColor(genre) : COLORS.ink;
+  // Pour les mairies, associations et commerces, la couleur du type prime sur le genre
+  const color = couleurStructure || (genre ? genreColor(genre) : COLORS.ink);
   const clickable = !!(userId && onClick);
   const label = age ? `${t("by_organiser", { org: name })} · ${age} ${t("profile_years")}` : t("by_organiser", { org: name });
   const content = (
@@ -5908,6 +5909,7 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
 function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, genderMode = false, onViewProfile }) {
   const meta = metaFrom(categories, item.category);
   const Icon = meta.icon;
+  const structure = structureDe(item);
   const full = item.inscrits >= item.places;
   return (
     <div
@@ -6005,7 +6007,7 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
 
       {(item.organisateur || item.participantsAvgAge) && (
         <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8 }}>
-          <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={16} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
+          <OrganiserBadge couleurStructure={structure?.couleur} name={item.organisateur} genre={item.organisateurGenre} size={16} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
           <AvgAgeBadge avg={item.participantsAvgAge} size={12} />
         </div>
       )}
@@ -6069,8 +6071,18 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
       </div>
 
       <div style={{ flex: 1, minWidth: "15ch" }}>
-        {(spaceLabel || isCreator || isPast) && (
+        {(spaceLabel || isCreator || isPast || structure) && (
           <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap", marginBottom: 2 }}>
+            {/* Type de structure organisatrice : le texte lève toute ambiguïté sur la couleur */}
+            {structure && !isPast && (
+              <span style={{
+                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9, padding: "1px 7px",
+                borderRadius: 999, background: `${structure.couleur}1F`, color: structure.couleur,
+                textTransform: "uppercase", letterSpacing: 0.4,
+              }}>
+                {structure.label()}
+              </span>
+            )}
             {spaceLabel && (
               <span style={{
                 fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9.5, letterSpacing: 0.4,
@@ -6129,7 +6141,7 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
         </div>
         {item.organisateur && (
           <div style={{ marginTop: 3, display: "flex", alignItems: "center", gap: 6 }}>
-            <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={15} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
+            <OrganiserBadge couleurStructure={structure?.couleur} name={item.organisateur} genre={item.organisateurGenre} size={15} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
             <AvgAgeBadge avg={item.participantsAvgAge} size={10.5} />
           </div>
         )}
@@ -6386,6 +6398,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
   if (!item) return null;
   const meta = metaFrom(categories, item.category);
   const Icon = meta.icon;
+  const structure = structureDe(item);
   const isJoined = joined.includes(item.id);
   const full = item.inscrits >= item.places && !isJoined;
   const isPast = (item.offsetDays ?? 0) < 0;
@@ -6411,14 +6424,14 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
           <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, letterSpacing: 0.6, textTransform: "uppercase", color: meta.color }}>
             {meta.label}
           </span>
-          {structureDe(item) && (
+          {structure && (
             <span style={{
               fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 10,
               padding: "2px 8px", borderRadius: 999,
-              background: `${structureDe(item).couleur}20`,
-              color: structureDe(item).couleur,
+              background: `${structure.couleur}20`,
+              color: structure.couleur,
             }}>
-              {structureDe(item).label()}
+              {structure.label()}
             </span>
           )}
         </div>
@@ -6482,7 +6495,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
 
         {(item.organisateur || item.participantsAvgAge) && (
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-            <OrganiserBadge name={item.organisateur} genre={item.organisateurGenre} size={20} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
+            <OrganiserBadge couleurStructure={structure?.couleur} name={item.organisateur} genre={item.organisateurGenre} size={20} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
             <AvgAgeBadge avg={item.participantsAvgAge} size={13} />
           </div>
         )}
