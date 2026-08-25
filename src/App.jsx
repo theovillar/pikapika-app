@@ -50,7 +50,7 @@ const TRANSLATIONS = {
     create_title: "Proposer une sortie",
     create_subtitle: "Partagez une activité, d'autres parents pourront rejoindre avec leurs enfants.",
     label_titre: "Titre de la sortie", placeholder_titre: "Ex. Balade contée au parc", placeholder_kid_name: "Prénom de l'enfant", btn_ajouter: "Ajouter",
-    label_categorie: "Catégorie", label_emoji: "Emoji (optionnel)", emoji_aide: "Choisissez un emoji pour illustrer votre sortie", emoji_choisi: "Il apparaîtra sur votre annonce", emoji_retirer: "Retirer", idees_titre: "Besoin d'inspiration ? Choisissez une idée", label_lieu: "Lieu", placeholder_lieu: "Parc, adresse…",
+    label_categorie: "Catégorie", idees_titre: "Besoin d'inspiration ? Choisissez une idée", label_lieu: "Lieu", placeholder_lieu: "Parc, adresse…",
     label_date: "Date & heure", placeholder_date: "Sam. 9 août · 10h", label_heure: "Heure",
     label_age: "Âge conseillé", placeholder_age: "Ex. 4-8 ans",
     label_places: "Places disponibles", label_places_parents: "Places parents", label_places_enfants: "Places enfants", detail_parents_count: "{a}/{b} parents", detail_kids_count: "{a}/{b} enfants", join_kids_question: "Combien d'enfants amenez-vous ?", join_kids_max: "Vous avez déclaré {n} enfant(s) sur votre profil.", profile_nb_enfants_label: "Nombre d'enfants", profile_nb_moins12_label: "Dont enfants de moins de 12 ans", access_parent_ok: "Vous avez accès aux sorties Famille et Jeune.", access_parent_locked: "Les sorties Famille et Jeune sont réservées aux personnes ayant au moins un enfant de moins de 12 ans.", auth_nb_moins12: "Combien ont moins de 12 ans ?", profile_nb_enfants_note: "Sert à limiter le nombre d'enfants que vous pouvez inscrire à une sortie.", label_description: "Description", label_signe: "Signe distinctif (optionnel)", placeholder_signe: "Ex. Je porterai une casquette rouge, poussette bleue",
@@ -2333,7 +2333,7 @@ const ASSO_EVENTS = [
 ];
 
 // ---------- Small building blocks ----------
-function Stamp({ category, size = 46, rotate = -8, emoji = null }) {
+function Stamp({ category, size = 46, rotate = -8 }) {
   const meta = catMeta(category);
   const Icon = meta.icon;
   return (
@@ -2352,9 +2352,7 @@ function Stamp({ category, size = 46, rotate = -8, emoji = null }) {
         flexShrink: 0,
       }}
     >
-      {emoji
-        ? <span style={{ fontSize: size * 0.5, lineHeight: 1 }}>{emoji}</span>
-        : <Icon size={size * 0.45} color={meta.color} strokeWidth={2.4} />}
+      <Icon size={size * 0.45} color={meta.color} strokeWidth={2.4} />
     </div>
   );
 }
@@ -3255,69 +3253,72 @@ function IdeesSorties({ categorie, onChoisir }) {
   );
 }
 
-// Choix d'un emoji pour illustrer une sortie : purement décoratif, mais aide
-// à la repérer dans une longue liste. Facultatif — l'icône de catégorie sert de repli.
-const EMOJIS_SORTIE = [
-  "🌳", "🏞️", "🌸", "🍂", "☀️", "🌊", "⛰️", "🚶",
-  "🎨", "🎭", "🎵", "📚", "🎬", "🖌️", "📷", "✏️",
-  "⚽", "🏀", "🚲", "🏃", "🧘", "🏊", "🎾", "⛳",
-  "🍕", "🍰", "☕", "🥐", "🍦", "🧃", "🍎", "🥗",
-  "🎲", "🧩", "🃏", "🎮", "♟️", "🎯", "🎪", "🎈",
-  "👶", "🧸", "🎠", "🪁", "🛝", "🧵", "🌻", "🐶",
-];
+// Champ de saisie avec un petit bouton emoji à droite : permet d'insérer un
+// emoji directement dans le texte, à l'endroit du curseur.
+function ChampAvecEmoji({ valeur, onChange, placeholder, multiligne = false, rows = 3, style = {} }) {
+  const [palette, setPalette] = useState(false);
+  const champRef = useRef(null);
 
-function EmojiSortiePicker({ valeur, onChoisir }) {
-  const [ouvert, setOuvert] = useState(false);
+  const inserer = (emoji) => {
+    const el = champRef.current;
+    const pos = el?.selectionStart ?? (valeur || "").length;
+    const texte = valeur || "";
+    onChange(texte.slice(0, pos) + emoji + texte.slice(pos));
+    setPalette(false);
+    // On redonne le focus juste après l'emoji inséré
+    setTimeout(() => {
+      el?.focus();
+      const nouvellePos = pos + emoji.length;
+      el?.setSelectionRange?.(nouvellePos, nouvellePos);
+    }, 0);
+  };
+
+  const styleChamp = {
+    ...style,
+    width: "100%", boxSizing: "border-box",
+    paddingRight: 42,          // place pour le bouton
+    marginBottom: 0,
+  };
+
   return (
-    <div>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <button
-          type="button"
-          onClick={() => setOuvert((v) => !v)}
-          style={{
-            width: 48, height: 48, borderRadius: 14, flexShrink: 0, cursor: "pointer",
-            border: `2px solid ${valeur ? COLORS.sun : "#F0EADB"}`,
-            background: valeur ? "#FFF9EC" : "#fff",
-            fontSize: valeur ? 24 : 18, lineHeight: 1, padding: 0,
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}
-        >
-          {valeur || "＋"}
-        </button>
-        <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 12.5, color: "#9A93AF", lineHeight: 1.45 }}>
-          {valeur ? t("emoji_choisi") : t("emoji_aide")}
-        </span>
-        {valeur && (
-          <button
-            type="button"
-            onClick={() => { onChoisir(null); setOuvert(false); }}
-            style={{
-              background: "none", border: "none", cursor: "pointer", marginLeft: "auto",
-              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, color: COLORS.coral,
-            }}
-          >
-            {t("emoji_retirer")}
-          </button>
-        )}
-      </div>
+    <div style={{ position: "relative" }}>
+      {multiligne ? (
+        <textarea ref={champRef} rows={rows} value={valeur} placeholder={placeholder}
+          onChange={(e) => onChange(e.target.value)} style={styleChamp} />
+      ) : (
+        <input ref={champRef} value={valeur} placeholder={placeholder}
+          onChange={(e) => onChange(e.target.value)} style={styleChamp} />
+      )}
 
-      {ouvert && (
+      <button
+        type="button"
+        onClick={() => setPalette((v) => !v)}
+        aria-label={t("chat_emoji")}
+        style={{
+          position: "absolute", right: 8, top: multiligne ? 8 : "50%",
+          transform: multiligne ? "none" : "translateY(-50%)",
+          width: 28, height: 28, borderRadius: 8, cursor: "pointer",
+          background: palette ? COLORS.sun : "transparent",
+          border: "none", fontSize: 16, lineHeight: 1, padding: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}
+      >
+        🙂
+      </button>
+
+      {palette && (
         <div style={{
-          display: "grid", gridTemplateColumns: "repeat(8, 1fr)", gap: 3,
-          background: COLORS.cloud, border: "2px solid #F0EADB", borderRadius: 14,
-          padding: 8, marginTop: 8, maxHeight: 170, overflowY: "auto",
+          position: "absolute", top: "calc(100% + 4px)", right: 0, zIndex: 40,
+          display: "grid", gridTemplateColumns: "repeat(8, 1fr)", gap: 2,
+          background: "#fff", border: "2px solid #F0EADB", borderRadius: 14,
+          padding: 8, width: 280, maxHeight: 180, overflowY: "auto",
+          boxShadow: "0 10px 24px rgba(43,37,96,0.14)",
         }}>
-          {EMOJIS_SORTIE.map((e) => (
-            <button
-              key={e}
-              type="button"
-              onClick={() => { onChoisir(e); setOuvert(false); }}
-              style={{
-                background: valeur === e ? "#FFF4DD" : "none",
-                border: "none", cursor: "pointer", fontSize: 22,
-                padding: "6px 0", lineHeight: 1, borderRadius: 8,
-              }}
-            >
+          {EMOJIS.map((e) => (
+            <button key={e} type="button" onClick={() => inserer(e)} style={{
+              background: "none", border: "none", cursor: "pointer",
+              fontSize: 20, padding: "4px 0", lineHeight: 1, borderRadius: 6,
+            }}>
               {e}
             </button>
           ))}
@@ -3330,7 +3331,7 @@ function EmojiSortiePicker({ valeur, onChoisir }) {
 function CreateActivity({ onCreate }) {
   const todayISO = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({
-    title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, placesEnfants: 10, desc: "", payant: false, signeDistinctif: "", emoji: null,
+    title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, placesEnfants: 10, desc: "", payant: false, signeDistinctif: "",
   });
   const [sent, setSent] = useState(false);
 
@@ -3345,7 +3346,7 @@ function CreateActivity({ onCreate }) {
     });
     setSent(true);
     setTimeout(() => setSent(false), 2200);
-    setForm({ title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, placesEnfants: 10, desc: "", payant: false, signeDistinctif: "", emoji: null });
+    setForm({ title: "", category: "nature", lieu: "", dateStr: todayISO, timeStr: "10:00", age: "", places: 6, placesEnfants: 10, desc: "", payant: false, signeDistinctif: "" });
   };
 
   const inputStyle = {
@@ -3367,15 +3368,15 @@ function CreateActivity({ onCreate }) {
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <div>
           <label style={label}>{t("label_titre")}</label>
-          <input style={inputStyle} placeholder={t("placeholder_titre")} value={form.title} onChange={set("title")} />
+          <ChampAvecEmoji
+            style={inputStyle}
+            placeholder={t("placeholder_titre")}
+            valeur={form.title}
+            onChange={(v) => setForm({ ...form, title: v })}
+          />
         </div>
 
         <IdeesSorties categorie={form.category} onChoisir={(idee) => setForm({ ...form, title: idee })} />
-
-        <div>
-          <label style={label}>{t("label_emoji")}</label>
-          <EmojiSortiePicker valeur={form.emoji} onChoisir={(e) => setForm({ ...form, emoji: e })} />
-        </div>
 
         <div>
           <label style={label}>{t("label_categorie")}</label>
@@ -3437,8 +3438,13 @@ function CreateActivity({ onCreate }) {
         </div>
         <div>
           <label style={label}>{t("label_description")}</label>
-          <textarea rows={3} style={{ ...inputStyle, resize: "vertical", fontFamily: "Nunito, sans-serif" }}
-            placeholder={t("placeholder_description")} value={form.desc} onChange={set("desc")} />
+          <ChampAvecEmoji
+            multiligne rows={3}
+            style={{ ...inputStyle, resize: "vertical", fontFamily: "Nunito, sans-serif" }}
+            placeholder={t("placeholder_description")}
+            valeur={form.desc}
+            onChange={(v) => setForm({ ...form, desc: v })}
+          />
         </div>
 
         <PillButton color={COLORS.grass} textColor="#fff" onClick={submit} style={{ marginTop: 6 }}>
@@ -5631,7 +5637,7 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
-          <Stamp category={activity.category} size={56} rotate={-6} emoji={activity.emoji} />
+          <Stamp category={activity.category} size={56} rotate={-6} />
           <button onClick={onClose} style={{ background: "#fff", border: "none", borderRadius: "50%", width: 34, height: 34, cursor: "pointer" }}>
             <X size={18} color={COLORS.ink} />
           </button>
@@ -5934,9 +5940,7 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
           background: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
           transform: "rotate(-8deg)", boxShadow: "0 2px 6px rgba(43,37,96,0.12)", flexShrink: 0, position: "relative",
         }}>
-          {item.emoji
-            ? <span style={{ fontSize: 24, lineHeight: 1 }}>{item.emoji}</span>
-            : <Icon size={20} color={meta.color} strokeWidth={2.4} />}
+          <Icon size={20} color={meta.color} strokeWidth={2.4} />
           {item.intergen && (
             <span
               title={t("intergen_badge")}
@@ -6050,9 +6054,7 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
         position: "relative",
       }}>
         {/* L'emoji choisi par l'organisateur prime sur l'icône de catégorie */}
-        {item.emoji
-          ? <span style={{ fontSize: 16, lineHeight: 1, filter: isPast ? "grayscale(1)" : "none" }}>{item.emoji}</span>
-          : <Icon size={15} color={iconColor} strokeWidth={2.4} />}
+        <Icon size={15} color={iconColor} strokeWidth={2.4} />
         {item.intergen && (
           <span
             title={t("intergen_badge")}
@@ -6398,9 +6400,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
             background: "#fff", display: "flex", alignItems: "center", justifyContent: "center",
             transform: "rotate(-6deg)", boxShadow: "0 2px 6px rgba(43,37,96,0.12)",
           }}>
-            {item.emoji
-              ? <span style={{ fontSize: 28, lineHeight: 1 }}>{item.emoji}</span>
-              : <Icon size={24} color={meta.color} strokeWidth={2.4} />}
+            <Icon size={24} color={meta.color} strokeWidth={2.4} />
           </div>
           <button onClick={onClose} style={{ background: "#fff", border: "none", borderRadius: "50%", width: 34, height: 34, cursor: "pointer" }}>
             <X size={18} color={COLORS.ink} />
@@ -6655,7 +6655,7 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
 function CreateMeetup({ categories, onCreate }) {
   const todayISO = new Date().toISOString().slice(0, 10);
   const [form, setForm] = useState({
-    title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "", payant: false, signeDistinctif: "", emoji: null,
+    title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "", payant: false, signeDistinctif: "",
   });
   const [sent, setSent] = useState(false);
 
@@ -6670,7 +6670,7 @@ function CreateMeetup({ categories, onCreate }) {
     });
     setSent(true);
     setTimeout(() => setSent(false), 2200);
-    setForm({ title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "", payant: false, signeDistinctif: "", emoji: null });
+    setForm({ title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "", payant: false, signeDistinctif: "" });
   };
 
   const inputStyle = {
@@ -6692,15 +6692,15 @@ function CreateMeetup({ categories, onCreate }) {
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <div>
           <label style={label}>{t("label_titre")}</label>
-          <input style={inputStyle} placeholder={t("placeholder_titre")} value={form.title} onChange={set("title")} />
+          <ChampAvecEmoji
+            style={inputStyle}
+            placeholder={t("placeholder_titre")}
+            valeur={form.title}
+            onChange={(v) => setForm({ ...form, title: v })}
+          />
         </div>
 
         <IdeesSorties categorie={form.category} onChoisir={(idee) => setForm({ ...form, title: idee })} />
-
-        <div>
-          <label style={label}>{t("label_emoji")}</label>
-          <EmojiSortiePicker valeur={form.emoji} onChoisir={(e) => setForm({ ...form, emoji: e })} />
-        </div>
 
         <div>
           <label style={label}>{t("label_categorie")}</label>
@@ -6758,8 +6758,13 @@ function CreateMeetup({ categories, onCreate }) {
         </div>
         <div>
           <label style={label}>{t("label_description")}</label>
-          <textarea rows={3} style={{ ...inputStyle, resize: "vertical", fontFamily: "Nunito, sans-serif" }}
-            placeholder={t("placeholder_description")} value={form.desc} onChange={set("desc")} />
+          <ChampAvecEmoji
+            multiligne rows={3}
+            style={{ ...inputStyle, resize: "vertical", fontFamily: "Nunito, sans-serif" }}
+            placeholder={t("placeholder_description")}
+            valeur={form.desc}
+            onChange={(v) => setForm({ ...form, desc: v })}
+          />
         </div>
 
         <PillButton color={COLORS.grass} textColor="#fff" onClick={submit} style={{ marginTop: 6 }}>
@@ -6844,7 +6849,7 @@ function EditActivityModal({ activity, space, categories, onClose, onSave }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div>
             <label style={label}>{t("label_titre")}</label>
-            <input style={inputStyle} value={form.title} onChange={set("title")} />
+            <ChampAvecEmoji style={inputStyle} valeur={form.title} onChange={(v) => setForm({ ...form, title: v })} />
           </div>
 
           <div>
@@ -6908,8 +6913,13 @@ function EditActivityModal({ activity, space, categories, onClose, onSave }) {
 
           <div>
             <label style={label}>{t("label_description")}</label>
-            <textarea rows={3} style={{ ...inputStyle, resize: "vertical", fontFamily: "Nunito, sans-serif" }}
-              placeholder={t("placeholder_description")} value={form.desc} onChange={set("desc")} />
+            <ChampAvecEmoji
+              multiligne rows={3}
+              style={{ ...inputStyle, resize: "vertical", fontFamily: "Nunito, sans-serif" }}
+              placeholder={t("placeholder_description")}
+              valeur={form.desc}
+              onChange={(v) => setForm({ ...form, desc: v })}
+            />
           </div>
 
           <PillButton color={COLORS.grass} textColor="#fff" onClick={submit} style={{ opacity: saving ? 0.6 : 1 }}>
@@ -6934,9 +6944,7 @@ function OutingRow({ item, categories, onOpen }) {
         width: 40, height: 40, borderRadius: "50%", border: `2px dashed ${meta.color}`,
         background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
       }}>
-        {item.emoji
-          ? <span style={{ fontSize: 21, lineHeight: 1 }}>{item.emoji}</span>
-          : <Icon size={18} color={meta.color} strokeWidth={2.4} />}
+        <Icon size={18} color={meta.color} strokeWidth={2.4} />
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15, color: COLORS.ink }}>{item.title}</div>
@@ -8291,7 +8299,7 @@ function usePikapikaData() {
       intergen: row.intergen, intergenNote: row.intergen_note,
       participants: [...real, ...(row.demo_participants || [])],
       createdBy: row.created_by, payant: row.payant, signeDistinctif: row.signe_distinctif,
-      defi: row.defi, defiLe: row.defi_le, emoji: row.emoji,
+      defi: row.defi, defiLe: row.defi_le,
       starts_at: row.starts_at,
       chatOpen: Date.now() < new Date(row.starts_at).getTime() + 5 * 60 * 60 * 1000,
       placesEnfants: row.places_enfants, inscritsEnfants: kidsByActivity[row.id] || 0,
@@ -8373,7 +8381,7 @@ function usePikapikaData() {
     const starts_at = `${form.dateStr}T${form.timeStr}:00`;
     const newRow = {
       id: Date.now(), space, title: form.title, category: form.category, ville: profile.commune || null, lieu: form.lieu,
-      starts_at, age: form.age || null, info: form.info || null, places: form.places, places_enfants: form.placesEnfants ?? null, emoji: form.emoji || null,
+      starts_at, age: form.age || null, info: form.info || null, places: form.places, places_enfants: form.placesEnfants ?? null,
       demo_inscrits: 0, organisateur: profile.displayName || t("you_organizer"), organisateur_genre: profile.genre || null,
       description: form.desc || "", intergen: false, intergen_note: null,
       demo_participants: [], created_by: user.id, payant: !!form.payant, signe_distinctif: form.signeDistinctif || null,
