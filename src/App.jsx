@@ -6513,6 +6513,7 @@ function MessagesPage({ pika, onViewProfile, openConvId, onClearOpen }) {
   const [draft, setDraft] = useState("");
   const [loading, setLoading] = useState(false);
   const [alerte, setAlerte] = useState("");
+  const [alerteRecherche, setAlerteRecherche] = useState("");
   const [confirmBlock, setConfirmBlock] = useState(false);
   const [rechercheQ, setRechercheQ] = useState("");
   const [resultats, setResultats] = useState([]);
