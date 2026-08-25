@@ -759,15 +759,25 @@ const STRUCTURE_META = {
   commercant:  { couleur: COLORS.sky,   label: () => t("badge_commerce") },
 };
 
-// Une annonce Commune : on se fie au rôle de l'organisateur, et à défaut
-// à la catégorie choisie (les seed data n'ont pas toujours de rôle).
+// Correspondance entre les catégories Commune et le type de structure,
+// utilisée quand l'organisateur n'est pas identifié (annonces de démonstration).
+const CATEGORIE_VERS_STRUCTURE = {
+  mairie: "mairie",
+  commerce: "commercant",
+  solidaire: "association",
+  culture: "association",
+  sport: "association",
+  fete: "association",
+};
+
+// Type de structure d'une annonce Commune : le rôle réel de l'organisateur
+// en priorité, sinon déduit de la catégorie choisie.
 function structureDe(item) {
   if (item.organisateurRole && STRUCTURE_META[item.organisateurRole]) {
     return STRUCTURE_META[item.organisateurRole];
   }
-  if (item.category === "mairie") return STRUCTURE_META.mairie;
-  if (item.category === "commerce") return STRUCTURE_META.commercant;
-  return null;
+  const parCategorie = CATEGORIE_VERS_STRUCTURE[item.category];
+  return parCategorie ? STRUCTURE_META[parCategorie] : null;
 }
 
 
