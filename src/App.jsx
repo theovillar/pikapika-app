@@ -38,7 +38,7 @@ const TRANSLATIONS = {
     explorer_subtitle: "{n} sortie(s) à partager avec vos enfants près de chez vous",
     search_placeholder: "Chercher une sortie, un lieu…",
     search_placeholder_community: "Chercher une sortie, un lieu…",
-    chip_all: "Toutes", view_liste: "Liste", view_carte: "Carte",
+    chip_all: "Toutes", voir_plus: "Voir plus ({n} restantes)", view_liste: "Liste", view_carte: "Carte",
     empty_kids: "Aucune sortie ne correspond. Essayez une autre recherche !",
     fav_aria: "Ajouter aux favoris",
     card_full: "Complet", card_places_left: "{n} place(s) libre(s)",
@@ -179,7 +179,7 @@ const TRANSLATIONS = {
     explorer_subtitle: "{n} outing(s) to share with your kids near you",
     search_placeholder: "Search an outing, a place…",
     search_placeholder_community: "Search a meetup, a place…",
-    chip_all: "All", view_liste: "List", view_carte: "Map",
+    chip_all: "All", voir_plus: "Show more ({n} left)", view_liste: "List", view_carte: "Map",
     empty_kids: "No outing matches. Try another search!",
     fav_aria: "Add to favourites",
     card_full: "Full", card_places_left: "{n} spot(s) left",
@@ -6055,6 +6055,11 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
     return Math.round((picked - today) / 86400000);
   }, [fromDate]);
 
+  // On n'affiche qu'un nombre limité d'annonces à la fois : au-delà, la page devient
+  // lourde à faire défiler, surtout sur téléphone.
+  const PAR_PAGE = 50;
+  const [limite, setLimite] = useState(PAR_PAGE);
+
   const filtered = useMemo(() => {
     return items.filter((a) => {
       const matchCat = cat === "tous" || (cat === "intergen" ? a.intergen : a.category === cat);
@@ -6065,6 +6070,11 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
       return matchCat && matchLoc && matchFav && matchDate && matchQuery;
     });
   }, [items, query, cat, location, onlyFav, favorites, fromOffset]);
+
+  const affichees = useMemo(() => filtered.slice(0, limite), [filtered, limite]);
+
+  // Tout changement de filtre remet la liste au début
+  useEffect(() => { setLimite(PAR_PAGE); }, [query, cat, location, onlyFav, fromOffset]);
   const hasIntergen = items.some((a) => a.intergen);
 
   return (
@@ -6142,18 +6152,18 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
       <ViewToggle view={view} onChange={setView} />
 
       {view === "carte" ? (
-        <MapView items={filtered} categories={categories} onOpen={onOpen} location={location} />
+        <MapView items={affichees} categories={categories} onOpen={onOpen} location={location} />
       ) : layout === "days" ? (
         filtered.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px 0", color: "#9A93AF", fontFamily: "Nunito, sans-serif" }}>
             {emptyText}
           </div>
         ) : (
-          <DayAccordion items={filtered} categories={categories} onOpen={onOpen} favorites={favorites} onToggleFav={onToggleFav} genderMode={genderMode} onViewProfile={onViewProfile} />
+          <DayAccordion items={affichees} categories={categories} onOpen={onOpen} favorites={favorites} onToggleFav={onToggleFav} genderMode={genderMode} onViewProfile={onViewProfile} />
         )
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(270px, 1fr))", gap: 14 }}>
-          {filtered.map((item) => (
+          {affichees.map((item) => (
             <CommunityCard key={item.id} item={item} categories={categories} onOpen={onOpen}
               favorite={favorites.includes(item.id)} onToggleFav={onToggleFav} genderMode={genderMode} onViewProfile={onViewProfile} />
           ))}
@@ -6162,6 +6172,14 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
               {emptyText}
             </div>
           )}
+        </div>
+      )}
+
+      {view !== "carte" && filtered.length > affichees.length && (
+        <div style={{ textAlign: "center", marginTop: 18 }}>
+          <PillButton color={COLORS.ink} textColor="#fff" onClick={() => setLimite((n) => n + PAR_PAGE)} style={{ padding: "10px 22px", fontSize: 13.5 }}>
+            {t("voir_plus", { n: filtered.length - affichees.length })}
+          </PillButton>
         </div>
       )}
     </div>
@@ -7832,10 +7850,35 @@ function usePikapikaData() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { data, error } = await supabase.from("activities").select("*");
+      // On ne charge que les sorties encore pertinentes (pas terminées depuis plus de 5h),
+      // les plus proches en premier, avec un plafond pour ne pas tout télécharger.
+      const depuis = new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString();
+      const { data, error } = await supabase
+        .from("activities")
+        .select("*")
+        .gte("starts_at", depuis)
+        .order("starts_at", { ascending: true })
+        .limit(500);
       if (cancelled) return;
       if (error) console.error("Erreur chargement activités :", error);
-      setRows(data || []);
+
+      // On complète avec les sorties passées auxquelles la personne a participé,
+      // pour que "Mes sorties" garde son historique.
+      let toutes = data || [];
+      if (user) {
+        const { data: mesRegs } = await supabase
+          .from("registrations").select("activity_id").eq("user_id", user.id);
+        const ids = (mesRegs || []).map((r) => r.activity_id);
+        const dejaLa = new Set(toutes.map((a) => a.id));
+        const manquants = ids.filter((id) => !dejaLa.has(id));
+        if (manquants.length > 0) {
+          const { data: anciennes } = await supabase
+            .from("activities").select("*").in("id", manquants.slice(0, 200));
+          if (cancelled) return;
+          toutes = [...toutes, ...(anciennes || [])];
+        }
+      }
+      setRows(toutes);
       const { data: regRows } = await supabase.from("registrations").select("activity_id, nb_enfants");
       if (cancelled) return;
       const counts = {};
@@ -7879,7 +7922,8 @@ function usePikapikaData() {
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   useEffect(() => {
     if (!user) { setDataLoading(false); setMyRegs(new Set()); setMyFavs(new Set()); return; }
