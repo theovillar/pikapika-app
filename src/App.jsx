@@ -106,7 +106,7 @@ const TRANSLATIONS = {
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
     change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
-    share_btn: "Partager", defi_btn: "La roue des défis", chat_btn: "Discussion du groupe", chat_open: "Discussion ouverte", chat_closed: "Discussion fermée", chat_placeholder: "Écrire un message…", chat_emoji: "Émoticônes", chat_stickers: "Autocollants", chat_insulte: "Ce message contient des propos inappropriés. Merci de rester bienveillant.", chat_empty: "Aucun message pour le moment.\nÉcrivez le premier pour organiser vos retrouvailles !", chat_closed_note: "La discussion est fermée (5h après le début de la sortie). Vous pouvez toujours relire les messages.", defi_btn_view: "Voir le défi du groupe", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", defi_validate: "Valider ce défi pour le groupe", defi_group_label: "Le défi du groupe", defi_group_subtitle: "Le défi a déjà été tiré pour cette sortie — le voici !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
+    share_btn: "Partager", defi_btn: "La roue des défis", chat_btn: "Discussion du groupe", chat_open: "Discussion ouverte", chat_closed: "Discussion fermée", chat_placeholder: "Écrire un message…", chat_emoji: "Émoticônes", chat_insulte: "Ce message contient des propos inappropriés. Merci de rester bienveillant.", chat_empty: "Aucun message pour le moment.\nÉcrivez le premier pour organiser vos retrouvailles !", chat_closed_note: "La discussion est fermée (5h après le début de la sortie). Vous pouvez toujours relire les messages.", defi_btn_view: "Voir le défi du groupe", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", defi_validate: "Valider ce défi pour le groupe", defi_group_label: "Le défi du groupe", defi_group_subtitle: "Le défi a déjà été tiré pour cette sortie — le voici !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
     share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Regarde cette sortie sur Orée : {title}",
     report_btn: "Signaler", report_user_btn: "Signaler cet utilisateur", pm_title: "Messages", pm_subtitle: "Vos échanges avec les personnes rencontrées lors de sorties.", pm_requests: "Demandes de contact", pm_conversations: "Conversations", pm_search_placeholder: "Rechercher un membre par pseudo…", pm_search_empty: "Aucun membre trouvé avec ce pseudo.", pm_quota_atteint: "Vous avez atteint la limite de 3 demandes par jour. Réessayez demain.", pm_age_bloque: "Pour la sécurité des plus jeunes, les échanges se font entre personnes de la même tranche d'âge.", pm_ask: "Demander à discuter", pm_asked: "Demande envoyée", pm_quota_reste: "{n} demande(s) restante(s) aujourd'hui", pm_retry: "Refaire une demande", pm_empty: "Aucune conversation pour le moment.", pm_no_message: "Aucun message", pm_wants_to_talk: "Souhaite discuter avec vous", pm_accept: "Accepter", pm_refuse: "Refuser", pm_block: "Bloquer", pm_block_confirm: "Confirmer ?", pm_write_to: "Envoyer un message", pm_need_shared_outing: "Pour la sécurité des plus jeunes, les échanges se font entre personnes de la même tranche d'âge.", pm_waiting_accept: "Votre demande est en attente. Vous pourrez écrire dès qu'elle sera acceptée.", pm_wait_reply: "En attente de la réponse de votre correspondant.", pm_refused: "Cette demande a été refusée.", pm_open_error: "Impossible d'ouvrir la discussion pour le moment. Réessayez dans un instant.", pm_refused_section: "Demandes refusées", pm_blocked_section: "Personnes bloquées", pm_blocked_note: "Cette personne ne peut plus vous écrire", pm_unblock: "Débloquer", pm_refused_by_me: "Vous avez refusé cette demande", pm_refused_by_them: "Votre demande a été refusée", pm_change_mind: "Finalement, accepter la discussion", pm_send_error: "Impossible d'envoyer ce message.", tab_messages: "Messages", orga_btn: "Écrire à l'organisateur", orga_btn_owner: "Questions reçues", orga_title: "Contacter l'organisateur", orga_title_owner: "Questions sur votre sortie", orga_badge: "organisateur", orga_placeholder: "Poser une question sur la sortie…", orga_reply_placeholder: "Répondre…", orga_empty: "Une question sur cette sortie ? Écrivez à l'organisateur.", orga_empty_owner: "Aucune question pour le moment.", orga_closed: "Les échanges sont clos (5h après le début de la sortie).", report_user_title: "Signaler cet utilisateur", report_title: "Signaler cette annonce",
     report_reason_label: "Raison du signalement", report_details_label: "Détails (optionnel)",
@@ -4641,62 +4641,40 @@ function masquerInsultes(texte) {
 }
 
 // Sélection d'émojis utiles pour se retrouver et échanger simplement
-// Autocollants maison : dessinés dans le style d'Orée, donc aucun contenu
-// extérieur imprévisible. Ils s'insèrent dans le message sous forme de code court
-// (ex. :pouce:) et s'affichent ensuite en image.
-const STICKERS = [
-  { code: ":pouce:", label: "Super !", couleur: "#43C59E" },
-  { code: ":coeur:", label: "J'adore", couleur: "#FF6B6B" },
-  { code: ":arrive:", label: "J'arrive", couleur: "#6FC2D4" },
-  { code: ":retard:", label: "Un peu en retard", couleur: "#FFDD57" },
-  { code: ":merci:", label: "Merci !", couleur: "#9B72CF" },
-  { code: ":partant:", label: "Partant !", couleur: "#43C59E" },
-  { code: ":question:", label: "Une question", couleur: "#6FC2D4" },
-  { code: ":bravo:", label: "Bravo", couleur: "#FFDD57" },
-];
-
-const STICKER_PAR_CODE = Object.fromEntries(STICKERS.map((s) => [s.code, s]));
-
-// Petit visuel d'un autocollant : une pastille colorée avec son texte
-function StickerVisuel({ sticker, taille = "normal" }) {
-  const grand = taille === "grand";
-  return (
-    <span style={{
-      display: "inline-flex", alignItems: "center", gap: grand ? 7 : 5,
-      background: `${sticker.couleur}20`, border: `2px solid ${sticker.couleur}`,
-      borderRadius: 999, padding: grand ? "7px 14px" : "4px 10px",
-      fontFamily: "Fredoka, sans-serif", fontWeight: 600,
-      fontSize: grand ? 14 : 12, color: shade(sticker.couleur, -35),
-    }}>
-      <span style={{
-        width: grand ? 9 : 7, height: grand ? 9 : 7, borderRadius: "50%",
-        background: sticker.couleur, flexShrink: 0,
-      }} />
-      {sticker.label}
-    </span>
-  );
-}
-
-// Remplace les codes d'autocollants par leur visuel dans un message
-function MessageAvecStickers({ texte }) {
-  const morceaux = texte.split(/(:[a-z]+:)/g);
-  return (
-    <>
-      {morceaux.map((m, i) =>
-        STICKER_PAR_CODE[m]
-          ? <StickerVisuel key={i} sticker={STICKER_PAR_CODE[m]} />
-          : <span key={i}>{m}</span>
-      )}
-    </>
-  );
-}
-
+// Palette d'émojis, organisée par familles pour retrouver facilement une émotion.
 const EMOJIS = [
-  "😀", "😄", "😉", "🙂", "😍", "🤗", "😂", "🥳",
-  "👍", "👋", "🙏", "👏", "💪", "🤝", "❤️", "✨",
-  "🏃", "🚶", "🚗", "🚲", "⏰", "📍", "🗺️", "☀️",
-  "🌧️", "☂️", "🎉", "🎈", "☕", "🍎", "⚽", "🎨",
+  // Joie et bonne humeur
+  "😀", "😃", "😄", "😁", "😆", "😂", "🤣", "🙂",
+  "😊", "😇", "🥰", "😍", "🤩", "😘", "😋", "🤗",
+  // Complicité et humour
+  "😉", "😜", "😝", "🤪", "😎", "🤓", "🥳", "🤭",
+  // Doutes et réflexion
+  "🤔", "🤨", "😐", "😶", "🙄", "😬", "🫤", "😅",
+  // Peine et fatigue
+  "😔", "😕", "🙁", "😢", "😭", "😴", "🥱", "😮‍💨",
+  // Surprise et inquiétude
+  "😮", "😯", "😲", "😳", "🤯", "😰", "😱", "🥺",
+  // Agacement
+  "😤", "😠", "😡", "🤦", "🤷", "😑", "🫠", "🥴",
+  // Santé et divers
+  "🤒", "🤧", "🥶", "🥵", "😷", "🤢", "🫡", "🤫",
+  // Gestes
+  "👍", "👎", "👌", "🤙", "✌️", "🤝", "👏", "🙌",
+  "🙏", "👋", "💪", "🫶", "🤞", "✊", "👉", "☝️",
+  // Cœurs et symboles
+  "❤️", "🧡", "💛", "💚", "💙", "💜", "🤍", "💔",
+  "✨", "⭐", "🔥", "💯", "🎉", "🎈", "🎁", "🏆",
+  // Se retrouver
+  "⏰", "📍", "🗺️", "🚗", "🚲", "🚶", "🏃", "🧭",
+  "📅", "✅", "❌", "❓", "❗", "💬", "📱", "🔔",
+  // Météo et nature
+  "☀️", "⛅", "🌧️", "⛈️", "❄️", "🌈", "🌳", "🌸",
+  "🍂", "🌊", "⛰️", "🏖️", "🌙", "🐦", "🐶", "🐱",
+  // Activités et gourmandises
+  "⚽", "🏀", "🎾", "🎨", "🎵", "📚", "🎬", "🎲",
+  "☕", "🍎", "🍕", "🍰", "🥐", "🧃", "🍦", "🥗",
 ];
+
 
 function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
   const [messages, setMessages] = useState([]);
@@ -4704,7 +4682,6 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [emojiOpen, setEmojiOpen] = useState(false);
-  const [stickerOpen, setStickerOpen] = useState(false);
   const [alerte, setAlerte] = useState("");
   const bottomRef = useRef(null);
 
@@ -4747,7 +4724,7 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
       activity_id: activity.id, user_id: currentUserId, content: texte.slice(0, 500),
     });
     if (error) console.error("Erreur envoi message :", error);
-    else { setDraft(""); setEmojiOpen(false); setStickerOpen(false); await load(); }
+    else { setDraft(""); setEmojiOpen(false); await load(); }
     setSending(false);
   };
 
@@ -4842,7 +4819,7 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
                     fontFamily: "Nunito, sans-serif", fontSize: 14, lineHeight: 1.45,
                     overflowWrap: "anywhere", whiteSpace: "pre-wrap",
                   }}>
-                    <MessageAvecStickers texte={masquerInsultes(m.content)} />
+                    {masquerInsultes(m.content)}
                   </div>
                   <div style={{
                     fontFamily: "Nunito, sans-serif", fontSize: 10, color: "#B7AF98",
@@ -4875,26 +4852,11 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
           )}
           {chatOuvert ? (
             <>
-            {stickerOpen && (
-              <div style={{
-                display: "flex", flexWrap: "wrap", gap: 6,
-                background: COLORS.cloud, border: "2px solid #F0EADB", borderRadius: 16,
-                padding: 10, marginBottom: 8, maxHeight: 160, overflowY: "auto",
-              }}>
-                {STICKERS.map((s) => (
-                  <button key={s.code} onClick={() => setDraft((d) => (d + s.code).slice(0, 500))} style={{
-                    background: "none", border: "none", cursor: "pointer", padding: 0,
-                  }}>
-                    <StickerVisuel sticker={s} grand />
-                  </button>
-                ))}
-              </div>
-            )}
             {emojiOpen && (
               <div style={{
                 display: "grid", gridTemplateColumns: "repeat(8, 1fr)", gap: 2,
                 background: COLORS.cloud, border: "2px solid #F0EADB", borderRadius: 16,
-                padding: 8, marginBottom: 8, maxHeight: 150, overflowY: "auto",
+                padding: 8, marginBottom: 8, maxHeight: 200, overflowY: "auto",
               }}>
                 {EMOJIS.map((e) => (
                   <button
@@ -4912,7 +4874,7 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
             )}
             <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
               <button
-                onClick={() => { setEmojiOpen((v) => !v); setStickerOpen(false); }}
+                onClick={() => setEmojiOpen((v) => !v)}
                 aria-label={t("chat_emoji")}
                 style={{
                   width: 40, height: 40, borderRadius: "50%", flexShrink: 0, cursor: "pointer",
@@ -4922,18 +4884,6 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
                 }}
               >
                 🙂
-              </button>
-              <button
-                onClick={() => { setStickerOpen((v) => !v); setEmojiOpen(false); }}
-                aria-label={t("chat_stickers")}
-                style={{
-                  width: 40, height: 40, borderRadius: "50%", flexShrink: 0, cursor: "pointer",
-                  background: stickerOpen ? COLORS.grape : "#fff",
-                  border: `2px solid ${stickerOpen ? COLORS.grape : "#F0EADB"}`,
-                  display: "flex", alignItems: "center", justifyContent: "center", padding: 0,
-                }}
-              >
-                <Sparkles size={17} color={stickerOpen ? "#fff" : COLORS.grape} />
               </button>
               <textarea
                 rows={1}
@@ -5278,7 +5228,7 @@ function ContactOrganisateurModal({ activity, currentUserId, onClose, onViewProf
                     fontFamily: "Nunito, sans-serif", fontSize: 14, lineHeight: 1.45,
                     overflowWrap: "anywhere", whiteSpace: "pre-wrap",
                   }}>
-                    <MessageAvecStickers texte={masquerInsultes(m.content)} />
+                    {masquerInsultes(m.content)}
                   </div>
                   <div style={{
                     fontFamily: "Nunito, sans-serif", fontSize: 10, color: "#B7AF98",
@@ -5312,7 +5262,7 @@ function ContactOrganisateurModal({ activity, currentUserId, onClose, onViewProf
               <div style={{
                 display: "grid", gridTemplateColumns: "repeat(8, 1fr)", gap: 2,
                 background: COLORS.cloud, border: "2px solid #F0EADB", borderRadius: 16,
-                padding: 8, marginBottom: 8, maxHeight: 150, overflowY: "auto",
+                padding: 8, marginBottom: 8, maxHeight: 200, overflowY: "auto",
               }}>
                 {EMOJIS.map((e) => (
                   <button key={e} onClick={() => setDraft((d) => (d + e).slice(0, 800))} style={{
@@ -5320,22 +5270,6 @@ function ContactOrganisateurModal({ activity, currentUserId, onClose, onViewProf
                     fontSize: 22, padding: "5px 0", lineHeight: 1, borderRadius: 8,
                   }}>
                     {e}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {palette === "sticker" && (
-              <div style={{
-                display: "flex", flexWrap: "wrap", gap: 6,
-                background: COLORS.cloud, border: "2px solid #F0EADB", borderRadius: 16,
-                padding: 10, marginBottom: 8, maxHeight: 160, overflowY: "auto",
-              }}>
-                {STICKERS.map((s) => (
-                  <button key={s.code} onClick={() => setDraft((d) => (d + s.code).slice(0, 800))} style={{
-                    background: "none", border: "none", cursor: "pointer", padding: 0,
-                  }}>
-                    <StickerVisuel sticker={s} grand />
                   </button>
                 ))}
               </div>
@@ -5353,18 +5287,6 @@ function ContactOrganisateurModal({ activity, currentUserId, onClose, onViewProf
                 }}
               >
                 🙂
-              </button>
-              <button
-                onClick={() => setPalette((p) => (p === "sticker" ? null : "sticker"))}
-                aria-label={t("chat_stickers")}
-                style={{
-                  width: 38, height: 38, borderRadius: "50%", flexShrink: 0, cursor: "pointer",
-                  background: palette === "sticker" ? COLORS.grape : "#fff",
-                  border: `2px solid ${palette === "sticker" ? COLORS.grape : "#F0EADB"}`,
-                  display: "flex", alignItems: "center", justifyContent: "center", padding: 0,
-                }}
-              >
-                <Sparkles size={17} color={palette === "sticker" ? "#fff" : COLORS.grape} />
               </button>
               <textarea
                 rows={1} value={draft}
