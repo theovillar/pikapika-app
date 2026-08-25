@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import {
   Compass, PlusCircle, BookMarked, UserCircle2, Search, MapPin,
-  CalendarDays, Users, X, ChevronRight, Sparkles, Heart, Check, Mail,
+  CalendarDays, Users, X, ChevronRight, Sparkles, Heart, Check, Mail, Store,
   Baby, Trees, Palette, Music4, Puzzle, Bike, Coffee, Dumbbell,
   Landmark, Gamepad2, Film, Clock, ShieldCheck, Lock, ChevronDown, List, Map,
   Footprints, BookOpen, Flower2, PartyPopper, HeartHandshake, Trophy, Eye, EyeOff, Share2, Link2,
@@ -46,7 +46,7 @@ const TRANSLATIONS = {
     cat_cafe: "Café / Brunch", cat_culture: "Sorties culture", cat_bienetre: "Bien-être", cat_jeuxsociete: "Jeux de société",
     cat_jeuxvideo: "Jeux vidéo", cat_cinema: "Ciné / Sorties",
     cat_marche: "Marche santé", cat_ateliers: "Ateliers", cat_jardinage: "Jardinage",
-    cat_mairie: "Mairie", cat_solidaire: "Solidaire", cat_fete: "Fête de quartier",
+    cat_mairie: "Mairie", cat_solidaire: "Solidaire", cat_fete: "Fête de quartier", cat_commerce: "Commerce",
     create_title: "Proposer une sortie",
     create_subtitle: "Partagez une activité, d'autres parents pourront rejoindre avec leurs enfants.",
     label_titre: "Titre de la sortie", placeholder_titre: "Ex. Balade contée au parc", placeholder_kid_name: "Prénom de l'enfant", btn_ajouter: "Ajouter",
@@ -85,8 +85,8 @@ const TRANSLATIONS = {
     community_senior_title: "Sorties entre aînés",
     community_senior_subtitle: "Des moments conviviaux entre retraités du quartier, à leur rythme.",
     community_kids_title: "Sorties enfants", community_kids_subtitle: "Des sorties à partager avec vos enfants près de chez vous.",
-    tab_associations: "Commune", community_asso_title: "Associations & Mairie",
-    community_asso_subtitle: "Événements organisés par la mairie et les associations de votre commune.",
+    tab_associations: "Commune", community_asso_title: "La vie de votre commune",
+    community_asso_subtitle: "Événements proposés par la mairie, les associations et les commerçants de votre commune.",
     join_label_asso: "Je participe",
     chip_intergen: "Intergénérationnel", intergen_badge: "Intergénérationnel", chip_favorites: "Favoris", filter_from_date: "À partir du", filter_from_date_short: "Date", filter_reset_date: "Toutes dates",
     btn_sign_out: "Se déconnecter",
@@ -97,7 +97,7 @@ const TRANSLATIONS = {
     auth_switch_to_login: "Déjà un compte ? Connectez-vous", auth_forgot: "Mot de passe oublié ?", auth_forgot_need_email: "Saisissez d'abord votre adresse email.", auth_forgot_sent: "Un lien de réinitialisation vient de vous être envoyé par email.",
     auth_error_generic: "Une erreur est survenue. Vérifiez vos informations et réessayez.",
     auth_loading: "Chargement…",
-    account_type_parent: "Particulier", account_type_association: "Association",
+    account_type_parent: "Particulier", account_type_association: "Association", account_type_commercant: "Commerçant", auth_commerce_name: "Nom de votre établissement",
     auth_association_name: "Nom de l'association",
     auth_association_note: "Votre compte sera activé après validation par la mairie.",
     auth_last_name: "Votre nom de famille", auth_pseudo: "Votre pseudo", auth_pseudo_note: "C'est ce nom qui sera visible par les autres membres sur les annonces.", auth_pseudo_required: "Merci de choisir un pseudo.", auth_birthdate_required: "Merci d'indiquer votre date de naissance.", pseudo_pris: "Ce pseudo est déjà utilisé, choisissez-en un autre.", pseudo_libre: "Ce pseudo est disponible.", show_password: "Afficher le mot de passe", hide_password: "Masquer le mot de passe",
@@ -187,7 +187,7 @@ const TRANSLATIONS = {
     cat_cafe: "Coffee / Brunch", cat_culture: "Culture outings", cat_bienetre: "Wellness", cat_jeuxsociete: "Board games",
     cat_jeuxvideo: "Video games", cat_cinema: "Movies / Outings",
     cat_marche: "Health walk", cat_ateliers: "Workshops", cat_jardinage: "Gardening",
-    cat_mairie: "Town hall", cat_solidaire: "Solidarity", cat_fete: "Neighbourhood fair",
+    cat_mairie: "Town hall", cat_solidaire: "Solidarity", cat_fete: "Neighbourhood fair", cat_commerce: "Local business",
     create_title: "Propose an outing",
     create_subtitle: "Share an activity, other parents can join with their kids.",
     label_titre: "Outing title", placeholder_titre: "E.g. Storytelling walk in the park", placeholder_kid_name: "Child's first name", btn_ajouter: "Add",
@@ -226,7 +226,7 @@ const TRANSLATIONS = {
     community_senior_title: "Meetups between seniors",
     community_senior_subtitle: "Friendly moments between retirees in the neighbourhood, at their own pace.",
     community_kids_title: "Kids outings", community_kids_subtitle: "Outings to share with your kids near you.",
-    tab_associations: "Community", community_asso_title: "Town Hall & Associations",
+    tab_associations: "Community", community_asso_title: "Local life",
     community_asso_subtitle: "Events organised by the town hall and local associations.",
     join_label_asso: "I'm in",
     chip_intergen: "Intergenerational", intergen_badge: "Intergenerational", chip_favorites: "Favourites",
@@ -238,7 +238,7 @@ const TRANSLATIONS = {
     auth_switch_to_login: "Already have an account? Sign in", auth_forgot: "Forgot password?", auth_forgot_need_email: "Enter your email address first.", auth_forgot_sent: "A reset link has just been sent to your email.",
     auth_error_generic: "Something went wrong. Check your details and try again.",
     auth_loading: "Loading…",
-    account_type_parent: "Individual", account_type_association: "Association",
+    account_type_parent: "Individual", account_type_association: "Association", account_type_commercant: "Business", auth_commerce_name: "Business name",
     auth_association_name: "Association name",
     auth_association_note: "Your account will be activated after town hall validation.",
     auth_last_name: "Your last name", show_password: "Show password", hide_password: "Hide password",
@@ -323,7 +323,7 @@ const TRANSLATIONS = {
     cat_cafe: "Café / Brunch", cat_culture: "Salidas culturales", cat_bienetre: "Bienestar", cat_jeuxsociete: "Juegos de mesa",
     cat_jeuxvideo: "Videojuegos", cat_cinema: "Cine / Salidas",
     cat_marche: "Marcha saludable", cat_ateliers: "Talleres", cat_jardinage: "Jardinería",
-    cat_mairie: "Ayuntamiento", cat_solidaire: "Solidaridad", cat_fete: "Fiesta de barrio",
+    cat_mairie: "Ayuntamiento", cat_solidaire: "Solidaridad", cat_fete: "Fiesta de barrio", cat_commerce: "Comercio",
     create_title: "Proponer una salida",
     create_subtitle: "Comparte una actividad, otros padres podrán unirse con sus hijos.",
     label_titre: "Título de la salida", placeholder_titre: "Ej. Paseo cuentacuentos en el parque", placeholder_kid_name: "Nombre del niño/a", btn_ajouter: "Añadir",
@@ -502,6 +502,11 @@ const CATEGORIES = [
 ];
 
 const catMeta = (id) => CATEGORIES.find((c) => c.id === id) || CATEGORIES[0];
+
+// Les associations, commerçants et mairies publient au nom d'une structure :
+// on affiche leur nom d'établissement plutôt qu'un prénom.
+const estStructure = (role) => role === "association" || role === "commercant" || role === "mairie";
+
 
 // ---------- Localisation (villes, départements, distances) ----------
 // Coordonnées des villes utilisées par les sorties de démo (id "ville" -> position + département)
@@ -741,6 +746,7 @@ const ASSO_CATEGORIES = [
   { id: "culture", label: t("cat_culture"), icon: Palette, color: COLORS.grape },
   { id: "solidaire", label: t("cat_solidaire"), icon: HeartHandshake, color: COLORS.coral },
   { id: "fete", label: t("cat_fete"), icon: PartyPopper, color: COLORS.sun },
+  { id: "commerce", label: t("cat_commerce"), icon: Store, color: COLORS.sky },
 ];
 
 const metaFrom = (categories, id) => categories.find((c) => c.id === id) || categories[0];
@@ -2409,7 +2415,7 @@ function ProfileHoverCard({ userId, children }) {
 
   if (!userId) return children;
 
-  const name = data?.role === "association" ? (data?.association_name || data?.display_name) : data?.display_name;
+  const name = estStructure(data?.role) ? (data?.association_name || data?.display_name) : data?.display_name;
   const age = data?.birthdate ? ageFromBirthdate(data.birthdate) : null;
   const color = data?.genre ? genreColor(data.genre) : COLORS.ink;
 
@@ -4425,7 +4431,7 @@ function UserProfilePage({ userId, onClose, currentUserId, onReport, onMessage, 
     return () => { cancelled = true; };
   }, [userId]);
 
-  const name = profile?.role === "association" ? (profile?.association_name || profile?.display_name) : profile?.display_name;
+  const name = estStructure(profile?.role) ? (profile?.association_name || profile?.display_name) : profile?.display_name;
   const age = profile?.birthdate ? ageFromBirthdate(profile.birthdate) : null;
   const color = profile?.genre ? genreColor(profile.genre) : COLORS.sky;
   const memberSince = profile?.created_at ? new Date(profile.created_at).toLocaleDateString(
@@ -4522,9 +4528,9 @@ function UserProfilePage({ userId, onClose, currentUserId, onReport, onMessage, 
                     {age} {t("profile_years")}
                   </div>
                 )}
-                {profile.role === "association" && (
+                {estStructure(profile.role) && profile.role !== "mairie" && (
                   <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, color: COLORS.grape, textTransform: "uppercase", letterSpacing: 0.4, marginTop: 6 }}>
-                    {t("account_type_association")}
+                    {profile.role === "commercant" ? t("account_type_commercant") : t("account_type_association")}
                   </div>
                 )}
                 {profile.commune && (
@@ -6846,7 +6852,7 @@ function CreatePage({ parentValidated, onCreateKid, onCreateTeen, onCreateAdult,
 
   // Une mairie ou une association propose uniquement des événements Commune —
   // pas de sortie en son nom propre dans une autre catégorie.
-  if (role === "mairie" || role === "association") {
+  if (estStructure(role)) {
     return (
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
         <CreateMeetup categories={ASSO_CATEGORIES} onCreate={onCreateAsso} />
@@ -6978,7 +6984,7 @@ function MesSortiesPage({
 // ---------- Authentification ----------
 function AuthScreen({ onClose, onOpenLegal }) {
   const [mode, setMode] = useState("login"); // "login" | "signup"
-  const [accountType, setAccountType] = useState("parent"); // "parent" | "association"
+  const [accountType, setAccountType] = useState("parent"); // "parent" | "association" | "commercant"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -7029,12 +7035,14 @@ function AuthScreen({ onClose, onOpenLegal }) {
     try {
       if (mode === "signup") {
         // Le pseudo est ce qui s'affiche publiquement ; prénom et nom restent privés.
-        const publicName = accountType === "association" ? name : (pseudo.trim() || name);
+        const publicName = accountType !== "parent" ? name : (pseudo.trim() || name);
         const { data, error: err } = await supabase.auth.signUp({
           email, password,
           options: { data: {
             display_name: publicName,
             pseudo: publicName,
+            role: accountType,
+            association_name: accountType !== "parent" ? name : null,
             first_name: accountType === "parent" ? name : null,
             last_name: accountType === "parent" ? (lastName || null) : null,
             commune_nom: accountType === "parent" && commune ? commune.nom : null,
@@ -7081,6 +7089,7 @@ function AuthScreen({ onClose, onOpenLegal }) {
             {[
               { id: "parent", label: t("account_type_parent") },
               { id: "association", label: t("account_type_association") },
+              { id: "commercant", label: t("account_type_commercant") },
             ].map((opt) => (
               <button
                 key={opt.id}
@@ -7089,8 +7098,8 @@ function AuthScreen({ onClose, onOpenLegal }) {
                   flex: 1, border: `2px solid ${accountType === opt.id ? COLORS.grass : "#F0EADB"}`,
                   background: accountType === opt.id ? COLORS.grass : "#fff",
                   color: accountType === opt.id ? "#fff" : COLORS.ink,
-                  borderRadius: 12, padding: "9px 8px", fontFamily: "Nunito, sans-serif",
-                  fontWeight: 800, fontSize: 12.5, cursor: "pointer",
+                  borderRadius: 12, padding: "9px 5px", fontFamily: "Nunito, sans-serif",
+                  fontWeight: 800, fontSize: 11.5, cursor: "pointer",
                 }}
               >
                 {opt.label}
@@ -7101,7 +7110,7 @@ function AuthScreen({ onClose, onOpenLegal }) {
         {mode === "signup" && (
           <input
             style={inputStyle}
-            placeholder={accountType === "association" ? t("auth_association_name") : t("auth_name")}
+            placeholder={accountType === "association" ? t("auth_association_name") : accountType === "commercant" ? t("auth_commerce_name") : t("auth_name")}
             value={name} onChange={(e) => setName(e.target.value)}
           />
         )}
@@ -7405,6 +7414,7 @@ function UsersAdminSection({ allProfiles, currentUserId, onToggleBan, onDelete, 
   const roleLabel = (p) => {
     if (p.role === "mairie") return t("tab_mairie");
     if (p.role === "association") return t("account_type_association");
+    if (p.role === "commercant") return t("account_type_commercant");
     return t("account_type_parent");
   };
 
@@ -7412,7 +7422,7 @@ function UsersAdminSection({ allProfiles, currentUserId, onToggleBan, onDelete, 
     const q = query.trim().toLowerCase();
     if (!q) return allProfiles;
     return allProfiles.filter((p) => {
-      const name = (p.role === "association" ? (p.association_name || p.display_name) : p.display_name) || "";
+      const name = (estStructure(p.role) ? (p.association_name || p.display_name) : p.display_name) || "";
       return name.toLowerCase().includes(q) || (p.email || "").toLowerCase().includes(q);
     });
   }, [allProfiles, query]);
@@ -7452,7 +7462,7 @@ function UsersAdminSection({ allProfiles, currentUserId, onToggleBan, onDelete, 
         )}
         {filteredProfiles.map((p) => {
           const isSelf = p.id === currentUserId;
-          const name = p.role === "association" ? (p.association_name || p.display_name) : p.display_name;
+          const name = estStructure(p.role) ? (p.association_name || p.display_name) : p.display_name;
           const color = p.genre ? genreColor(p.genre) : COLORS.ink;
           return (
             <div key={p.id} style={{
@@ -7479,7 +7489,7 @@ function UsersAdminSection({ allProfiles, currentUserId, onToggleBan, onDelete, 
                   {roleLabel(p)}{p.commune ? ` · ${villeName(p.commune)}` : ""}{ageFromBirthdate(p.birthdate) !== null ? ` · ${ageFromBirthdate(p.birthdate)} ${t("profile_years")}` : ""}
                 </div>
               </div>
-              {(p.role === "mairie" || p.role === "association") && (
+              {estStructure(p.role) && (
                 <select
                   value={p.commune || ""}
                   onChange={(e) => onSetCommune(p.id, e.target.value)}
