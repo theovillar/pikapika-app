@@ -46,7 +46,7 @@ const TRANSLATIONS = {
     cat_cafe: "Café / Brunch", cat_culture: "Sorties culture", cat_bienetre: "Bien-être", cat_jeuxsociete: "Jeux de société",
     cat_jeuxvideo: "Jeux vidéo", cat_cinema: "Ciné / Sorties",
     cat_marche: "Marche santé", cat_ateliers: "Ateliers", cat_jardinage: "Jardinage",
-    cat_mairie: "Mairie", cat_solidaire: "Solidaire", cat_fete: "Fête de quartier", cat_commerce: "Commerce",
+    cat_mairie: "Mairie", cat_solidaire: "Solidaire", cat_fete: "Fête de quartier", cat_commerce: "Commerce", badge_mairie: "Mairie", badge_association: "Association", badge_commerce: "Commerce",
     create_title: "Proposer une sortie",
     create_subtitle: "Partagez une activité, d'autres parents pourront rejoindre avec leurs enfants.",
     label_titre: "Titre de la sortie", placeholder_titre: "Ex. Balade contée au parc", placeholder_kid_name: "Prénom de l'enfant", btn_ajouter: "Ajouter",
@@ -750,6 +750,26 @@ const ASSO_CATEGORIES = [
 ];
 
 const metaFrom = (categories, id) => categories.find((c) => c.id === id) || categories[0];
+
+// Repère visuel des annonces de l'onglet Commune : chaque type de structure
+// a sa couleur, pour distinguer d'un coup d'œil mairie, association et commerce.
+const STRUCTURE_META = {
+  mairie:      { couleur: COLORS.ink,   label: () => t("badge_mairie") },
+  association: { couleur: COLORS.grass, label: () => t("badge_association") },
+  commercant:  { couleur: COLORS.sky,   label: () => t("badge_commerce") },
+};
+
+// Une annonce Commune : on se fie au rôle de l'organisateur, et à défaut
+// à la catégorie choisie (les seed data n'ont pas toujours de rôle).
+function structureDe(item) {
+  if (item.organisateurRole && STRUCTURE_META[item.organisateurRole]) {
+    return STRUCTURE_META[item.organisateurRole];
+  }
+  if (item.category === "mairie") return STRUCTURE_META.mairie;
+  if (item.category === "commerce") return STRUCTURE_META.commercant;
+  return null;
+}
+
 
 // ---------- Mock data ----------
 const INITIAL_ACTIVITIES = [
@@ -5913,6 +5933,7 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
   const Icon = meta.icon;
   const full = item.inscrits >= item.places;
   const iconColor = isPast ? "#C7C0AE" : meta.color;
+  const structure = structureDe(item);
   return (
     <div
       onClick={() => onOpen(item)}
@@ -5920,6 +5941,8 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
         display: "flex", alignItems: "center", gap: 10,
         background: isPast ? "#F7F5F0" : (isCreator ? "#FFF9EC" : "#fff"),
         border: `2px solid ${isPast ? "#E8E4DA" : (isCreator ? COLORS.sun : "#F0EADB")}`,
+        // Bande colorée à gauche : identifie le type de structure organisatrice
+        borderLeft: structure && !isPast ? `6px solid ${structure.couleur}` : undefined,
         borderRadius: 14, padding: "9px 12px", cursor: "pointer", opacity: isPast ? 0.65 : 1,
       }}
     >
@@ -6281,8 +6304,20 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
           </button>
         </div>
 
-        <div style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, letterSpacing: 0.6, textTransform: "uppercase", color: meta.color, marginBottom: 4 }}>
-          {meta.label}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
+          <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, letterSpacing: 0.6, textTransform: "uppercase", color: meta.color }}>
+            {meta.label}
+          </span>
+          {structureDe(item) && (
+            <span style={{
+              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 10,
+              padding: "2px 8px", borderRadius: 999,
+              background: `${structureDe(item).couleur}20`,
+              color: structureDe(item).couleur,
+            }}>
+              {structureDe(item).label()}
+            </span>
+          )}
         </div>
         <h2 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 22, color: COLORS.ink, margin: "0 0 12px" }}>
           {item.title}
@@ -8042,10 +8077,17 @@ function usePikapikaData() {
       const creatorIds = [...new Set((data || []).map((a) => a.created_by).filter(Boolean))];
       if (creatorIds.length > 0) {
         const { data: creatorRows } = await supabase
-          .from("profiles").select("id, display_name, genre").in("id", creatorIds);
+          .from("profiles").select("id, display_name, genre, role, association_name").in("id", creatorIds);
         if (cancelled) return;
         const byId = {};
-        (creatorRows || []).forEach((p) => { byId[p.id] = { displayName: p.display_name, genre: p.genre }; });
+        (creatorRows || []).forEach((p) => {
+          byId[p.id] = {
+            // Les structures publient sous leur nom d'établissement
+            displayName: estStructure(p.role) ? (p.association_name || p.display_name) : p.display_name,
+            genre: p.genre,
+            role: p.role,
+          };
+        });
         setOrganiserProfiles(byId);
       }
     })();
@@ -8134,6 +8176,7 @@ function usePikapikaData() {
       inscrits: (row.demo_inscrits || 0) + (regByActivity[row.id] || 0),
       organisateur: creator?.displayName || row.organisateur,
       organisateurGenre: creator?.genre ?? row.organisateur_genre,
+      organisateurRole: creator?.role || null,
       desc: row.description,
       intergen: row.intergen, intergenNote: row.intergen_note,
       participants: [...real, ...(row.demo_participants || [])],
