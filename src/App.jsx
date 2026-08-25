@@ -759,26 +759,33 @@ const STRUCTURE_META = {
   commercant:  { couleur: COLORS.sky,   label: () => t("badge_commerce") },
 };
 
-// Correspondance entre les catégories Commune et le type de structure,
-// utilisée quand l'organisateur n'est pas identifié (annonces de démonstration).
-const CATEGORIE_VERS_STRUCTURE = {
-  mairie: "mairie",
-  commerce: "commercant",
-  solidaire: "association",
-  culture: "association",
-  sport: "association",
-  fete: "association",
-};
+// Mots qui trahissent une structure municipale dans le nom de l'organisateur.
+// Les annonces de démonstration n'ont pas de compte associé : on se fie au nom.
+const MOTS_MAIRIE = ["mairie", "municipal", "ville de", "cabinet du maire", "commune de", "conseil municipal"];
+const MOTS_COMMERCE = ["boutique", "commerce", "magasin", "librairie", "boulangerie", "restaurant", "café", "brasserie", "épicerie"];
 
-// Type de structure d'une annonce Commune : le rôle réel de l'organisateur
-// en priorité, sinon déduit de la catégorie choisie.
+// Type de structure d'une annonce Commune. Trois sources, par ordre de fiabilité :
+// le rôle du compte organisateur, puis le nom affiché, puis la catégorie.
 function structureDe(item) {
   if (item.organisateurRole && STRUCTURE_META[item.organisateurRole]) {
     return STRUCTURE_META[item.organisateurRole];
   }
-  const parCategorie = CATEGORIE_VERS_STRUCTURE[item.category];
-  return parCategorie ? STRUCTURE_META[parCategorie] : null;
+
+  const nom = (item.organisateur || "").toLowerCase();
+  if (nom) {
+    if (MOTS_MAIRIE.some((mot) => nom.includes(mot))) return STRUCTURE_META.mairie;
+    if (MOTS_COMMERCE.some((mot) => nom.includes(mot))) return STRUCTURE_META.commercant;
+  }
+
+  if (item.category === "mairie") return STRUCTURE_META.mairie;
+  if (item.category === "commerce") return STRUCTURE_META.commercant;
+
+  // Par défaut sur l'onglet Commune uniquement : une association.
+  // Les autres espaces (Famille, Jeune, Adultes, Retraité) ne sont pas concernés.
+  const CATS_COMMUNE = ["mairie", "sport", "culture", "solidaire", "fete", "commerce"];
+  return CATS_COMMUNE.includes(item.category) ? STRUCTURE_META.association : null;
 }
+
 
 
 // ---------- Mock data ----------
