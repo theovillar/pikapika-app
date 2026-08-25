@@ -105,7 +105,7 @@ const TRANSLATIONS = {
     mairie_no_commune: "Aucune commune assignée à ce compte mairie — contactez l'administrateur du site.",
     mairie_territory: "Territoire : {commune}",
     profile_not_found: "Ce profil n'est pas disponible.", member_since: "Membre depuis {date}",
-    change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
+    change_photo: "Changer la photo", photo_uploading: "Envoi de la photo…", photo_refusee: "Cette photo ne peut pas être utilisée : elle contient un contenu inapproprié. Merci d'en choisir une autre.", profile_cover_label: "Photo de couverture", profile_cover_add: "Ajouter une couverture", profile_cover_change: "Changer la couverture",
     share_btn: "Partager", defi_btn: "La roue des défis", chat_btn: "Discussion du groupe", chat_open: "Discussion ouverte", chat_closed: "Discussion fermée", chat_placeholder: "Écrire un message…", chat_emoji: "Émoticônes", chat_insulte: "Ce message contient des propos inappropriés. Merci de rester bienveillant.", chat_empty: "Aucun message pour le moment.\nÉcrivez le premier pour organiser vos retrouvailles !", chat_closed_note: "La discussion est fermée (5h après le début de la sortie). Vous pouvez toujours relire les messages.", defi_btn_view: "Voir le défi du groupe", defi_title: "La roue des défis", defi_subtitle: "Un petit défi à faire ensemble, une fois sur place !", defi_spin: "Tourner la roue", defi_again: "Tourner à nouveau", defi_spinning: "La roue tourne…", defi_hint: "Appuyez sur le bouton pour tirer un défi au sort.", defi_result_label: "Votre défi", defi_spins_left: "Il vous reste {n} tirage(s).", defi_no_more: "Plus de tirage : c'est ce défi qu'il faut relever !", defi_accept: "Défi accepté !", defi_validate: "Valider ce défi pour le groupe", defi_group_label: "Le défi du groupe", defi_group_subtitle: "Le défi a déjà été tiré pour cette sortie — le voici !", share_copy_link: "Copier le lien", share_link_copied: "Lien copié !",
     share_whatsapp: "WhatsApp", share_facebook: "Facebook", share_message: "Regarde cette sortie sur Orée : {title}",
     report_btn: "Signaler", report_user_btn: "Signaler cet utilisateur", pm_title: "Messages", pm_subtitle: "Vos échanges avec les personnes rencontrées lors de sorties.", pm_requests: "Demandes de contact", pm_conversations: "Conversations", pm_search_placeholder: "Rechercher un membre par pseudo…", pm_search_empty: "Aucun membre trouvé avec ce pseudo.", pm_quota_atteint: "Vous avez atteint la limite de 3 demandes par jour. Réessayez demain.", pm_age_bloque: "Pour la sécurité des plus jeunes, les échanges se font entre personnes de la même tranche d'âge.", pm_ask: "Demander à discuter", pm_asked: "Demande envoyée", pm_quota_reste: "{n} demande(s) restante(s) aujourd'hui", pm_retry: "Refaire une demande", pm_empty: "Aucune conversation pour le moment.", pm_no_message: "Aucun message", pm_wants_to_talk: "Souhaite discuter avec vous", pm_accept: "Accepter", pm_refuse: "Refuser", pm_block: "Bloquer", pm_block_confirm: "Confirmer ?", pm_write_to: "Envoyer un message", pm_need_shared_outing: "Pour la sécurité des plus jeunes, les échanges se font entre personnes de la même tranche d'âge.", pm_waiting_accept: "Votre demande est en attente. Vous pourrez écrire dès qu'elle sera acceptée.", pm_wait_reply: "En attente de la réponse de votre correspondant.", pm_refused: "Cette demande a été refusée.", pm_open_error: "Impossible d'ouvrir la discussion pour le moment. Réessayez dans un instant.", pm_refused_section: "Demandes refusées", pm_blocked_section: "Personnes bloquées", pm_blocked_note: "Cette personne ne peut plus vous écrire", pm_unblock: "Débloquer", pm_refused_by_me: "Vous avez refusé cette demande", pm_refused_by_them: "Votre demande a été refusée", pm_change_mind: "Finalement, accepter la discussion", pm_send_error: "Impossible d'envoyer ce message.", tab_messages: "Messages", orga_btn: "Écrire à l'organisateur", orga_btn_owner: "Questions reçues", orga_title: "Contacter l'organisateur", orga_title_owner: "Questions sur votre sortie", orga_badge: "organisateur", orga_placeholder: "Poser une question sur la sortie…", orga_reply_placeholder: "Répondre…", orga_empty: "Une question sur cette sortie ? Écrivez à l'organisateur.", orga_empty_owner: "Aucune question pour le moment.", orga_closed: "Les échanges sont clos (5h après le début de la sortie).", report_user_title: "Signaler cet utilisateur", report_title: "Signaler cette annonce",
@@ -131,7 +131,7 @@ const TRANSLATIONS = {
     stats_monthly_chart: "Sorties créées par mois (12 derniers mois)",
     stats_outings_created: "sortie(s) créée(s)",
     deleted_account_name: "Compte supprimé",
-    admin_sub_stats: "Statistiques", admin_sub_users: "Utilisateurs", admin_sub_reports: "Signalements", admin_reports_title: "Signalements reçus", admin_reports_empty: "Aucun signalement dans cette catégorie.", admin_reports_pending: "{n} signalement(s) en attente de traitement", admin_report_reporter: "Signalé par", admin_report_reported: "Personne visée", admin_report_activity: "Sortie concernée", admin_report_note: "Note interne", admin_report_note_ph: "Ex. Contacté par téléphone le 12/03, avertissement donné.", admin_report_add_note: "Ajouter une note", admin_report_escalate: "Transmis aux autorités", admin_report_reopen: "Remettre en attente", report_status_escalated: "Transmis",
+    admin_sub_stats: "Statistiques", admin_sub_users: "Utilisateurs", admin_sub_reports: "Signalements", admin_reports_title: "Signalements reçus", admin_photos_title: "Photos à vérifier", admin_photos_note: "Ces photos ont passé le filtre automatique mais méritent un coup d'œil.", admin_photo_ok: "Valider", admin_photo_remove: "Supprimer", admin_reports_empty: "Aucun signalement dans cette catégorie.", admin_reports_pending: "{n} signalement(s) en attente de traitement", admin_report_reporter: "Signalé par", admin_report_reported: "Personne visée", admin_report_activity: "Sortie concernée", admin_report_note: "Note interne", admin_report_note_ph: "Ex. Contacté par téléphone le 12/03, avertissement donné.", admin_report_add_note: "Ajouter une note", admin_report_escalate: "Transmis aux autorités", admin_report_reopen: "Remettre en attente", report_status_escalated: "Transmis",
     admin_users_title: "Tous les utilisateurs", admin_no_users: "Aucun utilisateur pour le moment.", admin_no_commune: "Aucune commune",
     admin_search_placeholder: "Rechercher par nom ou email…", admin_no_results: "Aucun utilisateur ne correspond.",
     admin_block: "Bloquer", admin_unblock: "Débloquer", admin_delete: "Supprimer",
@@ -3647,7 +3647,9 @@ function ProfileEdit({ onBack,  joinedCount, validated, displayName, email, nbEn
     e.target.value = "";
     if (!file) return;
     setCoverUploading(true);
-    await onUploadCover(file);
+    setUploadError("");
+    const res = await onUploadCover(file);
+    if (res && res.error) setUploadError(res.error);
     setCoverUploading(false);
   };
 
@@ -5833,10 +5835,10 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
           {/* Places enfants : uniquement sur les sorties Famille */}
           {item.placesEnfants != null && item.placesEnfants > 0 && (
             <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
-              <Baby size={14} color={(item.inscritsEnfants || 0) >= item.placesEnfants ? COLORS.coral : COLORS.sun} />
+              <Baby size={14} color={(item.inscritsEnfants || 0) >= item.placesEnfants ? COLORS.coral : COLORS.grape} />
               <span style={{
                 fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
-                color: (item.inscritsEnfants || 0) >= item.placesEnfants ? COLORS.coral : COLORS.ink,
+                color: (item.inscritsEnfants || 0) >= item.placesEnfants ? COLORS.coral : shade(COLORS.grape, -22),
               }}>
                 {t("card_kids_left", { n: Math.max(0, item.placesEnfants - (item.inscritsEnfants || 0)) })}
               </span>
@@ -5988,7 +5990,7 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
           <span style={{
             display: "inline-flex", alignItems: "center", gap: 2,
             fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 10,
-            color: (item.inscritsEnfants || 0) >= item.placesEnfants ? COLORS.coral : COLORS.sun,
+            color: (item.inscritsEnfants || 0) >= item.placesEnfants ? COLORS.coral : shade(COLORS.grape, -22),
           }}>
             <Baby size={10} /> {item.inscritsEnfants || 0}/{item.placesEnfants}
           </span>
@@ -7501,7 +7503,7 @@ function UsersAdminSection({ allProfiles, currentUserId, onToggleBan, onDelete, 
 // classer, bloquer la personne visée ou marquer comme transmis aux autorités.
 // Traitement des signalements : une ligne compacte par signalement, dépliable au clic
 // pour consulter le détail complet et agir (traiter, transmettre, bloquer, annoter).
-function ReportsAdminSection({ reports, onHandle, onToggleBan, onViewProfile }) {
+function ReportsAdminSection({ reports, onHandle, onToggleBan, onViewProfile, photos = [], onTraiterPhoto }) {
   const [filter, setFilter] = useState("pending");
   const [openId, setOpenId] = useState(null);
   const [noteFor, setNoteFor] = useState(null);
@@ -7548,6 +7550,61 @@ function ReportsAdminSection({ reports, onHandle, onToggleBan, onViewProfile }) 
 
   return (
     <div>
+      {photos.length > 0 && (
+        <>
+          <SectionLabel>{t("admin_photos_title")}</SectionLabel>
+          <div style={{
+            background: "#FFF4DD", border: `2px solid ${COLORS.sun}`, borderRadius: 14,
+            padding: "10px 14px", marginBottom: 12, fontFamily: "Nunito, sans-serif",
+            fontWeight: 700, fontSize: 12.5, color: COLORS.ink, lineHeight: 1.5,
+          }}>
+            {t("admin_photos_note")}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 }}>
+            {photos.map((p) => (
+              <div key={p.id} style={{
+                background: "#fff", border: "2px solid #F0EADB", borderRadius: 16,
+                padding: 12, display: "flex", alignItems: "center", gap: 12,
+              }}>
+                <img
+                  src={p.image_url} alt=""
+                  style={{ width: 56, height: 56, borderRadius: 12, objectFit: "cover", flexShrink: 0, background: "#EDEAF4" }}
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <button
+                    onClick={() => onViewProfile(p.user_id)}
+                    style={{ background: "none", border: "none", padding: 0, cursor: "pointer", textAlign: "left",
+                      fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 13.5, color: COLORS.ink, textDecoration: "underline" }}
+                  >
+                    {p.display_name}
+                  </button>
+                  <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 11, color: "#9A93AF" }}>
+                    {p.type === "cover" ? t("profile_cover_label") : t("change_photo")}
+                    {p.score_sexual != null ? ` · ${Math.round(p.score_sexual * 100)}%` : ""}
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                  <button onClick={() => onTraiterPhoto(p.id, "ok", p.user_id, p.type)} style={{
+                    background: "transparent", border: `2px solid ${COLORS.grass}`, borderRadius: 10,
+                    padding: "6px 11px", color: COLORS.grass, cursor: "pointer",
+                    fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5,
+                  }}>
+                    {t("admin_photo_ok")}
+                  </button>
+                  <button onClick={() => onTraiterPhoto(p.id, "removed", p.user_id, p.type)} style={{
+                    background: COLORS.coral, border: "none", borderRadius: 10,
+                    padding: "6px 11px", color: "#fff", cursor: "pointer",
+                    fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5,
+                  }}>
+                    {t("admin_photo_remove")}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
       <SectionLabel>{t("admin_reports_title")}</SectionLabel>
       {pendingCount > 0 && (
         <div style={{
@@ -7731,7 +7788,7 @@ function ReportsAdminSection({ reports, onHandle, onToggleBan, onViewProfile }) 
   );
 }
 
-function AdminArea({ allProfiles, allActivitiesRaw, currentUserId, onToggleBan, onDelete, onSetCommune, reportsDetailed, onHandleReport, onViewProfile }) {
+function AdminArea({ allProfiles, allActivitiesRaw, currentUserId, onToggleBan, onDelete, onSetCommune, reportsDetailed, onHandleReport, onViewProfile, photos, onTraiterPhoto }) {
   const [sub, setSub] = useState("stats");
   const pendingReports = (reportsDetailed || []).filter((r) => r.status === "pending").length;
   const subTabs = [
@@ -7762,7 +7819,7 @@ function AdminArea({ allProfiles, allActivitiesRaw, currentUserId, onToggleBan, 
         <UsersAdminSection allProfiles={allProfiles} currentUserId={currentUserId} onToggleBan={onToggleBan} onDelete={onDelete} onSetCommune={onSetCommune} />
       )}
       {sub === "reports" && (
-        <ReportsAdminSection reports={reportsDetailed || []} onHandle={onHandleReport} onToggleBan={onToggleBan} onViewProfile={onViewProfile} />
+        <ReportsAdminSection reports={reportsDetailed || []} onHandle={onHandleReport} onToggleBan={onToggleBan} onViewProfile={onViewProfile} photos={photos || []} onTraiterPhoto={onTraiterPhoto} />
       )}
     </div>
   );
@@ -7866,6 +7923,7 @@ function usePikapikaData() {
   const [reports, setReports] = useState([]);
   const [allProfiles, setAllProfiles] = useState([]);
   const [reportsDetailed, setReportsDetailed] = useState([]);
+  const [photosAVerifier, setPhotosAVerifier] = useState([]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -8017,6 +8075,8 @@ function usePikapikaData() {
         .then(({ data }) => setAllProfiles(data || []));
       supabase.from("reports_detailed").select("*").order("created_at", { ascending: false })
         .then(({ data }) => setReportsDetailed(data || []));
+      supabase.from("photo_reviews_detailed").select("*").eq("status", "pending").order("created_at", { ascending: false })
+        .then(({ data }) => setPhotosAVerifier(data || []));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, profile.role, profile.isAdmin]);
@@ -8300,6 +8360,29 @@ function usePikapikaData() {
     setProfile((p) => ({ ...p, [field]: clean }));
   };
 
+  // Vérifie qu'une photo ne contient pas de contenu inapproprié.
+  // L'analyse tourne côté serveur (fonction Supabase), jamais dans le navigateur.
+  const verifierPhoto = async (imageUrl, type) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("moderer-image", {
+        body: { imageUrl },
+      });
+      if (error) { console.error("Vérification photo indisponible :", error); return { autorise: true }; }
+
+      // Cas limite : la photo passe, mais on la signale pour un contrôle humain
+      if (data?.aVerifier && user) {
+        await supabase.from("photo_reviews").insert({
+          user_id: user.id, image_url: imageUrl, type,
+          score_sexual: data?.scores?.sexual ?? null,
+        });
+      }
+      return data || { autorise: true };
+    } catch (e) {
+      console.error("Erreur vérification photo :", e);
+      return { autorise: true };   // on ne bloque pas en cas de panne technique
+    }
+  };
+
   const uploadAvatar = async (file) => {
     if (!user) return { error: t("auth_error_generic") };
     try {
@@ -8312,6 +8395,13 @@ function usePikapikaData() {
       const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
       // on ajoute un paramètre unique pour forcer le rechargement de l'image (le nom de fichier ne change pas)
       const avatarUrl = `${pub.publicUrl}?t=${Date.now()}`;
+
+      const verif = await verifierPhoto(avatarUrl, "avatar");
+      if (!verif.autorise) {
+        await supabase.storage.from("avatars").remove([path]);
+        return { error: t("photo_refusee") };
+      }
+
       await supabase.from("profiles").update({ avatar_url: avatarUrl }).eq("id", user.id);
       setProfile((p) => ({ ...p, avatarUrl }));
       return { error: null };
@@ -8334,6 +8424,13 @@ function usePikapikaData() {
       if (uploadErr) throw uploadErr;
       const { data: pub } = supabase.storage.from("covers").getPublicUrl(path);
       const coverUrl = `${pub.publicUrl}?t=${Date.now()}`;
+
+      const verif = await verifierPhoto(coverUrl, "cover");
+      if (!verif.autorise) {
+        await supabase.storage.from("covers").remove([path]);
+        return { error: t("photo_refusee") };
+      }
+
       await supabase.from("profiles").update({ cover_url: coverUrl }).eq("id", user.id);
       setProfile((p) => ({ ...p, coverUrl }));
       return { error: null };
@@ -8361,6 +8458,19 @@ function usePikapikaData() {
   };
 
   // ---------- Actions réservées à la mairie ----------
+  // Traitement d'une photo signalée automatiquement : on valide ou on supprime
+  const traiterPhoto = async (reviewId, action, userId, type) => {
+    if (!user) return;
+    if (action === "removed") {
+      const bucket = type === "cover" ? "covers" : "avatars";
+      await supabase.storage.from(bucket).remove([`${userId}.jpg`]);
+      const colonne = type === "cover" ? { cover_url: null } : { avatar_url: null };
+      await supabase.from("profiles").update(colonne).eq("id", userId);
+    }
+    await supabase.from("photo_reviews").update({ status: action }).eq("id", reviewId);
+    setPhotosAVerifier((l) => l.filter((p) => p.id !== reviewId));
+  };
+
   // Traitement d'un signalement par l'administrateur : changement de statut + note interne
   const handleReport = async (reportId, status, note) => {
     if (!user) return false;
@@ -8439,7 +8549,7 @@ function usePikapikaData() {
     uploadAvatar,
     uploadCover, removeCover,
     submitReport,
-    reports, reportsDetailed, allProfiles, allActivitiesRaw: rows,
+    reports, reportsDetailed, photosAVerifier, traiterPhoto, allProfiles, allActivitiesRaw: rows,
     toggleBanUser, deleteUserData, setUserCommune,
     resolveReport, handleReport,
     signOut: () => supabase.auth.signOut(),
@@ -8587,7 +8697,7 @@ export default function RecreApp() {
   const TABS_ALL = [
     { id: "ados", label: t("tab_ados"), icon: Gamepad2, kidsOnly: true, authRequired: true },
     { id: "adultes", label: t("tab_adultes"), icon: Coffee },
-    { id: "explorer", label: t("tab_enfants"), icon: Compass, kidsOnly: true, authRequired: true },
+    { id: "explorer", label: t("tab_enfants"), icon: Baby, kidsOnly: true, authRequired: true },
     { id: "aine", label: t("tab_aine"), icon: Flower2 },
     { id: "asso", label: t("tab_associations"), icon: Landmark, authRequired: true },
     { id: "mairie", label: t("tab_mairie"), icon: ShieldCheck, mairieOnly: true },
@@ -8895,6 +9005,8 @@ export default function RecreApp() {
             reportsDetailed={pika.reportsDetailed}
             onHandleReport={pika.handleReport}
             onViewProfile={openUserProfile}
+            photos={pika.photosAVerifier}
+            onTraiterPhoto={pika.traiterPhoto}
           />
         )}
         {tab === "profil" && (
