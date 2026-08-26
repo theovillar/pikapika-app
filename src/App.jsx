@@ -4536,7 +4536,7 @@ function LocationFilter({ location, onChange }) {
             )}
 
             {query.trim().length > 0 && query.trim() !== (location?.nom || "") && (
-              <div style={{ maxHeight: 220, overflowY: "auto" }}>
+              <div data-modale-contenu style={{ maxHeight: 220, overflowY: "auto" }}>
                 {deptSuggestions.map((d) => (
                   <CityOption key={d.code} label={`${d.nom} (${d.code})`} sub={t("loc_dept")}
                     active={location?.type === "departement" && location.code === d.code}
@@ -4707,7 +4707,7 @@ function LegalModal({ doc, onClose }) {
   };
   const current = docs[doc];
   return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 10000, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+    <div onClick={onClose} data-modale style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 10000, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
       <div onClick={(e) => e.stopPropagation()} style={{
         background: COLORS.cloud, width: "100%", maxWidth: 560, borderRadius: "26px 26px 0 0",
         padding: "24px 24px calc(24px + env(safe-area-inset-bottom))", maxHeight: "calc(100dvh - 100px)", overflowY: "auto", boxSizing: "border-box", position: "relative",
@@ -5049,7 +5049,7 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
   );
 
   return (
-    <div onClick={onClose} style={{
+    <div onClick={onClose} data-modale style={{
       position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999,
       display: "flex", alignItems: "flex-end", justifyContent: "center",
     }}>
@@ -5078,7 +5078,7 @@ function ChatModal({ activity, currentUserId, onClose, onViewProfile }) {
         </div>
 
         {/* Messages */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "14px 16px" }}>
+        <div data-modale-contenu style={{ flex: 1, overflowY: "auto", padding: "14px 16px" }}>
           {loading && (
             <p style={{ textAlign: "center", fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#9A93AF" }}>
               {t("auth_loading")}
@@ -5276,7 +5276,7 @@ function DefiWheel({ onClose, existingDefi, onSaveDefi }) {
   const sectorColors = [COLORS.sun, COLORS.coral, COLORS.grass, COLORS.sky, COLORS.grape, COLORS.sun, COLORS.coral, COLORS.grass];
 
   return (
-    <div onClick={onClose} style={{
+    <div onClick={onClose} data-modale style={{
       position: "fixed", inset: 0, background: "rgba(43,37,96,0.55)", zIndex: 9999,
       display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
     }}>
@@ -5458,7 +5458,7 @@ function ContactOrganisateurModal({ activity, currentUserId, onClose, onViewProf
     LANG === "fr" ? "fr-FR" : LANG === "es" ? "es-ES" : "en-US", { hour: "2-digit", minute: "2-digit" });
 
   return (
-    <div onClick={onClose} style={{
+    <div onClick={onClose} data-modale style={{
       position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999,
       display: "flex", alignItems: "flex-end", justifyContent: "center",
     }}>
@@ -5485,7 +5485,7 @@ function ContactOrganisateurModal({ activity, currentUserId, onClose, onViewProf
           </button>
         </div>
 
-        <div style={{ flex: 1, overflowY: "auto", padding: "14px 16px" }}>
+        <div data-modale-contenu style={{ flex: 1, overflowY: "auto", padding: "14px 16px" }}>
           {loading && (
             <p style={{ textAlign: "center", fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#9A93AF" }}>
               {t("auth_loading")}
@@ -5665,7 +5665,7 @@ function ShareModal({ item, onClose }) {
   const iconWrap = (bg) => ({ width: 32, height: 32, borderRadius: "50%", background: bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 });
 
   return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+    <div onClick={onClose} data-modale style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <div onClick={(e) => e.stopPropagation()} style={{ background: COLORS.cloud, borderRadius: 22, padding: 22, width: "100%", maxWidth: 360, position: "relative" }}>
         <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "#fff", border: "none", borderRadius: "50%", width: 30, height: 30, cursor: "pointer" }}>
           <X size={15} color={COLORS.ink} />
@@ -5720,7 +5720,7 @@ function ReportModal({ onClose, onSubmit, isUser = false }) {
   };
 
   return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+    <div onClick={onClose} data-modale style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
       <div onClick={(e) => e.stopPropagation()} style={{ background: COLORS.cloud, borderRadius: 22, padding: 22, width: "100%", maxWidth: 380, position: "relative" }}>
         <button onClick={onClose} style={{ position: "absolute", top: 14, right: 14, background: "#fff", border: "none", borderRadius: "50%", width: 30, height: 30, cursor: "pointer" }}>
           <X size={15} color={COLORS.ink} />
@@ -5776,7 +5776,7 @@ function DetailModal({ activity, onClose, joined, onJoin, onReport, onViewProfil
   return (
     <div
       onClick={onClose}
-      style={{
+      data-modale style={{
         position: "fixed", inset: 0, background: "rgba(43,37,96,0.45)",
         display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 9999,
       }}
@@ -6560,8 +6560,8 @@ function CommunityDetailModal({ item, categories, onClose, joined, onJoin, joinL
   const isToday = (item.offsetDays ?? 0) === 0;
 
   return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.45)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 9999 }}>
-      <div onClick={(e) => e.stopPropagation()} style={{ background: COLORS.cloud, width: "100%", maxWidth: 520, borderRadius: "26px 26px 0 0", padding: "24px 24px calc(24px + env(safe-area-inset-bottom))", maxHeight: "calc(100dvh - 100px)", overflowY: "auto", boxSizing: "border-box" }}>
+    <div onClick={onClose} data-modale style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.45)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 9999 }}>
+      <div onClick={(e) => e.stopPropagation()} data-modale-contenu style={{ background: COLORS.cloud, width: "100%", maxWidth: 520, borderRadius: "26px 26px 0 0", padding: "24px 24px calc(24px + env(safe-area-inset-bottom))", maxHeight: "calc(100dvh - 100px)", overflowY: "auto", boxSizing: "border-box" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
           <div style={{
             width: 56, height: 56, borderRadius: "50%", border: `2px dashed ${meta.color}`,
@@ -7013,7 +7013,7 @@ function EditActivityModal({ activity, space, categories, onClose, onSave }) {
   };
 
   return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+    <div onClick={onClose} data-modale style={{ position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
       <div onClick={(e) => e.stopPropagation()} style={{
         background: COLORS.cloud, width: "100%", maxWidth: 560, borderRadius: "26px 26px 0 0",
         padding: "24px 24px calc(24px + env(safe-area-inset-bottom))", maxHeight: "calc(100dvh - 100px)", overflowY: "auto", boxSizing: "border-box", position: "relative",
@@ -7625,7 +7625,7 @@ function AuthScreen({ onClose, onOpenLegal }) {
 
   if (onClose) {
     return (
-      <div onClick={onClose} style={{
+      <div onClick={onClose} data-modale style={{
         position: "fixed", inset: 0, background: "rgba(43,37,96,0.5)", zIndex: 9999,
         display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
       }}>
@@ -9100,6 +9100,16 @@ export default function RecreApp() {
   const [defiOpen, setDefiOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [orgaOpen, setOrgaOpen] = useState(false);
+
+  // Tant qu'une fenêtre est ouverte, on fige la page derrière : sinon le geste
+  // de défilement la fait bouger dès qu'on atteint le bout de la fenêtre.
+  const modaleOuverte = !!(selectedId || selectedCommunity || chatOpen || orgaOpen
+    || defiOpen || viewingUserId || reportTarget || legalDoc || shareTarget);
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.classList.toggle("pika-modale-ouverte", modaleOuverte);
+    return () => document.body.classList.remove("pika-modale-ouverte");
+  }, [modaleOuverte]);
   const [editingProfile, setEditingProfile] = useState(false);
 
   // Compteurs toutes catégories confondues, pour la fiche profil
@@ -9870,6 +9880,12 @@ export default function RecreApp() {
         * { box-sizing: border-box; }
         input:focus, textarea:focus { border-color: ${COLORS.sky} !important; }
         ::placeholder { color: #C7C0AE; }
+
+        /* Sur iPhone, arriver en bout de course dans une fenêtre fait défiler la
+           page qui est derrière. Cette règle enferme le geste dans la fenêtre. */
+        [data-modale] { overscroll-behavior: contain; touch-action: pan-y; }
+        [data-modale-contenu] { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+        body.pika-modale-ouverte { overflow: hidden; }
         /* Safari sur iPhone zoome automatiquement sur tout champ dont la police
            fait moins de 16px : on impose ce minimum pour éviter le déréglage. */
         @media (max-width: 900px) {
