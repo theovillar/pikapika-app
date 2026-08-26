@@ -2767,9 +2767,31 @@ function PlainAvatar({ participant, color, size, overlap = false, genderMode = f
 // Affiche les participants sous forme de pastilles qui se chevauchent.
 // Approche entièrement CSS : plus de mesure du conteneur (source de débordements),
 // c'est le navigateur qui gère la largeur disponible.
+// Nombre de bulles affichables selon la largeur de l'écran. Calculé en
+// JavaScript et non masqué en CSS : le compteur "+N" reste ainsi exact.
+function useNbBulles(max) {
+  const calcul = () => {
+    if (typeof window === "undefined") return max;
+    const l = window.innerWidth;
+    if (l <= 380) return Math.min(max, 2);
+    if (l <= 460) return Math.min(max, 3);
+    if (l <= 700) return Math.min(max, 4);
+    return max;
+  };
+  const [nb, setNb] = useState(calcul);
+  useEffect(() => {
+    const maj = () => setNb(calcul());
+    window.addEventListener("resize", maj);
+    return () => window.removeEventListener("resize", maj);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [max]);
+  return nb;
+}
+
 function PlainParticipantsRow({ names, color, max = 5, genderMode = false, onViewProfile }) {
+  const nbBulles = useNbBulles(max);
   if (!names || names.length === 0) return null;
-  const shown = names.slice(0, max);
+  const shown = names.slice(0, nbBulles);
   const extra = names.length - shown.length;
 
   return (
@@ -3143,7 +3165,7 @@ function Explorer({ activities, favorites, onToggleFav, onOpen, location }) {
         />
       </div>
 
-      <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 6, marginBottom: 10 }}>
+      <div className="pika-chips" style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 6, marginBottom: 10 }}>
         <Chip active={cat === "tous"} onClick={() => setCat("tous")} color={COLORS.ink}>
           {t("chip_all")}
         </Chip>
@@ -6546,7 +6568,7 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
         />
       </div>
 
-      <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 6, marginBottom: 10 }}>
+      <div className="pika-chips" style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 6, marginBottom: 10 }}>
         {/* Se positionner à une date : petit bouton discret, le calendrier natif s'ouvre au clic */}
         <div style={{ position: "relative", flexShrink: 0 }}>
           <Chip active={!!fromDate} onClick={() => dateInputRef.current?.showPicker?.() ?? dateInputRef.current?.focus()} color={COLORS.sky}>
@@ -8082,7 +8104,7 @@ function ReportsAdminSection({ reports, onHandle, onToggleBan, onViewProfile, ph
         </div>
       )}
 
-      <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 6, marginBottom: 14 }}>
+      <div className="pika-chips" style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 6, marginBottom: 14 }}>
         {FILTERS.map((f) => (
           <Chip key={f.id} active={filter === f.id} onClick={() => setFilter(f.id)} color={COLORS.ink}>
             {f.label}
@@ -10003,6 +10025,21 @@ export default function RecreApp() {
         input:focus, textarea:focus { border-color: ${COLORS.sky} !important; }
         ::placeholder { color: #C7C0AE; }
 
+        /* Rangées de filtres : elles défilent horizontalement. Sur mobile, elles
+           s'étendent jusqu'aux bords de l'écran, ce qui évite l'effet de coupure
+           au milieu d'une pastille. La barre de défilement reste masquée. */
+        .pika-chips { scrollbar-width: none; -ms-overflow-style: none; scroll-padding: 0 16px; }
+        .pika-chips::-webkit-scrollbar { display: none; }
+        .pika-chips > * { scroll-snap-align: start; }
+        @media (max-width: 700px) {
+          .pika-chips {
+            margin-left: -20px; margin-right: -20px;
+            padding-left: 20px; padding-right: 20px;
+            -webkit-mask-image: linear-gradient(to right, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+          }
+        }
+
         /* Sur iPhone, arriver en bout de course dans une fenêtre fait défiler la
            page qui est derrière. Cette règle enferme le geste dans la fenêtre. */
         [data-modale] { overscroll-behavior: contain; touch-action: pan-y; }
@@ -11001,12 +11038,8 @@ export default function RecreApp() {
         /* Sur écran étroit, on masque les dernières pastilles plutôt que de déborder.
            Le compteur "+N" reste toujours visible, lui. */
         @media (max-width: 560px) {
-          .pika-avatars > *:nth-child(n+4):not(:last-child) { display: none !important; }
           /* Sur écran étroit, le badge cède la place aux informations essentielles */
           .pika-badge-structure { display: none !important; }
-        }
-        @media (max-width: 420px) {
-          .pika-avatars > *:nth-child(n+3):not(:last-child) { display: none !important; }
         }
         @media (max-width: 460px) {
           /* Sur petit écran : le bouton flottant devient rond (icône seule) et les
