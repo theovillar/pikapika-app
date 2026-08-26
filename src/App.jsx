@@ -9114,7 +9114,11 @@ export default function RecreApp() {
   return (
     <div
       className={SAISON === "ete" ? "oree-fond-eau" : undefined}
-      style={{ background: COLORS.cloud, minHeight: "100dvh", fontFamily: "Nunito, sans-serif" }}
+      style={{
+        // backgroundColor (et non background) : la forme abrégée effacerait
+        // l'image de fond des ondulations définie par la classe CSS.
+        backgroundColor: COLORS.cloud, minHeight: "100dvh", fontFamily: "Nunito, sans-serif",
+      }}
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;700;800&display=swap');
@@ -9634,9 +9638,16 @@ export default function RecreApp() {
         }
         .oree-fond-eau {
           background-image:
-            repeating-linear-gradient(102deg, rgba(46,196,182,0.13) 0 12px, transparent 12px 30px),
-            repeating-linear-gradient(78deg, rgba(11,79,90,0.08) 0 9px, transparent 9px 26px);
+            repeating-linear-gradient(102deg, rgba(46,196,182,0.22) 0 14px, transparent 14px 34px),
+            repeating-linear-gradient(78deg, rgba(11,79,90,0.13) 0 10px, transparent 10px 28px);
           animation: oree-flot 22s linear infinite;
+          background-attachment: fixed;
+        }
+        /* L'en-tête laisse voir l'eau qui dérive dessous */
+        .oree-fond-eau .pika-header-sticky {
+          background-color: rgba(228, 246, 245, 0.82);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
         }
         /* Respect du réglage système : pas d'animation pour qui la désactive */
         @media (prefers-reduced-motion: reduce) {
