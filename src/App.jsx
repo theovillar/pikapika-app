@@ -9115,11 +9115,28 @@ export default function RecreApp() {
     <div
       className={SAISON === "ete" ? "oree-fond-eau" : undefined}
       style={{
-        // backgroundColor (et non background) : la forme abrégée effacerait
-        // l'image de fond des ondulations définie par la classe CSS.
         backgroundColor: COLORS.cloud, minHeight: "100dvh", fontFamily: "Nunito, sans-serif",
+        position: "relative",
       }}
     >
+      {/* Vagues d'été : purement décoratives, elles ne captent aucun clic */}
+      {SAISON === "ete" && (
+        <svg
+          className="oree-vagues" viewBox="0 0 800 210" preserveAspectRatio="none"
+          aria-hidden="true" focusable="false"
+        >
+          <g className="oree-vague-a">
+            <path d="M0 130 Q100 112 200 130 T400 130 T600 130 T800 130 T1000 130 T1200 130 V210 H0 Z" fill="#2EC4B6" opacity="0.16" />
+          </g>
+          <g className="oree-vague-b">
+            <path d="M0 152 Q140 134 280 152 T560 152 T840 152 T1120 152 V210 H0 Z" fill="#2EC4B6" opacity="0.2" />
+          </g>
+          <g className="oree-vague-c">
+            <path d="M0 172 Q75 158 150 172 T300 172 T450 172 T600 172 T750 172 T900 172 T1050 172 V210 H0 Z" fill="#0B7C8C" opacity="0.14" />
+          </g>
+        </svg>
+      )}
+
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;700;800&display=swap');
         * { box-sizing: border-box; }
@@ -9241,6 +9258,7 @@ export default function RecreApp() {
 
       <div style={{
         maxWidth: 960, margin: "0 auto", padding: "18px 20px 110px",
+        position: "relative", zIndex: 1,
       }}>
         {tab === "explorer" && parentValidated && (
           <CommunityExplorer
@@ -9632,26 +9650,27 @@ export default function RecreApp() {
         /* Ondulations d'eau : uniquement l'été, sur le fond de la page.
            Deux trames de reflets qui dérivent lentement en sens contraire,
            entièrement en CSS (aucune image à télécharger). */
-        @keyframes oree-flot {
-          0%   { background-position: 0 0, 0 0; }
-          100% { background-position: 120px 0, -90px 0; }
+        /* Trois vagues qui glissent à des vitesses différentes : leur décalage
+           progressif donne l'impression d'une surface qui ondule. */
+        @keyframes oree-vague-a { from { transform: translateX(0); }    to { transform: translateX(-400px); } }
+        @keyframes oree-vague-b { from { transform: translateX(0); }    to { transform: translateX(-560px); } }
+        @keyframes oree-vague-c { from { transform: translateX(-300px); } to { transform: translateX(0); } }
+        .oree-vagues {
+          position: fixed; left: 0; right: 0; bottom: 0; height: 42vh;
+          pointer-events: none; z-index: 0;
         }
-        .oree-fond-eau {
-          background-image:
-            repeating-linear-gradient(102deg, rgba(46,196,182,0.22) 0 14px, transparent 14px 34px),
-            repeating-linear-gradient(78deg, rgba(11,79,90,0.13) 0 10px, transparent 10px 28px);
-          animation: oree-flot 22s linear infinite;
-          background-attachment: fixed;
-        }
-        /* L'en-tête laisse voir l'eau qui dérive dessous */
+        .oree-vague-a { animation: oree-vague-a 18s linear infinite; }
+        .oree-vague-b { animation: oree-vague-b 13s linear infinite; }
+        .oree-vague-c { animation: oree-vague-c 24s linear infinite; }
+        /* L'en-tête laisse voir l'eau qui bouge dessous */
         .oree-fond-eau .pika-header-sticky {
-          background-color: rgba(228, 246, 245, 0.82);
+          background-color: rgba(228, 246, 245, 0.85);
           backdrop-filter: blur(6px);
           -webkit-backdrop-filter: blur(6px);
         }
         /* Respect du réglage système : pas d'animation pour qui la désactive */
         @media (prefers-reduced-motion: reduce) {
-          .oree-fond-eau { animation: none; }
+          .oree-vague-a, .oree-vague-b, .oree-vague-c { animation: none; }
         }
 
         /* Sur écran étroit, on masque les dernières pastilles plutôt que de déborder.
