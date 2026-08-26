@@ -3131,6 +3131,7 @@ function CommunePicker({ value, onSelect, placeholder }) {
 }
 
 function AddressInput({ value, onChange, placeholder }) {
+  const problematique = !!value && contientInsulte(value);
   const [suggestions, setSuggestions] = useState([]);
   const [open, setOpen] = useState(false);
 
@@ -3188,6 +3189,14 @@ function AddressInput({ value, onChange, placeholder }) {
             </button>
           ))}
         </div>
+      )}
+      {problematique && (
+        <p style={{
+          fontFamily: "Nunito, sans-serif", fontSize: 11.5, fontWeight: 700,
+          color: COLORS.coral, margin: "4px 0 0", lineHeight: 1.4,
+        }}>
+          {t("champ_insulte")}
+        </p>
       )}
     </div>
   );
@@ -3259,6 +3268,8 @@ function IdeesSorties({ categorie, onChoisir }) {
 function ChampAvecEmoji({ valeur, onChange, placeholder, multiligne = false, rows = 3, style = {} }) {
   const [palette, setPalette] = useState(false);
   const champRef = useRef(null);
+  // Signalé dès la saisie plutôt qu'à la publication : plus clair pour la personne
+  const problematique = !!valeur && contientInsulte(valeur);
 
   const inserer = (emoji) => {
     const el = champRef.current;
@@ -3279,6 +3290,8 @@ function ChampAvecEmoji({ valeur, onChange, placeholder, multiligne = false, row
     width: "100%", boxSizing: "border-box",
     paddingRight: 42,          // place pour le bouton
     marginBottom: 0,
+    borderColor: problematique ? COLORS.coral : (style.borderColor || undefined),
+    border: problematique ? `2px solid ${COLORS.coral}` : style.border,
   };
 
   return (
@@ -3306,6 +3319,15 @@ function ChampAvecEmoji({ valeur, onChange, placeholder, multiligne = false, row
       >
         🙂
       </button>
+
+      {problematique && (
+        <p style={{
+          fontFamily: "Nunito, sans-serif", fontSize: 11.5, fontWeight: 700,
+          color: COLORS.coral, margin: "4px 0 0", lineHeight: 1.4,
+        }}>
+          {t("champ_insulte")}
+        </p>
+      )}
 
       {palette && (
         <div style={{
@@ -3452,7 +3474,7 @@ function CreateActivity({ onCreate }) {
         </div>
         <div>
           <label style={label}>{t("label_signe")}</label>
-          <input style={inputStyle} placeholder={t("placeholder_signe")} value={form.signeDistinctif} onChange={set("signeDistinctif")} />
+          <ChampAvecEmoji style={inputStyle} placeholder={t("placeholder_signe")} valeur={form.signeDistinctif} onChange={(v) => setForm({ ...form, signeDistinctif: v })} />
         </div>
         <div>
           <label style={label}>{t("label_description")}</label>
@@ -3748,6 +3770,7 @@ function ProfileTextField({ label, placeholder, value, onSave, multiline = false
   const [input, setInput] = useState(value || "");
   const [saved, setSaved] = useState(false);
   const [erreur, setErreur] = useState("");
+  const problematique = !!input && contientInsulte(input);
 
   const save = async () => {
     const res = await onSave(input);
@@ -3777,14 +3800,14 @@ function ProfileTextField({ label, placeholder, value, onSave, multiline = false
           placeholder={placeholder} style={{ ...baseStyle, marginBottom: 6 }}
         />
       )}
-      {erreur && (
+      {(erreur || problematique) && (
         <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: COLORS.coral, fontWeight: 700, margin: "0 0 6px", lineHeight: 1.4 }}>
-          {erreur}
+          {erreur || t("champ_insulte")}
         </p>
       )}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 11, color: "#B7AF98" }}>{input.length}/{maxLength}</span>
-        <PillButton color={saved ? COLORS.grass : COLORS.ink} textColor="#fff" onClick={save} style={{ padding: "7px 14px", fontSize: 12.5 }}>
+        <PillButton color={problematique ? "#D8D2C2" : (saved ? COLORS.grass : COLORS.ink)} textColor="#fff" onClick={() => !problematique && save()} style={{ padding: "7px 14px", fontSize: 12.5 }}>
           {saved ? <Check size={14} /> : t("btn_enregistrer")}
         </PillButton>
       </div>
@@ -6795,7 +6818,7 @@ function CreateMeetup({ categories, onCreate }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
             <label style={label}>{t("label_info")}</label>
-            <input style={inputStyle} placeholder={t("placeholder_info")} value={form.info} onChange={set("info")} />
+            <ChampAvecEmoji style={inputStyle} placeholder={t("placeholder_info")} valeur={form.info} onChange={(v) => setForm({ ...form, info: v })} />
           </div>
           <div>
             <label style={label}>{t("label_places")}</label>
@@ -6813,7 +6836,7 @@ function CreateMeetup({ categories, onCreate }) {
         </div>
         <div>
           <label style={label}>{t("label_signe")}</label>
-          <input style={inputStyle} placeholder={t("placeholder_signe")} value={form.signeDistinctif} onChange={set("signeDistinctif")} />
+          <ChampAvecEmoji style={inputStyle} placeholder={t("placeholder_signe")} valeur={form.signeDistinctif} onChange={(v) => setForm({ ...form, signeDistinctif: v })} />
         </div>
         <div>
           <label style={label}>{t("label_description")}</label>
@@ -6959,7 +6982,7 @@ function EditActivityModal({ activity, space, categories, onClose, onSave }) {
           ) : (
             <div>
               <label style={label}>{t("label_info")}</label>
-              <input style={inputStyle} placeholder={t("placeholder_info")} value={form.info} onChange={set("info")} />
+              <ChampAvecEmoji style={inputStyle} placeholder={t("placeholder_info")} valeur={form.info} onChange={(v) => setForm({ ...form, info: v })} />
             </div>
           )}
 
@@ -6978,7 +7001,7 @@ function EditActivityModal({ activity, space, categories, onClose, onSave }) {
 
           <div>
             <label style={label}>{t("label_signe")}</label>
-            <input style={inputStyle} placeholder={t("placeholder_signe")} value={form.signeDistinctif} onChange={set("signeDistinctif")} />
+            <ChampAvecEmoji style={inputStyle} placeholder={t("placeholder_signe")} valeur={form.signeDistinctif} onChange={(v) => setForm({ ...form, signeDistinctif: v })} />
           </div>
 
           <div>
