@@ -503,6 +503,79 @@ const CATEGORIES = [
 
 const catMeta = (id) => CATEGORIES.find((c) => c.id === id) || CATEGORIES[0];
 
+// Filtre anti-insultes du chat : masque les termes injurieux sans bloquer la conversation.
+// La détection ignore accents, majuscules et lettres répétées (ex. "coooon").
+// Ce filtre reste volontairement simple : il décourage les débordements sans prétendre
+// à l'exhaustivité — le signalement reste le vrai recours en cas de problème.
+const MOTS_INTERDITS = [
+  // Insultes dirigées contre une personne
+  "connard", "connasse", "conard", "salope", "salaud", "encule", "enculee", "enfoire",
+  "batard", "batarde", "pute", "putain", "putes", "pd", "tapette", "tarlouze",
+  "ordure", "raclure", "charogne", "sous merde", "branleur", "branleuse",
+  "couillon", "trouduc", "trou du cul", "pouffiasse", "poufiasse", "grognasse",
+  "boloss", "bouffon", "clochard", "parasite", "fils de pute", "fils de chien",
+  "nique", "niquer", "niques", "casse toi", "degage",
+  // Insultes racistes, homophobes ou transphobes
+  "negre", "bougnoule", "youpin", "bicot", "raton", "chinetoque",
+  "gouine", "trav", "tafiole",
+  // Abréviations courantes
+  "fdp", "ntm", "tg",
+  // Mépris et rabaissement
+  "debile", "cretin", "abruti", "attarde", "mongol", "trisomique",
+  "cheh", "creve", "ferme ta gueule", "ta gueule", "va te faire",
+];
+
+// Grossièretés sans cible : tolérées dans les discussions entre membres,
+// mais pas dans les annonces publiques, qui restent visibles par tous et durablement.
+const MOTS_ANNONCES_SEULEMENT = [
+  "merde", "merdique", "couille", "couilles", "chier", "chiant", "chiante",
+  "bordel", "putin", "foutre", "connerie", "conneries", "cul",
+];
+
+// Ignore accents, majuscules, chiffres substitués et lettres répétées :
+// « C0NNAAARD » se ramène à « conard ».
+function normaliserPourFiltre(texte) {
+  return texte
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[0@]/g, "o").replace(/[1!|]/g, "i").replace(/3/g, "e")
+    .replace(/5/g, "s").replace(/4/g, "a").replace(/7/g, "t")
+    .replace(/(.)\1+/g, "$1")
+    .replace(/[^a-z\s]/g, " ");
+}
+
+// Cherche une liste de mots dans un texte
+function chercheMots(texte, liste) {
+  const n = normaliserPourFiltre(texte);
+  return liste.some((mot) => {
+    const m = normaliserPourFiltre(mot).trim();
+    if (m.includes(" ")) return n.includes(m);
+    return new RegExp(`\\b${m}\\b`).test(n);
+  });
+}
+
+// Insultes visant une personne : bloquées partout dans l'application
+function contientInsulte(texte) {
+  return chercheMots(texte, MOTS_INTERDITS);
+}
+
+// Contrôle renforcé pour les annonces publiques : les grossièretés banales
+// y sont aussi refusées, alors qu'elles passent dans les discussions privées.
+function contientInsulteAnnonce(texte) {
+  return chercheMots(texte, MOTS_INTERDITS) || chercheMots(texte, MOTS_ANNONCES_SEULEMENT);
+}
+
+function masquerInsultes(texte) {
+  let sortie = texte;
+  MOTS_INTERDITS.forEach((mot) => {
+    if (mot.includes(" ")) return;
+    const re = new RegExp(`\\b${mot.split("").join("[\\W_]*")}\\w*`, "gi");
+    sortie = sortie.replace(re, (m) => "•".repeat(Math.max(3, m.length)));
+  });
+  return sortie;
+}
+
+
 // Les associations, commerçants et mairies publient au nom d'une structure :
 // on affiche leur nom d'établissement plutôt qu'un prénom.
 const estStructure = (role) => role === "association" || role === "commercant" || role === "mairie";
@@ -3131,7 +3204,7 @@ function CommunePicker({ value, onSelect, placeholder }) {
 }
 
 function AddressInput({ value, onChange, placeholder }) {
-  const problematique = !!value && contientInsulte(value);
+  const problematique = !!value && contientInsulteAnnonce(value);
   const [suggestions, setSuggestions] = useState([]);
   const [open, setOpen] = useState(false);
 
@@ -3265,11 +3338,12 @@ function IdeesSorties({ categorie, onChoisir }) {
 
 // Champ de saisie avec un petit bouton emoji à droite : permet d'insérer un
 // emoji directement dans le texte, à l'endroit du curseur.
-function ChampAvecEmoji({ valeur, onChange, placeholder, multiligne = false, rows = 3, style = {} }) {
+function ChampAvecEmoji({ valeur, onChange, placeholder, multiligne = false, rows = 3, style = {}, annonce = false }) {
   const [palette, setPalette] = useState(false);
   const champRef = useRef(null);
   // Signalé dès la saisie plutôt qu'à la publication : plus clair pour la personne
-  const problematique = !!valeur && contientInsulte(valeur);
+  const verifier = annonce ? contientInsulteAnnonce : contientInsulte;
+  const problematique = !!valeur && verifier(valeur);
 
   const inserer = (emoji) => {
     const el = champRef.current;
@@ -3366,7 +3440,7 @@ function CreateActivity({ onCreate }) {
     if (!form.title || !form.lieu || !form.dateStr) return;
     // Tous les textes libres passent par le filtre : titre, lieu, description, signe distinctif
     const champs = [form.title, form.lieu, form.desc, form.signeDistinctif];
-    if (champs.some((v) => v && contientInsulte(v))) {
+    if (champs.some((v) => v && contientInsulteAnnonce(v))) {
       setErreur(t("create_insulte"));
       setTimeout(() => setErreur(""), 5000);
       return;
@@ -3402,6 +3476,7 @@ function CreateActivity({ onCreate }) {
         <div>
           <label style={label}>{t("label_titre")}</label>
           <ChampAvecEmoji
+            annonce
             style={inputStyle}
             placeholder={t("placeholder_titre")}
             valeur={form.title}
@@ -3474,11 +3549,12 @@ function CreateActivity({ onCreate }) {
         </div>
         <div>
           <label style={label}>{t("label_signe")}</label>
-          <ChampAvecEmoji style={inputStyle} placeholder={t("placeholder_signe")} valeur={form.signeDistinctif} onChange={(v) => setForm({ ...form, signeDistinctif: v })} />
+          <ChampAvecEmoji annonce style={inputStyle} placeholder={t("placeholder_signe")} valeur={form.signeDistinctif} onChange={(v) => setForm({ ...form, signeDistinctif: v })} />
         </div>
         <div>
           <label style={label}>{t("label_description")}</label>
           <ChampAvecEmoji
+            annonce
             multiligne rows={3}
             style={{ ...inputStyle, resize: "vertical", fontFamily: "Nunito, sans-serif" }}
             placeholder={t("placeholder_description")}
@@ -4822,47 +4898,6 @@ const MAX_SPINS = 2;
 // Chat de groupe entre participants d'une même sortie : sert surtout à se retrouver
 // le jour J. L'écriture se ferme automatiquement 5h après le début de la sortie,
 // mais l'historique reste consultable.
-// Filtre anti-insultes du chat : masque les termes injurieux sans bloquer la conversation.
-// La détection ignore accents, majuscules et lettres répétées (ex. "coooon").
-// Ce filtre reste volontairement simple : il décourage les débordements sans prétendre
-// à l'exhaustivité — le signalement reste le vrai recours en cas de problème.
-const MOTS_INTERDITS = [
-  "connard", "connasse", "conard", "salope", "salaud", "encule", "enculee", "enfoire",
-  "batard", "batarde", "pute", "putain", "putes", "pd", "tapette", "tarlouze",
-  "negre", "bougnoule", "youpin", "bicot", "raton", "chinetoque",
-  "fdp", "ntm", "tg", "tafiole", "gouine", "trav",
-  "debile", "cretin", "abruti", "attarde", "mongol", "trisomique",
-  "cheh", "creve", "ferme ta gueule", "ta gueule", "va te faire",
-];
-
-function normaliserPourFiltre(texte) {
-  return texte
-    .toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")   // enlève les accents
-    .replace(/[0@]/g, "o").replace(/[1!|]/g, "i").replace(/3/g, "e")
-    .replace(/5/g, "s").replace(/4/g, "a").replace(/7/g, "t")
-    .replace(/(.)\1+/g, "$1")                             // "coooonnard" -> "conard"
-    .replace(/[^a-z\s]/g, " ");
-}
-
-function contientInsulte(texte) {
-  const n = normaliserPourFiltre(texte);
-  return MOTS_INTERDITS.some((mot) => {
-    const m = normaliserPourFiltre(mot).trim();
-    if (m.includes(" ")) return n.includes(m);
-    return new RegExp(`\\b${m}\\b`).test(n);
-  });
-}
-
-function masquerInsultes(texte) {
-  let sortie = texte;
-  MOTS_INTERDITS.forEach((mot) => {
-    if (mot.includes(" ")) return;
-    const re = new RegExp(`\\b${mot.split("").join("[\\W_]*")}\\w*`, "gi");
-    sortie = sortie.replace(re, (m) => "•".repeat(Math.max(3, m.length)));
-  });
-  return sortie;
-}
 
 // Sélection d'émojis utiles pour se retrouver et échanger simplement
 // Palette d'émojis, organisée par familles pour retrouver facilement une émotion.
@@ -6739,7 +6774,7 @@ function CreateMeetup({ categories, onCreate }) {
   const submit = () => {
     if (!form.title || !form.lieu || !form.dateStr) return;
     const champs = [form.title, form.lieu, form.desc, form.info, form.signeDistinctif];
-    if (champs.some((v) => v && contientInsulte(v))) {
+    if (champs.some((v) => v && contientInsulteAnnonce(v))) {
       setErreur(t("create_insulte"));
       setTimeout(() => setErreur(""), 5000);
       return;
@@ -6775,6 +6810,7 @@ function CreateMeetup({ categories, onCreate }) {
         <div>
           <label style={label}>{t("label_titre")}</label>
           <ChampAvecEmoji
+            annonce
             style={inputStyle}
             placeholder={t("placeholder_titre")}
             valeur={form.title}
@@ -6818,7 +6854,7 @@ function CreateMeetup({ categories, onCreate }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
             <label style={label}>{t("label_info")}</label>
-            <ChampAvecEmoji style={inputStyle} placeholder={t("placeholder_info")} valeur={form.info} onChange={(v) => setForm({ ...form, info: v })} />
+            <ChampAvecEmoji annonce style={inputStyle} placeholder={t("placeholder_info")} valeur={form.info} onChange={(v) => setForm({ ...form, info: v })} />
           </div>
           <div>
             <label style={label}>{t("label_places")}</label>
@@ -6836,11 +6872,12 @@ function CreateMeetup({ categories, onCreate }) {
         </div>
         <div>
           <label style={label}>{t("label_signe")}</label>
-          <ChampAvecEmoji style={inputStyle} placeholder={t("placeholder_signe")} valeur={form.signeDistinctif} onChange={(v) => setForm({ ...form, signeDistinctif: v })} />
+          <ChampAvecEmoji annonce style={inputStyle} placeholder={t("placeholder_signe")} valeur={form.signeDistinctif} onChange={(v) => setForm({ ...form, signeDistinctif: v })} />
         </div>
         <div>
           <label style={label}>{t("label_description")}</label>
           <ChampAvecEmoji
+            annonce
             multiligne rows={3}
             style={{ ...inputStyle, resize: "vertical", fontFamily: "Nunito, sans-serif" }}
             placeholder={t("placeholder_description")}
@@ -6942,7 +6979,7 @@ function EditActivityModal({ activity, space, categories, onClose, onSave }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div>
             <label style={label}>{t("label_titre")}</label>
-            <ChampAvecEmoji style={inputStyle} valeur={form.title} onChange={(v) => setForm({ ...form, title: v })} />
+            <ChampAvecEmoji annonce style={inputStyle} valeur={form.title} onChange={(v) => setForm({ ...form, title: v })} />
           </div>
 
           <div>
@@ -6982,7 +7019,7 @@ function EditActivityModal({ activity, space, categories, onClose, onSave }) {
           ) : (
             <div>
               <label style={label}>{t("label_info")}</label>
-              <ChampAvecEmoji style={inputStyle} placeholder={t("placeholder_info")} valeur={form.info} onChange={(v) => setForm({ ...form, info: v })} />
+              <ChampAvecEmoji annonce style={inputStyle} placeholder={t("placeholder_info")} valeur={form.info} onChange={(v) => setForm({ ...form, info: v })} />
             </div>
           )}
 
@@ -7001,12 +7038,13 @@ function EditActivityModal({ activity, space, categories, onClose, onSave }) {
 
           <div>
             <label style={label}>{t("label_signe")}</label>
-            <ChampAvecEmoji style={inputStyle} placeholder={t("placeholder_signe")} valeur={form.signeDistinctif} onChange={(v) => setForm({ ...form, signeDistinctif: v })} />
+            <ChampAvecEmoji annonce style={inputStyle} placeholder={t("placeholder_signe")} valeur={form.signeDistinctif} onChange={(v) => setForm({ ...form, signeDistinctif: v })} />
           </div>
 
           <div>
             <label style={label}>{t("label_description")}</label>
             <ChampAvecEmoji
+            annonce
               multiligne rows={3}
               style={{ ...inputStyle, resize: "vertical", fontFamily: "Nunito, sans-serif" }}
               placeholder={t("placeholder_description")}
