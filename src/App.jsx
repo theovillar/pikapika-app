@@ -9177,7 +9177,7 @@ export default function RecreApp() {
       {/* Printemps : soleil, fleurs et abeilles — purement décoratif */}
       {SAISON === "printemps" && (
         <div className="oree-printemps" aria-hidden="true">
-          <div className="oree-nuage" style={{ left: "29.7%", top: "36.8vh", width: 176, height: 108, opacity: 0.9, animationDuration: "12.6s", animationDelay: "-7.5s" }}>
+          <div className="oree-nuage" style={{ left: "29.7%", top: "36.8vh", width: 176, height: 108, opacity: 0.62, animationDuration: "12.6s", animationDelay: "-7.5s" }}>
               <span style={{ left: 0, top: 24, width: 62, height: 62 }} />
               <span style={{ left: 35, top: 11, width: 84, height: 84 }} />
               <span style={{ left: 84, top: 27, width: 59, height: 59 }} />
@@ -9185,7 +9185,7 @@ export default function RecreApp() {
               <span style={{ left: 65, top: 43, width: 49, height: 49 }} />
               <span style={{ left: 116, top: 35, width: 46, height: 46 }} />
           </div>
-          <div className="oree-nuage" style={{ left: "58.1%", top: "28.2vh", width: 160, height: 98, opacity: 0.81, animationDuration: "13.5s", animationDelay: "-4.0s" }}>
+          <div className="oree-nuage" style={{ left: "58.1%", top: "28.2vh", width: 160, height: 98, opacity: 0.58, animationDuration: "13.5s", animationDelay: "-4.0s" }}>
               <span style={{ left: 0, top: 22, width: 57, height: 57 }} />
               <span style={{ left: 32, top: 10, width: 76, height: 76 }} />
               <span style={{ left: 76, top: 25, width: 54, height: 54 }} />
@@ -9193,7 +9193,7 @@ export default function RecreApp() {
               <span style={{ left: 59, top: 39, width: 44, height: 44 }} />
               <span style={{ left: 106, top: 32, width: 42, height: 42 }} />
           </div>
-          <div className="oree-nuage" style={{ left: "46.7%", top: "36.4vh", width: 117, height: 72, opacity: 0.91, animationDuration: "9.7s", animationDelay: "-9.4s" }}>
+          <div className="oree-nuage" style={{ left: "46.7%", top: "36.4vh", width: 117, height: 72, opacity: 0.6, animationDuration: "9.7s", animationDelay: "-9.4s" }}>
               <span style={{ left: 0, top: 16, width: 41, height: 41 }} />
               <span style={{ left: 23, top: 7, width: 56, height: 56 }} />
               <span style={{ left: 56, top: 18, width: 40, height: 40 }} />
@@ -9201,37 +9201,13 @@ export default function RecreApp() {
               <span style={{ left: 43, top: 29, width: 32, height: 32 }} />
               <span style={{ left: 77, top: 23, width: 31, height: 31 }} />
           </div>
-          <div className="oree-nuage" style={{ left: "26.1%", top: "9.0vh", width: 133, height: 82, opacity: 0.91, animationDuration: "10.1s", animationDelay: "-3.4s" }}>
+          <div className="oree-nuage" style={{ left: "26.1%", top: "9.0vh", width: 133, height: 82, opacity: 0.6, animationDuration: "10.1s", animationDelay: "-3.4s" }}>
               <span style={{ left: 0, top: 18, width: 47, height: 47 }} />
               <span style={{ left: 27, top: 8, width: 63, height: 63 }} />
               <span style={{ left: 63, top: 20, width: 45, height: 45 }} />
               <span style={{ left: 14, top: 31, width: 41, height: 41 }} />
               <span style={{ left: 49, top: 33, width: 37, height: 37 }} />
               <span style={{ left: 88, top: 27, width: 35, height: 35 }} />
-          </div>
-          <div className="oree-nuage" style={{ left: "1.7%", top: "20.1vh", width: 107, height: 66, opacity: 0.94, animationDuration: "11.9s", animationDelay: "-6.6s" }}>
-              <span style={{ left: 0, top: 15, width: 38, height: 38 }} />
-              <span style={{ left: 21, top: 7, width: 51, height: 51 }} />
-              <span style={{ left: 51, top: 16, width: 36, height: 36 }} />
-              <span style={{ left: 11, top: 25, width: 33, height: 33 }} />
-              <span style={{ left: 39, top: 26, width: 30, height: 30 }} />
-              <span style={{ left: 71, top: 21, width: 28, height: 28 }} />
-          </div>
-          <div className="oree-nuage" style={{ left: "34.3%", top: "43.2vh", width: 147, height: 90, opacity: 0.79, animationDuration: "13.6s", animationDelay: "-3.2s" }}>
-              <span style={{ left: 0, top: 20, width: 52, height: 52 }} />
-              <span style={{ left: 29, top: 9, width: 70, height: 70 }} />
-              <span style={{ left: 70, top: 23, width: 50, height: 50 }} />
-              <span style={{ left: 16, top: 34, width: 45, height: 45 }} />
-              <span style={{ left: 54, top: 36, width: 41, height: 41 }} />
-              <span style={{ left: 97, top: 29, width: 38, height: 38 }} />
-          </div>
-          <div className="oree-nuage" style={{ left: "67.7%", top: "33.1vh", width: 188, height: 116, opacity: 0.75, animationDuration: "15.8s", animationDelay: "-7.3s" }}>
-              <span style={{ left: 0, top: 26, width: 67, height: 67 }} />
-              <span style={{ left: 38, top: 12, width: 90, height: 90 }} />
-              <span style={{ left: 90, top: 29, width: 64, height: 64 }} />
-              <span style={{ left: 20, top: 44, width: 58, height: 58 }} />
-              <span style={{ left: 70, top: 46, width: 52, height: 52 }} />
-              <span style={{ left: 125, top: 38, width: 49, height: 49 }} />
           </div>
 
           <div className="oree-pluie">
@@ -9397,7 +9373,40 @@ export default function RecreApp() {
             <span className="oree-corolle" style={{ bottom: 55, width: 4, height: 4, background: "#FFF3C4" }} />
           </span>
 
-          <span className="oree-abeille" style={{ top: "33.0vh", left: "-6vw", animationDuration: "34.6s", animationDelay: "-18.4s" }}>
+          {/* Petit arbre, avec un oiseau posé sur une branche */}
+          <div className="oree-arbre">
+            <svg width="150" height="200" viewBox="0 0 150 200" aria-hidden="true">
+              <path d="M70 200 L70 118 Q70 108 66 100 L58 84" stroke="#8B6239" strokeWidth="9" fill="none" strokeLinecap="round" />
+              <path d="M70 132 Q78 122 90 112" stroke="#8B6239" strokeWidth="6" fill="none" strokeLinecap="round" />
+              <path d="M70 148 Q60 140 48 134" stroke="#8B6239" strokeWidth="5" fill="none" strokeLinecap="round" />
+
+              <g className="oree-feuillage">
+                <ellipse cx="62" cy="72" rx="42" ry="34" fill="#7FC97F" opacity="0.9" />
+                <ellipse cx="94" cy="88" rx="30" ry="25" fill="#8FD48F" opacity="0.85" />
+                <ellipse cx="38" cy="92" rx="27" ry="22" fill="#6FB96F" opacity="0.88" />
+                <ellipse cx="74" cy="46" rx="28" ry="23" fill="#93D993" opacity="0.85" />
+
+                <circle cx="46" cy="58" r="4" fill="#F7A9C4" opacity="0.9" />
+                <circle cx="82" cy="64" r="3.5" fill="#FFD9E8" opacity="0.9" />
+                <circle cx="60" cy="38" r="3.5" fill="#F7A9C4" opacity="0.85" />
+                <circle cx="100" cy="82" r="3" fill="#FFD9E8" opacity="0.85" />
+                <circle cx="34" cy="86" r="3.5" fill="#F7A9C4" opacity="0.85" />
+              </g>
+            </svg>
+
+            <span className="oree-oiseau" style={{ left: 84, top: 104 }}>
+              <svg width="30" height="24" viewBox="0 0 34 26" aria-hidden="true">
+                <path d="M10 10 Q4 12 2 11 Q7 13 10 12 Z" fill="#5C7A99" />
+                <ellipse cx="18" cy="10" rx="8" ry="4.2" fill="#4A6A8A" />
+                <path d="M14 8 Q9 3 4 6 Q10 9 15 10 Z" fill="#5C7A99" />
+                <circle cx="25" cy="8" r="3.4" fill="#4A6A8A" />
+                <path d="M28 8 L33 9.5 L28 10.5 Z" fill="#E8A33D" />
+                <circle cx="26" cy="7.2" r="0.9" fill="#1E2E3E" />
+              </svg>
+            </span>
+          </div>
+
+          <span className="oree-abeille" style={{ left: "18.4%", bottom: "78px", animationDelay: "-1.7s" }}>
             <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true">
               <ellipse cx="8" cy="5" rx="6" ry="3.5" fill="rgba(255,255,255,0.75)" />
               <ellipse cx="14" cy="5" rx="5" ry="3" fill="rgba(255,255,255,0.6)" />
@@ -9407,17 +9416,7 @@ export default function RecreApp() {
               <circle cx="17.4" cy="9.4" r="2.6" fill="#4A3B1E" />
             </svg>
           </span>
-          <span className="oree-abeille" style={{ top: "33.0vh", left: "-6vw", animationDuration: "38.9s", animationDelay: "-10.9s" }}>
-            <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true">
-              <ellipse cx="8" cy="5" rx="6" ry="3.5" fill="rgba(255,255,255,0.75)" />
-              <ellipse cx="14" cy="5" rx="5" ry="3" fill="rgba(255,255,255,0.6)" />
-              <ellipse cx="11" cy="10" rx="6.5" ry="4.5" fill="#F5C518" />
-              <rect x="8" y="6" width="2.4" height="8.6" rx="1" fill="#4A3B1E" />
-              <rect x="12.5" y="6.6" width="2.2" height="7.6" rx="1" fill="#4A3B1E" />
-              <circle cx="17.4" cy="9.4" r="2.6" fill="#4A3B1E" />
-            </svg>
-          </span>
-          <span className="oree-abeille" style={{ top: "31.7vh", left: "-6vw", animationDuration: "30.4s", animationDelay: "-3.5s" }}>
+          <span className="oree-abeille" style={{ left: "63.2%", bottom: "96px", animationDelay: "-3.4s" }}>
             <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true">
               <ellipse cx="8" cy="5" rx="6" ry="3.5" fill="rgba(255,255,255,0.75)" />
               <ellipse cx="14" cy="5" rx="5" ry="3" fill="rgba(255,255,255,0.6)" />
@@ -10401,7 +10400,7 @@ export default function RecreApp() {
           animation-iteration-count: infinite;
         }
         .oree-nuage span {
-          position: absolute; border-radius: 50%; background: #fff;
+          position: absolute; border-radius: 50%; background: rgba(255,255,255,0.75);
         }
         @keyframes oree-flotte-nuage {
           0%, 100% { transform: translate(0, 0)      scale(1); }
@@ -10450,7 +10449,6 @@ export default function RecreApp() {
         }
         .oree-soleil-rayons {
           position: absolute; inset: 0;
-          animation: oree-rayons 42s linear infinite;
         }
         .oree-rayon {
           position: absolute; left: 50%; top: 50%;
@@ -10462,7 +10460,6 @@ export default function RecreApp() {
           0%, 100% { opacity: .65; transform: scale(1); }
           50%      { opacity: 1;   transform: scale(1.08); }
         }
-        @keyframes oree-rayons { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         /* Fleurs : elles poussent depuis le bas puis se balancent au vent */
         .oree-fleur {
@@ -10484,21 +10481,36 @@ export default function RecreApp() {
           60%      { transform: scaleY(0.98) rotate(-3deg); }
         }
 
-        /* Abeilles : trajectoire irrégulière, comme un vol de butinage */
+        /* Arbre : son feuillage frémit doucement, comme sous une brise */
+        .oree-arbre {
+          position: absolute; bottom: 0; left: 6%;
+          /* Repère pour l'oiseau posé sur une branche */
+          line-height: 0;
+        }
+        .oree-feuillage {
+          transform-origin: 50% 100%;
+          animation: oree-brise 8s ease-in-out infinite;
+        }
+        @keyframes oree-brise {
+          0%, 100% { transform: rotate(0deg)    scaleX(1); }
+          35%      { transform: rotate(1.4deg)  scaleX(1.02); }
+          70%      { transform: rotate(-1.2deg) scaleX(0.99); }
+        }
+
+        /* Oiseau posé sur une branche : il ne fait que frémir */
+        .oree-oiseau {
+          position: absolute;
+          animation: oree-frémit 5s ease-in-out infinite;
+        }
+
+        /* Abeilles posées sur une fleur : elles ne font que frémir légèrement */
         .oree-abeille {
           position: absolute;
-          animation-name: oree-butine;
-          animation-timing-function: ease-in-out;
-          animation-iteration-count: infinite;
+          animation: oree-frémit 4s ease-in-out infinite;
         }
-        @keyframes oree-butine {
-          0%   { transform: translate(0, 0)         rotate(0deg); }
-          15%  { transform: translate(14vw, -7vh)   rotate(12deg); }
-          32%  { transform: translate(28vw, 4vh)    rotate(-8deg); }
-          50%  { transform: translate(46vw, -10vh)  rotate(10deg); }
-          68%  { transform: translate(62vw, 2vh)    rotate(-6deg); }
-          85%  { transform: translate(78vw, -6vh)   rotate(8deg); }
-          100% { transform: translate(96vw, 0)      rotate(0deg); }
+        @keyframes oree-frémit {
+          0%, 100% { transform: translate(0, 0)     rotate(-2deg); }
+          50%      { transform: translate(1px, -2px) rotate(2deg); }
         }
 
         /* Feuilles d'automne : elles tombent en virevoltant, chacune sur sa
@@ -10575,7 +10587,8 @@ export default function RecreApp() {
           .oree-vague-a, .oree-vague-b, .oree-vague-c, .oree-poisson, .oree-bulle,
           .oree-flocon, .oree-cristal, .oree-lueur, .oree-flamme, .oree-feuille,
           .oree-soleil-halo, .oree-soleil-rayons, .oree-fleur, .oree-abeille,
-          .oree-nuage, .oree-pluie, .oree-goutte { animation: none; }
+          .oree-nuage, .oree-pluie, .oree-goutte,
+          .oree-oiseau, .oree-arbre, .oree-feuillage { animation: none; }
         }
 
         /* Sur écran étroit, on masque les dernières pastilles plutôt que de déborder.
