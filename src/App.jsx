@@ -485,13 +485,15 @@ function saisonCourante(date = new Date()) {
   return "hiver";                           // décembre → février
 }
 
-// Saison forcée pour les essais : mémorisée dans le navigateur, ou passée
-// dans l'adresse (?saison=hiver). Sans rien, on suit le calendrier.
+// Saison forcée pour les essais, via l'adresse : ?saison=hiver
+// Sans paramètre, on suit le calendrier.
 function saisonChoisie() {
-  if (typeof window === "undefined") return saisonCourante();
-  const params = new URLSearchParams(window.location.search);
-  const forcee = params.get("saison") || window.localStorage?.getItem("oree_saison");
-  return PALETTES[forcee] ? forcee : saisonCourante();
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const forcee = params.get("saison");
+    if (forcee && PALETTES[forcee]) return forcee;
+  } catch (e) { /* environnement sans adresse : on garde le calendrier */ }
+  return saisonCourante();
 }
 
 const SAISON = saisonChoisie();
@@ -8192,15 +8194,19 @@ function AdminArea({ allProfiles, allActivitiesRaw, currentUserId, onToggleBan, 
           { id: "automne", label: t("saison_automne") },
           { id: "hiver", label: t("saison_hiver") },
         ].map((s) => {
-          const actuelle = (typeof window !== "undefined" && window.localStorage?.getItem("oree_saison")) || "auto";
+          let actuelle = "auto";
+          try {
+            actuelle = new URLSearchParams(window.location.search).get("saison") || "auto";
+          } catch (e) { /* rien */ }
           const active = actuelle === s.id;
           return (
             <button
               key={s.id}
               onClick={() => {
-                if (s.id === "auto") window.localStorage?.removeItem("oree_saison");
-                else window.localStorage?.setItem("oree_saison", s.id);
-                window.location.reload();
+                const url = new URL(window.location.href);
+                if (s.id === "auto") url.searchParams.delete("saison");
+                else url.searchParams.set("saison", s.id);
+                window.location.href = url.toString();
               }}
               style={{
                 border: `2px solid ${active ? COLORS.ink : "#F0EADB"}`,
