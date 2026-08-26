@@ -454,14 +454,42 @@ function t(key, vars) {
 }
 
 // ---------- Design tokens ----------
+// ---------- Palettes saisonnières ----------
+// L'appli change d'ambiance au fil de l'année : verts tendres au printemps,
+// turquoise l'été, cuivre à l'automne, bleu givré l'hiver.
+// Le rose et le bleu du genre ne changent jamais : ils servent de repère constant.
+const PALETTES = {
+  printemps: {
+    ink: "#2F5E3A", cloud: "#F2F9F1", sun: "#F5D76E", sky: "#7FC0D8",
+    grass: "#7FC97F", coral: "#F07C7C", grape: "#A87BC7",
+  },
+  ete: {
+    ink: "#0B4F5A", cloud: "#E4F6F5", sun: "#F4D35E", sky: "#2EC4B6",
+    grass: "#3FB89E", coral: "#FF8C61", grape: "#7C8FD4",
+  },
+  automne: {
+    ink: "#5C3A1E", cloud: "#FDF4EA", sun: "#F2B872", sky: "#7FA8A3",
+    grass: "#8C9A5B", coral: "#E07A3F", grape: "#A8763E",
+  },
+  hiver: {
+    ink: "#33405C", cloud: "#F2F4F8", sun: "#D4A574", sky: "#5B7BA8",
+    grass: "#6E9B8E", coral: "#C97B84", grape: "#9B6B8F",
+  },
+};
+
+function saisonCourante(date = new Date()) {
+  const m = date.getMonth();               // 0 = janvier
+  if (m >= 2 && m <= 4) return "printemps"; // mars → mai
+  if (m >= 5 && m <= 7) return "ete";       // juin → août
+  if (m >= 8 && m <= 10) return "automne";  // septembre → novembre
+  return "hiver";                           // décembre → février
+}
+
+const SAISON = saisonCourante();
+
 const COLORS = {
-  ink: "#2B2560",
-  cloud: "#FFF9EE",
-  sun: "#FFC93C",
-  sky: "#4EC5F1",
-  grass: "#6BCB77",
-  coral: "#FF6F61",
-  grape: "#8B5FBF",
+  ...PALETTES[SAISON],
+  // Repères de genre : identiques toute l'année
   boy: "#4EC5F1",
   girl: "#FF8FB1",
 };
@@ -9084,7 +9112,10 @@ export default function RecreApp() {
   }
 
   return (
-    <div style={{ background: COLORS.cloud, minHeight: "100dvh", fontFamily: "Nunito, sans-serif" }}>
+    <div
+      className={SAISON === "ete" ? "oree-fond-eau" : undefined}
+      style={{ background: COLORS.cloud, minHeight: "100dvh", fontFamily: "Nunito, sans-serif" }}
+    >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;700;800&display=swap');
         * { box-sizing: border-box; }
@@ -9594,6 +9625,24 @@ export default function RecreApp() {
           .desktop-nav { display: flex !important; }
           .mobile-nav { display: none !important; }
         }
+        /* Ondulations d'eau : uniquement l'été, sur le fond de la page.
+           Deux trames de reflets qui dérivent lentement en sens contraire,
+           entièrement en CSS (aucune image à télécharger). */
+        @keyframes oree-flot {
+          0%   { background-position: 0 0, 0 0; }
+          100% { background-position: 120px 0, -90px 0; }
+        }
+        .oree-fond-eau {
+          background-image:
+            repeating-linear-gradient(102deg, rgba(46,196,182,0.13) 0 12px, transparent 12px 30px),
+            repeating-linear-gradient(78deg, rgba(11,79,90,0.08) 0 9px, transparent 9px 26px);
+          animation: oree-flot 22s linear infinite;
+        }
+        /* Respect du réglage système : pas d'animation pour qui la désactive */
+        @media (prefers-reduced-motion: reduce) {
+          .oree-fond-eau { animation: none; }
+        }
+
         /* Sur écran étroit, on masque les dernières pastilles plutôt que de déborder.
            Le compteur "+N" reste toujours visible, lui. */
         @media (max-width: 560px) {
