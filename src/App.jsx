@@ -131,7 +131,7 @@ const TRANSLATIONS = {
     stats_monthly_chart: "Sorties créées par mois (12 derniers mois)",
     stats_outings_created: "sortie(s) créée(s)",
     deleted_account_name: "Compte supprimé",
-    admin_sub_stats: "Statistiques", admin_sub_users: "Utilisateurs", admin_sub_reports: "Signalements", admin_reports_title: "Signalements reçus", admin_photos_title: "Photos à vérifier", admin_photos_note: "Ces photos ont passé le filtre automatique mais méritent un coup d'œil.", admin_photo_ok: "Valider", admin_photo_remove: "Supprimer", admin_reports_empty: "Aucun signalement dans cette catégorie.", admin_reports_pending: "{n} signalement(s) en attente de traitement", admin_report_reporter: "Signalé par", admin_report_reported: "Personne visée", admin_report_activity: "Sortie concernée", admin_report_note: "Note interne", admin_report_note_ph: "Ex. Contacté par téléphone le 12/03, avertissement donné.", admin_report_add_note: "Ajouter une note", admin_report_escalate: "Transmis aux autorités", admin_report_reopen: "Remettre en attente", report_status_escalated: "Transmis",
+    admin_sub_stats: "Statistiques", admin_saison: "Ambiance", saison_auto: "Automatique", saison_printemps: "Printemps", saison_ete: "Été", saison_automne: "Automne", saison_hiver: "Hiver", admin_sub_users: "Utilisateurs", admin_sub_reports: "Signalements", admin_reports_title: "Signalements reçus", admin_photos_title: "Photos à vérifier", admin_photos_note: "Ces photos ont passé le filtre automatique mais méritent un coup d'œil.", admin_photo_ok: "Valider", admin_photo_remove: "Supprimer", admin_reports_empty: "Aucun signalement dans cette catégorie.", admin_reports_pending: "{n} signalement(s) en attente de traitement", admin_report_reporter: "Signalé par", admin_report_reported: "Personne visée", admin_report_activity: "Sortie concernée", admin_report_note: "Note interne", admin_report_note_ph: "Ex. Contacté par téléphone le 12/03, avertissement donné.", admin_report_add_note: "Ajouter une note", admin_report_escalate: "Transmis aux autorités", admin_report_reopen: "Remettre en attente", report_status_escalated: "Transmis",
     admin_users_title: "Tous les utilisateurs", admin_no_users: "Aucun utilisateur pour le moment.", admin_no_commune: "Aucune commune",
     admin_search_placeholder: "Rechercher par nom ou email…", admin_no_results: "Aucun utilisateur ne correspond.",
     admin_block: "Bloquer", admin_unblock: "Débloquer", admin_delete: "Supprimer",
@@ -485,7 +485,16 @@ function saisonCourante(date = new Date()) {
   return "hiver";                           // décembre → février
 }
 
-const SAISON = saisonCourante();
+// Saison forcée pour les essais : mémorisée dans le navigateur, ou passée
+// dans l'adresse (?saison=hiver). Sans rien, on suit le calendrier.
+function saisonChoisie() {
+  if (typeof window === "undefined") return saisonCourante();
+  const params = new URLSearchParams(window.location.search);
+  const forcee = params.get("saison") || window.localStorage?.getItem("oree_saison");
+  return PALETTES[forcee] ? forcee : saisonCourante();
+}
+
+const SAISON = saisonChoisie();
 
 const COLORS = {
   ...PALETTES[SAISON],
@@ -8167,6 +8176,46 @@ function AdminArea({ allProfiles, allActivitiesRaw, currentUserId, onToggleBan, 
       {sub === "users" && (
         <UsersAdminSection allProfiles={allProfiles} currentUserId={currentUserId} onToggleBan={onToggleBan} onDelete={onDelete} onSetCommune={onSetCommune} />
       )}
+      {/* Essai des ambiances saisonnières : réservé à l'administrateur */}
+      <div style={{
+        background: "#fff", border: "2px solid #F0EADB", borderRadius: 14,
+        padding: "10px 14px", marginBottom: 18,
+        display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap",
+      }}>
+        <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5, color: "#9A93AF", textTransform: "uppercase", letterSpacing: 0.4 }}>
+          {t("admin_saison")}
+        </span>
+        {[
+          { id: "auto", label: t("saison_auto") },
+          { id: "printemps", label: t("saison_printemps") },
+          { id: "ete", label: t("saison_ete") },
+          { id: "automne", label: t("saison_automne") },
+          { id: "hiver", label: t("saison_hiver") },
+        ].map((s) => {
+          const actuelle = (typeof window !== "undefined" && window.localStorage?.getItem("oree_saison")) || "auto";
+          const active = actuelle === s.id;
+          return (
+            <button
+              key={s.id}
+              onClick={() => {
+                if (s.id === "auto") window.localStorage?.removeItem("oree_saison");
+                else window.localStorage?.setItem("oree_saison", s.id);
+                window.location.reload();
+              }}
+              style={{
+                border: `2px solid ${active ? COLORS.ink : "#F0EADB"}`,
+                background: active ? COLORS.ink : "#fff",
+                color: active ? "#fff" : COLORS.ink,
+                borderRadius: 999, padding: "5px 12px", cursor: "pointer",
+                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12,
+              }}
+            >
+              {s.label}
+            </button>
+          );
+        })}
+      </div>
+
       {sub === "reports" && (
         <ReportsAdminSection reports={reportsDetailed || []} onHandle={onHandleReport} onToggleBan={onToggleBan} onViewProfile={onViewProfile} photos={photos || []} onTraiterPhoto={onTraiterPhoto} />
       )}
