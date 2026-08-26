@@ -9177,7 +9177,7 @@ export default function RecreApp() {
       {/* Printemps : soleil, fleurs et abeilles — purement décoratif */}
       {SAISON === "printemps" && (
         <div className="oree-printemps" aria-hidden="true">
-          <div className="oree-nuage" style={{ top: "23.9vh", width: 176, height: 108, opacity: 0.9, animationDuration: "156.8s", animationDelay: "-43.4s" }}>
+          <div className="oree-nuage" style={{ left: "29.7%", top: "36.8vh", width: 176, height: 108, opacity: 0.9, animationDuration: "12.6s", animationDelay: "-7.5s" }}>
               <span style={{ left: 0, top: 24, width: 62, height: 62 }} />
               <span style={{ left: 35, top: 11, width: 84, height: 84 }} />
               <span style={{ left: 84, top: 27, width: 59, height: 59 }} />
@@ -9185,7 +9185,7 @@ export default function RecreApp() {
               <span style={{ left: 65, top: 43, width: 49, height: 49 }} />
               <span style={{ left: 116, top: 35, width: 46, height: 46 }} />
           </div>
-          <div className="oree-nuage" style={{ top: "31.6vh", width: 160, height: 98, opacity: 0.81, animationDuration: "88.8s", animationDelay: "-4.0s" }}>
+          <div className="oree-nuage" style={{ left: "58.1%", top: "28.2vh", width: 160, height: 98, opacity: 0.81, animationDuration: "13.5s", animationDelay: "-4.0s" }}>
               <span style={{ left: 0, top: 22, width: 57, height: 57 }} />
               <span style={{ left: 32, top: 10, width: 76, height: 76 }} />
               <span style={{ left: 76, top: 25, width: 54, height: 54 }} />
@@ -9193,7 +9193,7 @@ export default function RecreApp() {
               <span style={{ left: 59, top: 39, width: 44, height: 44 }} />
               <span style={{ left: 106, top: 32, width: 42, height: 42 }} />
           </div>
-          <div className="oree-nuage" style={{ top: "33.3vh", width: 117, height: 72, opacity: 0.91, animationDuration: "120.1s", animationDelay: "-47.6s" }}>
+          <div className="oree-nuage" style={{ left: "46.7%", top: "36.4vh", width: 117, height: 72, opacity: 0.91, animationDuration: "9.7s", animationDelay: "-9.4s" }}>
               <span style={{ left: 0, top: 16, width: 41, height: 41 }} />
               <span style={{ left: 23, top: 7, width: 56, height: 56 }} />
               <span style={{ left: 56, top: 18, width: 40, height: 40 }} />
@@ -9201,7 +9201,7 @@ export default function RecreApp() {
               <span style={{ left: 43, top: 29, width: 32, height: 32 }} />
               <span style={{ left: 77, top: 23, width: 31, height: 31 }} />
           </div>
-          <div className="oree-nuage" style={{ top: "41.7vh", width: 133, height: 82, opacity: 0.91, animationDuration: "159.9s", animationDelay: "-9.3s" }}>
+          <div className="oree-nuage" style={{ left: "26.1%", top: "9.0vh", width: 133, height: 82, opacity: 0.91, animationDuration: "10.1s", animationDelay: "-3.4s" }}>
               <span style={{ left: 0, top: 18, width: 47, height: 47 }} />
               <span style={{ left: 27, top: 8, width: 63, height: 63 }} />
               <span style={{ left: 63, top: 20, width: 45, height: 45 }} />
@@ -9209,7 +9209,7 @@ export default function RecreApp() {
               <span style={{ left: 49, top: 33, width: 37, height: 37 }} />
               <span style={{ left: 88, top: 27, width: 35, height: 35 }} />
           </div>
-          <div className="oree-nuage" style={{ top: "38.8vh", width: 107, height: 66, opacity: 0.94, animationDuration: "136.4s", animationDelay: "-83.8s" }}>
+          <div className="oree-nuage" style={{ left: "1.7%", top: "20.1vh", width: 107, height: 66, opacity: 0.94, animationDuration: "11.9s", animationDelay: "-6.6s" }}>
               <span style={{ left: 0, top: 15, width: 38, height: 38 }} />
               <span style={{ left: 21, top: 7, width: 51, height: 51 }} />
               <span style={{ left: 51, top: 16, width: 36, height: 36 }} />
@@ -9217,7 +9217,7 @@ export default function RecreApp() {
               <span style={{ left: 39, top: 26, width: 30, height: 30 }} />
               <span style={{ left: 71, top: 21, width: 28, height: 28 }} />
           </div>
-          <div className="oree-nuage" style={{ top: "10.8vh", width: 147, height: 90, opacity: 0.79, animationDuration: "150.6s", animationDelay: "-95.8s" }}>
+          <div className="oree-nuage" style={{ left: "34.3%", top: "43.2vh", width: 147, height: 90, opacity: 0.79, animationDuration: "13.6s", animationDelay: "-3.2s" }}>
               <span style={{ left: 0, top: 20, width: 52, height: 52 }} />
               <span style={{ left: 29, top: 9, width: 70, height: 70 }} />
               <span style={{ left: 70, top: 23, width: 50, height: 50 }} />
@@ -9225,7 +9225,7 @@ export default function RecreApp() {
               <span style={{ left: 54, top: 36, width: 41, height: 41 }} />
               <span style={{ left: 97, top: 29, width: 38, height: 38 }} />
           </div>
-          <div className="oree-nuage" style={{ top: "5.4vh", width: 188, height: 116, opacity: 0.75, animationDuration: "117.9s", animationDelay: "-149.4s" }}>
+          <div className="oree-nuage" style={{ left: "67.7%", top: "33.1vh", width: 188, height: 116, opacity: 0.75, animationDuration: "15.8s", animationDelay: "-7.3s" }}>
               <span style={{ left: 0, top: 26, width: 67, height: 67 }} />
               <span style={{ left: 38, top: 12, width: 90, height: 90 }} />
               <span style={{ left: 90, top: 29, width: 64, height: 64 }} />
@@ -9692,6 +9692,100 @@ export default function RecreApp() {
           </div>
         </>
       )}
+      {/* Poissons et bulles d'été : purement décoratifs */}
+      {SAISON === "ete" && (
+        <div className="oree-poissons" aria-hidden="true">
+          <span className="oree-poisson oree-poisson-retour" style={{ top: "65.8vh", opacity: 0.77, animationDuration: "35.0s", animationDelay: "-19.3s" }}>
+            <svg width="32" height="19" viewBox="0 0 44 26" aria-hidden="true" style={{ transform: "scaleX(-1)" }}>
+              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#4A87C4" />
+              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#6FA8DC" />
+              <path d="M17 4.5 Q21 0 25 5" fill="#4A87C4" />
+              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+            </svg>
+          </span>
+          <span className="oree-poisson" style={{ top: "50.9vh", opacity: 0.6, animationDuration: "42.9s", animationDelay: "-1.5s" }}>
+            <svg width="44" height="26" viewBox="0 0 44 26" aria-hidden="true">
+              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#E86A3D" />
+              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#FF8C61" />
+              <path d="M17 4.5 Q21 0 25 5" fill="#E86A3D" />
+              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+            </svg>
+          </span>
+          <span className="oree-poisson" style={{ top: "87.8vh", opacity: 0.56, animationDuration: "43.4s", animationDelay: "-2.2s" }}>
+            <svg width="32" height="19" viewBox="0 0 44 26" aria-hidden="true">
+              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#4FC4BB" />
+              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#7FDDD6" />
+              <path d="M17 4.5 Q21 0 25 5" fill="#4FC4BB" />
+              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+            </svg>
+          </span>
+          <span className="oree-poisson oree-poisson-retour" style={{ top: "43.3vh", opacity: 0.78, animationDuration: "26.8s", animationDelay: "-14.0s" }}>
+            <svg width="32" height="19" viewBox="0 0 44 26" aria-hidden="true" style={{ transform: "scaleX(-1)" }}>
+              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#DDB63C" />
+              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#F4D35E" />
+              <path d="M17 4.5 Q21 0 25 5" fill="#DDB63C" />
+              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+            </svg>
+          </span>
+          <span className="oree-poisson" style={{ top: "79.4vh", opacity: 0.79, animationDuration: "31.3s", animationDelay: "-6.1s" }}>
+            <svg width="44" height="26" viewBox="0 0 44 26" aria-hidden="true">
+              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#E86A3D" />
+              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#FF8C61" />
+              <path d="M17 4.5 Q21 0 25 5" fill="#E86A3D" />
+              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+            </svg>
+          </span>
+          <span className="oree-poisson" style={{ top: "62.1vh", opacity: 0.6, animationDuration: "45.8s", animationDelay: "-26.3s" }}>
+            <svg width="44" height="26" viewBox="0 0 44 26" aria-hidden="true">
+              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#4A87C4" />
+              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#6FA8DC" />
+              <path d="M17 4.5 Q21 0 25 5" fill="#4A87C4" />
+              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+            </svg>
+          </span>
+          <span className="oree-poisson oree-poisson-retour" style={{ top: "33.0vh", opacity: 0.8, animationDuration: "44.1s", animationDelay: "-23.7s" }}>
+            <svg width="44" height="26" viewBox="0 0 44 26" aria-hidden="true" style={{ transform: "scaleX(-1)" }}>
+              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#DDB63C" />
+              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#F4D35E" />
+              <path d="M17 4.5 Q21 0 25 5" fill="#DDB63C" />
+              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+            </svg>
+          </span>
+          <span className="oree-poisson" style={{ top: "81.8vh", opacity: 0.83, animationDuration: "40.6s", animationDelay: "-3.8s" }}>
+            <svg width="26" height="15" viewBox="0 0 44 26" aria-hidden="true">
+              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#E86A3D" />
+              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#FF8C61" />
+              <path d="M17 4.5 Q21 0 25 5" fill="#E86A3D" />
+              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+            </svg>
+          </span>
+          <span className="oree-poisson" style={{ top: "74.8vh", opacity: 0.67, animationDuration: "31.2s", animationDelay: "-9.4s" }}>
+            <svg width="44" height="26" viewBox="0 0 44 26" aria-hidden="true">
+              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#DC7EA3" />
+              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#F2A2C0" />
+              <path d="M17 4.5 Q21 0 25 5" fill="#DC7EA3" />
+              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+            </svg>
+          </span>
+          <span className="oree-bulle" style={{ left: "15.3%", width: 7, height: 7, animationDuration: "10.8s", animationDelay: "-8.6s" }} />
+          <span className="oree-bulle" style={{ left: "62.2%", width: 7, height: 7, animationDuration: "13.3s", animationDelay: "-8.4s" }} />
+          <span className="oree-bulle" style={{ left: "90.0%", width: 7, height: 7, animationDuration: "13.4s", animationDelay: "-9.7s" }} />
+          <span className="oree-bulle" style={{ left: "11.1%", width: 12, height: 12, animationDuration: "9.6s", animationDelay: "-6.0s" }} />
+          <span className="oree-bulle" style={{ left: "29.9%", width: 12, height: 12, animationDuration: "11.1s", animationDelay: "-7.4s" }} />
+          <span className="oree-bulle" style={{ left: "24.3%", width: 9, height: 9, animationDuration: "11.1s", animationDelay: "-12.3s" }} />
+          <span className="oree-bulle" style={{ left: "83.4%", width: 12, height: 12, animationDuration: "13.4s", animationDelay: "-3.7s" }} />
+          <span className="oree-bulle" style={{ left: "80.6%", width: 9, height: 9, animationDuration: "10.2s", animationDelay: "-2.9s" }} />
+          <span className="oree-bulle" style={{ left: "91.3%", width: 9, height: 9, animationDuration: "15.7s", animationDelay: "-14.3s" }} />
+          <span className="oree-bulle" style={{ left: "91.3%", width: 5, height: 5, animationDuration: "11.2s", animationDelay: "-9.0s" }} />
+          <span className="oree-bulle" style={{ left: "70.0%", width: 12, height: 12, animationDuration: "12.2s", animationDelay: "-3.0s" }} />
+          <span className="oree-bulle" style={{ left: "76.5%", width: 12, height: 12, animationDuration: "17.6s", animationDelay: "-14.8s" }} />
+          <span className="oree-bulle" style={{ left: "65.1%", width: 7, height: 7, animationDuration: "10.6s", animationDelay: "-8.9s" }} />
+          <span className="oree-bulle" style={{ left: "71.9%", width: 5, height: 5, animationDuration: "9.6s", animationDelay: "-8.5s" }} />
+          <span className="oree-bulle" style={{ left: "42.6%", width: 5, height: 5, animationDuration: "15.8s", animationDelay: "-6.9s" }} />
+          <span className="oree-bulle" style={{ left: "52.0%", width: 12, height: 12, animationDuration: "10.3s", animationDelay: "-10.9s" }} />
+        </div>
+      )}
+
       {/* Vagues d'été, en bas de l'écran : purement décoratives.
           Les tracés dépassent largement à droite pour qu'aucune coupure
           n'apparaisse quand ils glissent. */}
@@ -10253,6 +10347,53 @@ export default function RecreApp() {
         /* Ondulations d'eau : uniquement l'été, sur le fond de la page.
            Deux trames de reflets qui dérivent lentement en sens contraire,
            entièrement en CSS (aucune image à télécharger). */
+        /* Poissons : ils traversent l'écran en ondulant légèrement */
+        .oree-poissons {
+          position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .oree-poisson {
+          position: absolute; left: -12%;
+          animation-name: oree-nage;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+        }
+        .oree-poisson-retour {
+          left: auto; right: -12%;
+          animation-name: oree-nage-retour;
+        }
+        @keyframes oree-nage {
+          0%   { transform: translate(0, 0)      rotate(0deg); }
+          25%  { transform: translate(32vw, -3vh) rotate(-5deg); }
+          50%  { transform: translate(60vw, 2vh)  rotate(4deg); }
+          75%  { transform: translate(90vw, -2vh) rotate(-3deg); }
+          100% { transform: translate(124vw, 0)   rotate(0deg); }
+        }
+        @keyframes oree-nage-retour {
+          0%   { transform: translate(0, 0)        rotate(0deg); }
+          25%  { transform: translate(-32vw, 3vh)  rotate(5deg); }
+          50%  { transform: translate(-60vw, -2vh) rotate(-4deg); }
+          75%  { transform: translate(-90vw, 2vh)  rotate(3deg); }
+          100% { transform: translate(-124vw, 0)   rotate(0deg); }
+        }
+
+        /* Bulles : elles remontent vers la surface en se balançant */
+        .oree-bulle {
+          position: absolute; bottom: -40px; border-radius: 50%;
+          background: rgba(255,255,255,0.42);
+          box-shadow: inset 0 -2px 3px rgba(255,255,255,0.85), 0 0 0 1px rgba(46,196,182,0.35);
+          animation-name: oree-remonte;
+          animation-timing-function: ease-in;
+          animation-iteration-count: infinite;
+        }
+        @keyframes oree-remonte {
+          0%   { transform: translate(0, 0)      scale(0.8); opacity: 0; }
+          12%  { opacity: .9; }
+          35%  { transform: translate(16px, -32vh) scale(1); }
+          65%  { transform: translate(-12px, -62vh) scale(1.05); }
+          88%  { opacity: .7; }
+          100% { transform: translate(10px, -102vh) scale(1.1); opacity: 0; }
+        }
+
         /* Vagues qui glissent à trois vitesses différentes, l'une à contresens :
            c'est leur décalage progressif qui donne l'impression d'ondulation. */
         @keyframes oree-vague-a { from { transform: translateX(0); }    to { transform: translateX(-400px); } }
@@ -10306,18 +10447,20 @@ export default function RecreApp() {
         }
 
         /* Nuages : des bulles blanches groupées, qui dérivent lentement */
+        /* Les nuages restent en place et respirent doucement, plutôt que de
+           traverser l'écran : c'est plus calme derrière une liste. */
         .oree-nuage {
-          position: absolute; left: -30%;
-          animation-name: oree-derive-nuage;
-          animation-timing-function: linear;
+          position: absolute;
+          animation-name: oree-flotte-nuage;
+          animation-timing-function: ease-in-out;
           animation-iteration-count: infinite;
         }
         .oree-nuage span {
           position: absolute; border-radius: 50%; background: #fff;
         }
-        @keyframes oree-derive-nuage {
-          from { transform: translateX(0); }
-          to   { transform: translateX(160vw); }
+        @keyframes oree-flotte-nuage {
+          0%, 100% { transform: translate(0, 0)      scale(1); }
+          50%      { transform: translate(14px, 6px) scale(1.03); }
         }
 
         /* Averse : une pluie fine qui va et vient */
@@ -10345,9 +10488,9 @@ export default function RecreApp() {
         }
 
         /* Soleil : il pulse doucement, ses rayons tournent lentement */
-        /* Il se devine à travers l'en-tête translucide */
+        /* Sous l'en-tête fixe, pour rester entièrement visible */
         .oree-soleil {
-          position: absolute; top: 34px; right: 7vw;
+          position: absolute; top: 96px; right: 7vw;
           width: 96px; height: 96px;
         }
         .oree-soleil-halo {
@@ -10484,7 +10627,7 @@ export default function RecreApp() {
         /* L'en-tête laisse voir l'eau qui bouge dessous */
         /* Respect du réglage système : pas d'animation pour qui la désactive */
         @media (prefers-reduced-motion: reduce) {
-          .oree-vague-a, .oree-vague-b, .oree-vague-c,
+          .oree-vague-a, .oree-vague-b, .oree-vague-c, .oree-poisson, .oree-bulle,
           .oree-flocon, .oree-cristal, .oree-lueur, .oree-flamme, .oree-feuille,
           .oree-soleil-halo, .oree-soleil-rayons, .oree-fleur, .oree-abeille,
           .oree-nuage, .oree-pluie, .oree-goutte { animation: none; }
