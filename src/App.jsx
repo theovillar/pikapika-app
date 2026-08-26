@@ -2541,8 +2541,8 @@ function Avatar({ name, genre, size = 26, overlap = false, genderMode = true, co
     width: size, height: size, minWidth: size, borderRadius: "50%", background: finalColor,
     display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
     color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800, lineHeight: 1,
-    fontSize: size * 0.42, border: "2px solid #fff", boxSizing: "content-box", boxShadow: "none",
-    marginLeft: overlap ? -10 : 0, flexShrink: 0,
+    fontSize: size * 0.42, border: "none", boxSizing: "border-box", boxShadow: "none",
+    marginLeft: overlap ? 3 : 0, flexShrink: 0,
     cursor: clickable ? "pointer" : "default", padding: 0,
   };
   const content = avatarUrl ? (
@@ -2575,7 +2575,7 @@ function ParticipantsRow({ participants, max = 5 }) {
           width: 26, height: 26, borderRadius: "50%", background: "#EDEAF4",
           display: "flex", alignItems: "center", justifyContent: "center",
           color: COLORS.ink, fontFamily: "Nunito, sans-serif", fontWeight: 800,
-          fontSize: 10.5, border: "2px solid #fff", marginLeft: -8,
+          fontSize: 10.5, border: "none", marginLeft: 3,
         }}>
           +{extra}
         </div>
@@ -2745,8 +2745,8 @@ function PlainAvatar({ participant, color, size, overlap = false, genderMode = f
     width: dim, height: dim, minWidth: dim, borderRadius: "50%", background: avatarColor,
     display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
     color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800, lineHeight: 1,
-    fontSize, border: "2px solid #fff", boxSizing: "content-box", boxShadow: "none",
-    marginLeft: overlap ? -10 : 0, flexShrink: 0,
+    fontSize, border: "none", boxSizing: "border-box", boxShadow: "none",
+    marginLeft: overlap ? 3 : 0, flexShrink: 0,
     cursor: clickable ? "pointer" : "default", padding: 0,
   };
   // Les bulles n'affichent que l'initiale : charger une photo pleine taille pour une
@@ -2814,7 +2814,8 @@ function PlainParticipantsRow({ names, color, max = 5, genderMode = false, onVie
             borderRadius: "50%", background: "#EDEAF4",
             display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
             color: "#6B6485", fontFamily: "Nunito, sans-serif", fontWeight: 800, lineHeight: 1,
-            fontSize: 10.5, border: "2px solid #fff", boxSizing: "content-box", marginLeft: -10,
+            fontSize: "calc(var(--pika-avatar-size, 26px) * 0.4)", border: "none",
+            boxSizing: "content-box", marginLeft: 3,
           }}
         >
           +{extra}
@@ -10064,7 +10065,7 @@ export default function RecreApp() {
         }
         :root { --pika-avatar-size: 26px; }
         @media (max-width: 480px) {
-          :root { --pika-avatar-size: 20px; }
+          :root { --pika-avatar-size: 22px; }
         }
       `}</style>
 
