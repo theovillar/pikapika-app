@@ -131,7 +131,7 @@ const TRANSLATIONS = {
     stats_monthly_chart: "Sorties créées par mois (12 derniers mois)",
     stats_outings_created: "sortie(s) créée(s)",
     deleted_account_name: "Compte supprimé",
-    admin_sub_stats: "Statistiques", admin_saison: "Ambiance", saison_auto: "Automatique", saison_printemps: "Printemps", saison_ete: "Été", saison_automne: "Automne", saison_hiver: "Hiver", saison_nuit: "Nuit", admin_sub_users: "Utilisateurs", admin_sub_reports: "Signalements", admin_reports_title: "Signalements reçus", admin_photos_title: "Photos à vérifier", admin_photos_note: "Ces photos ont passé le filtre automatique mais méritent un coup d'œil.", admin_photo_ok: "Valider", admin_photo_remove: "Supprimer", admin_reports_empty: "Aucun signalement dans cette catégorie.", admin_reports_pending: "{n} signalement(s) en attente de traitement", admin_report_reporter: "Signalé par", admin_report_reported: "Personne visée", admin_report_activity: "Sortie concernée", admin_report_note: "Note interne", admin_report_note_ph: "Ex. Contacté par téléphone le 12/03, avertissement donné.", admin_report_add_note: "Ajouter une note", admin_report_escalate: "Transmis aux autorités", admin_report_reopen: "Remettre en attente", report_status_escalated: "Transmis",
+    admin_sub_stats: "Statistiques", admin_saison: "Ambiance", saison_auto: "Automatique", saison_printemps: "Printemps", saison_ete: "Été", saison_automne: "Automne", saison_hiver: "Hiver", moment_auto: "Heure réelle", moment_jour: "Jour", moment_nuit: "Nuit", admin_sub_users: "Utilisateurs", admin_sub_reports: "Signalements", admin_reports_title: "Signalements reçus", admin_photos_title: "Photos à vérifier", admin_photos_note: "Ces photos ont passé le filtre automatique mais méritent un coup d'œil.", admin_photo_ok: "Valider", admin_photo_remove: "Supprimer", admin_reports_empty: "Aucun signalement dans cette catégorie.", admin_reports_pending: "{n} signalement(s) en attente de traitement", admin_report_reporter: "Signalé par", admin_report_reported: "Personne visée", admin_report_activity: "Sortie concernée", admin_report_note: "Note interne", admin_report_note_ph: "Ex. Contacté par téléphone le 12/03, avertissement donné.", admin_report_add_note: "Ajouter une note", admin_report_escalate: "Transmis aux autorités", admin_report_reopen: "Remettre en attente", report_status_escalated: "Transmis",
     admin_users_title: "Tous les utilisateurs", admin_no_users: "Aucun utilisateur pour le moment.", admin_no_commune: "Aucune commune",
     admin_search_placeholder: "Rechercher par nom ou email…", admin_no_results: "Aucun utilisateur ne correspond.",
     admin_block: "Bloquer", admin_unblock: "Débloquer", admin_delete: "Supprimer",
@@ -8237,30 +8237,39 @@ function AdminArea({ allProfiles, allActivitiesRaw, currentUserId, onToggleBan, 
           );
         })}
 
-        {/* Essai du ciel de nuit, qui se pose par-dessus la saison */}
+        {/* Essai du moment de la journée, qui se superpose à la saison */}
         {(() => {
-          let nuitForcee = null;
-          try { nuitForcee = new URLSearchParams(window.location.search).get("nuit"); } catch (e) { /* rien */ }
-          const active = nuitForcee === "1";
+          let forcee = null;
+          try { forcee = new URLSearchParams(window.location.search).get("nuit"); } catch (e) { /* rien */ }
+          const choisir = (valeur) => {
+            const url = new URL(window.location.href);
+            if (valeur === null) url.searchParams.delete("nuit");
+            else url.searchParams.set("nuit", valeur);
+            window.location.href = url.toString();
+          };
+          const options = [
+            { id: null, label: t("moment_auto"), actif: forcee === null },
+            { id: "0", label: t("moment_jour"), actif: forcee === "0" },
+            { id: "1", label: t("moment_nuit"), actif: forcee === "1" },
+          ];
           return (
-            <button
-              onClick={() => {
-                const url = new URL(window.location.href);
-                if (active) url.searchParams.delete("nuit");
-                else url.searchParams.set("nuit", "1");
-                window.location.href = url.toString();
-              }}
-              style={{
-                border: `2px solid ${active ? "#1B2A4A" : "#F0EADB"}`,
-                background: active ? "#1B2A4A" : "#fff",
-                color: active ? "#fff" : COLORS.ink,
-                borderRadius: 999, padding: "5px 12px", cursor: "pointer",
-                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12,
-                marginLeft: 6,
-              }}
-            >
-              {t("saison_nuit")}
-            </button>
+            <span style={{ display: "inline-flex", gap: 6, marginLeft: 10, paddingLeft: 10, borderLeft: "2px solid #F0EADB" }}>
+              {options.map((o) => (
+                <button
+                  key={o.label}
+                  onClick={() => choisir(o.id)}
+                  style={{
+                    border: `2px solid ${o.actif ? "#1B2A4A" : "#F0EADB"}`,
+                    background: o.actif ? "#1B2A4A" : "#fff",
+                    color: o.actif ? "#fff" : COLORS.ink,
+                    borderRadius: 999, padding: "5px 12px", cursor: "pointer",
+                    fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12,
+                  }}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </span>
           );
         })()}
       </div>
@@ -10506,6 +10515,16 @@ export default function RecreApp() {
           background: #F5F0DC;
           box-shadow: 0 0 30px rgba(245,240,220,0.55), inset -12px 4px 0 -2px rgba(0,0,0,0.06);
           animation: oree-lueur-lune 9s ease-in-out infinite;
+        }
+        /* Sur téléphone, la lune se fait discrète : plus petite, moins lumineuse
+           et repoussée dans un coin, pour ne pas gêner la lecture. */
+        @media (max-width: 700px) {
+          .oree-lune {
+            width: 34px; height: 34px; top: 78px; right: 5vw;
+            opacity: 0.55;
+            box-shadow: 0 0 14px rgba(245,240,220,0.3), inset -6px 2px 0 -1px rgba(0,0,0,0.06);
+            animation: none;
+          }
         }
         @keyframes oree-lueur-lune {
           0%, 100% { box-shadow: 0 0 26px rgba(245,240,220,0.45), inset -12px 4px 0 -2px rgba(0,0,0,0.06); }
