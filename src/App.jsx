@@ -471,9 +471,10 @@ const PALETTES = {
     ink: "#5C3A1E", cloud: "#FDF4EA", sun: "#F2B872", sky: "#7FA8A3",
     grass: "#8C9A5B", coral: "#E07A3F", grape: "#A8763E",
   },
+  // Ambiance chalet : bois chaud, feu de cheminée, neige au dehors
   hiver: {
-    ink: "#33405C", cloud: "#F2F4F8", sun: "#D4A574", sky: "#5B7BA8",
-    grass: "#6E9B8E", coral: "#C97B84", grape: "#9B6B8F",
+    ink: "#4A2F22", cloud: "#FAF3EA", sun: "#E8A33D", sky: "#8FA9BF",
+    grass: "#7A8C6B", coral: "#C4522F", grape: "#8B5E4A",
   },
 };
 
@@ -9173,6 +9174,68 @@ export default function RecreApp() {
         position: "relative",
       }}
     >
+      {/* Neige d'hiver : purement décorative, ne capte aucun clic */}
+      {SAISON === "hiver" && (
+        <>
+          <div className="oree-neige" aria-hidden="true">
+            <div className="oree-neige-a">
+            <span className="oree-flocon" style={{ left: "32.1%", top: 17.3, width: 7, height: 7, opacity: 0.9 }} />
+            <span className="oree-flocon" style={{ left: "7.2%", top: 61.6, width: 6, height: 6, opacity: 1 }} />
+            <span className="oree-flocon" style={{ left: "5.7%", top: 58.4, width: 5, height: 5, opacity: 0.9 }} />
+            <span className="oree-flocon" style={{ left: "42.9%", top: 8.0, width: 5, height: 5, opacity: 1 }} />
+            <span className="oree-flocon" style={{ left: "42.0%", top: 95.1, width: 5, height: 5, opacity: 0.9 }} />
+            <span className="oree-flocon" style={{ left: "62.4%", top: 67.0, width: 5, height: 5, opacity: 1 }} />
+            <span className="oree-flocon" style={{ left: "58.0%", top: 5.7, width: 5, height: 5, opacity: 0.9 }} />
+            <span className="oree-flocon" style={{ left: "55.1%", top: 15.3, width: 6, height: 6, opacity: 0.9 }} />
+            <span className="oree-flocon" style={{ left: "53.5%", top: 65.7, width: 7, height: 7, opacity: 1 }} />
+            <span className="oree-flocon" style={{ left: "17.9%", top: 66.9, width: 7, height: 7, opacity: 0.9 }} />
+            <span className="oree-flocon" style={{ left: "36.9%", top: 63.0, width: 5, height: 5, opacity: 1 }} />
+            <span className="oree-flocon" style={{ left: "5.9%", top: 23.7, width: 7, height: 7, opacity: 1 }} />
+            <span className="oree-flocon" style={{ left: "42.3%", top: 36.1, width: 7, height: 7, opacity: 0.95 }} />
+            <span className="oree-flocon" style={{ left: "35.8%", top: 28.6, width: 5, height: 5, opacity: 1 }} />
+            </div>
+            <div className="oree-neige-b">
+            <span className="oree-flocon" style={{ left: "77.2%", top: 9.4, width: 4, height: 4, opacity: 0.85 }} />
+            <span className="oree-flocon" style={{ left: "49.0%", top: 39.5, width: 4, height: 4, opacity: 0.75 }} />
+            <span className="oree-flocon" style={{ left: "60.3%", top: 8.4, width: 5, height: 5, opacity: 0.75 }} />
+            <span className="oree-flocon" style={{ left: "16.3%", top: 39.3, width: 4, height: 4, opacity: 0.75 }} />
+            <span className="oree-flocon" style={{ left: "3.9%", top: 76.8, width: 5, height: 5, opacity: 0.85 }} />
+            <span className="oree-flocon" style={{ left: "78.1%", top: 94.1, width: 4, height: 4, opacity: 0.85 }} />
+            <span className="oree-flocon" style={{ left: "34.7%", top: 57.1, width: 4, height: 4, opacity: 0.65 }} />
+            <span className="oree-flocon" style={{ left: "83.2%", top: 108.6, width: 4, height: 4, opacity: 0.85 }} />
+            <span className="oree-flocon" style={{ left: "65.8%", top: 7.0, width: 5, height: 5, opacity: 0.75 }} />
+            <span className="oree-flocon" style={{ left: "64.1%", top: 114.2, width: 4, height: 4, opacity: 0.75 }} />
+            <span className="oree-flocon" style={{ left: "70.9%", top: 102.0, width: 4, height: 4, opacity: 0.65 }} />
+            <span className="oree-flocon" style={{ left: "93.1%", top: 40.9, width: 5, height: 5, opacity: 0.65 }} />
+            <span className="oree-flocon" style={{ left: "48.9%", top: 25.1, width: 4, height: 4, opacity: 0.65 }} />
+            <span className="oree-flocon" style={{ left: "73.1%", top: 45.8, width: 4, height: 4, opacity: 0.65 }} />
+            <span className="oree-flocon" style={{ left: "16.5%", top: 46.2, width: 4, height: 4, opacity: 0.65 }} />
+            <span className="oree-flocon" style={{ left: "81.1%", top: 99.4, width: 4, height: 4, opacity: 0.85 }} />
+            </div>
+            <div className="oree-neige-c">
+            <span className="oree-flocon" style={{ left: "41.1%", top: 41.3, width: 3, height: 3, opacity: 0.45 }} />
+            <span className="oree-flocon" style={{ left: "14.9%", top: 20.3, width: 2, height: 2, opacity: 0.6 }} />
+            <span className="oree-flocon" style={{ left: "23.1%", top: 55.8, width: 2, height: 2, opacity: 0.55 }} />
+            <span className="oree-flocon" style={{ left: "27.9%", top: 16.8, width: 3, height: 3, opacity: 0.6 }} />
+            <span className="oree-flocon" style={{ left: "56.1%", top: 109.6, width: 2, height: 2, opacity: 0.55 }} />
+            <span className="oree-flocon" style={{ left: "89.1%", top: 89.7, width: 3, height: 3, opacity: 0.55 }} />
+            <span className="oree-flocon" style={{ left: "39.5%", top: 11.9, width: 3, height: 3, opacity: 0.45 }} />
+            <span className="oree-flocon" style={{ left: "18.9%", top: 113.2, width: 3, height: 3, opacity: 0.45 }} />
+            <span className="oree-flocon" style={{ left: "10.9%", top: 69.1, width: 2, height: 2, opacity: 0.45 }} />
+            <span className="oree-flocon" style={{ left: "56.1%", top: 61.7, width: 3, height: 3, opacity: 0.6 }} />
+            <span className="oree-flocon" style={{ left: "2.5%", top: 100.5, width: 3, height: 3, opacity: 0.45 }} />
+            <span className="oree-flocon" style={{ left: "62.8%", top: 109.9, width: 3, height: 3, opacity: 0.55 }} />
+            <span className="oree-flocon" style={{ left: "12.2%", top: 97.6, width: 3, height: 3, opacity: 0.55 }} />
+            <span className="oree-flocon" style={{ left: "47.9%", top: 9.9, width: 2, height: 2, opacity: 0.6 }} />
+            <span className="oree-flocon" style={{ left: "33.9%", top: 30.4, width: 2, height: 2, opacity: 0.6 }} />
+            <span className="oree-flocon" style={{ left: "2.3%", top: 109.4, width: 3, height: 3, opacity: 0.45 }} />
+            <span className="oree-flocon" style={{ left: "68.3%", top: 105.1, width: 3, height: 3, opacity: 0.6 }} />
+            <span className="oree-flocon" style={{ left: "85.5%", top: 80.1, width: 3, height: 3, opacity: 0.6 }} />
+            </div>
+          </div>
+          <div className="oree-feu" aria-hidden="true" />
+        </>
+      )}
       {/* Vagues d'été, en bas de l'écran : purement décoratives.
           Les tracés dépassent largement à droite pour qu'aucune coupure
           n'apparaisse quand ils glissent. */}
@@ -9744,6 +9807,36 @@ export default function RecreApp() {
         .oree-vague-b { animation: oree-vague-b 13s linear infinite; }
         .oree-vague-c { animation: oree-vague-c 24s linear infinite; }
 
+        /* Neige d'hiver : trois couches de flocons qui tombent à des rythmes
+           différents, en dérivant légèrement sur le côté comme sous le vent. */
+        @keyframes oree-neige {
+          from { transform: translate3d(0, -120px, 0); }
+          to   { transform: translate3d(-40px, 100vh, 0); }
+        }
+        .oree-neige {
+          position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .oree-neige > div {
+          position: absolute; top: -120px; left: 0; right: 0; height: 120px;
+        }
+        .oree-neige-a { animation: oree-neige 14s linear infinite; }
+        .oree-neige-b { animation: oree-neige 20s linear infinite; animation-delay: -7s; }
+        .oree-neige-c { animation: oree-neige 27s linear infinite; animation-delay: -14s; }
+        .oree-flocon {
+          position: absolute; border-radius: 50%; background: #fff;
+        }
+        /* Lueur chaude du feu, en bas de l'écran */
+        .oree-feu {
+          position: fixed; left: 0; right: 0; bottom: 0; height: 30vh;
+          pointer-events: none; z-index: 0;
+          background: radial-gradient(ellipse 70% 100% at 50% 100%, rgba(232,163,61,0.22), transparent 70%);
+          animation: oree-braise 7s ease-in-out infinite;
+        }
+        @keyframes oree-braise {
+          0%, 100% { opacity: .7; }
+          50%      { opacity: 1; }
+        }
+
         /* L'en-tête laisse voir l'eau qui bouge dessous */
         .oree-fond-eau .pika-header-sticky {
           background-color: rgba(228, 246, 245, 0.85);
@@ -9752,7 +9845,8 @@ export default function RecreApp() {
         }
         /* Respect du réglage système : pas d'animation pour qui la désactive */
         @media (prefers-reduced-motion: reduce) {
-          .oree-vague-a, .oree-vague-b, .oree-vague-c { animation: none; }
+          .oree-vague-a, .oree-vague-b, .oree-vague-c,
+          .oree-neige > div, .oree-feu { animation: none; }
         }
 
         /* Sur écran étroit, on masque les dernières pastilles plutôt que de déborder.
