@@ -3069,10 +3069,10 @@ function Explorer({ activities, favorites, onToggleFav, onOpen, location }) {
   return (
     <div>
       <div style={{ padding: "4px 4px 14px" }}>
-        <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 26, color: COLORS.ink, margin: "0 0 4px" }}>
+        <h1 className="pika-titre-page" style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 26, color: COLORS.ink, margin: "0 0 4px" }}>
           {t("greeting", { name: "Sarah" })}
         </h1>
-        <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14.5, margin: 0 }}>
+        <p className="pika-sous-titre" style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14.5, margin: 0 }}>
           {t("explorer_subtitle", { n: filtered.length })}
         </p>
       </div>
@@ -3519,10 +3519,10 @@ function CreateActivity({ onCreate }) {
 
   return (
     <div style={{ maxWidth: 560, margin: "0 auto" }}>
-      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
+      <h1 className="pika-titre-page" style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
         {t("create_title")}
       </h1>
-      <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 18px" }}>
+      <p className="pika-sous-titre" style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 18px" }}>
         {t("create_subtitle")}
       </p>
 
@@ -3669,10 +3669,10 @@ function MyOutings({ joined, activities, currentUserId, onOpen }) {
 
   return (
     <div>
-      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
+      <h1 className="pika-titre-page" style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
         {t("my_title")}
       </h1>
-      <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 18px" }}>
+      <p className="pika-sous-titre" style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 18px" }}>
         {t("my_subtitle")}
       </p>
 
@@ -4014,7 +4014,7 @@ function ProfileEdit({ onBack,  joinedCount, validated, displayName, email, nbEn
         }}>
           <ArrowLeft size={16} color={COLORS.ink} />
         </button>
-        <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink, margin: 0 }}>
+        <h1 className="pika-titre-page" style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink, margin: 0 }}>
           {t("profile_edit_title")}
         </h1>
       </div>
@@ -6858,10 +6858,10 @@ function CreateMeetup({ categories, onCreate }) {
 
   return (
     <div style={{ maxWidth: 560, margin: "0 auto" }}>
-      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
+      <h1 className="pika-titre-page" style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
         {t("create_meetup_title")}
       </h1>
-      <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 18px" }}>
+      <p className="pika-sous-titre" style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 18px" }}>
         {t("create_meetup_subtitle")}
       </p>
 
@@ -7162,10 +7162,10 @@ function MyMeetups({ items, joined, categories, onOpen, title, subtitle, current
 
   return (
     <div>
-      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
+      <h1 className="pika-titre-page" style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
         {title || t("my_meetups_title")}
       </h1>
-      <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 18px" }}>
+      <p className="pika-sous-titre" style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 18px" }}>
         {subtitle || t("my_meetups_subtitle")}
       </p>
 
@@ -7281,19 +7281,19 @@ function MesSortiesPage({
 
   return (
     <div>
-      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
+      <h1 className="pika-titre-page" style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
         {t("my_title")}
       </h1>
-      <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 12px" }}>
+      <p className="pika-sous-titre" style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14, margin: "0 0 12px" }}>
         {t("my_all_subtitle")}
       </p>
 
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18, flexWrap: "wrap" }}>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#6B6485", fontWeight: 700 }}>
+        <span className="pika-legende" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#6B6485", fontWeight: 700 }}>
           <span style={{ width: 12, height: 12, borderRadius: 4, background: "#FFF9EC", border: `2px solid ${COLORS.sun}`, display: "inline-block" }} />
           {t("legend_created")}
         </span>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#6B6485", fontWeight: 700 }}>
+        <span className="pika-legende" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: "#6B6485", fontWeight: 700 }}>
           <span style={{ width: 12, height: 12, borderRadius: 4, background: "#fff", border: "2px solid #F0EADB", display: "inline-block" }} />
           {t("legend_joined")}
         </span>
@@ -7419,7 +7419,7 @@ function AuthScreen({ onClose, onOpenLegal }) {
   const content = (
     <>
       <OreeMascot size={56} rotate={-4} />
-      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "14px 0 4px", textAlign: "center" }}>
+      <h1 className="pika-titre-page" style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "14px 0 4px", textAlign: "center" }}>
         {t("auth_title")}
       </h1>
       <p style={{ color: "#6B6485", fontSize: 14, textAlign: "center", margin: "0 0 22px", maxWidth: 320 }}>
@@ -8281,7 +8281,7 @@ function BannedScreen({ onSignOut }) {
   return (
     <div style={{ background: COLORS.cloud, minHeight: "100dvh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24, textAlign: "center" }}>
       <OreeMascot size={48} />
-      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 22, color: COLORS.ink, margin: "16px 0 8px" }}>
+      <h1 className="pika-titre-page" style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 22, color: COLORS.ink, margin: "16px 0 8px" }}>
         {t("banned_title")}
       </h1>
       <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 14, color: "#6B6485", maxWidth: 320, marginBottom: 20 }}>
@@ -8307,7 +8307,7 @@ function MairieDashboard({ reports, onResolveReport, commune }) {
 
   return (
     <div style={{ maxWidth: 640, margin: "0 auto" }}>
-      <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
+      <h1 className="pika-titre-page" style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 24, color: COLORS.ink, margin: "4px 0 4px" }}>
         {t("mairie_title")}
       </h1>
       {commune && (
@@ -10468,10 +10468,17 @@ export default function RecreApp() {
         .oree-mode-nuit .pika-header-action:not([data-actif="1"]) {
           background: rgba(255,255,255,0.08) !important;
         }
-        .oree-mode-nuit .pika-header-action:not([data-actif="1"]) span,
-        .oree-mode-nuit .pika-header-action:not([data-actif="1"]) svg {
+        .oree-mode-nuit .pika-header-action:not([data-actif="1"]) span {
           color: #E6ECF7 !important;
         }
+        /* Les icônes de lucide-react se colorent par leur trait, pas par color */
+        .oree-mode-nuit .pika-header-action:not([data-actif="1"]) svg {
+          stroke: #E6ECF7 !important;
+          color: #E6ECF7 !important;
+        }
+        /* Sélecteur de lieu et légendes posés sur le fond */
+        .oree-mode-nuit .pika-header-sticky svg { stroke: #E6ECF7; }
+        .oree-mode-nuit .pika-legende { color: #C3CFE2 !important; }
 
         /* Ciel de nuit : un voile sombre par-dessus le décor de saison,
            avec des étoiles qui scintillent et une lune. */
