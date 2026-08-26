@@ -9703,27 +9703,11 @@ export default function RecreApp() {
               <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
             </svg>
           </span>
-          <span className="oree-poisson" style={{ top: "50.9vh", opacity: 0.6, animationDuration: "42.9s", animationDelay: "-1.5s" }}>
-            <svg width="44" height="26" viewBox="0 0 44 26" aria-hidden="true">
-              <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#E86A3D" />
-              <ellipse cx="26" cy="13" rx="16" ry="9" fill="#FF8C61" />
-              <path d="M19 4.5 Q23 0 27 5" fill="#E86A3D" />
-              <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
-            </svg>
-          </span>
           <span className="oree-poisson" style={{ top: "87.8vh", opacity: 0.56, animationDuration: "43.4s", animationDelay: "-2.2s" }}>
             <svg width="32" height="19" viewBox="0 0 44 26" aria-hidden="true">
               <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#4FC4BB" />
               <ellipse cx="26" cy="13" rx="16" ry="9" fill="#7FDDD6" />
               <path d="M19 4.5 Q23 0 27 5" fill="#4FC4BB" />
-              <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
-            </svg>
-          </span>
-          <span className="oree-poisson oree-poisson-retour" style={{ top: "43.3vh", opacity: 0.78, animationDuration: "26.8s", animationDelay: "-14.0s" }}>
-            <svg width="32" height="19" viewBox="0 0 44 26" aria-hidden="true" style={{ transform: "scaleX(-1)" }}>
-              <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#DDB63C" />
-              <ellipse cx="26" cy="13" rx="16" ry="9" fill="#F4D35E" />
-              <path d="M19 4.5 Q23 0 27 5" fill="#DDB63C" />
               <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
             </svg>
           </span>
@@ -9735,54 +9719,12 @@ export default function RecreApp() {
               <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
             </svg>
           </span>
-          <span className="oree-poisson" style={{ top: "62.1vh", opacity: 0.6, animationDuration: "45.8s", animationDelay: "-26.3s" }}>
-            <svg width="44" height="26" viewBox="0 0 44 26" aria-hidden="true">
-              <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#4A87C4" />
-              <ellipse cx="26" cy="13" rx="16" ry="9" fill="#6FA8DC" />
-              <path d="M19 4.5 Q23 0 27 5" fill="#4A87C4" />
-              <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
-            </svg>
-          </span>
-          <span className="oree-poisson oree-poisson-retour" style={{ top: "33.0vh", opacity: 0.8, animationDuration: "44.1s", animationDelay: "-23.7s" }}>
-            <svg width="44" height="26" viewBox="0 0 44 26" aria-hidden="true" style={{ transform: "scaleX(-1)" }}>
-              <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#DDB63C" />
-              <ellipse cx="26" cy="13" rx="16" ry="9" fill="#F4D35E" />
-              <path d="M19 4.5 Q23 0 27 5" fill="#DDB63C" />
-              <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
-            </svg>
-          </span>
-          <span className="oree-poisson" style={{ top: "81.8vh", opacity: 0.83, animationDuration: "40.6s", animationDelay: "-3.8s" }}>
-            <svg width="26" height="15" viewBox="0 0 44 26" aria-hidden="true">
-              <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#E86A3D" />
-              <ellipse cx="26" cy="13" rx="16" ry="9" fill="#FF8C61" />
-              <path d="M19 4.5 Q23 0 27 5" fill="#E86A3D" />
-              <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
-            </svg>
-          </span>
-          <span className="oree-poisson" style={{ top: "74.8vh", opacity: 0.67, animationDuration: "31.2s", animationDelay: "-9.4s" }}>
-            <svg width="44" height="26" viewBox="0 0 44 26" aria-hidden="true">
-              <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#DC7EA3" />
-              <ellipse cx="26" cy="13" rx="16" ry="9" fill="#F2A2C0" />
-              <path d="M19 4.5 Q23 0 27 5" fill="#DC7EA3" />
-              <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
-            </svg>
-          </span>
           <span className="oree-bulle" style={{ left: "15.3%", width: 12, height: 12, animationDuration: "10.8s", animationDelay: "-8.6s" }} />
           <span className="oree-bulle" style={{ left: "62.2%", width: 12, height: 12, animationDuration: "13.3s", animationDelay: "-8.4s" }} />
           <span className="oree-bulle" style={{ left: "90.0%", width: 12, height: 12, animationDuration: "13.4s", animationDelay: "-9.7s" }} />
           <span className="oree-bulle" style={{ left: "11.1%", width: 20, height: 20, animationDuration: "9.6s", animationDelay: "-6.0s" }} />
           <span className="oree-bulle" style={{ left: "29.9%", width: 20, height: 20, animationDuration: "11.1s", animationDelay: "-7.4s" }} />
-          <span className="oree-bulle" style={{ left: "24.3%", width: 15, height: 15, animationDuration: "11.1s", animationDelay: "-12.3s" }} />
           <span className="oree-bulle" style={{ left: "83.4%", width: 20, height: 20, animationDuration: "13.4s", animationDelay: "-3.7s" }} />
-          <span className="oree-bulle" style={{ left: "80.6%", width: 15, height: 15, animationDuration: "10.2s", animationDelay: "-2.9s" }} />
-          <span className="oree-bulle" style={{ left: "91.3%", width: 15, height: 15, animationDuration: "15.7s", animationDelay: "-14.3s" }} />
-          <span className="oree-bulle" style={{ left: "91.3%", width: 8, height: 8, animationDuration: "11.2s", animationDelay: "-9.0s" }} />
-          <span className="oree-bulle" style={{ left: "70.0%", width: 20, height: 20, animationDuration: "12.2s", animationDelay: "-3.0s" }} />
-          <span className="oree-bulle" style={{ left: "76.5%", width: 20, height: 20, animationDuration: "17.6s", animationDelay: "-14.8s" }} />
-          <span className="oree-bulle" style={{ left: "65.1%", width: 12, height: 12, animationDuration: "10.6s", animationDelay: "-8.9s" }} />
-          <span className="oree-bulle" style={{ left: "71.9%", width: 8, height: 8, animationDuration: "9.6s", animationDelay: "-8.5s" }} />
-          <span className="oree-bulle" style={{ left: "42.6%", width: 8, height: 8, animationDuration: "15.8s", animationDelay: "-6.9s" }} />
-          <span className="oree-bulle" style={{ left: "52.0%", width: 20, height: 20, animationDuration: "10.3s", animationDelay: "-10.9s" }} />
         </div>
       )}
 
@@ -10381,22 +10323,19 @@ export default function RecreApp() {
           position: absolute; bottom: -40px; border-radius: 50%;
           /* Contour marqué et reflet net : sans cela, une bulle blanche
              disparaît sur un fond turquoise clair. */
-          background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0 18%, rgba(255,255,255,0.35) 40%, rgba(255,255,255,0.12) 70%);
-          border: 1.5px solid rgba(11,124,140,0.45);
-          box-shadow:
-            inset -2px -3px 5px rgba(11,79,90,0.18),
-            inset 2px 2px 4px rgba(255,255,255,0.9),
-            0 0 6px rgba(255,255,255,0.5);
+          background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.6) 0 18%, rgba(255,255,255,0.2) 42%, rgba(255,255,255,0.06) 72%);
+          border: 1px solid rgba(11,124,140,0.22);
+          box-shadow: inset 1px 1px 3px rgba(255,255,255,0.6);
           animation-name: oree-remonte;
           animation-timing-function: ease-in;
           animation-iteration-count: infinite;
         }
         @keyframes oree-remonte {
           0%   { transform: translate(0, 0)         scale(0.8); opacity: 0; }
-          10%  { opacity: 1; }
+          10%  { opacity: .6; }
           35%  { transform: translate(16px, -32vh)  scale(1); }
           65%  { transform: translate(-12px, -62vh) scale(1.05); }
-          90%  { opacity: .95; }
+          90%  { opacity: .5; }
           100% { transform: translate(10px, -102vh) scale(1.1); opacity: 0; }
         }
 
