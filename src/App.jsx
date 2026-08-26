@@ -9119,20 +9119,28 @@ export default function RecreApp() {
         position: "relative",
       }}
     >
-      {/* Vagues d'été : purement décoratives, elles ne captent aucun clic */}
+      {/* Vagues d'été, sur toute la hauteur : purement décoratives */}
       {SAISON === "ete" && (
         <svg
-          className="oree-vagues" viewBox="0 0 800 210" preserveAspectRatio="none"
+          className="oree-vagues" viewBox="0 0 800 600" preserveAspectRatio="none"
           aria-hidden="true" focusable="false"
         >
           <g className="oree-vague-a">
-            <path d="M0 130 Q100 112 200 130 T400 130 T600 130 T800 130 T1000 130 T1200 130 V210 H0 Z" fill="#2EC4B6" opacity="0.16" />
+            <path d="M0 90 Q100 72 200 90 T400 90 T600 90 T800 90 T1000 90 T1200 90 V150 H0 Z" fill="#2EC4B6" opacity="0.13" />
+            <path d="M0 250 Q100 232 200 250 T400 250 T600 250 T800 250 T1000 250 T1200 250 V310 H0 Z" fill="#2EC4B6" opacity="0.13" />
+            <path d="M0 410 Q100 392 200 410 T400 410 T600 410 T800 410 T1000 410 T1200 410 V470 H0 Z" fill="#2EC4B6" opacity="0.13" />
+            <path d="M0 560 Q100 542 200 560 T400 560 T600 560 T800 560 T1000 560 T1200 560 V600 H0 Z" fill="#2EC4B6" opacity="0.14" />
           </g>
           <g className="oree-vague-b">
-            <path d="M0 152 Q140 134 280 152 T560 152 T840 152 T1120 152 V210 H0 Z" fill="#2EC4B6" opacity="0.2" />
+            <path d="M0 150 Q140 132 280 150 T560 150 T840 150 T1120 150 V205 H0 Z" fill="#2EC4B6" opacity="0.16" />
+            <path d="M0 320 Q140 302 280 320 T560 320 T840 320 T1120 320 V375 H0 Z" fill="#2EC4B6" opacity="0.16" />
+            <path d="M0 490 Q140 472 280 490 T560 490 T840 490 T1120 490 V545 H0 Z" fill="#2EC4B6" opacity="0.16" />
           </g>
           <g className="oree-vague-c">
-            <path d="M0 172 Q75 158 150 172 T300 172 T450 172 T600 172 T750 172 T900 172 T1050 172 V210 H0 Z" fill="#0B7C8C" opacity="0.14" />
+            <path d="M0 40 Q75 26 150 40 T300 40 T450 40 T600 40 T750 40 T900 40 T1050 40 V85 H0 Z" fill="#0B7C8C" opacity="0.1" />
+            <path d="M0 200 Q75 186 150 200 T300 200 T450 200 T600 200 T750 200 T900 200 T1050 200 V245 H0 Z" fill="#0B7C8C" opacity="0.1" />
+            <path d="M0 370 Q75 356 150 370 T300 370 T450 370 T600 370 T750 370 T900 370 T1050 370 V415 H0 Z" fill="#0B7C8C" opacity="0.1" />
+            <path d="M0 530 Q75 516 150 530 T300 530 T450 530 T600 530 T750 530 T900 530 T1050 530 V575 H0 Z" fill="#0B7C8C" opacity="0.11" />
           </g>
         </svg>
       )}
@@ -9650,18 +9658,19 @@ export default function RecreApp() {
         /* Ondulations d'eau : uniquement l'été, sur le fond de la page.
            Deux trames de reflets qui dérivent lentement en sens contraire,
            entièrement en CSS (aucune image à télécharger). */
-        /* Trois vagues qui glissent à des vitesses différentes : leur décalage
-           progressif donne l'impression d'une surface qui ondule. */
+        /* Vagues qui glissent à trois vitesses différentes, l'une à contresens :
+           c'est leur décalage progressif qui donne l'impression d'ondulation. */
         @keyframes oree-vague-a { from { transform: translateX(0); }    to { transform: translateX(-400px); } }
         @keyframes oree-vague-b { from { transform: translateX(0); }    to { transform: translateX(-560px); } }
         @keyframes oree-vague-c { from { transform: translateX(-300px); } to { transform: translateX(0); } }
         .oree-vagues {
-          position: fixed; left: 0; right: 0; bottom: 0; height: 42vh;
+          position: fixed; inset: 0; width: 100%; height: 100%;
           pointer-events: none; z-index: 0;
         }
         .oree-vague-a { animation: oree-vague-a 18s linear infinite; }
         .oree-vague-b { animation: oree-vague-b 13s linear infinite; }
         .oree-vague-c { animation: oree-vague-c 24s linear infinite; }
+
         /* L'en-tête laisse voir l'eau qui bouge dessous */
         .oree-fond-eau .pika-header-sticky {
           background-color: rgba(228, 246, 245, 0.85);
