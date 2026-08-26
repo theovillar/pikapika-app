@@ -9202,132 +9202,116 @@ export default function RecreApp() {
       {SAISON === "hiver" && (
         <>
           <div className="oree-neige" aria-hidden="true">
-            <div className="oree-neige-a">
-            <span className="oree-flocon" style={{ left: "91.6%", top: 111.9, width: 5, height: 5, opacity: 0.9 }} />
-            <span className="oree-flocon" style={{ left: "58.6%", top: 50.0, width: 7, height: 7, opacity: 0.9 }} />
-            <span className="oree-flocon" style={{ left: "71.9%", top: 31.6, width: 5, height: 5, opacity: 0.9 }} />
-            <span className="oree-flocon" style={{ left: "61.4%", top: 106.4, width: 5, height: 5, opacity: 0.9 }} />
-            <span className="oree-flocon" style={{ left: "97.1%", top: 58.8, width: 5, height: 5, opacity: 1 }} />
-            <span className="oree-flocon" style={{ left: "62.1%", top: 50.9, width: 5, height: 5, opacity: 0.9 }} />
-            <span className="oree-flocon" style={{ left: "77.5%", top: 69.5, width: 6, height: 6, opacity: 1 }} />
-            <span className="oree-flocon" style={{ left: "21.4%", top: 86.8, width: 7, height: 7, opacity: 1 }} />
-            <span className="oree-flocon" style={{ left: "27.8%", top: 115.0, width: 5, height: 5, opacity: 0.95 }} />
-            <span className="oree-flocon" style={{ left: "17.6%", top: 57.0, width: 8, height: 8, opacity: 1 }} />
-            <span className="oree-flocon" style={{ left: "63.6%", top: 21.5, width: 6, height: 6, opacity: 1 }} />
-            <span className="oree-flocon" style={{ left: "32.0%", top: 96.3, width: 6, height: 6, opacity: 1 }} />
-            <span className="oree-flocon" style={{ left: "11.3%", top: 11.6, width: 5, height: 5, opacity: 1 }} />
-            <span className="oree-flocon" style={{ left: "27.3%", top: 67.6, width: 7, height: 7, opacity: 0.9 }} />
-            <span className="oree-flocon" style={{ left: "36.6%", top: 34.0, width: 7, height: 7, opacity: 0.95 }} />
-            <span className="oree-flocon" style={{ left: "54.4%", top: 30.5, width: 5, height: 5, opacity: 1 }} />
-            <span className="oree-flocon" style={{ left: "77.6%", top: 83.4, width: 8, height: 8, opacity: 0.9 }} />
-            <span className="oree-flocon" style={{ left: "32.5%", top: 16.8, width: 5, height: 5, opacity: 0.95 }} />
-            <span className="oree-flocon" style={{ left: "16.6%", top: 115.1, width: 5, height: 5, opacity: 1 }} />
-            <span className="oree-flocon" style={{ left: "41.2%", top: 2.8, width: 6, height: 6, opacity: 1 }} />
-            <span className="oree-flocon" style={{ left: "1.3%", top: 26.2, width: 5, height: 5, opacity: 1 }} />
-            <span className="oree-flocon" style={{ left: "93.5%", top: 52.5, width: 5, height: 5, opacity: 0.95 }} />
-            <span className="oree-flocon" style={{ left: "1.6%", top: 93.0, width: 8, height: 8, opacity: 0.9 }} />
-            <span className="oree-flocon" style={{ left: "3.7%", top: 31.2, width: 6, height: 6, opacity: 0.95 }} />
-            <span className="oree-flocon" style={{ left: "94.1%", top: 25.5, width: 5, height: 5, opacity: 1 }} />
-            <span className="oree-flocon" style={{ left: "52.4%", top: 20.0, width: 6, height: 6, opacity: 0.95 }} />
-            </div>
-            <div className="oree-neige-b">
-            <span className="oree-flocon" style={{ left: "9.9%", top: 19.5, width: 3, height: 3, opacity: 0.8 }} />
-            <span className="oree-flocon" style={{ left: "75.4%", top: 77.5, width: 4, height: 4, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "88.6%", top: 81.2, width: 4, height: 4, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "68.6%", top: 97.9, width: 5, height: 5, opacity: 0.9 }} />
-            <span className="oree-flocon" style={{ left: "23.6%", top: 34.8, width: 4, height: 4, opacity: 0.8 }} />
-            <span className="oree-flocon" style={{ left: "76.4%", top: 65.7, width: 5, height: 5, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "81.8%", top: 12.8, width: 5, height: 5, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "32.9%", top: 66.0, width: 4, height: 4, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "16.4%", top: 78.0, width: 4, height: 4, opacity: 0.9 }} />
-            <span className="oree-flocon" style={{ left: "68.2%", top: 13.4, width: 5, height: 5, opacity: 0.8 }} />
-            <span className="oree-flocon" style={{ left: "79.2%", top: 116.6, width: 4, height: 4, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "33.5%", top: 2.8, width: 3, height: 3, opacity: 0.9 }} />
-            <span className="oree-flocon" style={{ left: "85.9%", top: 24.0, width: 5, height: 5, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "17.1%", top: 53.0, width: 4, height: 4, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "41.6%", top: 32.7, width: 5, height: 5, opacity: 0.9 }} />
-            <span className="oree-flocon" style={{ left: "98.2%", top: 85.0, width: 3, height: 3, opacity: 0.9 }} />
-            <span className="oree-flocon" style={{ left: "52.7%", top: 31.3, width: 3, height: 3, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "86.8%", top: 101.9, width: 4, height: 4, opacity: 0.8 }} />
-            <span className="oree-flocon" style={{ left: "76.9%", top: 79.5, width: 5, height: 5, opacity: 0.8 }} />
-            <span className="oree-flocon" style={{ left: "28.9%", top: 37.7, width: 4, height: 4, opacity: 0.8 }} />
-            <span className="oree-flocon" style={{ left: "27.1%", top: 109.8, width: 3, height: 3, opacity: 0.8 }} />
-            <span className="oree-flocon" style={{ left: "4.2%", top: 104.7, width: 5, height: 5, opacity: 0.8 }} />
-            <span className="oree-flocon" style={{ left: "74.8%", top: 104.2, width: 5, height: 5, opacity: 0.8 }} />
-            <span className="oree-flocon" style={{ left: "68.4%", top: 45.3, width: 4, height: 4, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "49.7%", top: 13.0, width: 4, height: 4, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "27.5%", top: 90.8, width: 3, height: 3, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "25.7%", top: 100.4, width: 3, height: 3, opacity: 0.9 }} />
-            <span className="oree-flocon" style={{ left: "62.8%", top: 5.0, width: 3, height: 3, opacity: 0.8 }} />
-            <span className="oree-flocon" style={{ left: "19.8%", top: 66.7, width: 5, height: 5, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "17.9%", top: 60.1, width: 5, height: 5, opacity: 0.9 }} />
-            </div>
-            <div className="oree-neige-c">
-            <span className="oree-flocon" style={{ left: "35.8%", top: 116.4, width: 2, height: 2, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "96.6%", top: 107.6, width: 2, height: 2, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "13.5%", top: 80.6, width: 3, height: 3, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "88.8%", top: 34.8, width: 2, height: 2, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "59.7%", top: 69.8, width: 3, height: 3, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "13.3%", top: 10.9, width: 2, height: 2, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "95.7%", top: 117.1, width: 2, height: 2, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "58.1%", top: 110.8, width: 3, height: 3, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "64.5%", top: 87.9, width: 3, height: 3, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "87.8%", top: 115.8, width: 2, height: 2, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "37.6%", top: 91.3, width: 2, height: 2, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "39.1%", top: 85.5, width: 2, height: 2, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "31.3%", top: 49.9, width: 2, height: 2, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "72.9%", top: 55.8, width: 2, height: 2, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "92.2%", top: 43.3, width: 3, height: 3, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "66.4%", top: 52.6, width: 2, height: 2, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "81.4%", top: 67.9, width: 2, height: 2, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "89.0%", top: 74.5, width: 2, height: 2, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "97.1%", top: 78.0, width: 3, height: 3, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "45.2%", top: 0.4, width: 3, height: 3, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "5.7%", top: 4.0, width: 3, height: 3, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "96.5%", top: 87.4, width: 3, height: 3, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "16.7%", top: 71.1, width: 2, height: 2, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "80.3%", top: 54.8, width: 2, height: 2, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "41.9%", top: 81.0, width: 3, height: 3, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "61.4%", top: 88.5, width: 2, height: 2, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "63.9%", top: 100.5, width: 3, height: 3, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "69.7%", top: 50.8, width: 3, height: 3, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "95.3%", top: 2.6, width: 2, height: 2, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "68.2%", top: 111.8, width: 2, height: 2, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "91.2%", top: 114.4, width: 2, height: 2, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "7.9%", top: 9.6, width: 2, height: 2, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "47.2%", top: 110.5, width: 2, height: 2, opacity: 0.7 }} />
-            <span className="oree-flocon" style={{ left: "26.2%", top: 64.3, width: 3, height: 3, opacity: 0.7 }} />
-            </div>
-            <div className="oree-neige-d">
-            <span className="oree-flocon" style={{ left: "64.0%", top: 103.3, width: 2, height: 2, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "65.3%", top: 79.9, width: 4, height: 4, opacity: 0.4 }} />
-            <span className="oree-flocon" style={{ left: "17.4%", top: 25.6, width: 2, height: 2, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "65.6%", top: 16.8, width: 2, height: 2, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "80.1%", top: 89.6, width: 4, height: 4, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "41.7%", top: 5.4, width: 2, height: 2, opacity: 0.4 }} />
-            <span className="oree-flocon" style={{ left: "14.4%", top: 1.6, width: 4, height: 4, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "93.1%", top: 65.8, width: 3, height: 3, opacity: 0.4 }} />
-            <span className="oree-flocon" style={{ left: "84.5%", top: 9.7, width: 3, height: 3, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "66.4%", top: 72.2, width: 2, height: 2, opacity: 0.4 }} />
-            <span className="oree-flocon" style={{ left: "30.4%", top: 99.3, width: 2, height: 2, opacity: 0.4 }} />
-            <span className="oree-flocon" style={{ left: "15.6%", top: 96.8, width: 4, height: 4, opacity: 0.4 }} />
-            <span className="oree-flocon" style={{ left: "60.8%", top: 50.5, width: 4, height: 4, opacity: 0.4 }} />
-            <span className="oree-flocon" style={{ left: "80.1%", top: 61.6, width: 4, height: 4, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "58.7%", top: 110.0, width: 2, height: 2, opacity: 0.4 }} />
-            <span className="oree-flocon" style={{ left: "26.4%", top: 70.8, width: 4, height: 4, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "80.0%", top: 98.8, width: 2, height: 2, opacity: 0.4 }} />
-            <span className="oree-flocon" style={{ left: "50.3%", top: 42.2, width: 2, height: 2, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "49.6%", top: 116.1, width: 2, height: 2, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "24.5%", top: 43.6, width: 3, height: 3, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "21.5%", top: 65.9, width: 2, height: 2, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "3.8%", top: 69.9, width: 2, height: 2, opacity: 0.4 }} />
-            <span className="oree-flocon" style={{ left: "72.9%", top: 18.0, width: 4, height: 4, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "63.1%", top: 89.6, width: 3, height: 3, opacity: 0.4 }} />
-            <span className="oree-flocon" style={{ left: "16.1%", top: 105.0, width: 3, height: 3, opacity: 0.6 }} />
-            <span className="oree-flocon" style={{ left: "20.4%", top: 83.3, width: 4, height: 4, opacity: 0.5 }} />
-            <span className="oree-flocon" style={{ left: "29.8%", top: 94.6, width: 3, height: 3, opacity: 0.4 }} />
-            <span className="oree-flocon" style={{ left: "40.0%", top: 78.6, width: 3, height: 3, opacity: 0.6 }} />
-            </div>
+          <span className="oree-flocon" style={{ left: "1.2%", width: 5, height: 5, opacity: 0.95, animationDuration: "11.7s", animationDelay: "-0.5s" }} />
+          <span className="oree-flocon" style={{ left: "94.1%", width: 6, height: 6, opacity: 1, animationDuration: "14.8s", animationDelay: "-2.2s" }} />
+          <span className="oree-flocon" style={{ left: "73.3%", width: 5, height: 5, opacity: 0.9, animationDuration: "12.2s", animationDelay: "-8.9s" }} />
+          <span className="oree-flocon" style={{ left: "52.1%", width: 6, height: 6, opacity: 1, animationDuration: "11.5s", animationDelay: "-0.2s" }} />
+          <span className="oree-flocon" style={{ left: "93.0%", width: 8, height: 8, opacity: 0.95, animationDuration: "12.0s", animationDelay: "-4.0s" }} />
+          <span className="oree-flocon" style={{ left: "36.1%", width: 6, height: 6, opacity: 0.9, animationDuration: "14.6s", animationDelay: "-6.1s" }} />
+          <span className="oree-flocon" style={{ left: "65.6%", width: 5, height: 5, opacity: 0.9, animationDuration: "15.2s", animationDelay: "-5.4s" }} />
+          <span className="oree-flocon" style={{ left: "20.2%", width: 8, height: 8, opacity: 0.9, animationDuration: "11.4s", animationDelay: "-6.1s" }} />
+          <span className="oree-flocon" style={{ left: "43.4%", width: 6, height: 6, opacity: 0.9, animationDuration: "15.0s", animationDelay: "-10.9s" }} />
+          <span className="oree-flocon" style={{ left: "19.2%", width: 6, height: 6, opacity: 0.95, animationDuration: "11.2s", animationDelay: "-3.8s" }} />
+          <span className="oree-flocon" style={{ left: "33.1%", width: 8, height: 8, opacity: 0.95, animationDuration: "14.2s", animationDelay: "-11.9s" }} />
+          <span className="oree-flocon" style={{ left: "95.2%", width: 5, height: 5, opacity: 0.95, animationDuration: "15.5s", animationDelay: "-8.7s" }} />
+          <span className="oree-flocon" style={{ left: "92.7%", width: 7, height: 7, opacity: 0.9, animationDuration: "11.9s", animationDelay: "-0.3s" }} />
+          <span className="oree-flocon" style={{ left: "78.6%", width: 7, height: 7, opacity: 1, animationDuration: "15.8s", animationDelay: "-10.6s" }} />
+          <span className="oree-flocon" style={{ left: "28.2%", width: 7, height: 7, opacity: 1, animationDuration: "15.2s", animationDelay: "-13.5s" }} />
+          <span className="oree-flocon" style={{ left: "11.3%", width: 6, height: 6, opacity: 0.95, animationDuration: "13.2s", animationDelay: "-10.4s" }} />
+          <span className="oree-flocon" style={{ left: "55.6%", width: 5, height: 5, opacity: 0.95, animationDuration: "11.5s", animationDelay: "-11.3s" }} />
+          <span className="oree-flocon" style={{ left: "11.8%", width: 6, height: 6, opacity: 0.9, animationDuration: "12.7s", animationDelay: "-9.1s" }} />
+          <span className="oree-flocon" style={{ left: "84.6%", width: 8, height: 8, opacity: 0.9, animationDuration: "13.5s", animationDelay: "-10.6s" }} />
+          <span className="oree-flocon" style={{ left: "27.5%", width: 7, height: 7, opacity: 1, animationDuration: "13.5s", animationDelay: "-8.0s" }} />
+          <span className="oree-flocon" style={{ left: "84.6%", width: 8, height: 8, opacity: 0.9, animationDuration: "15.0s", animationDelay: "-9.1s" }} />
+          <span className="oree-flocon" style={{ left: "49.3%", width: 5, height: 5, opacity: 0.95, animationDuration: "13.4s", animationDelay: "-10.5s" }} />
+          <span className="oree-flocon" style={{ left: "46.5%", width: 6, height: 6, opacity: 0.9, animationDuration: "11.5s", animationDelay: "-6.7s" }} />
+          <span className="oree-flocon" style={{ left: "44.1%", width: 5, height: 5, opacity: 0.9, animationDuration: "11.6s", animationDelay: "-10.0s" }} />
+          <span className="oree-flocon" style={{ left: "4.9%", width: 6, height: 6, opacity: 0.9, animationDuration: "15.7s", animationDelay: "-13.6s" }} />
+          <span className="oree-flocon" style={{ left: "68.2%", width: 8, height: 8, opacity: 1, animationDuration: "14.5s", animationDelay: "-7.6s" }} />
+          <span className="oree-flocon" style={{ left: "85.1%", width: 8, height: 8, opacity: 0.9, animationDuration: "13.6s", animationDelay: "-9.8s" }} />
+          <span className="oree-flocon" style={{ left: "45.7%", width: 8, height: 8, opacity: 0.95, animationDuration: "11.7s", animationDelay: "-1.4s" }} />
+          <span className="oree-flocon" style={{ left: "77.5%", width: 6, height: 6, opacity: 0.95, animationDuration: "14.5s", animationDelay: "-8.4s" }} />
+          <span className="oree-flocon" style={{ left: "16.5%", width: 5, height: 5, opacity: 1, animationDuration: "13.1s", animationDelay: "-1.8s" }} />
+          <span className="oree-flocon" style={{ left: "37.7%", width: 4, height: 4, opacity: 0.7, animationDuration: "18.0s", animationDelay: "-12.8s" }} />
+          <span className="oree-flocon" style={{ left: "53.6%", width: 3, height: 3, opacity: 0.8, animationDuration: "20.1s", animationDelay: "-16.6s" }} />
+          <span className="oree-flocon" style={{ left: "3.3%", width: 5, height: 5, opacity: 0.8, animationDuration: "16.8s", animationDelay: "-3.4s" }} />
+          <span className="oree-flocon" style={{ left: "80.6%", width: 4, height: 4, opacity: 0.7, animationDuration: "17.8s", animationDelay: "-14.6s" }} />
+          <span className="oree-flocon" style={{ left: "38.0%", width: 3, height: 3, opacity: 0.7, animationDuration: "16.5s", animationDelay: "-5.7s" }} />
+          <span className="oree-flocon" style={{ left: "69.1%", width: 4, height: 4, opacity: 0.7, animationDuration: "20.4s", animationDelay: "-1.3s" }} />
+          <span className="oree-flocon" style={{ left: "24.7%", width: 5, height: 5, opacity: 0.9, animationDuration: "18.4s", animationDelay: "-9.2s" }} />
+          <span className="oree-flocon" style={{ left: "92.6%", width: 4, height: 4, opacity: 0.9, animationDuration: "16.3s", animationDelay: "-0.6s" }} />
+          <span className="oree-flocon" style={{ left: "47.8%", width: 4, height: 4, opacity: 0.8, animationDuration: "20.8s", animationDelay: "-20.4s" }} />
+          <span className="oree-flocon" style={{ left: "27.4%", width: 4, height: 4, opacity: 0.8, animationDuration: "17.1s", animationDelay: "-15.6s" }} />
+          <span className="oree-flocon" style={{ left: "57.4%", width: 4, height: 4, opacity: 0.7, animationDuration: "16.7s", animationDelay: "-2.4s" }} />
+          <span className="oree-flocon" style={{ left: "62.6%", width: 4, height: 4, opacity: 0.7, animationDuration: "19.7s", animationDelay: "-13.9s" }} />
+          <span className="oree-flocon" style={{ left: "2.0%", width: 5, height: 5, opacity: 0.8, animationDuration: "21.6s", animationDelay: "-14.5s" }} />
+          <span className="oree-flocon" style={{ left: "51.4%", width: 4, height: 4, opacity: 0.8, animationDuration: "20.5s", animationDelay: "-8.2s" }} />
+          <span className="oree-flocon" style={{ left: "21.1%", width: 3, height: 3, opacity: 0.8, animationDuration: "15.3s", animationDelay: "-8.7s" }} />
+          <span className="oree-flocon" style={{ left: "94.9%", width: 3, height: 3, opacity: 0.7, animationDuration: "20.9s", animationDelay: "-8.6s" }} />
+          <span className="oree-flocon" style={{ left: "90.3%", width: 4, height: 4, opacity: 0.7, animationDuration: "20.6s", animationDelay: "-1.3s" }} />
+          <span className="oree-flocon" style={{ left: "24.6%", width: 4, height: 4, opacity: 0.8, animationDuration: "16.0s", animationDelay: "-0.8s" }} />
+          <span className="oree-flocon" style={{ left: "31.0%", width: 3, height: 3, opacity: 0.8, animationDuration: "16.6s", animationDelay: "-14.3s" }} />
+          <span className="oree-flocon" style={{ left: "54.1%", width: 3, height: 3, opacity: 0.7, animationDuration: "18.5s", animationDelay: "-8.8s" }} />
+          <span className="oree-flocon" style={{ left: "26.9%", width: 4, height: 4, opacity: 0.9, animationDuration: "19.8s", animationDelay: "-17.8s" }} />
+          <span className="oree-flocon" style={{ left: "81.9%", width: 5, height: 5, opacity: 0.9, animationDuration: "17.4s", animationDelay: "-2.9s" }} />
+          <span className="oree-flocon" style={{ left: "8.9%", width: 4, height: 4, opacity: 0.7, animationDuration: "21.6s", animationDelay: "-8.5s" }} />
+          <span className="oree-flocon" style={{ left: "86.1%", width: 5, height: 5, opacity: 0.8, animationDuration: "16.4s", animationDelay: "-3.6s" }} />
+          <span className="oree-flocon" style={{ left: "5.7%", width: 4, height: 4, opacity: 0.7, animationDuration: "21.2s", animationDelay: "-8.7s" }} />
+          <span className="oree-flocon" style={{ left: "74.4%", width: 3, height: 3, opacity: 0.9, animationDuration: "20.5s", animationDelay: "-19.6s" }} />
+          <span className="oree-flocon" style={{ left: "51.1%", width: 4, height: 4, opacity: 0.8, animationDuration: "16.7s", animationDelay: "-4.3s" }} />
+          <span className="oree-flocon" style={{ left: "9.0%", width: 3, height: 3, opacity: 0.7, animationDuration: "21.1s", animationDelay: "-6.5s" }} />
+          <span className="oree-flocon" style={{ left: "70.2%", width: 3, height: 3, opacity: 0.7, animationDuration: "19.5s", animationDelay: "-9.1s" }} />
+          <span className="oree-flocon" style={{ left: "27.2%", width: 4, height: 4, opacity: 0.8, animationDuration: "20.4s", animationDelay: "-17.0s" }} />
+          <span className="oree-flocon" style={{ left: "59.2%", width: 5, height: 5, opacity: 0.8, animationDuration: "17.4s", animationDelay: "-3.2s" }} />
+          <span className="oree-flocon" style={{ left: "22.4%", width: 4, height: 4, opacity: 0.7, animationDuration: "15.8s", animationDelay: "-13.5s" }} />
+          <span className="oree-flocon" style={{ left: "70.1%", width: 4, height: 4, opacity: 0.8, animationDuration: "19.7s", animationDelay: "-8.9s" }} />
+          <span className="oree-flocon" style={{ left: "19.5%", width: 5, height: 5, opacity: 0.7, animationDuration: "17.3s", animationDelay: "-15.6s" }} />
+          <span className="oree-flocon" style={{ left: "86.2%", width: 4, height: 4, opacity: 0.8, animationDuration: "16.0s", animationDelay: "-7.0s" }} />
+          <span className="oree-flocon" style={{ left: "15.4%", width: 4, height: 4, opacity: 0.9, animationDuration: "17.3s", animationDelay: "-14.7s" }} />
+          <span className="oree-flocon" style={{ left: "30.5%", width: 3, height: 3, opacity: 0.8, animationDuration: "15.8s", animationDelay: "-11.2s" }} />
+          <span className="oree-flocon" style={{ left: "60.4%", width: 5, height: 5, opacity: 0.7, animationDuration: "18.9s", animationDelay: "-11.2s" }} />
+          <span className="oree-flocon" style={{ left: "75.9%", width: 3, height: 3, opacity: 0.45, animationDuration: "25.4s", animationDelay: "-20.0s" }} />
+          <span className="oree-flocon" style={{ left: "58.9%", width: 3, height: 3, opacity: 0.65, animationDuration: "29.8s", animationDelay: "-7.7s" }} />
+          <span className="oree-flocon" style={{ left: "7.4%", width: 2, height: 2, opacity: 0.45, animationDuration: "26.9s", animationDelay: "-3.8s" }} />
+          <span className="oree-flocon" style={{ left: "95.1%", width: 2, height: 2, opacity: 0.55, animationDuration: "24.5s", animationDelay: "-4.4s" }} />
+          <span className="oree-flocon" style={{ left: "45.6%", width: 2, height: 2, opacity: 0.65, animationDuration: "28.8s", animationDelay: "-10.2s" }} />
+          <span className="oree-flocon" style={{ left: "38.5%", width: 2, height: 2, opacity: 0.55, animationDuration: "23.4s", animationDelay: "-11.7s" }} />
+          <span className="oree-flocon" style={{ left: "65.7%", width: 2, height: 2, opacity: 0.65, animationDuration: "21.4s", animationDelay: "-18.3s" }} />
+          <span className="oree-flocon" style={{ left: "16.0%", width: 2, height: 2, opacity: 0.65, animationDuration: "24.6s", animationDelay: "-12.2s" }} />
+          <span className="oree-flocon" style={{ left: "93.3%", width: 2, height: 2, opacity: 0.45, animationDuration: "27.5s", animationDelay: "-24.9s" }} />
+          <span className="oree-flocon" style={{ left: "59.4%", width: 2, height: 2, opacity: 0.45, animationDuration: "21.0s", animationDelay: "-17.0s" }} />
+          <span className="oree-flocon" style={{ left: "83.9%", width: 3, height: 3, opacity: 0.65, animationDuration: "21.8s", animationDelay: "-1.6s" }} />
+          <span className="oree-flocon" style={{ left: "41.0%", width: 3, height: 3, opacity: 0.65, animationDuration: "20.5s", animationDelay: "-6.1s" }} />
+          <span className="oree-flocon" style={{ left: "81.3%", width: 2, height: 2, opacity: 0.45, animationDuration: "24.0s", animationDelay: "-12.3s" }} />
+          <span className="oree-flocon" style={{ left: "16.0%", width: 2, height: 2, opacity: 0.55, animationDuration: "20.7s", animationDelay: "-3.0s" }} />
+          <span className="oree-flocon" style={{ left: "96.5%", width: 2, height: 2, opacity: 0.55, animationDuration: "22.5s", animationDelay: "-19.2s" }} />
+          <span className="oree-flocon" style={{ left: "95.7%", width: 3, height: 3, opacity: 0.55, animationDuration: "25.2s", animationDelay: "-10.8s" }} />
+          <span className="oree-flocon" style={{ left: "98.3%", width: 2, height: 2, opacity: 0.55, animationDuration: "27.1s", animationDelay: "-17.1s" }} />
+          <span className="oree-flocon" style={{ left: "23.9%", width: 2, height: 2, opacity: 0.65, animationDuration: "20.2s", animationDelay: "-14.7s" }} />
+          <span className="oree-flocon" style={{ left: "59.5%", width: 2, height: 2, opacity: 0.55, animationDuration: "26.6s", animationDelay: "-13.1s" }} />
+          <span className="oree-flocon" style={{ left: "34.1%", width: 2, height: 2, opacity: 0.55, animationDuration: "24.7s", animationDelay: "-9.0s" }} />
+          <span className="oree-flocon" style={{ left: "23.1%", width: 3, height: 3, opacity: 0.65, animationDuration: "29.6s", animationDelay: "-7.9s" }} />
+          <span className="oree-flocon" style={{ left: "87.8%", width: 3, height: 3, opacity: 0.65, animationDuration: "26.5s", animationDelay: "-5.3s" }} />
+          <span className="oree-flocon" style={{ left: "41.1%", width: 2, height: 2, opacity: 0.45, animationDuration: "24.6s", animationDelay: "-8.3s" }} />
+          <span className="oree-flocon" style={{ left: "79.7%", width: 3, height: 3, opacity: 0.55, animationDuration: "20.8s", animationDelay: "-12.4s" }} />
+          <span className="oree-flocon" style={{ left: "58.2%", width: 3, height: 3, opacity: 0.55, animationDuration: "25.5s", animationDelay: "-19.6s" }} />
+          <span className="oree-flocon" style={{ left: "2.7%", width: 2, height: 2, opacity: 0.65, animationDuration: "26.9s", animationDelay: "-26.3s" }} />
+          <span className="oree-flocon" style={{ left: "93.4%", width: 3, height: 3, opacity: 0.55, animationDuration: "22.8s", animationDelay: "-10.3s" }} />
+          <span className="oree-flocon" style={{ left: "15.7%", width: 2, height: 2, opacity: 0.55, animationDuration: "21.9s", animationDelay: "-10.8s" }} />
+          <span className="oree-flocon" style={{ left: "22.8%", width: 3, height: 3, opacity: 0.55, animationDuration: "20.4s", animationDelay: "-19.2s" }} />
+          <span className="oree-flocon" style={{ left: "68.8%", width: 2, height: 2, opacity: 0.45, animationDuration: "29.0s", animationDelay: "-11.6s" }} />
+          <span className="oree-flocon" style={{ left: "46.1%", width: 2, height: 2, opacity: 0.55, animationDuration: "21.2s", animationDelay: "-10.7s" }} />
+          <span className="oree-flocon" style={{ left: "63.3%", width: 3, height: 3, opacity: 0.55, animationDuration: "29.3s", animationDelay: "-5.0s" }} />
+          <span className="oree-flocon" style={{ left: "33.6%", width: 2, height: 2, opacity: 0.65, animationDuration: "22.9s", animationDelay: "-6.2s" }} />
+          <span className="oree-flocon" style={{ left: "12.5%", width: 2, height: 2, opacity: 0.55, animationDuration: "25.7s", animationDelay: "-1.8s" }} />
+          <span className="oree-flocon" style={{ left: "21.4%", width: 2, height: 2, opacity: 0.55, animationDuration: "25.5s", animationDelay: "-5.5s" }} />
+          <span className="oree-flocon" style={{ left: "10.1%", width: 2, height: 2, opacity: 0.65, animationDuration: "23.8s", animationDelay: "-20.7s" }} />
+          <span className="oree-flocon" style={{ left: "4.4%", width: 2, height: 2, opacity: 0.45, animationDuration: "22.6s", animationDelay: "-10.1s" }} />
+          <span className="oree-flocon" style={{ left: "8.0%", width: 2, height: 2, opacity: 0.45, animationDuration: "28.4s", animationDelay: "-9.2s" }} />
+          <span className="oree-flocon" style={{ left: "77.3%", width: 3, height: 3, opacity: 0.55, animationDuration: "21.2s", animationDelay: "-16.3s" }} />
+          <span className="oree-flocon" style={{ left: "80.9%", width: 2, height: 2, opacity: 0.45, animationDuration: "28.8s", animationDelay: "-24.3s" }} />
+          <span className="oree-flocon" style={{ left: "87.5%", width: 3, height: 3, opacity: 0.45, animationDuration: "26.5s", animationDelay: "-20.8s" }} />
+          <span className="oree-flocon" style={{ left: "88.0%", width: 2, height: 2, opacity: 0.45, animationDuration: "27.0s", animationDelay: "-22.4s" }} />
           </div>
           <div className="oree-feu" aria-hidden="true">
             <div className="oree-lueur" />
@@ -9912,21 +9896,19 @@ export default function RecreApp() {
         /* Neige d'hiver : trois couches de flocons qui tombent à des rythmes
            différents, en dérivant légèrement sur le côté comme sous le vent. */
         @keyframes oree-neige {
-          from { transform: translate3d(0, -120px, 0); }
-          to   { transform: translate3d(-40px, 100vh, 0); }
+          from { transform: translate3d(0, 0, 0); }
+          to   { transform: translate3d(-40px, calc(100vh + 40px), 0); }
         }
         .oree-neige {
           position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
         }
-        .oree-neige > div {
-          position: absolute; top: -120px; left: 0; right: 0; height: 120px;
-        }
-        .oree-neige-a { animation: oree-neige 14s linear infinite; }
-        .oree-neige-b { animation: oree-neige 20s linear infinite; animation-delay: -7s; }
-        .oree-neige-c { animation: oree-neige 27s linear infinite; animation-delay: -14s; }
-        .oree-neige-d { animation: oree-neige 17s linear infinite; animation-delay: -4s; }
+        /* Chaque flocon tombe indépendamment, avec sa propre durée et son propre
+           retard : la chute est continue, sans paquets ni trous. */
         .oree-flocon {
-          position: absolute; border-radius: 50%; background: #fff;
+          position: absolute; top: -20px; border-radius: 50%; background: #fff;
+          animation-name: oree-neige;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
         }
         /* Feuilles d'automne : elles tombent en virevoltant, chacune sur sa
            propre trajectoire. La rotation et le balancement latéral rendent
@@ -10005,7 +9987,7 @@ export default function RecreApp() {
         /* Respect du réglage système : pas d'animation pour qui la désactive */
         @media (prefers-reduced-motion: reduce) {
           .oree-vague-a, .oree-vague-b, .oree-vague-c,
-          .oree-neige > div, .oree-lueur, .oree-flamme, .oree-feuille { animation: none; }
+          .oree-flocon, .oree-lueur, .oree-flamme, .oree-feuille { animation: none; }
         }
 
         /* Sur écran étroit, on masque les dernières pastilles plutôt que de déborder.
