@@ -9398,7 +9398,7 @@ export default function RecreApp() {
               <svg width="30" height="24" viewBox="0 0 34 26" aria-hidden="true">
                 <path d="M10 10 Q4 12 2 11 Q7 13 10 12 Z" fill="#5C7A99" />
                 <ellipse cx="18" cy="10" rx="8" ry="4.2" fill="#4A6A8A" />
-                <path d="M14 8 Q9 3 4 6 Q10 9 15 10 Z" fill="#5C7A99" />
+                <g className="oree-aile"><path d="M14 8 Q9 3 4 6 Q10 9 15 10 Z" fill="#5C7A99" /></g>
                 <circle cx="25" cy="8" r="3.4" fill="#4A6A8A" />
                 <path d="M28 8 L33 9.5 L28 10.5 Z" fill="#E8A33D" />
                 <circle cx="26" cy="7.2" r="0.9" fill="#1E2E3E" />
@@ -9406,7 +9406,7 @@ export default function RecreApp() {
             </span>
           </div>
 
-          <span className="oree-abeille" style={{ left: "18.4%", bottom: "78px", animationDelay: "-1.7s" }}>
+          <span className="oree-abeille oree-abeille-1" style={{ left: "17.2%", bottom: "62px", animationDelay: "-3s" }}>
             <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true">
               <ellipse cx="8" cy="5" rx="6" ry="3.5" fill="rgba(255,255,255,0.75)" />
               <ellipse cx="14" cy="5" rx="5" ry="3" fill="rgba(255,255,255,0.6)" />
@@ -9416,7 +9416,7 @@ export default function RecreApp() {
               <circle cx="17.4" cy="9.4" r="2.6" fill="#4A3B1E" />
             </svg>
           </span>
-          <span className="oree-abeille" style={{ left: "63.2%", bottom: "96px", animationDelay: "-3.4s" }}>
+          <span className="oree-abeille oree-abeille-2" style={{ left: "57.6%", bottom: "80px", animationDelay: "-11s" }}>
             <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true">
               <ellipse cx="8" cy="5" rx="6" ry="3.5" fill="rgba(255,255,255,0.75)" />
               <ellipse cx="14" cy="5" rx="5" ry="3" fill="rgba(255,255,255,0.6)" />
@@ -10503,14 +10503,63 @@ export default function RecreApp() {
           animation: oree-frémit 5s ease-in-out infinite;
         }
 
-        /* Abeilles posées sur une fleur : elles ne font que frémir légèrement */
+        /* Abeilles : posées la plupart du temps, elles changent de fleur
+           de temps en temps. Le vol ne dure qu'un instant dans le cycle. */
         .oree-abeille {
           position: absolute;
-          animation: oree-frémit 4s ease-in-out infinite;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
         }
-        @keyframes oree-frémit {
-          0%, 100% { transform: translate(0, 0)     rotate(-2deg); }
-          50%      { transform: translate(1px, -2px) rotate(2deg); }
+        .oree-abeille-1 { animation-name: oree-butine-1; animation-duration: 26s; }
+        .oree-abeille-2 { animation-name: oree-butine-2; animation-duration: 34s; }
+
+        @keyframes oree-butine-1 {
+          /* Posée sur sa fleur, elle frémit à peine */
+          0%, 34%  { transform: translate(0, 0) rotate(-2deg); }
+          38%      { transform: translate(0, -2px) rotate(2deg); }
+          /* Elle s'envole vers une autre fleur */
+          44%      { transform: translate(30px, -34px) rotate(-8deg); }
+          50%      { transform: translate(78px, -18px) rotate(6deg); }
+          56%, 92% { transform: translate(112px, -12px) rotate(-2deg); }
+          /* Puis elle revient */
+          97%      { transform: translate(48px, -28px) rotate(7deg); }
+          100%     { transform: translate(0, 0) rotate(-2deg); }
+        }
+        @keyframes oree-butine-2 {
+          0%, 48%  { transform: translate(0, 0) rotate(2deg); }
+          52%      { transform: translate(-2px, -2px) rotate(-2deg); }
+          58%      { transform: translate(-40px, -30px) rotate(9deg); }
+          64%      { transform: translate(-92px, -14px) rotate(-6deg); }
+          70%, 94% { transform: translate(-128px, -20px) rotate(2deg); }
+          98%      { transform: translate(-56px, -32px) rotate(-8deg); }
+          100%     { transform: translate(0, 0) rotate(2deg); }
+        }
+
+        /* L'oiseau s'envole de temps en temps, puis revient se poser */
+        .oree-oiseau {
+          position: absolute;
+          animation: oree-oiseau-envol 48s ease-in-out infinite;
+        }
+        .oree-aile {
+          transform-origin: 14px 9px;
+          animation: oree-bat-aile 0.5s ease-in-out infinite;
+        }
+        @keyframes oree-oiseau-envol {
+          /* Posé sur sa branche, immobile */
+          0%, 40%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+          /* Il s'élance et traverse le ciel */
+          46%       { transform: translate(60px, -70px) rotate(-8deg); opacity: 1; }
+          54%       { transform: translate(46vw, -34vh) rotate(4deg); opacity: 1; }
+          62%       { transform: translate(88vw, -22vh) rotate(-3deg); opacity: 0; }
+          /* Il revient par la gauche */
+          70%       { transform: translate(-40vw, -30vh) rotate(3deg); opacity: 0; }
+          76%       { transform: translate(-14vw, -24vh) rotate(-4deg); opacity: 1; }
+          86%       { transform: translate(70px, -58px) rotate(6deg); opacity: 1; }
+          94%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+        }
+        @keyframes oree-bat-aile {
+          0%, 100% { transform: rotate(-16deg); }
+          50%      { transform: rotate(20deg); }
         }
 
         /* Feuilles d'automne : elles tombent en virevoltant, chacune sur sa
@@ -10588,7 +10637,7 @@ export default function RecreApp() {
           .oree-flocon, .oree-cristal, .oree-lueur, .oree-flamme, .oree-feuille,
           .oree-soleil-halo, .oree-soleil-rayons, .oree-fleur, .oree-abeille,
           .oree-nuage, .oree-pluie, .oree-goutte,
-          .oree-oiseau, .oree-arbre, .oree-feuillage { animation: none; }
+          .oree-oiseau, .oree-aile, .oree-arbre, .oree-feuillage { animation: none; }
         }
 
         /* Sur écran étroit, on masque les dernières pastilles plutôt que de déborder.
