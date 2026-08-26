@@ -9919,7 +9919,7 @@ export default function RecreApp() {
           }}
         >
           <OreeMascot size={32} />
-          <span style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink }}>
+          <span className="pika-logo-nom" style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 20, color: COLORS.ink }}>
             Orée
           </span>
         </button>
@@ -9951,6 +9951,7 @@ export default function RecreApp() {
               aria-label={t("tab_mes_sorties")}
               title={t("tab_mes_sorties")}
               className="pika-header-action"
+              data-actif={tab === "mes-sorties" ? "1" : "0"}
               style={{
                 display: "flex", alignItems: "center", gap: 6, cursor: "pointer",
                 borderRadius: 999, border: "none", padding: "7px 12px", flexShrink: 0,
@@ -9975,6 +9976,7 @@ export default function RecreApp() {
               aria-label={t("mairie_sub_stats")}
               title={t("mairie_sub_stats")}
               className="pika-header-action"
+              data-actif={tab === "stats" ? "1" : "0"}
               style={{
                 display: "flex", alignItems: "center", gap: 6, cursor: "pointer",
                 borderRadius: 999, border: "none", padding: "7px 12px", flexShrink: 0,
@@ -10438,6 +10440,22 @@ export default function RecreApp() {
         }
         .oree-mode-nuit .pika-header-action { box-shadow: 0 0 0 2px rgba(255,255,255,0.22) inset; }
         .oree-mode-nuit .pika-header-action-icon { color: #E6ECF7 !important; }
+
+        /* Onglets de navigation, nom "Orée" et boutons de l'en-tête : tous posés
+           sur le fond sombre, ils doivent passer en clair. */
+        .oree-mode-nuit .desktop-nav button,
+        .oree-mode-nuit .desktop-nav button span { color: #E6ECF7 !important; }
+        .oree-mode-nuit .desktop-nav button svg { stroke: #E6ECF7 !important; }
+        .oree-mode-nuit .pika-logo-nom { color: #F2F5FB !important; }
+
+        /* Les boutons non actifs deviennent des contours clairs sur fond sombre */
+        .oree-mode-nuit .pika-header-action:not([data-actif="1"]) {
+          background: rgba(255,255,255,0.08) !important;
+        }
+        .oree-mode-nuit .pika-header-action:not([data-actif="1"]) span,
+        .oree-mode-nuit .pika-header-action:not([data-actif="1"]) svg {
+          color: #E6ECF7 !important;
+        }
 
         /* Ciel de nuit : un voile sombre par-dessus le décor de saison,
            avec des étoiles qui scintillent et une lune. */
