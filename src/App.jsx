@@ -131,7 +131,7 @@ const TRANSLATIONS = {
     stats_monthly_chart: "Sorties créées par mois (12 derniers mois)",
     stats_outings_created: "sortie(s) créée(s)",
     deleted_account_name: "Compte supprimé",
-    admin_sub_stats: "Statistiques", admin_saison: "Ambiance", saison_auto: "Automatique", saison_printemps: "Printemps", saison_ete: "Été", saison_automne: "Automne", saison_hiver: "Hiver", admin_sub_users: "Utilisateurs", admin_sub_reports: "Signalements", admin_reports_title: "Signalements reçus", admin_photos_title: "Photos à vérifier", admin_photos_note: "Ces photos ont passé le filtre automatique mais méritent un coup d'œil.", admin_photo_ok: "Valider", admin_photo_remove: "Supprimer", admin_reports_empty: "Aucun signalement dans cette catégorie.", admin_reports_pending: "{n} signalement(s) en attente de traitement", admin_report_reporter: "Signalé par", admin_report_reported: "Personne visée", admin_report_activity: "Sortie concernée", admin_report_note: "Note interne", admin_report_note_ph: "Ex. Contacté par téléphone le 12/03, avertissement donné.", admin_report_add_note: "Ajouter une note", admin_report_escalate: "Transmis aux autorités", admin_report_reopen: "Remettre en attente", report_status_escalated: "Transmis",
+    admin_sub_stats: "Statistiques", admin_saison: "Ambiance", saison_auto: "Automatique", saison_printemps: "Printemps", saison_ete: "Été", saison_automne: "Automne", saison_hiver: "Hiver", saison_nuit: "Nuit", admin_sub_users: "Utilisateurs", admin_sub_reports: "Signalements", admin_reports_title: "Signalements reçus", admin_photos_title: "Photos à vérifier", admin_photos_note: "Ces photos ont passé le filtre automatique mais méritent un coup d'œil.", admin_photo_ok: "Valider", admin_photo_remove: "Supprimer", admin_reports_empty: "Aucun signalement dans cette catégorie.", admin_reports_pending: "{n} signalement(s) en attente de traitement", admin_report_reporter: "Signalé par", admin_report_reported: "Personne visée", admin_report_activity: "Sortie concernée", admin_report_note: "Note interne", admin_report_note_ph: "Ex. Contacté par téléphone le 12/03, avertissement donné.", admin_report_add_note: "Ajouter une note", admin_report_escalate: "Transmis aux autorités", admin_report_reopen: "Remettre en attente", report_status_escalated: "Transmis",
     admin_users_title: "Tous les utilisateurs", admin_no_users: "Aucun utilisateur pour le moment.", admin_no_commune: "Aucune commune",
     admin_search_placeholder: "Rechercher par nom ou email…", admin_no_results: "Aucun utilisateur ne correspond.",
     admin_block: "Bloquer", admin_unblock: "Débloquer", admin_delete: "Supprimer",
@@ -498,6 +498,20 @@ function saisonChoisie() {
 }
 
 const SAISON = saisonChoisie();
+
+// Ciel de nuit : de 22h à 6h, un voile étoilé se pose par-dessus le décor
+// de saison. Comme pour les saisons, on peut le forcer pour essayer (?nuit=1).
+function estLaNuit() {
+  try {
+    const forcee = new URLSearchParams(window.location.search).get("nuit");
+    if (forcee === "1") return true;
+    if (forcee === "0") return false;
+  } catch (e) { /* pas d'adresse : on suit l'heure */ }
+  const h = new Date().getHours();
+  return h >= 22 || h < 6;
+}
+
+const NUIT = estLaNuit();
 
 const COLORS = {
   ...PALETTES[SAISON],
@@ -6205,18 +6219,8 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
       </div>
 
       <div style={{ flex: 1, minWidth: "15ch" }}>
-        {(spaceLabel || isCreator || isPast || structure) && (
+        {(spaceLabel || isCreator || isPast) && (
           <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap", marginBottom: 2 }}>
-            {/* Type de structure organisatrice : le texte lève toute ambiguïté sur la couleur */}
-            {structure && !isPast && (
-              <span style={{
-                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9, padding: "1px 7px",
-                borderRadius: 999, background: `${structure.couleur}1F`, color: structure.couleur,
-                textTransform: "uppercase", letterSpacing: 0.4,
-              }}>
-                {structure.label()}
-              </span>
-            )}
             {spaceLabel && (
               <span style={{
                 fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9.5, letterSpacing: 0.4,
@@ -8215,6 +8219,33 @@ function AdminArea({ allProfiles, allActivitiesRaw, currentUserId, onToggleBan, 
             </button>
           );
         })}
+
+        {/* Essai du ciel de nuit, qui se pose par-dessus la saison */}
+        {(() => {
+          let nuitForcee = null;
+          try { nuitForcee = new URLSearchParams(window.location.search).get("nuit"); } catch (e) { /* rien */ }
+          const active = nuitForcee === "1";
+          return (
+            <button
+              onClick={() => {
+                const url = new URL(window.location.href);
+                if (active) url.searchParams.delete("nuit");
+                else url.searchParams.set("nuit", "1");
+                window.location.href = url.toString();
+              }}
+              style={{
+                border: `2px solid ${active ? "#1B2A4A" : "#F0EADB"}`,
+                background: active ? "#1B2A4A" : "#fff",
+                color: active ? "#fff" : COLORS.ink,
+                borderRadius: 999, padding: "5px 12px", cursor: "pointer",
+                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12,
+                marginLeft: 6,
+              }}
+            >
+              {t("saison_nuit")}
+            </button>
+          );
+        })()}
       </div>
 
       {sub === "stats" && <StatsSection allProfiles={allProfiles} allActivitiesRaw={allActivitiesRaw} />}
@@ -9689,6 +9720,85 @@ export default function RecreApp() {
           </div>
         </>
       )}
+      {/* Ciel de nuit : se pose par-dessus le décor de saison */}
+      {NUIT && (
+        <div className="oree-nuit" aria-hidden="true">
+          <div className="oree-lune" />
+          <span className="oree-etoile" style={{ left: "79.1%", top: "15.9vh", width: 2, height: 2, animationDuration: "3.3s", animationDelay: "-5.6s" }} />
+          <span className="oree-etoile" style={{ left: "28.9%", top: "54.6vh", width: 3, height: 3, animationDuration: "3.5s", animationDelay: "-3.3s" }} />
+          <span className="oree-etoile" style={{ left: "65.5%", top: "0.1vh", width: 2, height: 2, animationDuration: "2.6s", animationDelay: "-5.7s" }} />
+          <span className="oree-etoile" style={{ left: "17.1%", top: "45.5vh", width: 3, height: 3, animationDuration: "6.5s", animationDelay: "-2.3s" }} />
+          <span className="oree-etoile" style={{ left: "32.8%", top: "4.9vh", width: 3, height: 3, animationDuration: "5.6s", animationDelay: "-3.2s" }} />
+          <span className="oree-etoile" style={{ left: "20.3%", top: "8.6vh", width: 1.5, height: 1.5, animationDuration: "5.9s", animationDelay: "-4.2s" }} />
+          <span className="oree-etoile" style={{ left: "89.2%", top: "31.8vh", width: 3, height: 3, animationDuration: "2.8s", animationDelay: "-5.0s" }} />
+          <span className="oree-etoile" style={{ left: "97.2%", top: "40.8vh", width: 3.5, height: 3.5, animationDuration: "3.8s", animationDelay: "-0.5s" }} />
+          <span className="oree-etoile" style={{ left: "57.1%", top: "46.4vh", width: 3, height: 3, animationDuration: "6.4s", animationDelay: "-1.6s" }} />
+          <span className="oree-etoile" style={{ left: "62.1%", top: "52.4vh", width: 1.5, height: 1.5, animationDuration: "3.9s", animationDelay: "-3.2s" }} />
+          <span className="oree-etoile" style={{ left: "82.0%", top: "42.8vh", width: 2.5, height: 2.5, animationDuration: "5.5s", animationDelay: "-5.7s" }} />
+          <span className="oree-etoile" style={{ left: "52.6%", top: "10.1vh", width: 2.5, height: 2.5, animationDuration: "4.1s", animationDelay: "-0.8s" }} />
+          <span className="oree-etoile" style={{ left: "79.6%", top: "0.4vh", width: 1.5, height: 1.5, animationDuration: "2.7s", animationDelay: "-3.8s" }} />
+          <span className="oree-etoile" style={{ left: "73.8%", top: "42.1vh", width: 2.5, height: 2.5, animationDuration: "3.0s", animationDelay: "-5.9s" }} />
+          <span className="oree-etoile" style={{ left: "89.6%", top: "37.5vh", width: 1.5, height: 1.5, animationDuration: "5.1s", animationDelay: "-4.9s" }} />
+          <span className="oree-etoile" style={{ left: "64.8%", top: "6.4vh", width: 3, height: 3, animationDuration: "2.9s", animationDelay: "-5.1s" }} />
+          <span className="oree-etoile" style={{ left: "90.6%", top: "52.6vh", width: 2.5, height: 2.5, animationDuration: "4.8s", animationDelay: "-0.4s" }} />
+          <span className="oree-etoile" style={{ left: "47.7%", top: "42.1vh", width: 1.5, height: 1.5, animationDuration: "5.3s", animationDelay: "-1.4s" }} />
+          <span className="oree-etoile" style={{ left: "66.0%", top: "24.0vh", width: 2.5, height: 2.5, animationDuration: "6.4s", animationDelay: "-0.6s" }} />
+          <span className="oree-etoile" style={{ left: "84.7%", top: "11.1vh", width: 2, height: 2, animationDuration: "5.6s", animationDelay: "-0.5s" }} />
+          <span className="oree-etoile" style={{ left: "16.3%", top: "0.8vh", width: 2, height: 2, animationDuration: "5.2s", animationDelay: "-4.6s" }} />
+          <span className="oree-etoile" style={{ left: "95.7%", top: "30.6vh", width: 3.5, height: 3.5, animationDuration: "4.9s", animationDelay: "-2.9s" }} />
+          <span className="oree-etoile" style={{ left: "26.5%", top: "47.1vh", width: 1.5, height: 1.5, animationDuration: "4.4s", animationDelay: "-2.5s" }} />
+          <span className="oree-etoile" style={{ left: "53.6%", top: "13.8vh", width: 2, height: 2, animationDuration: "2.6s", animationDelay: "-2.9s" }} />
+          <span className="oree-etoile" style={{ left: "3.5%", top: "40.5vh", width: 1.5, height: 1.5, animationDuration: "2.9s", animationDelay: "-5.3s" }} />
+          <span className="oree-etoile" style={{ left: "50.5%", top: "36.9vh", width: 2.5, height: 2.5, animationDuration: "3.2s", animationDelay: "-5.7s" }} />
+          <span className="oree-etoile" style={{ left: "38.0%", top: "23.6vh", width: 2.5, height: 2.5, animationDuration: "4.6s", animationDelay: "-4.9s" }} />
+          <span className="oree-etoile" style={{ left: "39.8%", top: "49.6vh", width: 3.5, height: 3.5, animationDuration: "4.2s", animationDelay: "-1.5s" }} />
+          <span className="oree-etoile" style={{ left: "85.6%", top: "49.3vh", width: 3, height: 3, animationDuration: "3.8s", animationDelay: "-5.5s" }} />
+          <span className="oree-etoile" style={{ left: "76.8%", top: "55.7vh", width: 3.5, height: 3.5, animationDuration: "6.5s", animationDelay: "-2.9s" }} />
+          <span className="oree-etoile" style={{ left: "74.2%", top: "43.4vh", width: 3, height: 3, animationDuration: "4.1s", animationDelay: "-3.2s" }} />
+          <span className="oree-etoile" style={{ left: "95.9%", top: "12.0vh", width: 3.5, height: 3.5, animationDuration: "6.0s", animationDelay: "-5.1s" }} />
+          <span className="oree-etoile" style={{ left: "65.2%", top: "52.7vh", width: 2, height: 2, animationDuration: "5.2s", animationDelay: "-0.9s" }} />
+          <span className="oree-etoile" style={{ left: "35.6%", top: "43.4vh", width: 1.5, height: 1.5, animationDuration: "3.3s", animationDelay: "-4.9s" }} />
+          <span className="oree-etoile" style={{ left: "61.7%", top: "32.4vh", width: 3, height: 3, animationDuration: "2.7s", animationDelay: "-0.1s" }} />
+          <span className="oree-etoile" style={{ left: "71.3%", top: "31.2vh", width: 3.5, height: 3.5, animationDuration: "5.3s", animationDelay: "-0.8s" }} />
+          <span className="oree-etoile" style={{ left: "78.6%", top: "35.3vh", width: 2, height: 2, animationDuration: "2.7s", animationDelay: "-3.1s" }} />
+          <span className="oree-etoile" style={{ left: "61.8%", top: "54.7vh", width: 1.5, height: 1.5, animationDuration: "6.0s", animationDelay: "-1.8s" }} />
+          <span className="oree-etoile" style={{ left: "35.6%", top: "35.0vh", width: 3.5, height: 3.5, animationDuration: "5.9s", animationDelay: "-0.3s" }} />
+          <span className="oree-etoile" style={{ left: "74.1%", top: "6.5vh", width: 2.5, height: 2.5, animationDuration: "5.7s", animationDelay: "-3.2s" }} />
+          <span className="oree-etoile" style={{ left: "81.2%", top: "21.8vh", width: 1.5, height: 1.5, animationDuration: "2.6s", animationDelay: "-4.7s" }} />
+          <span className="oree-etoile" style={{ left: "3.8%", top: "43.7vh", width: 2, height: 2, animationDuration: "5.8s", animationDelay: "-5.6s" }} />
+          <span className="oree-etoile" style={{ left: "62.7%", top: "46.2vh", width: 3, height: 3, animationDuration: "6.1s", animationDelay: "-0.5s" }} />
+          <span className="oree-etoile" style={{ left: "4.5%", top: "57.6vh", width: 3.5, height: 3.5, animationDuration: "4.1s", animationDelay: "-4.3s" }} />
+          <span className="oree-etoile" style={{ left: "17.7%", top: "24.9vh", width: 3, height: 3, animationDuration: "4.8s", animationDelay: "-4.4s" }} />
+          <span className="oree-etoile" style={{ left: "32.1%", top: "10.6vh", width: 2.5, height: 2.5, animationDuration: "4.8s", animationDelay: "-5.6s" }} />
+          <span className="oree-etoile" style={{ left: "38.3%", top: "35.7vh", width: 3, height: 3, animationDuration: "5.6s", animationDelay: "-2.4s" }} />
+          <span className="oree-etoile" style={{ left: "9.5%", top: "43.7vh", width: 3.5, height: 3.5, animationDuration: "6.5s", animationDelay: "-1.8s" }} />
+          <span className="oree-etoile" style={{ left: "66.2%", top: "16.7vh", width: 3.5, height: 3.5, animationDuration: "4.2s", animationDelay: "-3.0s" }} />
+          <span className="oree-etoile" style={{ left: "35.0%", top: "34.7vh", width: 2, height: 2, animationDuration: "3.9s", animationDelay: "-1.4s" }} />
+          <span className="oree-etoile" style={{ left: "15.7%", top: "36.4vh", width: 2, height: 2, animationDuration: "4.6s", animationDelay: "-2.7s" }} />
+          <span className="oree-etoile" style={{ left: "29.9%", top: "11.1vh", width: 1.5, height: 1.5, animationDuration: "4.4s", animationDelay: "-4.1s" }} />
+          <span className="oree-etoile" style={{ left: "27.6%", top: "7.7vh", width: 1.5, height: 1.5, animationDuration: "6.1s", animationDelay: "-3.5s" }} />
+          <span className="oree-etoile" style={{ left: "42.8%", top: "27.5vh", width: 2.5, height: 2.5, animationDuration: "5.3s", animationDelay: "-5.3s" }} />
+          <span className="oree-etoile" style={{ left: "79.4%", top: "37.5vh", width: 3, height: 3, animationDuration: "3.9s", animationDelay: "-2.9s" }} />
+          <span className="oree-etoile" style={{ left: "37.9%", top: "7.5vh", width: 2.5, height: 2.5, animationDuration: "6.0s", animationDelay: "-2.6s" }} />
+          <span className="oree-etoile" style={{ left: "74.4%", top: "0.8vh", width: 3, height: 3, animationDuration: "3.7s", animationDelay: "-1.7s" }} />
+          <span className="oree-etoile" style={{ left: "50.6%", top: "22.5vh", width: 3, height: 3, animationDuration: "2.6s", animationDelay: "-0.5s" }} />
+          <span className="oree-etoile" style={{ left: "32.7%", top: "55.8vh", width: 3.5, height: 3.5, animationDuration: "3.6s", animationDelay: "-6.0s" }} />
+          <span className="oree-etoile" style={{ left: "10.9%", top: "17.6vh", width: 1.5, height: 1.5, animationDuration: "4.3s", animationDelay: "-5.4s" }} />
+          <span className="oree-etoile" style={{ left: "16.4%", top: "25.6vh", width: 2, height: 2, animationDuration: "3.9s", animationDelay: "-5.7s" }} />
+          <span className="oree-etoile" style={{ left: "87.4%", top: "36.0vh", width: 2, height: 2, animationDuration: "3.2s", animationDelay: "-2.6s" }} />
+          <span className="oree-etoile" style={{ left: "2.4%", top: "31.3vh", width: 3, height: 3, animationDuration: "5.0s", animationDelay: "-1.4s" }} />
+          <span className="oree-etoile" style={{ left: "71.3%", top: "31.2vh", width: 2.5, height: 2.5, animationDuration: "2.9s", animationDelay: "-6.0s" }} />
+          <span className="oree-etoile" style={{ left: "89.8%", top: "3.7vh", width: 1.5, height: 1.5, animationDuration: "5.4s", animationDelay: "-2.9s" }} />
+          <span className="oree-etoile" style={{ left: "27.5%", top: "28.3vh", width: 2, height: 2, animationDuration: "4.5s", animationDelay: "-3.1s" }} />
+          <span className="oree-etoile" style={{ left: "57.8%", top: "49.4vh", width: 1.5, height: 1.5, animationDuration: "5.2s", animationDelay: "-4.8s" }} />
+          <span className="oree-etoile" style={{ left: "94.3%", top: "39.5vh", width: 2, height: 2, animationDuration: "5.8s", animationDelay: "-4.8s" }} />
+          <span className="oree-etoile" style={{ left: "27.5%", top: "54.2vh", width: 1.5, height: 1.5, animationDuration: "5.5s", animationDelay: "-3.2s" }} />
+          <span className="oree-etoile" style={{ left: "51.7%", top: "18.2vh", width: 2.5, height: 2.5, animationDuration: "5.3s", animationDelay: "-2.9s" }} />
+          <span className="oree-filante" style={{ left: "8%", top: "12vh" }} />
+          <span className="oree-filante" style={{ left: "52%", top: "6vh", animationDelay: "-7s" }} />
+        </div>
+      )}
+
       {/* Poissons et bulles d'été : purement décoratifs */}
       {SAISON === "ete" && (
         <div className="oree-poissons" aria-hidden="true">
@@ -10286,6 +10396,52 @@ export default function RecreApp() {
         /* Ondulations d'eau : uniquement l'été, sur le fond de la page.
            Deux trames de reflets qui dérivent lentement en sens contraire,
            entièrement en CSS (aucune image à télécharger). */
+        /* Ciel de nuit : un voile sombre par-dessus le décor de saison,
+           avec des étoiles qui scintillent et une lune. */
+        .oree-nuit {
+          position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+          background: linear-gradient(to bottom,
+            rgba(12,20,44,0.88) 0%,
+            rgba(20,32,64,0.82) 35%,
+            rgba(32,46,82,0.7) 68%,
+            rgba(44,58,94,0.55) 100%);
+        }
+        .oree-etoile {
+          position: absolute; border-radius: 50%; background: #fff;
+          animation-name: oree-scintille;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
+        }
+        @keyframes oree-scintille {
+          0%, 100% { opacity: .25; transform: scale(0.8); }
+          50%      { opacity: 1;   transform: scale(1.15); }
+        }
+        .oree-lune {
+          position: absolute; top: 84px; right: 9vw;
+          width: 70px; height: 70px; border-radius: 50%;
+          background: #F5F0DC;
+          box-shadow: 0 0 30px rgba(245,240,220,0.55), inset -12px 4px 0 -2px rgba(0,0,0,0.06);
+          animation: oree-lueur-lune 9s ease-in-out infinite;
+        }
+        @keyframes oree-lueur-lune {
+          0%, 100% { box-shadow: 0 0 26px rgba(245,240,220,0.45), inset -12px 4px 0 -2px rgba(0,0,0,0.06); }
+          50%      { box-shadow: 0 0 40px rgba(245,240,220,0.7),  inset -12px 4px 0 -2px rgba(0,0,0,0.06); }
+        }
+        /* Étoile filante : rare, elle traverse le ciel en un éclair */
+        .oree-filante {
+          position: absolute; width: 90px; height: 2px;
+          background: linear-gradient(to right, transparent, rgba(255,255,255,0.95));
+          border-radius: 2px;
+          animation: oree-file 14s ease-in infinite;
+          opacity: 0;
+        }
+        @keyframes oree-file {
+          0%, 88%  { transform: translate(0, 0) rotate(24deg); opacity: 0; }
+          90%      { opacity: 1; }
+          97%      { transform: translate(46vw, 26vh) rotate(24deg); opacity: 0; }
+          100%     { transform: translate(46vw, 26vh) rotate(24deg); opacity: 0; }
+        }
+
         /* Poissons : ils traversent l'écran en ondulant légèrement */
         .oree-poissons {
           position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
@@ -10635,7 +10791,8 @@ export default function RecreApp() {
           .oree-flocon, .oree-cristal, .oree-lueur, .oree-flamme, .oree-feuille,
           .oree-soleil-halo, .oree-soleil-rayons, .oree-fleur, .oree-abeille,
           .oree-nuage, .oree-pluie, .oree-goutte,
-          .oree-oiseau, .oree-aile, .oree-arbre, .oree-feuillage { animation: none; }
+          .oree-oiseau, .oree-aile, .oree-arbre, .oree-feuillage,
+          .oree-etoile, .oree-lune, .oree-filante { animation: none; }
         }
 
         /* Sur écran étroit, on masque les dernières pastilles plutôt que de déborder.
