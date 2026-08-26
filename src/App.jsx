@@ -52,13 +52,13 @@ const TRANSLATIONS = {
     label_titre: "Titre de la sortie", placeholder_titre: "Ex. Balade contée au parc", placeholder_kid_name: "Prénom de l'enfant", btn_ajouter: "Ajouter",
     label_categorie: "Catégorie", idees_titre: "Besoin d'inspiration ? Choisissez une idée", label_lieu: "Lieu", placeholder_lieu: "Parc, adresse…",
     label_date: "Date & heure", placeholder_date: "Sam. 9 août · 10h", label_heure: "Heure",
-    label_age: "Âge conseillé", placeholder_age: "Ex. 4-8 ans",
+    label_age: "Âge conseillé", placeholder_age: "Ex. 4-8",
     label_places: "Places disponibles", label_places_parents: "Places parents", label_places_enfants: "Places enfants", detail_parents_count: "{a}/{b} parents", detail_kids_count: "{a}/{b} enfants", join_kids_question: "Combien d'enfants amenez-vous ?", join_kids_max: "Vous avez déclaré {n} enfant(s) ou petit(s)-enfant(s) sur votre profil.", profile_nb_enfants_label: "Enfants ou petits-enfants", profile_nb_moins12_label: "Dont moins de 12 ans", access_parent_ok: "Vous avez accès aux sorties Famille et Jeune.", access_parent_locked: "Les sorties Famille et Jeune sont réservées aux personnes accompagnant un enfant ou petit-enfant de moins de 12 ans.", auth_nb_moins12: "Combien ont moins de 12 ans ?", profile_nb_enfants_note: "Comptez vos enfants et vos petits-enfants : ceux que vous pouvez emmener en sortie.", label_description: "Description", label_signe: "Signe distinctif (optionnel)", placeholder_signe: "Ex. Je porterai une casquette rouge, poussette bleue",
     placeholder_description: "Que va-t-on faire ? Quoi apporter ?",
     label_payant: "Sortie payante ?", toggle_oui: "Oui", toggle_non: "Non",
     badge_payant: "Payant", badge_gratuit: "Gratuit",
     btn_publier: "Publier la sortie",
-    success_message: "Sortie publiée ! Elle apparaît dans l'onglet Explorer.",
+    success_message: "Sortie publiée ! Elle apparaît dans l'onglet Explorer.", create_insulte: "Votre annonce contient des propos inappropriés. Merci de la reformuler.", champ_insulte: "Ce texte contient des propos inappropriés. Merci de le reformuler.",
     you_organizer: "Vous",
     my_title: "Mes sorties",
     my_subtitle: "Chaque sortie rejointe ajoute un tampon à votre passeport d'aventures.",
@@ -193,13 +193,13 @@ const TRANSLATIONS = {
     label_titre: "Outing title", placeholder_titre: "E.g. Storytelling walk in the park", placeholder_kid_name: "Child's first name", btn_ajouter: "Add",
     label_categorie: "Category", label_lieu: "Location", placeholder_lieu: "Park, address…",
     label_date: "Date & time", placeholder_date: "Sat. Aug 9 · 10am", label_heure: "Time",
-    label_age: "Recommended age", placeholder_age: "E.g. 4-8 years",
+    label_age: "Recommended age", placeholder_age: "E.g. 4-8",
     label_places: "Available spots", label_description: "Description", label_signe: "How to recognise you (optional)", placeholder_signe: "E.g. I'll wear a red cap, blue stroller",
     placeholder_description: "What will you do? What to bring?",
     label_payant: "Is it a paid outing?", toggle_oui: "Yes", toggle_non: "No",
     badge_payant: "Paid", badge_gratuit: "Free",
     btn_publier: "Publish outing",
-    success_message: "Outing published! It now appears in the Explore tab.",
+    success_message: "Outing published! It now appears in the Explore tab.", create_insulte: "Your listing contains inappropriate wording. Please rephrase it.", champ_insulte: "This text contains inappropriate wording. Please rephrase it.",
     you_organizer: "You",
     my_title: "My outings",
     my_subtitle: "Every outing you join adds a stamp to your adventure passport.",
@@ -329,7 +329,7 @@ const TRANSLATIONS = {
     label_titre: "Título de la salida", placeholder_titre: "Ej. Paseo cuentacuentos en el parque", placeholder_kid_name: "Nombre del niño/a", btn_ajouter: "Añadir",
     label_categorie: "Categoría", label_lieu: "Lugar", placeholder_lieu: "Parque, dirección…",
     label_date: "Fecha y hora", placeholder_date: "Sáb. 9 ago · 10h", label_heure: "Hora",
-    label_age: "Edad recomendada", placeholder_age: "Ej. 4-8 años",
+    label_age: "Edad recomendada", placeholder_age: "Ej. 4-8",
     label_places: "Plazas disponibles", label_description: "Descripción", label_signe: "Cómo reconocerte (opcional)", placeholder_signe: "Ej. Llevaré una gorra roja, carrito azul",
     placeholder_description: "¿Qué vais a hacer? ¿Qué traer?",
     label_payant: "¿Es una salida de pago?", toggle_oui: "Sí", toggle_non: "No",
@@ -3338,8 +3338,18 @@ function CreateActivity({ onCreate }) {
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
+  const [erreur, setErreur] = useState("");
+
   const submit = () => {
     if (!form.title || !form.lieu || !form.dateStr) return;
+    // Tous les textes libres passent par le filtre : titre, lieu, description, signe distinctif
+    const champs = [form.title, form.lieu, form.desc, form.signeDistinctif];
+    if (champs.some((v) => v && contientInsulte(v))) {
+      setErreur(t("create_insulte"));
+      setTimeout(() => setErreur(""), 5000);
+      return;
+    }
+    setErreur("");
     onCreate({
       title: form.title, category: form.category, lieu: form.lieu, age: form.age, desc: form.desc,
       dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1, placesEnfants: Number(form.placesEnfants) || 0, payant: !!form.payant,
@@ -3413,7 +3423,14 @@ function CreateActivity({ onCreate }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div>
             <label style={label}>{t("label_age")}</label>
-            <input style={inputStyle} placeholder={t("placeholder_age")} value={form.age} onChange={set("age")} />
+            {/* Seuls chiffres, tirets et "+" : "5", "3-6", "8+" */}
+            <input
+              style={inputStyle}
+              placeholder={t("placeholder_age")}
+              value={form.age}
+              inputMode="numeric"
+              onChange={(e) => setForm({ ...form, age: e.target.value.replace(/[^0-9+-]/g, "").slice(0, 10) })}
+            />
           </div>
           <div>
             <label style={label}>{t("label_places_parents")}</label>
@@ -3453,6 +3470,17 @@ function CreateActivity({ onCreate }) {
             <PlusCircle size={18} /> {t("btn_publier")}
           </span>
         </PillButton>
+
+        {erreur && (
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8, background: "#FFF0EC",
+            border: `2px solid ${COLORS.coral}`, color: COLORS.ink,
+            fontFamily: "Nunito, sans-serif", fontWeight: 700,
+            fontSize: 13, padding: "10px 14px", borderRadius: 12, lineHeight: 1.45,
+          }}>
+            {erreur}
+          </div>
+        )}
 
         {sent && (
           <div style={{
@@ -3719,9 +3747,12 @@ function ProfileView({ displayName, email, avatarUrl, coverUrl, genre, birthdate
 function ProfileTextField({ label, placeholder, value, onSave, multiline = false, maxLength = 160 }) {
   const [input, setInput] = useState(value || "");
   const [saved, setSaved] = useState(false);
+  const [erreur, setErreur] = useState("");
 
   const save = async () => {
-    await onSave(input);
+    const res = await onSave(input);
+    if (res && res.error) { setErreur(res.error); return; }
+    setErreur("");
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -3745,6 +3776,11 @@ function ProfileTextField({ label, placeholder, value, onSave, multiline = false
           value={input} onChange={(e) => setInput(e.target.value.slice(0, maxLength))}
           placeholder={placeholder} style={{ ...baseStyle, marginBottom: 6 }}
         />
+      )}
+      {erreur && (
+        <p style={{ fontFamily: "Nunito, sans-serif", fontSize: 11.5, color: COLORS.coral, fontWeight: 700, margin: "0 0 6px", lineHeight: 1.4 }}>
+          {erreur}
+        </p>
       )}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <span style={{ fontFamily: "Nunito, sans-serif", fontSize: 11, color: "#B7AF98" }}>{input.length}/{maxLength}</span>
@@ -3789,7 +3825,9 @@ function ProfileEdit({ onBack,  joinedCount, validated, displayName, email, nbEn
   };
 
   const saveBio = async () => {
-    await onUpdateBio(bioInput);
+    const res = await onUpdateBio(bioInput);
+    if (res && res.error) { setUploadError(res.error); return; }
+    setUploadError("");
     setBioSaved(true);
     setTimeout(() => setBioSaved(false), 2000);
   };
@@ -6671,11 +6709,19 @@ function CreateMeetup({ categories, onCreate }) {
     title: "", category: categories[0].id, lieu: "", dateStr: todayISO, timeStr: "18:00", places: 8, info: "", desc: "", payant: false, signeDistinctif: "",
   });
   const [sent, setSent] = useState(false);
+  const [erreur, setErreur] = useState("");
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
   const submit = () => {
     if (!form.title || !form.lieu || !form.dateStr) return;
+    const champs = [form.title, form.lieu, form.desc, form.info, form.signeDistinctif];
+    if (champs.some((v) => v && contientInsulte(v))) {
+      setErreur(t("create_insulte"));
+      setTimeout(() => setErreur(""), 5000);
+      return;
+    }
+    setErreur("");
     onCreate({
       title: form.title, category: form.category, lieu: form.lieu, info: form.info, desc: form.desc,
       dateStr: form.dateStr, timeStr: form.timeStr, places: Number(form.places) || 1, payant: !!form.payant,
@@ -6785,6 +6831,17 @@ function CreateMeetup({ categories, onCreate }) {
             <PlusCircle size={18} /> {t("btn_publier")}
           </span>
         </PillButton>
+
+        {erreur && (
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8, background: "#FFF0EC",
+            border: `2px solid ${COLORS.coral}`, color: COLORS.ink,
+            fontFamily: "Nunito, sans-serif", fontWeight: 700,
+            fontSize: 13, padding: "10px 14px", borderRadius: 12, lineHeight: 1.45,
+          }}>
+            {erreur}
+          </div>
+        )}
 
         {sent && (
           <div style={{
@@ -8464,6 +8521,7 @@ function usePikapikaData() {
   };
 
   const updateBio = async (bio) => {
+    if (bio && contientInsulte(bio)) return { error: t("champ_insulte") };
     if (!user) return;
     const { error } = await supabase.from("profiles").update({ bio: bio || null }).eq("id", user.id);
     if (error) { console.error("Erreur bio :", error); return; }
@@ -8490,6 +8548,7 @@ function usePikapikaData() {
   const updatePseudo = async (pseudo) => {
     if (!user || !pseudo.trim()) return { error: null };
     const clean = pseudo.trim();
+    if (contientInsulte(clean)) return { error: t("champ_insulte") };
     const libre = await pseudoDisponible(clean);
     if (!libre) return { error: t("pseudo_pris") };
     const { error } = await supabase.from("profiles").update({ pseudo: clean, display_name: clean }).eq("id", user.id);
@@ -8562,6 +8621,7 @@ function usePikapikaData() {
     coupDeCoeur: "coup_de_coeur",
   };
   const updateProfileField = async (field, value) => {
+    if (value && contientInsulte(value)) return { error: t("champ_insulte") };
     if (!user) return;
     const column = PROFILE_TEXT_FIELDS[field];
     if (!column) return;
@@ -8663,6 +8723,8 @@ function usePikapikaData() {
   };
 
   const submitReport = async ({ activityId, reportedUserId, reason, details }) => {
+    // Un signalement injurieux n'aide personne : on demande de reformuler
+    if (details && contientInsulte(details)) return { error: t("champ_insulte") };
     if (!user) return false;
     const { error } = await supabase.from("reports").insert({
       reporter_id: user.id, activity_id: activityId || null, reported_user_id: reportedUserId || null,
