@@ -9697,74 +9697,74 @@ export default function RecreApp() {
         <div className="oree-poissons" aria-hidden="true">
           <span className="oree-poisson oree-poisson-retour" style={{ top: "65.8vh", opacity: 0.77, animationDuration: "35.0s", animationDelay: "-19.3s" }}>
             <svg width="32" height="19" viewBox="0 0 44 26" aria-hidden="true" style={{ transform: "scaleX(-1)" }}>
-              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#4A87C4" />
-              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#6FA8DC" />
-              <path d="M17 4.5 Q21 0 25 5" fill="#4A87C4" />
-              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+              <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#4A87C4" />
+              <ellipse cx="26" cy="13" rx="16" ry="9" fill="#6FA8DC" />
+              <path d="M19 4.5 Q23 0 27 5" fill="#4A87C4" />
+              <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
             </svg>
           </span>
           <span className="oree-poisson" style={{ top: "50.9vh", opacity: 0.6, animationDuration: "42.9s", animationDelay: "-1.5s" }}>
             <svg width="44" height="26" viewBox="0 0 44 26" aria-hidden="true">
-              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#E86A3D" />
-              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#FF8C61" />
-              <path d="M17 4.5 Q21 0 25 5" fill="#E86A3D" />
-              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+              <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#E86A3D" />
+              <ellipse cx="26" cy="13" rx="16" ry="9" fill="#FF8C61" />
+              <path d="M19 4.5 Q23 0 27 5" fill="#E86A3D" />
+              <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
             </svg>
           </span>
           <span className="oree-poisson" style={{ top: "87.8vh", opacity: 0.56, animationDuration: "43.4s", animationDelay: "-2.2s" }}>
             <svg width="32" height="19" viewBox="0 0 44 26" aria-hidden="true">
-              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#4FC4BB" />
-              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#7FDDD6" />
-              <path d="M17 4.5 Q21 0 25 5" fill="#4FC4BB" />
-              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+              <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#4FC4BB" />
+              <ellipse cx="26" cy="13" rx="16" ry="9" fill="#7FDDD6" />
+              <path d="M19 4.5 Q23 0 27 5" fill="#4FC4BB" />
+              <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
             </svg>
           </span>
           <span className="oree-poisson oree-poisson-retour" style={{ top: "43.3vh", opacity: 0.78, animationDuration: "26.8s", animationDelay: "-14.0s" }}>
             <svg width="32" height="19" viewBox="0 0 44 26" aria-hidden="true" style={{ transform: "scaleX(-1)" }}>
-              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#DDB63C" />
-              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#F4D35E" />
-              <path d="M17 4.5 Q21 0 25 5" fill="#DDB63C" />
-              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+              <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#DDB63C" />
+              <ellipse cx="26" cy="13" rx="16" ry="9" fill="#F4D35E" />
+              <path d="M19 4.5 Q23 0 27 5" fill="#DDB63C" />
+              <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
             </svg>
           </span>
           <span className="oree-poisson" style={{ top: "79.4vh", opacity: 0.79, animationDuration: "31.3s", animationDelay: "-6.1s" }}>
             <svg width="44" height="26" viewBox="0 0 44 26" aria-hidden="true">
-              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#E86A3D" />
-              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#FF8C61" />
-              <path d="M17 4.5 Q21 0 25 5" fill="#E86A3D" />
-              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+              <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#E86A3D" />
+              <ellipse cx="26" cy="13" rx="16" ry="9" fill="#FF8C61" />
+              <path d="M19 4.5 Q23 0 27 5" fill="#E86A3D" />
+              <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
             </svg>
           </span>
           <span className="oree-poisson" style={{ top: "62.1vh", opacity: 0.6, animationDuration: "45.8s", animationDelay: "-26.3s" }}>
             <svg width="44" height="26" viewBox="0 0 44 26" aria-hidden="true">
-              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#4A87C4" />
-              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#6FA8DC" />
-              <path d="M17 4.5 Q21 0 25 5" fill="#4A87C4" />
-              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+              <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#4A87C4" />
+              <ellipse cx="26" cy="13" rx="16" ry="9" fill="#6FA8DC" />
+              <path d="M19 4.5 Q23 0 27 5" fill="#4A87C4" />
+              <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
             </svg>
           </span>
           <span className="oree-poisson oree-poisson-retour" style={{ top: "33.0vh", opacity: 0.8, animationDuration: "44.1s", animationDelay: "-23.7s" }}>
             <svg width="44" height="26" viewBox="0 0 44 26" aria-hidden="true" style={{ transform: "scaleX(-1)" }}>
-              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#DDB63C" />
-              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#F4D35E" />
-              <path d="M17 4.5 Q21 0 25 5" fill="#DDB63C" />
-              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+              <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#DDB63C" />
+              <ellipse cx="26" cy="13" rx="16" ry="9" fill="#F4D35E" />
+              <path d="M19 4.5 Q23 0 27 5" fill="#DDB63C" />
+              <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
             </svg>
           </span>
           <span className="oree-poisson" style={{ top: "81.8vh", opacity: 0.83, animationDuration: "40.6s", animationDelay: "-3.8s" }}>
             <svg width="26" height="15" viewBox="0 0 44 26" aria-hidden="true">
-              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#E86A3D" />
-              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#FF8C61" />
-              <path d="M17 4.5 Q21 0 25 5" fill="#E86A3D" />
-              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+              <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#E86A3D" />
+              <ellipse cx="26" cy="13" rx="16" ry="9" fill="#FF8C61" />
+              <path d="M19 4.5 Q23 0 27 5" fill="#E86A3D" />
+              <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
             </svg>
           </span>
           <span className="oree-poisson" style={{ top: "74.8vh", opacity: 0.67, animationDuration: "31.2s", animationDelay: "-9.4s" }}>
             <svg width="44" height="26" viewBox="0 0 44 26" aria-hidden="true">
-              <path d="M30 13 L43 5 L40 13 L43 21 Z" fill="#DC7EA3" />
-              <ellipse cx="18" cy="13" rx="16" ry="9" fill="#F2A2C0" />
-              <path d="M17 4.5 Q21 0 25 5" fill="#DC7EA3" />
-              <circle cx="8" cy="11" r="1.9" fill="#0B4F5A" />
+              <path d="M14 13 L1 5 L4 13 L1 21 Z" fill="#DC7EA3" />
+              <ellipse cx="26" cy="13" rx="16" ry="9" fill="#F2A2C0" />
+              <path d="M19 4.5 Q23 0 27 5" fill="#DC7EA3" />
+              <circle cx="36" cy="11" r="1.9" fill="#0B4F5A" />
             </svg>
           </span>
           <span className="oree-bulle" style={{ left: "15.3%", width: 7, height: 7, animationDuration: "10.8s", animationDelay: "-8.6s" }} />
