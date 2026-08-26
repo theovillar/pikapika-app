@@ -1015,7 +1015,8 @@ function matchLocation(villeId, location) {
 function locationLabel(location) {
   if (!location) return t("loc_all_france");
   if (location.type === "departement") return `${location.nom} (${location.code})`;
-  return `${location.nom} · ${location.radius} km`;
+  // Sans rayon défini, on affiche 0 plutôt qu'une valeur vide
+  return `${location.nom} · ${location.radius ?? 0} km`;
 }
 
 // Retourne le nom affichable d'une ville : soit depuis la liste intégrée (anciens
@@ -4682,7 +4683,7 @@ function LocationFilter({ location, onChange }) {
     const lat = known ? known.lat : p.lat;
     const lon = known ? known.lon : p.lon;
     const dept = known ? known.dept : p.dept;
-    onChange({ type: "commune", nom: p.nom, lat, lon, dept, radius: 0 });
+    onChange({ type: "commune", nom: p.nom, lat, lon, dept, radius: location?.radius ?? 0 });
     setQuery(p.nom);
   };
   const pickDept = (d) => {
@@ -4772,7 +4773,7 @@ function LocationFilter({ location, onChange }) {
                   {[0, 1, 5, 10, 25, 50, 100].map((km) => (
                     <button
                       key={km}
-                      onClick={() => onChange({ ...location, radius: km })}
+                      onClick={() => { onChange({ ...location, radius: km }); setOpen(false); }}
                       style={{
                         fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 11.5,
                         padding: "5px 10px", borderRadius: 999, cursor: "pointer",
@@ -10128,6 +10129,9 @@ export default function RecreApp() {
             left: 12px !important; right: 12px !important;
             width: auto !important; max-width: none !important;
             top: 72px !important;
+            max-height: calc(100dvh - 100px);
+            overflow-y: auto;
+            overscroll-behavior: contain;
           }
         }
         :root { --pika-avatar-size: 26px; }
