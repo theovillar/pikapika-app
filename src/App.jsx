@@ -460,7 +460,7 @@ function t(key, vars) {
 // Le rose et le bleu du genre ne changent jamais : ils servent de repère constant.
 const PALETTES = {
   printemps: {
-    ink: "#2F5E3A", cloud: "#F2F9F1", sun: "#F5D76E", sky: "#7FC0D8",
+    ink: "#2F5E3A", cloud: "#E8F4FB", sun: "#F5D76E", sky: "#5FA8D3",
     grass: "#7FC97F", coral: "#F07C7C", grape: "#A87BC7",
   },
   ete: {
@@ -9177,6 +9177,126 @@ export default function RecreApp() {
       {/* Printemps : soleil, fleurs et abeilles — purement décoratif */}
       {SAISON === "printemps" && (
         <div className="oree-printemps" aria-hidden="true">
+          <div className="oree-nuage" style={{ top: "23.9vh", width: 176, height: 108, opacity: 0.9, animationDuration: "156.8s", animationDelay: "-43.4s" }}>
+              <span style={{ left: 0, top: 24, width: 62, height: 62 }} />
+              <span style={{ left: 35, top: 11, width: 84, height: 84 }} />
+              <span style={{ left: 84, top: 27, width: 59, height: 59 }} />
+              <span style={{ left: 19, top: 40, width: 54, height: 54 }} />
+              <span style={{ left: 65, top: 43, width: 49, height: 49 }} />
+              <span style={{ left: 116, top: 35, width: 46, height: 46 }} />
+          </div>
+          <div className="oree-nuage" style={{ top: "31.6vh", width: 160, height: 98, opacity: 0.81, animationDuration: "88.8s", animationDelay: "-4.0s" }}>
+              <span style={{ left: 0, top: 22, width: 57, height: 57 }} />
+              <span style={{ left: 32, top: 10, width: 76, height: 76 }} />
+              <span style={{ left: 76, top: 25, width: 54, height: 54 }} />
+              <span style={{ left: 17, top: 37, width: 49, height: 49 }} />
+              <span style={{ left: 59, top: 39, width: 44, height: 44 }} />
+              <span style={{ left: 106, top: 32, width: 42, height: 42 }} />
+          </div>
+          <div className="oree-nuage" style={{ top: "33.3vh", width: 117, height: 72, opacity: 0.91, animationDuration: "120.1s", animationDelay: "-47.6s" }}>
+              <span style={{ left: 0, top: 16, width: 41, height: 41 }} />
+              <span style={{ left: 23, top: 7, width: 56, height: 56 }} />
+              <span style={{ left: 56, top: 18, width: 40, height: 40 }} />
+              <span style={{ left: 13, top: 27, width: 36, height: 36 }} />
+              <span style={{ left: 43, top: 29, width: 32, height: 32 }} />
+              <span style={{ left: 77, top: 23, width: 31, height: 31 }} />
+          </div>
+          <div className="oree-nuage" style={{ top: "41.7vh", width: 133, height: 82, opacity: 0.91, animationDuration: "159.9s", animationDelay: "-9.3s" }}>
+              <span style={{ left: 0, top: 18, width: 47, height: 47 }} />
+              <span style={{ left: 27, top: 8, width: 63, height: 63 }} />
+              <span style={{ left: 63, top: 20, width: 45, height: 45 }} />
+              <span style={{ left: 14, top: 31, width: 41, height: 41 }} />
+              <span style={{ left: 49, top: 33, width: 37, height: 37 }} />
+              <span style={{ left: 88, top: 27, width: 35, height: 35 }} />
+          </div>
+          <div className="oree-nuage" style={{ top: "38.8vh", width: 107, height: 66, opacity: 0.94, animationDuration: "136.4s", animationDelay: "-83.8s" }}>
+              <span style={{ left: 0, top: 15, width: 38, height: 38 }} />
+              <span style={{ left: 21, top: 7, width: 51, height: 51 }} />
+              <span style={{ left: 51, top: 16, width: 36, height: 36 }} />
+              <span style={{ left: 11, top: 25, width: 33, height: 33 }} />
+              <span style={{ left: 39, top: 26, width: 30, height: 30 }} />
+              <span style={{ left: 71, top: 21, width: 28, height: 28 }} />
+          </div>
+          <div className="oree-nuage" style={{ top: "10.8vh", width: 147, height: 90, opacity: 0.79, animationDuration: "150.6s", animationDelay: "-95.8s" }}>
+              <span style={{ left: 0, top: 20, width: 52, height: 52 }} />
+              <span style={{ left: 29, top: 9, width: 70, height: 70 }} />
+              <span style={{ left: 70, top: 23, width: 50, height: 50 }} />
+              <span style={{ left: 16, top: 34, width: 45, height: 45 }} />
+              <span style={{ left: 54, top: 36, width: 41, height: 41 }} />
+              <span style={{ left: 97, top: 29, width: 38, height: 38 }} />
+          </div>
+          <div className="oree-nuage" style={{ top: "5.4vh", width: 188, height: 116, opacity: 0.75, animationDuration: "117.9s", animationDelay: "-149.4s" }}>
+              <span style={{ left: 0, top: 26, width: 67, height: 67 }} />
+              <span style={{ left: 38, top: 12, width: 90, height: 90 }} />
+              <span style={{ left: 90, top: 29, width: 64, height: 64 }} />
+              <span style={{ left: 20, top: 44, width: 58, height: 58 }} />
+              <span style={{ left: 70, top: 46, width: 52, height: 52 }} />
+              <span style={{ left: 125, top: 38, width: 49, height: 49 }} />
+          </div>
+
+          <div className="oree-pluie">
+            <span className="oree-goutte" style={{ left: "81.2%", height: 22, opacity: 0.42, animationDuration: "0.71s", animationDelay: "-0.48s" }} />
+            <span className="oree-goutte" style={{ left: "75.2%", height: 22, opacity: 0.63, animationDuration: "0.73s", animationDelay: "-0.62s" }} />
+            <span className="oree-goutte" style={{ left: "0.5%", height: 26, opacity: 0.78, animationDuration: "0.84s", animationDelay: "-0.72s" }} />
+            <span className="oree-goutte" style={{ left: "52.7%", height: 22, opacity: 0.51, animationDuration: "0.73s", animationDelay: "-0.08s" }} />
+            <span className="oree-goutte" style={{ left: "74.8%", height: 18, opacity: 0.54, animationDuration: "0.85s", animationDelay: "-0.4s" }} />
+            <span className="oree-goutte" style={{ left: "17.1%", height: 14, opacity: 0.51, animationDuration: "1.25s", animationDelay: "-0.75s" }} />
+            <span className="oree-goutte" style={{ left: "1.0%", height: 22, opacity: 0.59, animationDuration: "0.71s", animationDelay: "-0.97s" }} />
+            <span className="oree-goutte" style={{ left: "5.4%", height: 18, opacity: 0.79, animationDuration: "0.89s", animationDelay: "-0.1s" }} />
+            <span className="oree-goutte" style={{ left: "91.0%", height: 14, opacity: 0.46, animationDuration: "1.07s", animationDelay: "-0.68s" }} />
+            <span className="oree-goutte" style={{ left: "48.5%", height: 26, opacity: 0.78, animationDuration: "0.81s", animationDelay: "-1.29s" }} />
+            <span className="oree-goutte" style={{ left: "67.6%", height: 18, opacity: 0.52, animationDuration: "0.73s", animationDelay: "-1.27s" }} />
+            <span className="oree-goutte" style={{ left: "89.0%", height: 22, opacity: 0.77, animationDuration: "1.19s", animationDelay: "-0.06s" }} />
+            <span className="oree-goutte" style={{ left: "9.3%", height: 22, opacity: 0.56, animationDuration: "1.2s", animationDelay: "-0.85s" }} />
+            <span className="oree-goutte" style={{ left: "7.5%", height: 14, opacity: 0.49, animationDuration: "1.03s", animationDelay: "-1.27s" }} />
+            <span className="oree-goutte" style={{ left: "95.8%", height: 18, opacity: 0.76, animationDuration: "1.18s", animationDelay: "-0.06s" }} />
+            <span className="oree-goutte" style={{ left: "58.6%", height: 26, opacity: 0.65, animationDuration: "0.83s", animationDelay: "-0.53s" }} />
+            <span className="oree-goutte" style={{ left: "7.7%", height: 26, opacity: 0.53, animationDuration: "1.15s", animationDelay: "-0.3s" }} />
+            <span className="oree-goutte" style={{ left: "18.9%", height: 22, opacity: 0.63, animationDuration: "1.06s", animationDelay: "-1.25s" }} />
+            <span className="oree-goutte" style={{ left: "51.9%", height: 14, opacity: 0.63, animationDuration: "1.24s", animationDelay: "-0.43s" }} />
+            <span className="oree-goutte" style={{ left: "93.0%", height: 18, opacity: 0.8, animationDuration: "1.07s", animationDelay: "-0.48s" }} />
+            <span className="oree-goutte" style={{ left: "75.5%", height: 22, opacity: 0.44, animationDuration: "0.96s", animationDelay: "-0.58s" }} />
+            <span className="oree-goutte" style={{ left: "10.6%", height: 14, opacity: 0.68, animationDuration: "0.82s", animationDelay: "-0.75s" }} />
+            <span className="oree-goutte" style={{ left: "76.5%", height: 26, opacity: 0.45, animationDuration: "0.98s", animationDelay: "-1.11s" }} />
+            <span className="oree-goutte" style={{ left: "54.9%", height: 26, opacity: 0.8, animationDuration: "0.71s", animationDelay: "-0.34s" }} />
+            <span className="oree-goutte" style={{ left: "82.6%", height: 26, opacity: 0.42, animationDuration: "0.9s", animationDelay: "-0.43s" }} />
+            <span className="oree-goutte" style={{ left: "9.9%", height: 14, opacity: 0.76, animationDuration: "0.72s", animationDelay: "-0.61s" }} />
+            <span className="oree-goutte" style={{ left: "61.2%", height: 14, opacity: 0.79, animationDuration: "1.17s", animationDelay: "-1.07s" }} />
+            <span className="oree-goutte" style={{ left: "45.5%", height: 18, opacity: 0.56, animationDuration: "1.22s", animationDelay: "-0.04s" }} />
+            <span className="oree-goutte" style={{ left: "12.3%", height: 14, opacity: 0.79, animationDuration: "1.14s", animationDelay: "-0.08s" }} />
+            <span className="oree-goutte" style={{ left: "26.2%", height: 22, opacity: 0.73, animationDuration: "0.91s", animationDelay: "-0.71s" }} />
+            <span className="oree-goutte" style={{ left: "97.5%", height: 26, opacity: 0.8, animationDuration: "1.25s", animationDelay: "-0.68s" }} />
+            <span className="oree-goutte" style={{ left: "8.1%", height: 14, opacity: 0.53, animationDuration: "1.08s", animationDelay: "-1.12s" }} />
+            <span className="oree-goutte" style={{ left: "11.7%", height: 18, opacity: 0.6, animationDuration: "1.02s", animationDelay: "-0.32s" }} />
+            <span className="oree-goutte" style={{ left: "28.3%", height: 14, opacity: 0.57, animationDuration: "0.85s", animationDelay: "-0.1s" }} />
+            <span className="oree-goutte" style={{ left: "68.5%", height: 26, opacity: 0.79, animationDuration: "0.92s", animationDelay: "-0.28s" }} />
+            <span className="oree-goutte" style={{ left: "78.7%", height: 18, opacity: 0.58, animationDuration: "1.17s", animationDelay: "-0.11s" }} />
+            <span className="oree-goutte" style={{ left: "89.7%", height: 18, opacity: 0.63, animationDuration: "1.1s", animationDelay: "-0.19s" }} />
+            <span className="oree-goutte" style={{ left: "93.6%", height: 26, opacity: 0.78, animationDuration: "1.18s", animationDelay: "-1.15s" }} />
+            <span className="oree-goutte" style={{ left: "40.7%", height: 18, opacity: 0.71, animationDuration: "0.8s", animationDelay: "-0.93s" }} />
+            <span className="oree-goutte" style={{ left: "42.7%", height: 22, opacity: 0.6, animationDuration: "1.02s", animationDelay: "-0.58s" }} />
+            <span className="oree-goutte" style={{ left: "12.9%", height: 18, opacity: 0.55, animationDuration: "1.0s", animationDelay: "-0.65s" }} />
+            <span className="oree-goutte" style={{ left: "63.5%", height: 22, opacity: 0.76, animationDuration: "1.0s", animationDelay: "-0.56s" }} />
+            <span className="oree-goutte" style={{ left: "37.8%", height: 18, opacity: 0.52, animationDuration: "0.74s", animationDelay: "-0.39s" }} />
+            <span className="oree-goutte" style={{ left: "90.7%", height: 26, opacity: 0.7, animationDuration: "0.89s", animationDelay: "-1.25s" }} />
+            <span className="oree-goutte" style={{ left: "30.8%", height: 22, opacity: 0.46, animationDuration: "1.25s", animationDelay: "-0.67s" }} />
+            <span className="oree-goutte" style={{ left: "10.4%", height: 22, opacity: 0.75, animationDuration: "0.84s", animationDelay: "-0.28s" }} />
+            <span className="oree-goutte" style={{ left: "83.9%", height: 26, opacity: 0.52, animationDuration: "0.93s", animationDelay: "-1.23s" }} />
+            <span className="oree-goutte" style={{ left: "97.1%", height: 18, opacity: 0.75, animationDuration: "1.23s", animationDelay: "-0.02s" }} />
+            <span className="oree-goutte" style={{ left: "58.2%", height: 22, opacity: 0.57, animationDuration: "1.1s", animationDelay: "-0.64s" }} />
+            <span className="oree-goutte" style={{ left: "25.9%", height: 22, opacity: 0.46, animationDuration: "0.97s", animationDelay: "-1.0s" }} />
+            <span className="oree-goutte" style={{ left: "41.5%", height: 18, opacity: 0.75, animationDuration: "0.82s", animationDelay: "-0.47s" }} />
+            <span className="oree-goutte" style={{ left: "94.3%", height: 18, opacity: 0.43, animationDuration: "1.16s", animationDelay: "-1.09s" }} />
+            <span className="oree-goutte" style={{ left: "65.9%", height: 22, opacity: 0.78, animationDuration: "1.13s", animationDelay: "-1.02s" }} />
+            <span className="oree-goutte" style={{ left: "48.4%", height: 26, opacity: 0.49, animationDuration: "1.19s", animationDelay: "-0.11s" }} />
+            <span className="oree-goutte" style={{ left: "43.6%", height: 26, opacity: 0.59, animationDuration: "0.84s", animationDelay: "-0.52s" }} />
+            <span className="oree-goutte" style={{ left: "85.2%", height: 18, opacity: 0.49, animationDuration: "0.9s", animationDelay: "-0.5s" }} />
+            <span className="oree-goutte" style={{ left: "17.4%", height: 14, opacity: 0.79, animationDuration: "0.98s", animationDelay: "-0.53s" }} />
+            <span className="oree-goutte" style={{ left: "48.1%", height: 18, opacity: 0.45, animationDuration: "1.0s", animationDelay: "-0.34s" }} />
+            <span className="oree-goutte" style={{ left: "15.7%", height: 18, opacity: 0.58, animationDuration: "0.72s", animationDelay: "-0.16s" }} />
+            <span className="oree-goutte" style={{ left: "8.8%", height: 22, opacity: 0.61, animationDuration: "1.21s", animationDelay: "-0.84s" }} />
+          </div>
+
           <div className="oree-soleil">
             <div className="oree-soleil-halo" />
             <div className="oree-soleil-rayons">
@@ -9607,7 +9727,11 @@ export default function RecreApp() {
           pour pouvoir changer de lieu à tout moment. */}
       <div className="pika-header-sticky" style={{
         position: "sticky", top: 0, zIndex: 500,
-        background: COLORS.cloud, borderBottom: "2px solid #F0EADB",
+        // Translucide : le décor de saison reste visible derrière
+        backgroundColor: `${COLORS.cloud}D9`,
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+        borderBottom: "1px solid rgba(0,0,0,0.06)",
       }}>
       <div className="pika-header-row" style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -10173,17 +10297,58 @@ export default function RecreApp() {
           from { transform: translate3d(0, 0, 0) rotate(0deg); }
           to   { transform: translate3d(-40px, calc(100vh + 60px), 0) rotate(300deg); }
         }
-        /* Printemps : un soleil dans le ciel, des fleurs qui poussent en bas,
-           et quelques abeilles qui butinent de l'une à l'autre. */
+        /* Printemps : ciel bleu et nuages, soleil, fleurs qui poussent,
+           abeilles qui butinent, et de brèves averses de temps en temps. */
         .oree-printemps {
           position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+          /* Dégradé de ciel : plus soutenu en haut, plus clair vers l'horizon */
+          background: linear-gradient(to bottom, #8ECBF0 0%, #B3DDF5 38%, #DCF0F8 70%, transparent 92%);
+        }
+
+        /* Nuages : des bulles blanches groupées, qui dérivent lentement */
+        .oree-nuage {
+          position: absolute; left: -30%;
+          animation-name: oree-derive-nuage;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+        }
+        .oree-nuage span {
+          position: absolute; border-radius: 50%; background: #fff;
+        }
+        @keyframes oree-derive-nuage {
+          from { transform: translateX(0); }
+          to   { transform: translateX(160vw); }
+        }
+
+        /* Averse : une pluie fine qui va et vient */
+        .oree-pluie {
+          position: absolute; inset: 0;
+          animation: oree-averse 95s ease-in-out infinite;
+        }
+        .oree-goutte {
+          position: absolute; top: -30px; width: 1.6px;
+          background: linear-gradient(to bottom, transparent, rgba(120,175,215,0.75));
+          border-radius: 1px;
+          animation-name: oree-tombe;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+        }
+        @keyframes oree-tombe {
+          from { transform: translate3d(0, 0, 0); }
+          to   { transform: translate3d(-30px, calc(100vh + 40px), 0); }
+        }
+        /* L'averse n'occupe qu'un quart du cycle : le reste du temps, ciel dégagé */
+        @keyframes oree-averse {
+          0%, 62%   { opacity: 0; }
+          70%, 88%  { opacity: 1; }
+          96%, 100% { opacity: 0; }
         }
 
         /* Soleil : il pulse doucement, ses rayons tournent lentement */
-        /* Placé sous l'en-tête fixe, qui occupe environ 70px en haut */
+        /* Il se devine à travers l'en-tête translucide */
         .oree-soleil {
-          position: absolute; top: 100px; right: 7vw;
-          width: 90px; height: 90px;
+          position: absolute; top: 34px; right: 7vw;
+          width: 96px; height: 96px;
         }
         .oree-soleil-halo {
           position: absolute; inset: -60%;
@@ -10317,16 +10482,12 @@ export default function RecreApp() {
         }
 
         /* L'en-tête laisse voir l'eau qui bouge dessous */
-        .oree-fond-eau .pika-header-sticky {
-          background-color: rgba(228, 246, 245, 0.85);
-          backdrop-filter: blur(6px);
-          -webkit-backdrop-filter: blur(6px);
-        }
         /* Respect du réglage système : pas d'animation pour qui la désactive */
         @media (prefers-reduced-motion: reduce) {
           .oree-vague-a, .oree-vague-b, .oree-vague-c,
           .oree-flocon, .oree-cristal, .oree-lueur, .oree-flamme, .oree-feuille,
-          .oree-soleil-halo, .oree-soleil-rayons, .oree-fleur, .oree-abeille { animation: none; }
+          .oree-soleil-halo, .oree-soleil-rayons, .oree-fleur, .oree-abeille,
+          .oree-nuage, .oree-pluie, .oree-goutte { animation: none; }
         }
 
         /* Sur écran étroit, on masque les dernières pastilles plutôt que de déborder.
