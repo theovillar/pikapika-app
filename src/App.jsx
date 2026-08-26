@@ -534,14 +534,28 @@ const SILHOUETTES = {
   },
 };
 
-// Nom de ville normalisé, pour retrouver sa silhouette
+// Départements dont le symbole est celui de leur préfecture
+const SILHOUETTE_PAR_DEPT = { "75": "paris", "38": "grenoble" };
+
+// Silhouette correspondant au lieu choisi, qu'il s'agisse d'une commune
+// ou d'un département
 function silhouetteDuLieu(location) {
-  if (!location || location.type !== "commune") return null;
+  if (!location) return null;
+
+  if (location.type === "departement") {
+    const cle = SILHOUETTE_PAR_DEPT[String(location.code)];
+    return cle ? SILHOUETTES[cle] : null;
+  }
+
   const nom = (location.nom || "")
     .toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .trim();
-  return SILHOUETTES[nom] || null;
+  if (SILHOUETTES[nom]) return SILHOUETTES[nom];
+
+  // Repli sur le département de la commune (ex. Vif → Grenoble)
+  const cle = SILHOUETTE_PAR_DEPT[String(location.dept)];
+  return cle ? SILHOUETTES[cle] : null;
 }
 
 const genreColor = (genre) => (genre === "F" ? COLORS.girl : COLORS.boy);
