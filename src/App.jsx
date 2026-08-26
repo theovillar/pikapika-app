@@ -6181,8 +6181,6 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
         display: "flex", alignItems: "center", gap: 10,
         background: isPast ? "#F7F5F0" : (isCreator ? "#FFF9EC" : "#fff"),
         border: `2px solid ${isPast ? "#E8E4DA" : (isCreator ? COLORS.sun : "#F0EADB")}`,
-        // Bande colorée à gauche : identifie le type de structure organisatrice
-        borderLeft: structure && !isPast ? `6px solid ${structure.couleur}` : undefined,
         borderRadius: 14, padding: "9px 12px", cursor: "pointer", opacity: isPast ? 0.65 : 1,
       }}
     >
