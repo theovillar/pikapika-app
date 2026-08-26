@@ -9234,9 +9234,11 @@ export default function RecreApp() {
             </div>
           </div>
           <div className="oree-feu" aria-hidden="true">
-            <div className="oree-feu-braise" />
-            <div className="oree-feu-flamme" />
-            <div className="oree-feu-langue" />
+            <div className="oree-lueur" />
+            <div className="oree-flamme f1" />
+            <div className="oree-flamme f2" />
+            <div className="oree-flamme f3" />
+            <div className="oree-flamme f4" />
           </div>
         </>
       )}
@@ -9829,51 +9831,47 @@ export default function RecreApp() {
         .oree-flocon {
           position: absolute; border-radius: 50%; background: #fff;
         }
-        /* Feu de cheminée : trois nappes de lueur qui montent, s'étirent et
-           vacillent à des rythmes décalés — l'irrégularité fait la flamme. */
+        /* Feu de cheminée : de vraies formes de flammes, chacune animée
+           séparément. Des ellipses floutées plutôt que des dégradés : elles se
+           déplacent réellement, au lieu de s'étirer sur place. */
         .oree-feu {
-          position: fixed; left: 0; right: 0; bottom: 0; height: 38vh;
+          position: fixed; left: 0; right: 0; bottom: -6vh; height: 40vh;
           pointer-events: none; z-index: 0;
         }
-        /* Les couches débordent volontairement : sans marge, l'étirement des
-           flammes sortirait du cadre au lieu de se voir. */
-        .oree-feu > div { position: absolute; left: -10%; right: -10%; top: -20%; bottom: 0; }
-
-        .oree-feu-braise {
-          background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(196,82,47,0.42), transparent 72%);
+        .oree-lueur {
+          position: absolute; left: 0; right: 0; bottom: 0; height: 100%;
+          background: radial-gradient(ellipse 75% 70% at 50% 100%, rgba(196,82,47,0.34), transparent 70%);
           animation: oree-braise 6s ease-in-out infinite;
         }
-        .oree-feu-flamme {
-          background:
-            radial-gradient(ellipse 34% 62% at 38% 100%, rgba(232,163,61,0.48), transparent 66%),
-            radial-gradient(ellipse 30% 74% at 62% 100%, rgba(232,163,61,0.44), transparent 68%);
-          animation: oree-danse 4.2s ease-in-out infinite;
+        .oree-flamme {
+          position: absolute; bottom: 0;
+          border-radius: 50% 50% 46% 46% / 62% 62% 38% 38%;
+          filter: blur(22px);
           transform-origin: 50% 100%;
         }
-        .oree-feu-langue {
-          background:
-            radial-gradient(ellipse 18% 52% at 47% 100%, rgba(255,214,140,0.55), transparent 60%),
-            radial-gradient(ellipse 14% 44% at 56% 100%, rgba(255,224,170,0.48), transparent 60%);
-          animation: oree-vacille 2.7s ease-in-out infinite;
-          transform-origin: 50% 100%;
-        }
+        .f1 { left: 28%; width: 30%; height: 58%; background: rgba(232,163,61,0.5);  animation: oree-danse 4.2s ease-in-out infinite; }
+        .f2 { left: 46%; width: 26%; height: 70%; background: rgba(240,180,80,0.45); animation: oree-danse 5.6s ease-in-out infinite reverse; }
+        .f3 { left: 38%; width: 18%; height: 82%; background: rgba(255,214,140,0.5); animation: oree-vacille 2.7s ease-in-out infinite; }
+        .f4 { left: 56%; width: 14%; height: 62%; background: rgba(255,224,170,0.42); animation: oree-vacille 3.4s ease-in-out infinite reverse; }
 
         @keyframes oree-braise {
-          0%, 100% { opacity: .68; }
+          0%, 100% { opacity: .7; }
           40%      { opacity: 1; }
           70%      { opacity: .82; }
         }
         @keyframes oree-danse {
-          0%, 100% { transform: scaleY(1)    scaleX(1)    translateX(0);     opacity: .75; }
-          25%      { transform: scaleY(1.45) scaleX(0.86) translateX(-26px); opacity: 1; }
-          55%      { transform: scaleY(0.8)  scaleX(1.18) translateX(22px);  opacity: .65; }
-          78%      { transform: scaleY(1.32) scaleX(0.92) translateX(-12px); opacity: .95; }
+          0%   { transform: translateX(0)     scaleY(1)    scaleX(1);    opacity: .75; }
+          25%  { transform: translateX(-34px) scaleY(1.4)  scaleX(0.82); opacity: 1; }
+          50%  { transform: translateX(18px)  scaleY(0.78) scaleX(1.2);  opacity: .6; }
+          75%  { transform: translateX(-14px) scaleY(1.28) scaleX(0.9);  opacity: .95; }
+          100% { transform: translateX(0)     scaleY(1)    scaleX(1);    opacity: .75; }
         }
         @keyframes oree-vacille {
-          0%, 100% { transform: scaleY(1)    translateX(0);     opacity: .65; }
-          20%      { transform: scaleY(1.7)  translateX(18px);  opacity: 1; }
-          45%      { transform: scaleY(0.7)  translateX(-20px); opacity: .5; }
-          68%      { transform: scaleY(1.5)  translateX(10px);  opacity: .95; }
+          0%   { transform: translateX(0)     scaleY(1)   rotate(0deg);    opacity: .6; }
+          22%  { transform: translateX(26px)  scaleY(1.6) rotate(7deg);    opacity: 1; }
+          48%  { transform: translateX(-30px) scaleY(0.7) rotate(-8deg);   opacity: .5; }
+          72%  { transform: translateX(16px)  scaleY(1.45) rotate(5deg);   opacity: .92; }
+          100% { transform: translateX(0)     scaleY(1)   rotate(0deg);    opacity: .6; }
         }
 
         /* L'en-tête laisse voir l'eau qui bouge dessous */
@@ -9885,7 +9883,7 @@ export default function RecreApp() {
         /* Respect du réglage système : pas d'animation pour qui la désactive */
         @media (prefers-reduced-motion: reduce) {
           .oree-vague-a, .oree-vague-b, .oree-vague-c,
-          .oree-neige > div, .oree-feu > div { animation: none; }
+          .oree-neige > div, .oree-lueur, .oree-flamme { animation: none; }
         }
 
         /* Sur écran étroit, on masque les dernières pastilles plutôt que de déborder.
