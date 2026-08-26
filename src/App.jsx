@@ -828,16 +828,27 @@ function haversineKm(lat1, lon1, lat2, lon2) {
 
 // location: null (toute la France) | { type: "commune", nom, lat, lon, dept, radius }
 //         | { type: "departement", code, nom }
-function matchLocation(villeId, location) {
+// coords : position enregistrée sur la sortie (prioritaire), sinon on retombe
+// sur la ville pré-listée. Sans aucune position connue, la sortie reste visible.
+function matchLocation(villeId, location, coords) {
   if (!location) return true;
+
   const meta = CITY_META[villeId];
-  if (!meta) return true;
-  if (location.type === "departement") return meta.dept === location.code;
+  const lat = coords?.lat ?? meta?.lat;
+  const lon = coords?.lon ?? meta?.lon;
+
+  if (location.type === "departement") {
+    if (meta) return meta.dept === location.code;
+    if (coords?.dept) return String(coords.dept) === String(location.code);
+    return true;
+  }
+
   if (location.type === "commune") {
-    // "Ville exacte" (0 km) tolère un petit écart de géocodage (quelques centaines de mètres) :
-    // deux sources de coordonnées pour une même ville ne tombent presque jamais pile au même point.
+    if (lat == null || lon == null) return true;
+    // "Ville exacte" (0 km) tolère un petit écart de géocodage : deux sources
+    // pour une même ville ne tombent presque jamais pile au même point.
     const effectiveRadius = location.radius === 0 ? 1.5 : location.radius;
-    return haversineKm(location.lat, location.lon, meta.lat, meta.lon) <= effectiveRadius;
+    return haversineKm(location.lat, location.lon, lat, lon) <= effectiveRadius;
   }
   return true;
 }
@@ -3098,7 +3109,7 @@ function Explorer({ activities, favorites, onToggleFav, onOpen, location }) {
   const filtered = useMemo(() => {
     return activities.filter((a) => {
       const matchCat = cat === "tous" || a.category === cat;
-      const matchLoc = matchLocation(a.ville, location);
+      const matchLoc = matchLocation(a.ville, location, { lat: a.lat, lon: a.lon, dept: a.dept });
       const matchQuery = a.title.toLowerCase().includes(query.toLowerCase()) ||
         a.lieu.toLowerCase().includes(query.toLowerCase());
       return matchCat && matchLoc && matchQuery;
@@ -6497,7 +6508,7 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
   const filtered = useMemo(() => {
     return items.filter((a) => {
       const matchCat = cat === "tous" || (cat === "intergen" ? a.intergen : a.category === cat);
-      const matchLoc = matchLocation(a.ville, location);
+      const matchLoc = matchLocation(a.ville, location, { lat: a.lat, lon: a.lon, dept: a.dept });
       const matchFav = !onlyFav || favorites.includes(a.id);
       const matchDate = fromOffset === null || (a.offsetDays ?? 0) >= fromOffset;
       const matchQuery = a.title.toLowerCase().includes(query.toLowerCase()) || a.lieu.toLowerCase().includes(query.toLowerCase());
@@ -8633,6 +8644,7 @@ function usePikapikaData() {
     const creator = row.created_by ? organiserProfiles[row.created_by] : null;
     return {
       id: row.id, title: row.title, category: row.category, ville: row.ville, lieu: row.lieu,
+      lat: row.lat, lon: row.lon, dept: row.dept,
       offsetDays, time, age: row.age, info: row.info, places: row.places,
       inscrits: (row.demo_inscrits || 0) + (regByActivity[row.id] || 0),
       organisateur: creator?.displayName || row.organisateur,
@@ -8724,7 +8736,8 @@ function usePikapikaData() {
     const starts_at = `${form.dateStr}T${form.timeStr}:00`;
     const newRow = {
       id: Date.now(), space, title: form.title, category: form.category, ville: profile.commune || null, lieu: form.lieu,
-      starts_at, age: form.age || null, info: form.info || null, places: form.places, places_enfants: form.placesEnfants ?? null,
+      starts_at, age: form.age || null, info: form.info || null, places: form.places,
+      lat: profile.communeLat ?? null, lon: profile.communeLon ?? null, places_enfants: form.placesEnfants ?? null,
       demo_inscrits: 0, organisateur: profile.displayName || t("you_organizer"), organisateur_genre: profile.genre || null,
       description: form.desc || "", intergen: false, intergen_note: null,
       demo_participants: [], created_by: user.id, payant: !!form.payant, signe_distinctif: form.signeDistinctif || null,
@@ -9837,7 +9850,22 @@ export default function RecreApp() {
       {/* Ciel de nuit : se pose par-dessus le décor de saison */}
       {NUIT && (
         <div className="oree-nuit" aria-hidden="true">
-          <div className="oree-lune" />
+          {/* Croissant de lune : un disque évidé par un second, décalé */}
+          <svg className="oree-lune" viewBox="0 0 100 100" aria-hidden="true">
+            <defs>
+              <mask id="oree-croissant">
+                <rect width="100" height="100" fill="#000" />
+                <circle cx="50" cy="50" r="44" fill="#fff" />
+                <circle cx="74" cy="40" r="38" fill="#000" />
+              </mask>
+            </defs>
+            <g mask="url(#oree-croissant)">
+              <circle cx="50" cy="50" r="44" fill="#F7F2DE" />
+              <circle cx="34" cy="36" r="7"   fill="#E4DBBD" opacity="0.6" />
+              <circle cx="28" cy="60" r="5"   fill="#E4DBBD" opacity="0.5" />
+              <circle cx="42" cy="76" r="4.5" fill="#E4DBBD" opacity="0.45" />
+            </g>
+          </svg>
           <span className="oree-etoile" style={{ left: "79.1%", top: "15.9vh", width: 2, height: 2, animationDuration: "3.3s", animationDelay: "-5.6s" }} />
           <span className="oree-etoile" style={{ left: "28.9%", top: "54.6vh", width: 3, height: 3, animationDuration: "3.5s", animationDelay: "-3.3s" }} />
           <span className="oree-etoile" style={{ left: "65.5%", top: "0.1vh", width: 2, height: 2, animationDuration: "2.6s", animationDelay: "-5.7s" }} />
@@ -10593,6 +10621,8 @@ export default function RecreApp() {
         }
         .oree-mode-nuit .oree-silhouette {
           color: #DCE6F7; opacity: 0.34;
+          /* Au-dessus du voile étoilé, qui la masquerait sinon */
+          z-index: 1;
         }
         @media (max-width: 900px) {
           .oree-silhouette { height: 120px; max-width: 40vw; top: 170px; opacity: 0.13; }
@@ -10624,26 +10654,25 @@ export default function RecreApp() {
           50%      { opacity: 1;   transform: scale(1.15); }
         }
         .oree-lune {
-          position: absolute; top: 84px; right: 9vw;
-          width: 70px; height: 70px; border-radius: 50%;
-          background: #F5F0DC;
-          box-shadow: 0 0 30px rgba(245,240,220,0.55), inset -12px 4px 0 -2px rgba(0,0,0,0.06);
+          position: absolute; top: 84px; right: 8vw;
+          width: 78px; height: 78px;
+          filter: drop-shadow(0 0 18px rgba(245,240,220,0.5));
           animation: oree-lueur-lune 9s ease-in-out infinite;
         }
-        /* Sur téléphone, la lune se fait discrète : plus petite, moins lumineuse
-           et repoussée dans un coin, pour ne pas gêner la lecture. */
+        @keyframes oree-lueur-lune {
+          0%, 100% { filter: drop-shadow(0 0 14px rgba(245,240,220,0.38)); }
+          50%      { filter: drop-shadow(0 0 26px rgba(245,240,220,0.62)); }
+        }
+        /* Sur téléphone, elle reste bien lisible mais plus petite et un peu
+           plus haut, pour ne pas gêner la lecture. */
         @media (max-width: 700px) {
           .oree-lune {
-            width: 34px; height: 34px; top: 78px; right: 5vw;
-            opacity: 0.55;
-            box-shadow: 0 0 14px rgba(245,240,220,0.3), inset -6px 2px 0 -1px rgba(0,0,0,0.06);
+            width: 46px; height: 46px; top: 80px; right: 6vw;
+            filter: drop-shadow(0 0 10px rgba(245,240,220,0.4));
             animation: none;
           }
         }
-        @keyframes oree-lueur-lune {
-          0%, 100% { box-shadow: 0 0 26px rgba(245,240,220,0.45), inset -12px 4px 0 -2px rgba(0,0,0,0.06); }
-          50%      { box-shadow: 0 0 40px rgba(245,240,220,0.7),  inset -12px 4px 0 -2px rgba(0,0,0,0.06); }
-        }
+
         /* Étoile filante : rare, elle traverse le ciel en un éclair */
         .oree-filante {
           position: absolute; width: 90px; height: 2px;
