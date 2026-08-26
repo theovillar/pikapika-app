@@ -9988,9 +9988,10 @@ export default function RecreApp() {
         /* Sur petit écran, le menu de lieu se recentre pour rester entièrement visible */
         @media (max-width: 480px) {
           .pika-menu-lieu {
-            right: 0 !important;
-            width: min(300px, calc(100vw - 24px)) !important;
-            max-width: none !important;
+            position: fixed !important;
+            left: 12px !important; right: 12px !important;
+            top: 66px !important;
+            width: auto !important; max-width: none !important;
             max-height: 60vh;
             overflow-y: auto;
             overscroll-behavior: contain;
@@ -10550,6 +10551,14 @@ export default function RecreApp() {
         .oree-mode-nuit .pika-header-sticky button {
           color: #E6ECF7;
         }
+        /* Le menu de lieu garde son fond blanc : ses textes restent sombres */
+        .oree-mode-nuit .pika-menu-lieu,
+        .oree-mode-nuit .pika-menu-lieu span,
+        .oree-mode-nuit .pika-menu-lieu button,
+        .oree-mode-nuit .pika-menu-lieu input {
+          color: #2B2560 !important;
+        }
+        .oree-mode-nuit .pika-menu-lieu svg { stroke: currentColor !important; }
         .oree-mode-nuit .pika-header-action { box-shadow: 0 0 0 2px rgba(255,255,255,0.22) inset; }
         .oree-mode-nuit .pika-header-action-icon { color: #E6ECF7 !important; }
 
