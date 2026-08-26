@@ -8174,10 +8174,6 @@ function AdminArea({ allProfiles, allActivitiesRaw, currentUserId, onToggleBan, 
           </button>
         ))}
       </div>
-      {sub === "stats" && <StatsSection allProfiles={allProfiles} allActivitiesRaw={allActivitiesRaw} />}
-      {sub === "users" && (
-        <UsersAdminSection allProfiles={allProfiles} currentUserId={currentUserId} onToggleBan={onToggleBan} onDelete={onDelete} onSetCommune={onSetCommune} />
-      )}
       {/* Essai des ambiances saisonnières : réservé à l'administrateur */}
       <div style={{
         background: "#fff", border: "2px solid #F0EADB", borderRadius: 14,
@@ -8222,6 +8218,10 @@ function AdminArea({ allProfiles, allActivitiesRaw, currentUserId, onToggleBan, 
         })}
       </div>
 
+      {sub === "stats" && <StatsSection allProfiles={allProfiles} allActivitiesRaw={allActivitiesRaw} />}
+      {sub === "users" && (
+        <UsersAdminSection allProfiles={allProfiles} currentUserId={currentUserId} onToggleBan={onToggleBan} onDelete={onDelete} onSetCommune={onSetCommune} />
+      )}
       {sub === "reports" && (
         <ReportsAdminSection reports={reportsDetailed || []} onHandle={onHandleReport} onToggleBan={onToggleBan} onViewProfile={onViewProfile} photos={photos || []} onTraiterPhoto={onTraiterPhoto} />
       )}
@@ -9131,11 +9131,10 @@ export default function RecreApp() {
   });
   // Ces trois-là ne sont plus dans la barre du bas : ils vivent en icônes dans l'en-tête,
   // pour laisser la barre du bas uniquement aux catégories d'âge (plus lisible sur petit écran).
+  // Pages accessibles depuis l'en-tête ou le bouton flottant, hors barre du bas
   const HEADER_ACTIONS = pika.user ? [
-    { id: "creer", label: t("tab_creer"), icon: PlusCircle },
-    { id: "mes-sorties", label: t("tab_mes_sorties"), icon: BookMarked },
-    ...(pika.isAdmin ? [{ id: "stats", label: t("mairie_sub_stats"), icon: BarChart3 }] : []),
-    { id: "profil", label: t("tab_profil"), icon: UserCircle2 },
+    { id: "creer" }, { id: "mes-sorties" }, { id: "profil" },
+    ...(pika.isAdmin ? [{ id: "stats" }] : []),
   ] : [];
 
   // Si le parent n'est plus validé (démo), ou si la session change, on repositionne si besoin
@@ -9275,6 +9274,30 @@ export default function RecreApp() {
                 color: tab === "mes-sorties" ? "#fff" : COLORS.ink, whiteSpace: "nowrap",
               }}>
                 {t("tab_mes_sorties")}
+              </span>
+            </button>
+          )}
+
+          {/* Espace d'administration : visible uniquement pour l'administrateur */}
+          {pika.user && pika.isAdmin && (
+            <button
+              onClick={() => setTab("stats")}
+              aria-label={t("mairie_sub_stats")}
+              title={t("mairie_sub_stats")}
+              className="pika-header-action"
+              style={{
+                display: "flex", alignItems: "center", gap: 6, cursor: "pointer",
+                borderRadius: 999, border: "none", padding: "7px 12px", flexShrink: 0,
+                background: tab === "stats" ? COLORS.ink : "#fff",
+                boxShadow: tab === "stats" ? "none" : "0 0 0 2px #F0EADB inset",
+              }}
+            >
+              <BarChart3 size={16} className="pika-header-action-icon" color={tab === "stats" ? "#fff" : COLORS.ink} />
+              <span className="pika-header-action-label" style={{
+                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
+                color: tab === "stats" ? "#fff" : COLORS.ink, whiteSpace: "nowrap",
+              }}>
+                {t("mairie_sub_stats")}
               </span>
             </button>
           )}
