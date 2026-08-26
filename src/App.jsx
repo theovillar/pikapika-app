@@ -6287,6 +6287,22 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
 
       <PlainParticipantsRow names={item.participants} color={meta.color} max={8} genderMode={genderMode} onViewProfile={onViewProfile} />
 
+      {/* Type de structure : placé à droite, il n'allonge pas la carte */}
+      {structure && !isPast && (
+        <span
+          className="pika-badge-structure"
+          title={structure.label()}
+          style={{
+            fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9,
+            padding: "2px 8px", borderRadius: 999, flexShrink: 0,
+            background: `${structure.couleur}1F`, color: structure.couleur,
+            textTransform: "uppercase", letterSpacing: 0.4, whiteSpace: "nowrap",
+          }}
+        >
+          {structure.label()}
+        </span>
+      )}
+
       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 1, flexShrink: 0 }}>
         <span style={{
           fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12,
@@ -9483,7 +9499,7 @@ export default function RecreApp() {
       )}
 
       {/* Neige d'hiver : purement décorative, ne capte aucun clic */}
-      {SAISON === "hiver" && (
+      {SAISON === "hiver" && !NUIT && (
         <>
           <div className="oree-neige" aria-hidden="true">
           <span className="oree-flocon" style={{ left: "37.7%", width: 8, height: 8, opacity: 0.95, animationDuration: "15.5s", animationDelay: "-6.0s" }} />
@@ -9711,13 +9727,6 @@ export default function RecreApp() {
             </svg>
           </span>
           </div>
-          <div className="oree-feu" aria-hidden="true">
-            <div className="oree-lueur" />
-            <div className="oree-flamme f1" />
-            <div className="oree-flamme f2" />
-            <div className="oree-flamme f3" />
-            <div className="oree-flamme f4" />
-          </div>
         </>
       )}
       {/* Ciel de nuit : se pose par-dessus le décor de saison */}
@@ -9832,6 +9841,17 @@ export default function RecreApp() {
           <span className="oree-bulle" style={{ left: "11.1%", width: 20, height: 20, animationDuration: "9.6s", animationDelay: "-6.0s" }} />
           <span className="oree-bulle" style={{ left: "29.9%", width: 20, height: 20, animationDuration: "11.1s", animationDelay: "-7.4s" }} />
           <span className="oree-bulle" style={{ left: "83.4%", width: 20, height: 20, animationDuration: "13.4s", animationDelay: "-3.7s" }} />
+        </div>
+      )}
+
+      {/* Feu de cheminée : il brûle jour et nuit, mais ressort surtout le soir */}
+      {SAISON === "hiver" && (
+        <div className={NUIT ? "oree-feu oree-feu-nuit" : "oree-feu"} aria-hidden="true">
+          <div className="oree-lueur" />
+          <div className="oree-flamme f1" />
+          <div className="oree-flamme f2" />
+          <div className="oree-flamme f3" />
+          <div className="oree-flamme f4" />
         </div>
       )}
 
@@ -10748,6 +10768,19 @@ export default function RecreApp() {
           position: fixed; left: 0; right: 0; bottom: -6vh; height: 40vh;
           pointer-events: none; z-index: 0;
         }
+        /* La nuit, le feu passe au-dessus du voile étoilé et brille davantage :
+           c'est là qu'un feu de cheminée prend tout son sens. */
+        .oree-feu-nuit {
+          z-index: 1;
+          filter: saturate(1.25) brightness(1.35);
+        }
+        .oree-feu-nuit .oree-lueur {
+          background: radial-gradient(ellipse 78% 74% at 50% 100%, rgba(232,110,50,0.52), transparent 72%);
+        }
+        .oree-feu-nuit .f1 { background: rgba(255,170,60,0.62); }
+        .oree-feu-nuit .f2 { background: rgba(255,186,80,0.56); }
+        .oree-feu-nuit .f3 { background: rgba(255,226,150,0.62); }
+        .oree-feu-nuit .f4 { background: rgba(255,238,180,0.54); }
         .oree-lueur {
           position: absolute; left: 0; right: 0; bottom: 0; height: 100%;
           background: radial-gradient(ellipse 75% 70% at 50% 100%, rgba(196,82,47,0.34), transparent 70%);
@@ -10799,6 +10832,8 @@ export default function RecreApp() {
            Le compteur "+N" reste toujours visible, lui. */
         @media (max-width: 560px) {
           .pika-avatars > *:nth-child(n+4):not(:last-child) { display: none !important; }
+          /* Sur écran étroit, le badge cède la place aux informations essentielles */
+          .pika-badge-structure { display: none !important; }
         }
         @media (max-width: 420px) {
           .pika-avatars > *:nth-child(n+3):not(:last-child) { display: none !important; }
