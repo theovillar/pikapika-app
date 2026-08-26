@@ -4517,8 +4517,9 @@ function LocationFilter({ location, onChange }) {
           display: "flex", alignItems: "center", gap: 6, background: "#fff",
           border: "2px solid #F0EADB", borderRadius: 999, padding: "7px 12px 7px 10px",
           cursor: "pointer", fontFamily: "Nunito, sans-serif", maxWidth: "100%",
-          // Le bouton ne se comprime pas : le rayon reste toujours lisible
-          flexShrink: 0, minWidth: 0,
+          // Le bouton peut se comprimer (sinon l'en-tête passe sur deux lignes),
+          // mais c'est le nom de ville qui se tronque, jamais le rayon.
+          minWidth: 0,
         }}
       >
         <MapPin size={15} color={COLORS.coral} style={{ flexShrink: 0 }} />
