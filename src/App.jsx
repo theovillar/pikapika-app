@@ -515,8 +515,6 @@ const NUIT = estLaNuit();
 
 const COLORS = {
   ...PALETTES[SAISON],
-  // La nuit, le fond s'assombrit : les textes doivent s'éclaircir pour rester lisibles
-  ...(NUIT ? { ink: "#EDF1F8" } : {}),
   // Repères de genre : identiques toute l'année
   boy: "#4EC5F1",
   girl: "#FF8FB1",
@@ -6374,7 +6372,7 @@ function DayAccordion({ items, categories, onOpen, favorites, onToggleFav, gende
             }}
           >
             <ChevronDown size={15} color="#B7AF98" style={{ transform: closed[g.key] ? "rotate(-90deg)" : "none", transition: "transform .15s ease" }} />
-            <span style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15.5, color: COLORS.ink, textTransform: "capitalize" }}>
+            <span className="pika-jour-titre" style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15.5, color: COLORS.ink, textTransform: "capitalize" }}>
               {g.label}
             </span>
             <span className="pika-jour-compte" style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, color: "#B7AF98" }}>
@@ -6442,7 +6440,7 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
   return (
     <div>
       <div style={{ padding: "4px 4px 14px" }}>
-        <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 26, color: COLORS.ink, margin: "0 0 4px" }}>
+        <h1 className="pika-titre-page" style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 26, color: COLORS.ink, margin: "0 0 4px" }}>
           {title}
         </h1>
         <p className="pika-sous-titre" style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14.5, margin: 0 }}>
@@ -10407,13 +10405,24 @@ export default function RecreApp() {
         /* Ondulations d'eau : uniquement l'été, sur le fond de la page.
            Deux trames de reflets qui dérivent lentement en sens contraire,
            entièrement en CSS (aucune image à télécharger). */
-        /* La nuit, les textes sur le fond (titres, sous-titres, en-têtes de jour)
-           s'éclaircissent : les gris sombres deviennent illisibles. */
-        .oree-mode-nuit h1,
-        .oree-mode-nuit h2 { color: #EDF1F8 !important; }
-        .oree-mode-nuit .pika-sous-titre { color: #B9C6DC !important; }
+        /* La nuit, seuls les textes posés directement sur le fond s'éclaircissent.
+           Tout ce qui est dans une carte blanche garde ses couleurs d'origine. */
+        .oree-mode-nuit .pika-titre-page { color: #EDF1F8 !important; }
+        .oree-mode-nuit .pika-sous-titre { color: #C3CFE2 !important; }
         .oree-mode-nuit .pika-jour-titre { color: #EDF1F8 !important; }
-        .oree-mode-nuit .pika-jour-compte { color: #9FB0C9 !important; }
+        .oree-mode-nuit .pika-jour-compte { color: #A9B8CE !important; }
+
+        /* En-tête : son fond translucide s'assombrit la nuit, donc ses textes
+           et ses boutons non actifs doivent s'éclaircir. */
+        .oree-mode-nuit .pika-header-sticky {
+          background-color: rgba(22, 32, 58, 0.82) !important;
+        }
+        .oree-mode-nuit .pika-header-sticky span,
+        .oree-mode-nuit .pika-header-sticky button {
+          color: #E6ECF7;
+        }
+        .oree-mode-nuit .pika-header-action { box-shadow: 0 0 0 2px rgba(255,255,255,0.22) inset; }
+        .oree-mode-nuit .pika-header-action-icon { color: #E6ECF7 !important; }
 
         /* Ciel de nuit : un voile sombre par-dessus le décor de saison,
            avec des étoiles qui scintillent et une lune. */
