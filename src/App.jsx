@@ -10082,31 +10082,6 @@ export default function RecreApp() {
             </button>
           )}
 
-          {/* Espace d'administration : visible uniquement pour l'administrateur */}
-          {pika.user && pika.isAdmin && (
-            <button
-              onClick={() => setTab("stats")}
-              aria-label={t("mairie_sub_stats")}
-              title={t("mairie_sub_stats")}
-              className="pika-header-action"
-              data-actif={tab === "stats" ? "1" : "0"}
-              style={{
-                display: "flex", alignItems: "center", gap: 6, cursor: "pointer",
-                borderRadius: 999, border: "none", padding: "7px 12px", flexShrink: 0,
-                background: tab === "stats" ? COLORS.ink : "#fff",
-                boxShadow: tab === "stats" ? "none" : "0 0 0 2px #F0EADB inset",
-              }}
-            >
-              <BarChart3 size={16} className="pika-header-action-icon" color={tab === "stats" ? "#fff" : COLORS.ink} />
-              <span className="pika-header-action-label" style={{
-                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
-                color: tab === "stats" ? "#fff" : COLORS.ink, whiteSpace: "nowrap",
-              }}>
-                {t("mairie_sub_stats")}
-              </span>
-            </button>
-          )}
-
           {/* Compte, toujours tout à droite : la photo de profil le rend immédiatement reconnaissable */}
           {pika.user ? (
             <button
@@ -10350,6 +10325,24 @@ export default function RecreApp() {
         )}
       </div>
 
+      {/* Espace d'administration : bouton flottant, pour dégager l'en-tête */}
+      {pika.user && pika.isAdmin && tab !== "stats" && (
+        <button
+          onClick={() => setTab("stats")}
+          aria-label={t("mairie_sub_stats")}
+          title={t("mairie_sub_stats")}
+          style={{
+            position: "fixed", right: 18, bottom: "calc(146px + env(safe-area-inset-bottom))",
+            zIndex: 900, width: 46, height: 46, borderRadius: "50%",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            background: "#fff", border: `2px solid ${COLORS.ink}`, cursor: "pointer",
+            boxShadow: "0 4px 14px rgba(43,37,96,0.18)",
+          }}
+        >
+          <BarChart3 size={20} color={COLORS.ink} />
+        </button>
+      )}
+
       {/* Bouton flottant "Créer" : l'action principale de l'appli, toujours accessible */}
       {pika.user && tab !== "creer" && (
         <button
@@ -10551,7 +10544,9 @@ export default function RecreApp() {
         .oree-mode-nuit .pika-header-sticky button {
           color: #E6ECF7;
         }
-        /* Le menu de lieu garde son fond blanc : ses textes restent sombres */
+        /* Bouton et menu de lieu : fond blanc, donc textes sombres même la nuit */
+        .oree-mode-nuit .pika-location-btn,
+        .oree-mode-nuit .pika-location-btn span,
         .oree-mode-nuit .pika-menu-lieu,
         .oree-mode-nuit .pika-menu-lieu span,
         .oree-mode-nuit .pika-menu-lieu button,
@@ -11016,12 +11011,18 @@ export default function RecreApp() {
           .pika-header-action-icon { width: 17px !important; height: 17px !important; }
           /* Assez large pour que le rayon reste visible : c'est le nom de ville
              qui se tronque, pas les kilomètres. */
-          /* La barre reste sur une seule ligne : c'est le nom de ville qui se
-             tronque quand la place manque, jamais le rayon. */
-          .pika-header-row { flex-wrap: nowrap !important; }
-          .pika-header-right { min-width: 0 !important; flex-shrink: 1 !important; }
-          .pika-location-btn { min-width: 0 !important; flex-shrink: 1 !important; }
-          .pika-location-label { max-width: 62px !important; font-size: 12px !important; }
+          /* La barre tient sur une seule ligne sans jamais déborder : le nom de
+             ville se tronque, le rayon et la photo de profil restent entiers. */
+          .pika-header-row {
+            flex-wrap: nowrap !important;
+            overflow: hidden;
+            padding: 12px 10px !important;
+            gap: 8px !important;
+          }
+          .pika-header-right { min-width: 0 !important; flex-shrink: 1 !important; gap: 7px !important; }
+          .pika-location-btn { min-width: 0 !important; flex-shrink: 1 !important; padding: 7px 9px 7px 8px !important; }
+          .pika-location-label { max-width: 74px !important; font-size: 12px !important; }
+          .pika-logo-nom { display: none !important; }
         }
       `}</style>
     </div>
