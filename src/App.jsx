@@ -4522,8 +4522,27 @@ function LocationFilter({ location, onChange }) {
     setOpen(false);
   };
 
+  // L'en-tête applique un flou, ce qui empêche un voile en position fixe de
+  // couvrir l'écran : on détecte donc le clic extérieur sur le document.
+  const boiteRef = useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    const dehors = (e) => {
+      if (boiteRef.current && !boiteRef.current.contains(e.target)) setOpen(false);
+    };
+    const echap = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", dehors);
+    document.addEventListener("touchstart", dehors);
+    document.addEventListener("keydown", echap);
+    return () => {
+      document.removeEventListener("mousedown", dehors);
+      document.removeEventListener("touchstart", dehors);
+      document.removeEventListener("keydown", echap);
+    };
+  }, [open]);
+
   return (
-    <div style={{ position: "relative" }}>
+    <div ref={boiteRef} style={{ position: "relative" }}>
       <button
         onClick={() => setOpen((o) => !o)}
         className="pika-location-btn"
@@ -4558,7 +4577,6 @@ function LocationFilter({ location, onChange }) {
 
       {open && (
         <>
-          <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 9998 }} />
           <div className="pika-menu-lieu" style={{
             position: "absolute", top: "calc(100% + 6px)", right: 0, background: "#fff",
             border: "2px solid #F0EADB", borderRadius: 16, padding: 12, width: 280,
@@ -9970,11 +9988,10 @@ export default function RecreApp() {
         /* Sur petit écran, le menu de lieu se recentre pour rester entièrement visible */
         @media (max-width: 480px) {
           .pika-menu-lieu {
-            position: fixed !important;
-            left: 12px !important; right: 12px !important;
-            width: auto !important; max-width: none !important;
-            top: 72px !important;
-            max-height: calc(100dvh - 100px);
+            right: 0 !important;
+            width: min(300px, calc(100vw - 24px)) !important;
+            max-width: none !important;
+            max-height: 60vh;
             overflow-y: auto;
             overscroll-behavior: contain;
           }
@@ -10020,7 +10037,7 @@ export default function RecreApp() {
         </button>
 
         {/* Desktop nav + sélecteur de ville + actions d'en-tête (Créer / Mes sorties / Profil) */}
-        <div className="pika-header-right" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div className="pika-header-right" style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
           <div className="desktop-nav" style={{ display: "none", gap: 6 }}>
             {TABS.map((tb) => (
               <button
@@ -10565,7 +10582,7 @@ export default function RecreApp() {
         /* Silhouette du lieu choisi : en haut à droite, où la page est dégagée.
            Sombre le jour sur fond clair, claire la nuit sur fond sombre. */
         .oree-silhouette {
-          position: fixed; top: 96px; right: 3vw;
+          position: fixed; top: 190px; right: 3vw;
           height: 170px; width: auto; max-width: 34vw;
           pointer-events: none; z-index: 0;
           color: #2B2560; opacity: 0.16;
@@ -10574,7 +10591,7 @@ export default function RecreApp() {
           color: #DCE6F7; opacity: 0.34;
         }
         @media (max-width: 900px) {
-          .oree-silhouette { height: 120px; max-width: 40vw; top: 88px; opacity: 0.13; }
+          .oree-silhouette { height: 120px; max-width: 40vw; top: 170px; opacity: 0.13; }
           .oree-mode-nuit .oree-silhouette { opacity: 0.28; }
         }
         @media (max-width: 560px) {
@@ -10990,7 +11007,12 @@ export default function RecreApp() {
           .pika-header-action-icon { width: 17px !important; height: 17px !important; }
           /* Assez large pour que le rayon reste visible : c'est le nom de ville
              qui se tronque, pas les kilomètres. */
-          .pika-location-label { max-width: 88px !important; font-size: 12px !important; }
+          /* La barre reste sur une seule ligne : c'est le nom de ville qui se
+             tronque quand la place manque, jamais le rayon. */
+          .pika-header-row { flex-wrap: nowrap !important; }
+          .pika-header-right { min-width: 0 !important; flex-shrink: 1 !important; }
+          .pika-location-btn { min-width: 0 !important; flex-shrink: 1 !important; }
+          .pika-location-label { max-width: 62px !important; font-size: 12px !important; }
         }
       `}</style>
     </div>
