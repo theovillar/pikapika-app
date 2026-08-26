@@ -9174,6 +9174,30 @@ export default function RecreApp() {
         position: "relative",
       }}
     >
+      {/* Feuilles d'automne : purement décoratives, ne captent aucun clic */}
+      {SAISON === "automne" && (
+        <div className="oree-feuilles" aria-hidden="true">
+            <span className="oree-feuille" style={{ left: "44.1%", width: 15, height: 19, background: "#8C6239", opacity: 0.79, animation: "oree-chute-a 15.8s linear infinite", animationDelay: "-3.0s" }} />
+            <span className="oree-feuille" style={{ left: "46.2%", width: 11, height: 13, background: "#A8763E", opacity: 0.79, animation: "oree-chute-b 11.4s linear infinite", animationDelay: "-1.5s" }} />
+            <span className="oree-feuille" style={{ left: "66.5%", width: 9, height: 15, background: "#A8763E", opacity: 0.73, animation: "oree-chute-a 16.7s linear infinite", animationDelay: "-10.5s" }} />
+            <span className="oree-feuille" style={{ left: "16.6%", width: 9, height: 15, background: "#E07A3F", opacity: 0.62, animation: "oree-chute-b 9.5s linear infinite", animationDelay: "-3.0s" }} />
+            <span className="oree-feuille" style={{ left: "4.8%", width: 15, height: 19, background: "#A8763E", opacity: 0.62, animation: "oree-chute-a 13.7s linear infinite", animationDelay: "-3.1s" }} />
+            <span className="oree-feuille" style={{ left: "29.4%", width: 9, height: 15, background: "#E07A3F", opacity: 0.85, animation: "oree-chute-b 12.7s linear infinite", animationDelay: "-4.5s" }} />
+            <span className="oree-feuille" style={{ left: "94.6%", width: 9, height: 15, background: "#D89B4A", opacity: 0.64, animation: "oree-chute-a 11.5s linear infinite", animationDelay: "-3.7s" }} />
+            <span className="oree-feuille" style={{ left: "8.5%", width: 9, height: 13, background: "#E07A3F", opacity: 0.84, animation: "oree-chute-b 15.8s linear infinite", animationDelay: "-6.2s" }} />
+            <span className="oree-feuille" style={{ left: "80.8%", width: 9, height: 11, background: "#C4522F", opacity: 0.66, animation: "oree-chute-a 16.4s linear infinite", animationDelay: "-0.8s" }} />
+            <span className="oree-feuille" style={{ left: "67.9%", width: 15, height: 17, background: "#8C6239", opacity: 0.63, animation: "oree-chute-b 14.0s linear infinite", animationDelay: "-12.5s" }} />
+            <span className="oree-feuille" style={{ left: "10.1%", width: 13, height: 15, background: "#A8763E", opacity: 0.62, animation: "oree-chute-a 15.1s linear infinite", animationDelay: "-1.9s" }} />
+            <span className="oree-feuille" style={{ left: "11.4%", width: 9, height: 13, background: "#C96A2E", opacity: 0.61, animation: "oree-chute-b 12.9s linear infinite", animationDelay: "-10.9s" }} />
+            <span className="oree-feuille" style={{ left: "49.3%", width: 11, height: 15, background: "#B8873C", opacity: 0.85, animation: "oree-chute-a 12.1s linear infinite", animationDelay: "-6.3s" }} />
+            <span className="oree-feuille" style={{ left: "2.0%", width: 13, height: 15, background: "#C4522F", opacity: 0.73, animation: "oree-chute-b 10.5s linear infinite", animationDelay: "-15.9s" }} />
+            <span className="oree-feuille" style={{ left: "55.7%", width: 9, height: 11, background: "#C4522F", opacity: 0.73, animation: "oree-chute-a 12.5s linear infinite", animationDelay: "-0.2s" }} />
+            <span className="oree-feuille" style={{ left: "79.2%", width: 15, height: 17, background: "#E07A3F", opacity: 0.62, animation: "oree-chute-b 9.7s linear infinite", animationDelay: "-9.3s" }} />
+            <span className="oree-feuille" style={{ left: "57.9%", width: 13, height: 19, background: "#A8763E", opacity: 0.8, animation: "oree-chute-a 10.0s linear infinite", animationDelay: "-9.4s" }} />
+            <span className="oree-feuille" style={{ left: "14.6%", width: 15, height: 17, background: "#B8873C", opacity: 0.8, animation: "oree-chute-b 10.2s linear infinite", animationDelay: "-14.5s" }} />
+        </div>
+      )}
+
       {/* Neige d'hiver : purement décorative, ne capte aucun clic */}
       {SAISON === "hiver" && (
         <>
@@ -9831,6 +9855,31 @@ export default function RecreApp() {
         .oree-flocon {
           position: absolute; border-radius: 50%; background: #fff;
         }
+        /* Feuilles d'automne : elles tombent en virevoltant, chacune sur sa
+           propre trajectoire. La rotation et le balancement latéral rendent
+           la chute crédible — une feuille ne tombe jamais droit. */
+        @keyframes oree-chute-a {
+          0%   { transform: translate(0, -60px) rotate(0deg); }
+          25%  { transform: translate(38px, 25vh) rotate(70deg); }
+          50%  { transform: translate(-22px, 50vh) rotate(160deg); }
+          75%  { transform: translate(30px, 75vh) rotate(250deg); }
+          100% { transform: translate(-12px, 104vh) rotate(340deg); }
+        }
+        @keyframes oree-chute-b {
+          0%   { transform: translate(0, -60px) rotate(0deg); }
+          30%  { transform: translate(-34px, 30vh) rotate(-80deg); }
+          60%  { transform: translate(26px, 60vh) rotate(-175deg); }
+          100% { transform: translate(-18px, 104vh) rotate(-300deg); }
+        }
+        .oree-feuilles {
+          position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .oree-feuille {
+          position: absolute; top: -60px;
+          /* Forme de feuille : pointue en haut, arrondie en bas */
+          border-radius: 0 100% 0 100%;
+        }
+
         /* Feu de cheminée : de vraies formes de flammes, chacune animée
            séparément. Des ellipses floutées plutôt que des dégradés : elles se
            déplacent réellement, au lieu de s'étirer sur place. */
@@ -9883,7 +9932,7 @@ export default function RecreApp() {
         /* Respect du réglage système : pas d'animation pour qui la désactive */
         @media (prefers-reduced-motion: reduce) {
           .oree-vague-a, .oree-vague-b, .oree-vague-c,
-          .oree-neige > div, .oree-lueur, .oree-flamme { animation: none; }
+          .oree-neige > div, .oree-lueur, .oree-flamme, .oree-feuille { animation: none; }
         }
 
         /* Sur écran étroit, on masque les dernières pastilles plutôt que de déborder.
