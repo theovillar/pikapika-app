@@ -4504,9 +4504,10 @@ function LocationFilter({ location, onChange }) {
       {open && (
         <>
           <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 9998 }} />
-          <div style={{
+          <div className="pika-menu-lieu" style={{
             position: "absolute", top: "calc(100% + 6px)", right: 0, background: "#fff",
             border: "2px solid #F0EADB", borderRadius: 16, padding: 12, width: 280,
+            maxWidth: "calc(100vw - 24px)",
             boxShadow: "0 12px 28px rgba(43,37,96,0.14)", zIndex: 9999,
           }}>
             <input
@@ -9869,6 +9870,20 @@ export default function RecreApp() {
         * { box-sizing: border-box; }
         input:focus, textarea:focus { border-color: ${COLORS.sky} !important; }
         ::placeholder { color: #C7C0AE; }
+        /* Safari sur iPhone zoome automatiquement sur tout champ dont la police
+           fait moins de 16px : on impose ce minimum pour éviter le déréglage. */
+        @media (max-width: 900px) {
+          input, textarea, select { font-size: 16px !important; }
+        }
+        /* Sur petit écran, le menu de lieu se recentre pour rester entièrement visible */
+        @media (max-width: 480px) {
+          .pika-menu-lieu {
+            position: fixed !important;
+            left: 12px !important; right: 12px !important;
+            width: auto !important; max-width: none !important;
+            top: 72px !important;
+          }
+        }
         :root { --pika-avatar-size: 26px; }
         @media (max-width: 480px) {
           :root { --pika-avatar-size: 20px; }
