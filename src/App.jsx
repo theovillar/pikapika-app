@@ -9174,6 +9174,142 @@ export default function RecreApp() {
         position: "relative",
       }}
     >
+      {/* Printemps : soleil, fleurs et abeilles — purement décoratif */}
+      {SAISON === "printemps" && (
+        <div className="oree-printemps" aria-hidden="true">
+          <div className="oree-soleil">
+            <div className="oree-soleil-halo" />
+            <div className="oree-soleil-rayons">
+              <span className="oree-rayon" style={{ transform: "rotate(0deg) translateY(-52px)" }} />
+              <span className="oree-rayon" style={{ transform: "rotate(30deg) translateY(-52px)" }} />
+              <span className="oree-rayon" style={{ transform: "rotate(60deg) translateY(-52px)" }} />
+              <span className="oree-rayon" style={{ transform: "rotate(90deg) translateY(-52px)" }} />
+              <span className="oree-rayon" style={{ transform: "rotate(120deg) translateY(-52px)" }} />
+              <span className="oree-rayon" style={{ transform: "rotate(150deg) translateY(-52px)" }} />
+              <span className="oree-rayon" style={{ transform: "rotate(180deg) translateY(-52px)" }} />
+              <span className="oree-rayon" style={{ transform: "rotate(210deg) translateY(-52px)" }} />
+              <span className="oree-rayon" style={{ transform: "rotate(240deg) translateY(-52px)" }} />
+              <span className="oree-rayon" style={{ transform: "rotate(270deg) translateY(-52px)" }} />
+              <span className="oree-rayon" style={{ transform: "rotate(300deg) translateY(-52px)" }} />
+              <span className="oree-rayon" style={{ transform: "rotate(330deg) translateY(-52px)" }} />
+            </div>
+            <div className="oree-soleil-coeur" />
+          </div>
+
+          <span className="oree-fleur" style={{ left: "60.8%", width: 19, height: 93, animationDuration: "11.7s", animationDelay: "-4.4s" }}>
+            <span className="oree-tige" style={{ height: 84 }} />
+            <span className="oree-corolle" style={{ bottom: 74, width: 19, height: 19, background: "#FFD9E8" }} />
+            <span className="oree-corolle" style={{ bottom: 80, width: 6, height: 6, background: "#FFF3C4" }} />
+          </span>
+          <span className="oree-fleur" style={{ left: "89.5%", width: 22, height: 47, animationDuration: "10.2s", animationDelay: "-5.4s" }}>
+            <span className="oree-tige" style={{ height: 36 }} />
+            <span className="oree-corolle" style={{ bottom: 25, width: 22, height: 22, background: "#F5D76E" }} />
+            <span className="oree-corolle" style={{ bottom: 32, width: 7, height: 7, background: "#FFF3C4" }} />
+          </span>
+          <span className="oree-fleur" style={{ left: "11.9%", width: 16, height: 76, animationDuration: "9.7s", animationDelay: "-3.4s" }}>
+            <span className="oree-tige" style={{ height: 68 }} />
+            <span className="oree-corolle" style={{ bottom: 60, width: 16, height: 16, background: "#FFF0A8" }} />
+            <span className="oree-corolle" style={{ bottom: 65, width: 5, height: 5, background: "#FFF3C4" }} />
+          </span>
+          <span className="oree-fleur" style={{ left: "2.3%", width: 22, height: 59, animationDuration: "7.9s", animationDelay: "-5.2s" }}>
+            <span className="oree-tige" style={{ height: 48 }} />
+            <span className="oree-corolle" style={{ bottom: 37, width: 22, height: 22, background: "#E88FB8" }} />
+            <span className="oree-corolle" style={{ bottom: 44, width: 7, height: 7, background: "#FFF3C4" }} />
+          </span>
+          <span className="oree-fleur" style={{ left: "38.4%", width: 13, height: 94, animationDuration: "10.1s", animationDelay: "-2.7s" }}>
+            <span className="oree-tige" style={{ height: 88 }} />
+            <span className="oree-corolle" style={{ bottom: 81, width: 13, height: 13, background: "#F5D76E" }} />
+            <span className="oree-corolle" style={{ bottom: 85, width: 4, height: 4, background: "#FFF3C4" }} />
+          </span>
+          <span className="oree-fleur" style={{ left: "13.7%", width: 16, height: 46, animationDuration: "11.8s", animationDelay: "-1.0s" }}>
+            <span className="oree-tige" style={{ height: 38 }} />
+            <span className="oree-corolle" style={{ bottom: 30, width: 16, height: 16, background: "#F5D76E" }} />
+            <span className="oree-corolle" style={{ bottom: 35, width: 5, height: 5, background: "#FFF3C4" }} />
+          </span>
+          <span className="oree-fleur" style={{ left: "17.0%", width: 16, height: 66, animationDuration: "11.4s", animationDelay: "-3.8s" }}>
+            <span className="oree-tige" style={{ height: 58 }} />
+            <span className="oree-corolle" style={{ bottom: 50, width: 16, height: 16, background: "#F2B5D4" }} />
+            <span className="oree-corolle" style={{ bottom: 55, width: 5, height: 5, background: "#FFF3C4" }} />
+          </span>
+          <span className="oree-fleur" style={{ left: "18.4%", width: 16, height: 90, animationDuration: "8.5s", animationDelay: "-2.2s" }}>
+            <span className="oree-tige" style={{ height: 82 }} />
+            <span className="oree-corolle" style={{ bottom: 74, width: 16, height: 16, background: "#FFF0A8" }} />
+            <span className="oree-corolle" style={{ bottom: 79, width: 5, height: 5, background: "#FFF3C4" }} />
+          </span>
+          <span className="oree-fleur" style={{ left: "16.9%", width: 19, height: 55, animationDuration: "8.7s", animationDelay: "-4.9s" }}>
+            <span className="oree-tige" style={{ height: 46 }} />
+            <span className="oree-corolle" style={{ bottom: 36, width: 19, height: 19, background: "#F7A9C4" }} />
+            <span className="oree-corolle" style={{ bottom: 42, width: 6, height: 6, background: "#FFF3C4" }} />
+          </span>
+          <span className="oree-fleur" style={{ left: "57.3%", width: 19, height: 84, animationDuration: "8.5s", animationDelay: "-4.9s" }}>
+            <span className="oree-tige" style={{ height: 75 }} />
+            <span className="oree-corolle" style={{ bottom: 65, width: 19, height: 19, background: "#F7A9C4" }} />
+            <span className="oree-corolle" style={{ bottom: 71, width: 6, height: 6, background: "#FFF3C4" }} />
+          </span>
+          <span className="oree-fleur" style={{ left: "47.2%", width: 16, height: 66, animationDuration: "9.4s", animationDelay: "-1.1s" }}>
+            <span className="oree-tige" style={{ height: 58 }} />
+            <span className="oree-corolle" style={{ bottom: 50, width: 16, height: 16, background: "#FFF0A8" }} />
+            <span className="oree-corolle" style={{ bottom: 55, width: 5, height: 5, background: "#FFF3C4" }} />
+          </span>
+          <span className="oree-fleur" style={{ left: "25.6%", width: 19, height: 47, animationDuration: "7.1s", animationDelay: "-4.7s" }}>
+            <span className="oree-tige" style={{ height: 38 }} />
+            <span className="oree-corolle" style={{ bottom: 28, width: 19, height: 19, background: "#FFF0A8" }} />
+            <span className="oree-corolle" style={{ bottom: 34, width: 6, height: 6, background: "#FFF3C4" }} />
+          </span>
+          <span className="oree-fleur" style={{ left: "36.2%", width: 13, height: 83, animationDuration: "7.2s", animationDelay: "-1.1s" }}>
+            <span className="oree-tige" style={{ height: 77 }} />
+            <span className="oree-corolle" style={{ bottom: 70, width: 13, height: 13, background: "#FFF0A8" }} />
+            <span className="oree-corolle" style={{ bottom: 74, width: 4, height: 4, background: "#FFF3C4" }} />
+          </span>
+          <span className="oree-fleur" style={{ left: "92.7%", width: 13, height: 58, animationDuration: "11.6s", animationDelay: "-5.7s" }}>
+            <span className="oree-tige" style={{ height: 52 }} />
+            <span className="oree-corolle" style={{ bottom: 45, width: 13, height: 13, background: "#F5D76E" }} />
+            <span className="oree-corolle" style={{ bottom: 49, width: 4, height: 4, background: "#FFF3C4" }} />
+          </span>
+          <span className="oree-fleur" style={{ left: "34.1%", width: 19, height: 68, animationDuration: "7.5s", animationDelay: "-4.5s" }}>
+            <span className="oree-tige" style={{ height: 59 }} />
+            <span className="oree-corolle" style={{ bottom: 49, width: 19, height: 19, background: "#FFF0A8" }} />
+            <span className="oree-corolle" style={{ bottom: 55, width: 6, height: 6, background: "#FFF3C4" }} />
+          </span>
+          <span className="oree-fleur" style={{ left: "77.5%", width: 13, height: 64, animationDuration: "11.7s", animationDelay: "-0.5s" }}>
+            <span className="oree-tige" style={{ height: 58 }} />
+            <span className="oree-corolle" style={{ bottom: 51, width: 13, height: 13, background: "#FFF0A8" }} />
+            <span className="oree-corolle" style={{ bottom: 55, width: 4, height: 4, background: "#FFF3C4" }} />
+          </span>
+
+          <span className="oree-abeille" style={{ top: "33.0vh", left: "-6vw", animationDuration: "34.6s", animationDelay: "-18.4s" }}>
+            <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true">
+              <ellipse cx="8" cy="5" rx="6" ry="3.5" fill="rgba(255,255,255,0.75)" />
+              <ellipse cx="14" cy="5" rx="5" ry="3" fill="rgba(255,255,255,0.6)" />
+              <ellipse cx="11" cy="10" rx="6.5" ry="4.5" fill="#F5C518" />
+              <rect x="8" y="6" width="2.4" height="8.6" rx="1" fill="#4A3B1E" />
+              <rect x="12.5" y="6.6" width="2.2" height="7.6" rx="1" fill="#4A3B1E" />
+              <circle cx="17.4" cy="9.4" r="2.6" fill="#4A3B1E" />
+            </svg>
+          </span>
+          <span className="oree-abeille" style={{ top: "33.0vh", left: "-6vw", animationDuration: "38.9s", animationDelay: "-10.9s" }}>
+            <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true">
+              <ellipse cx="8" cy="5" rx="6" ry="3.5" fill="rgba(255,255,255,0.75)" />
+              <ellipse cx="14" cy="5" rx="5" ry="3" fill="rgba(255,255,255,0.6)" />
+              <ellipse cx="11" cy="10" rx="6.5" ry="4.5" fill="#F5C518" />
+              <rect x="8" y="6" width="2.4" height="8.6" rx="1" fill="#4A3B1E" />
+              <rect x="12.5" y="6.6" width="2.2" height="7.6" rx="1" fill="#4A3B1E" />
+              <circle cx="17.4" cy="9.4" r="2.6" fill="#4A3B1E" />
+            </svg>
+          </span>
+          <span className="oree-abeille" style={{ top: "31.7vh", left: "-6vw", animationDuration: "30.4s", animationDelay: "-3.5s" }}>
+            <svg width="22" height="16" viewBox="0 0 22 16" aria-hidden="true">
+              <ellipse cx="8" cy="5" rx="6" ry="3.5" fill="rgba(255,255,255,0.75)" />
+              <ellipse cx="14" cy="5" rx="5" ry="3" fill="rgba(255,255,255,0.6)" />
+              <ellipse cx="11" cy="10" rx="6.5" ry="4.5" fill="#F5C518" />
+              <rect x="8" y="6" width="2.4" height="8.6" rx="1" fill="#4A3B1E" />
+              <rect x="12.5" y="6.6" width="2.2" height="7.6" rx="1" fill="#4A3B1E" />
+              <circle cx="17.4" cy="9.4" r="2.6" fill="#4A3B1E" />
+            </svg>
+          </span>
+        </div>
+      )}
+
       {/* Feuilles d'automne : purement décoratives, ne captent aucun clic */}
       {SAISON === "automne" && (
         <div className="oree-feuilles" aria-hidden="true">
@@ -9910,6 +10046,80 @@ export default function RecreApp() {
           animation-timing-function: linear;
           animation-iteration-count: infinite;
         }
+        /* Printemps : un soleil dans le ciel, des fleurs qui poussent en bas,
+           et quelques abeilles qui butinent de l'une à l'autre. */
+        .oree-printemps {
+          position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+        }
+
+        /* Soleil : il pulse doucement, ses rayons tournent lentement */
+        .oree-soleil {
+          position: absolute; top: 6vh; right: 8vw;
+          width: 90px; height: 90px;
+        }
+        .oree-soleil-halo {
+          position: absolute; inset: -60%;
+          background: radial-gradient(circle, rgba(245,215,110,0.4), transparent 62%);
+          animation: oree-halo 5s ease-in-out infinite;
+        }
+        .oree-soleil-coeur {
+          position: absolute; inset: 20%;
+          border-radius: 50%; background: #F5D76E;
+          box-shadow: 0 0 24px rgba(245,215,110,0.7);
+        }
+        .oree-soleil-rayons {
+          position: absolute; inset: 0;
+          animation: oree-rayons 42s linear infinite;
+        }
+        .oree-rayon {
+          position: absolute; left: 50%; top: 50%;
+          width: 4px; height: 46px; margin-left: -2px;
+          background: rgba(245,215,110,0.55); border-radius: 2px;
+          transform-origin: 50% 0;
+        }
+        @keyframes oree-halo {
+          0%, 100% { opacity: .65; transform: scale(1); }
+          50%      { opacity: 1;   transform: scale(1.08); }
+        }
+        @keyframes oree-rayons { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Fleurs : elles poussent depuis le bas puis se balancent au vent */
+        .oree-fleur {
+          position: absolute; bottom: 0;
+          transform-origin: 50% 100%;
+          animation: oree-pousse 9s ease-in-out infinite;
+        }
+        .oree-tige {
+          position: absolute; bottom: 0; left: 50%; width: 3px; margin-left: -1.5px;
+          background: #7FC97F; border-radius: 2px;
+        }
+        .oree-corolle {
+          position: absolute; left: 50%; border-radius: 50%;
+          transform: translateX(-50%);
+        }
+        @keyframes oree-pousse {
+          0%, 100% { transform: scaleY(1)    rotate(0deg); }
+          25%      { transform: scaleY(1.04) rotate(3.5deg); }
+          60%      { transform: scaleY(0.98) rotate(-3deg); }
+        }
+
+        /* Abeilles : trajectoire irrégulière, comme un vol de butinage */
+        .oree-abeille {
+          position: absolute;
+          animation-name: oree-butine;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
+        }
+        @keyframes oree-butine {
+          0%   { transform: translate(0, 0)         rotate(0deg); }
+          15%  { transform: translate(14vw, -7vh)   rotate(12deg); }
+          32%  { transform: translate(28vw, 4vh)    rotate(-8deg); }
+          50%  { transform: translate(46vw, -10vh)  rotate(10deg); }
+          68%  { transform: translate(62vw, 2vh)    rotate(-6deg); }
+          85%  { transform: translate(78vw, -6vh)   rotate(8deg); }
+          100% { transform: translate(96vw, 0)      rotate(0deg); }
+        }
+
         /* Feuilles d'automne : elles tombent en virevoltant, chacune sur sa
            propre trajectoire. La rotation et le balancement latéral rendent
            la chute crédible — une feuille ne tombe jamais droit. */
@@ -9987,7 +10197,8 @@ export default function RecreApp() {
         /* Respect du réglage système : pas d'animation pour qui la désactive */
         @media (prefers-reduced-motion: reduce) {
           .oree-vague-a, .oree-vague-b, .oree-vague-c,
-          .oree-flocon, .oree-lueur, .oree-flamme, .oree-feuille { animation: none; }
+          .oree-flocon, .oree-lueur, .oree-flamme, .oree-feuille,
+          .oree-soleil-halo, .oree-soleil-rayons, .oree-fleur, .oree-abeille { animation: none; }
         }
 
         /* Sur écran étroit, on masque les dernières pastilles plutôt que de déborder.
