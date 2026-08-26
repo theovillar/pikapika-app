@@ -9833,25 +9833,27 @@ export default function RecreApp() {
            vacillent à des rythmes décalés — l'irrégularité fait la flamme. */
         .oree-feu {
           position: fixed; left: 0; right: 0; bottom: 0; height: 38vh;
-          pointer-events: none; z-index: 0; overflow: hidden;
+          pointer-events: none; z-index: 0;
         }
-        .oree-feu > div { position: absolute; inset: 0; }
+        /* Les couches débordent volontairement : sans marge, l'étirement des
+           flammes sortirait du cadre au lieu de se voir. */
+        .oree-feu > div { position: absolute; left: -10%; right: -10%; top: -20%; bottom: 0; }
 
         .oree-feu-braise {
-          background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(196,82,47,0.3), transparent 72%);
+          background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(196,82,47,0.42), transparent 72%);
           animation: oree-braise 6s ease-in-out infinite;
         }
         .oree-feu-flamme {
           background:
-            radial-gradient(ellipse 34% 62% at 38% 100%, rgba(232,163,61,0.34), transparent 68%),
-            radial-gradient(ellipse 30% 74% at 62% 100%, rgba(232,163,61,0.3), transparent 70%);
+            radial-gradient(ellipse 34% 62% at 38% 100%, rgba(232,163,61,0.48), transparent 66%),
+            radial-gradient(ellipse 30% 74% at 62% 100%, rgba(232,163,61,0.44), transparent 68%);
           animation: oree-danse 4.2s ease-in-out infinite;
           transform-origin: 50% 100%;
         }
         .oree-feu-langue {
           background:
-            radial-gradient(ellipse 18% 52% at 47% 100%, rgba(255,214,140,0.4), transparent 62%),
-            radial-gradient(ellipse 14% 44% at 56% 100%, rgba(255,224,170,0.34), transparent 62%);
+            radial-gradient(ellipse 18% 52% at 47% 100%, rgba(255,214,140,0.55), transparent 60%),
+            radial-gradient(ellipse 14% 44% at 56% 100%, rgba(255,224,170,0.48), transparent 60%);
           animation: oree-vacille 2.7s ease-in-out infinite;
           transform-origin: 50% 100%;
         }
@@ -9862,16 +9864,16 @@ export default function RecreApp() {
           70%      { opacity: .82; }
         }
         @keyframes oree-danse {
-          0%, 100% { transform: scaleY(1)    scaleX(1)    translateX(0);    opacity: .8; }
-          25%      { transform: scaleY(1.16) scaleX(0.94) translateX(-8px); opacity: 1; }
-          55%      { transform: scaleY(0.92) scaleX(1.06) translateX(6px);  opacity: .74; }
-          78%      { transform: scaleY(1.1)  scaleX(0.97) translateX(-3px); opacity: .95; }
+          0%, 100% { transform: scaleY(1)    scaleX(1)    translateX(0);     opacity: .75; }
+          25%      { transform: scaleY(1.45) scaleX(0.86) translateX(-26px); opacity: 1; }
+          55%      { transform: scaleY(0.8)  scaleX(1.18) translateX(22px);  opacity: .65; }
+          78%      { transform: scaleY(1.32) scaleX(0.92) translateX(-12px); opacity: .95; }
         }
         @keyframes oree-vacille {
-          0%, 100% { transform: scaleY(1)    translateX(0);    opacity: .7; }
-          20%      { transform: scaleY(1.3)  translateX(5px);  opacity: 1; }
-          45%      { transform: scaleY(0.85) translateX(-6px); opacity: .6; }
-          68%      { transform: scaleY(1.22) translateX(3px);  opacity: .92; }
+          0%, 100% { transform: scaleY(1)    translateX(0);     opacity: .65; }
+          20%      { transform: scaleY(1.7)  translateX(18px);  opacity: 1; }
+          45%      { transform: scaleY(0.7)  translateX(-20px); opacity: .5; }
+          68%      { transform: scaleY(1.5)  translateX(10px);  opacity: .95; }
         }
 
         /* L'en-tête laisse voir l'eau qui bouge dessous */
