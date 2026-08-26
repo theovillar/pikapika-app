@@ -515,6 +515,8 @@ const NUIT = estLaNuit();
 
 const COLORS = {
   ...PALETTES[SAISON],
+  // La nuit, le fond s'assombrit : les textes doivent s'éclaircir pour rester lisibles
+  ...(NUIT ? { ink: "#EDF1F8" } : {}),
   // Repères de genre : identiques toute l'année
   boy: "#4EC5F1",
   girl: "#FF8FB1",
@@ -6375,7 +6377,7 @@ function DayAccordion({ items, categories, onOpen, favorites, onToggleFav, gende
             <span style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15.5, color: COLORS.ink, textTransform: "capitalize" }}>
               {g.label}
             </span>
-            <span style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, color: "#B7AF98" }}>
+            <span className="pika-jour-compte" style={{ fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12, color: "#B7AF98" }}>
               · {g.items.length}
             </span>
           </button>
@@ -6443,7 +6445,7 @@ function CommunityExplorer({ title, subtitle, categories, items, favorites, onTo
         <h1 style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 26, color: COLORS.ink, margin: "0 0 4px" }}>
           {title}
         </h1>
-        <p style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14.5, margin: 0 }}>
+        <p className="pika-sous-titre" style={{ fontFamily: "Nunito, sans-serif", color: "#6B6485", fontSize: 14.5, margin: 0 }}>
           {subtitle}
         </p>
       </div>
@@ -9213,7 +9215,7 @@ export default function RecreApp() {
 
   return (
     <div
-      className={SAISON === "ete" ? "oree-fond-eau" : undefined}
+      className={[SAISON === "ete" ? "oree-fond-eau" : "", NUIT ? "oree-mode-nuit" : ""].filter(Boolean).join(" ") || undefined}
       style={{
         backgroundColor: COLORS.cloud, minHeight: "100dvh", fontFamily: "Nunito, sans-serif",
         position: "relative",
@@ -10405,6 +10407,14 @@ export default function RecreApp() {
         /* Ondulations d'eau : uniquement l'été, sur le fond de la page.
            Deux trames de reflets qui dérivent lentement en sens contraire,
            entièrement en CSS (aucune image à télécharger). */
+        /* La nuit, les textes sur le fond (titres, sous-titres, en-têtes de jour)
+           s'éclaircissent : les gris sombres deviennent illisibles. */
+        .oree-mode-nuit h1,
+        .oree-mode-nuit h2 { color: #EDF1F8 !important; }
+        .oree-mode-nuit .pika-sous-titre { color: #B9C6DC !important; }
+        .oree-mode-nuit .pika-jour-titre { color: #EDF1F8 !important; }
+        .oree-mode-nuit .pika-jour-compte { color: #9FB0C9 !important; }
+
         /* Ciel de nuit : un voile sombre par-dessus le décor de saison,
            avec des étoiles qui scintillent et une lune. */
         .oree-nuit {
