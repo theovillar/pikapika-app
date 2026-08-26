@@ -520,6 +520,216 @@ const COLORS = {
   girl: "#FF8FB1",
 };
 
+// ---------- Silhouettes de villes ----------
+// Un motif discret en fond, selon la ville choisie dans le filtre de lieu.
+// Dessiné en SVG : quelques kilo-octets au total, aucune image à télécharger.
+// La clé est le nom de la ville en minuscules sans accents ; à défaut on
+// retombe sur un motif régional (montagnes, littoral, vignes…).
+const SILHOUETTES = {
+  paris: (
+    <g>
+      <path d="M60 200 L82 90 L88 90 L110 200 Z M68 160 L102 160 M72 140 L98 140 M76 118 L94 118" />
+      <path d="M85 90 L85 74 M78 74 L92 74" />
+    </g>
+  ),
+  lyon: (
+    <g>
+      <path d="M50 200 L50 120 L70 120 L70 200 Z" />
+      <path d="M50 120 L60 96 L70 120 Z" />
+      <path d="M60 96 L60 78" />
+      <path d="M78 200 L78 140 L128 140 L128 200 Z" />
+      <path d="M88 140 L88 118 L118 118 L118 140" />
+      <circle cx="103" cy="104" r="9" />
+    </g>
+  ),
+  marseille: (
+    <g>
+      <path d="M52 200 L52 132 L124 132 L124 200 Z" />
+      <path d="M62 132 L62 112 L114 112 L114 132" />
+      <path d="M88 112 L88 84" />
+      <circle cx="88" cy="72" r="11" />
+      <path d="M20 200 Q44 186 68 200 M108 200 Q132 186 156 200" />
+    </g>
+  ),
+  grenoble: (
+    <g>
+      <path d="M14 200 L54 108 L94 200 Z M74 200 L112 122 L150 200 Z" />
+      <circle cx="96" cy="88" r="15" />
+      <path d="M96 73 L96 60 M84 88 L70 88" />
+      <path d="M40 200 L46 178 L52 200" />
+    </g>
+  ),
+  bordeaux: (
+    <g>
+      <path d="M40 200 L40 118 L136 118 L136 200 Z" />
+      <path d="M56 118 L56 96 L72 96 L72 118 M104 118 L104 96 L120 96 L120 118" />
+      <path d="M64 96 L64 76 M112 96 L112 76" />
+      <path d="M20 200 Q50 188 80 200 Q110 188 140 200" />
+    </g>
+  ),
+  toulouse: (
+    <g>
+      <path d="M56 200 L56 106 L100 106 L100 200 Z" />
+      <path d="M56 106 L78 68 L100 106 Z" />
+      <path d="M78 68 L78 50" />
+      <path d="M66 130 L90 130 M66 154 L90 154" />
+      <path d="M112 200 L112 148 L146 148 L146 200 Z" />
+    </g>
+  ),
+  nice: (
+    <g>
+      <path d="M28 200 Q54 180 80 200 Q106 180 132 200" />
+      <circle cx="120" cy="72" r="16" />
+      <path d="M50 200 L50 130 L74 130 L74 200 Z M84 200 L84 116 L104 116 L104 200 Z" />
+      <path d="M36 150 Q44 128 52 150" />
+    </g>
+  ),
+  nantes: (
+    <g>
+      <path d="M44 200 L44 124 L132 124 L132 200 Z" />
+      <path d="M44 124 L58 100 L118 100 L132 124" />
+      <circle cx="88" cy="150" r="18" />
+      <path d="M88 132 L88 168 M70 150 L106 150" />
+    </g>
+  ),
+  strasbourg: (
+    <g>
+      <path d="M62 200 L62 92 L106 92 L106 200 Z" />
+      <path d="M62 92 L84 40 L106 92 Z" />
+      <path d="M84 40 L84 24" />
+      <path d="M70 120 L98 120 M70 148 L98 148" />
+    </g>
+  ),
+  montpellier: (
+    <g>
+      <path d="M40 200 L40 128 L136 128 L136 200 Z" />
+      <path d="M52 128 L52 100 M76 128 L76 100 M100 128 L100 100 M124 128 L124 100" />
+      <path d="M40 100 L136 100" />
+      <path d="M28 200 Q52 186 76 200" />
+    </g>
+  ),
+  lille: (
+    <g>
+      <path d="M50 200 L50 96 L82 96 L82 200 Z" />
+      <path d="M50 96 L66 62 L82 96 Z" />
+      <path d="M94 200 L94 126 L142 126 L142 200 Z" />
+      <path d="M94 126 L118 100 L142 126" />
+      <path d="M104 150 L132 150" />
+    </g>
+  ),
+  rennes: (
+    <g>
+      <path d="M48 200 L48 118 L128 118 L128 200 Z" />
+      <path d="M48 118 L88 82 L128 118" />
+      <path d="M64 200 L64 156 L84 156 L84 200" />
+      <path d="M100 146 L116 146 M100 166 L116 166" />
+    </g>
+  ),
+  reims: (
+    <g>
+      <path d="M56 200 L56 100 L120 100 L120 200 Z" />
+      <path d="M62 100 L62 68 L78 68 L78 100 M98 100 L98 68 L114 68 L114 100" />
+      <path d="M70 68 L70 50 M106 68 L106 50" />
+      <circle cx="88" cy="132" r="12" />
+    </g>
+  ),
+  "saint-etienne": (
+    <g>
+      <path d="M30 200 L62 130 L94 200 Z" />
+      <path d="M86 200 L86 128 L96 128 L96 200 Z" />
+      <path d="M96 140 L128 140 L128 200 L96 200" />
+      <path d="M110 128 L110 108" />
+    </g>
+  ),
+  annecy: (
+    <g>
+      <path d="M10 200 L52 112 L94 200 Z M78 200 L114 134 L150 200 Z" />
+      <path d="M60 200 L60 150 L84 150 L84 200 Z" />
+      <path d="M60 150 L72 132 L84 150" />
+      <path d="M16 178 Q44 168 72 178" />
+    </g>
+  ),
+  chamonix: (
+    <g>
+      <path d="M8 200 L48 96 L88 200 Z M70 200 L110 78 L150 200 Z" />
+      <path d="M36 124 L48 96 L60 124 Z" fill="currentColor" opacity="0.5" />
+      <path d="M96 108 L110 78 L124 108 Z" fill="currentColor" opacity="0.5" />
+    </g>
+  ),
+};
+
+// Motifs de repli, choisis d'après le département
+const MOTIFS_REGIONAUX = {
+  montagne: (
+    <g>
+      <path d="M10 200 L54 106 L98 200 Z M78 200 L118 128 L158 200 Z" />
+      <path d="M42 130 L54 106 L66 130 Z" fill="currentColor" opacity="0.5" />
+    </g>
+  ),
+  littoral: (
+    <g>
+      <path d="M14 200 Q44 182 74 200 Q104 182 134 200" />
+      <path d="M14 172 Q44 154 74 172 Q104 154 134 172" />
+      <circle cx="124" cy="76" r="15" />
+      <path d="M52 200 L52 150 L60 150 L60 200 Z" />
+      <path d="M56 150 Q40 132 56 118 Q72 132 56 150" />
+    </g>
+  ),
+  vignes: (
+    <g>
+      <path d="M28 200 L28 140 M58 200 L58 140 M88 200 L88 140 M118 200 L118 140" />
+      <path d="M20 140 L126 140" />
+      <circle cx="34" cy="120" r="7" /><circle cx="50" cy="112" r="7" />
+      <circle cx="42" cy="102" r="7" /><circle cx="96" cy="118" r="7" />
+      <circle cx="110" cy="110" r="7" /><circle cx="103" cy="100" r="7" />
+    </g>
+  ),
+  champs: (
+    <g>
+      <path d="M12 200 Q56 172 100 200 Q144 172 188 200" />
+      <path d="M40 172 L40 128 M58 168 L58 124 M76 170 L76 126" />
+      <path d="M40 128 Q34 118 40 112 Q46 118 40 128" />
+      <path d="M58 124 Q52 114 58 108 Q64 114 58 124" />
+      <path d="M76 126 Q70 116 76 110 Q82 116 76 126" />
+    </g>
+  ),
+  foret: (
+    <g>
+      <path d="M40 200 L40 168 M40 168 L18 168 L40 128 L62 168 Z" />
+      <path d="M40 148 L24 148 L40 116 L56 148 Z" />
+      <path d="M100 200 L100 160 M100 160 L80 160 L100 124 L120 160 Z" />
+      <path d="M100 142 L86 142 L100 112 L114 142 Z" />
+    </g>
+  ),
+};
+
+// Départements de montagne, littoraux et viticoles (repli quand la ville
+// n'a pas sa propre silhouette)
+const DEPT_MOTIF = {
+  montagne: ["73", "74", "38", "05", "04", "65", "64", "09", "66", "15", "63", "43", "07", "26"],
+  littoral: ["06", "83", "13", "34", "11", "29", "22", "56", "44", "85", "17", "33", "40", "50", "14", "76", "62", "2A", "2B"],
+  vignes: ["21", "51", "68", "67", "84", "30", "16", "49", "37", "58", "71", "89"],
+  foret: ["40", "88", "54", "55", "57", "23", "19", "87", "24", "46", "48"],
+};
+
+// Renvoie le motif correspondant au lieu choisi
+function motifDuLieu(location) {
+  if (!location) return null;
+  const nom = (location.nom || "")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/^(le|la|les) /, "")
+    .trim();
+
+  if (SILHOUETTES[nom]) return SILHOUETTES[nom];
+
+  const dept = String(location.dept || "").toUpperCase();
+  for (const [motif, depts] of Object.entries(DEPT_MOTIF)) {
+    if (depts.includes(dept)) return MOTIFS_REGIONAUX[motif];
+  }
+  return MOTIFS_REGIONAUX.champs;
+}
+
 const genreColor = (genre) => (genre === "F" ? COLORS.girl : COLORS.boy);
 const genreLabel = (genre) => (genre === "F" ? "Fille" : "Garçon");
 // Même palette que pour les enfants (couleur cohérente, indépendante de la catégorie de l'annonce),
@@ -9239,6 +9449,18 @@ export default function RecreApp() {
         position: "relative",
       }}
     >
+      {/* Silhouette du lieu choisi : discrète, elle situe la commune */}
+      {location && motifDuLieu(location) && (
+        <svg
+          className="oree-lieu-motif" viewBox="0 0 180 210"
+          aria-hidden="true" focusable="false"
+          fill="none" stroke={COLORS.ink} strokeWidth="3.5"
+          strokeLinecap="round" strokeLinejoin="round"
+        >
+          {motifDuLieu(location)}
+        </svg>
+      )}
+
       {/* Printemps : soleil, fleurs et abeilles — purement décoratif */}
       {SAISON === "printemps" && (
         <div className="oree-printemps" aria-hidden="true">
@@ -10488,6 +10710,17 @@ export default function RecreApp() {
         /* Sélecteur de lieu et légendes posés sur le fond */
         .oree-mode-nuit .pika-header-sticky svg { stroke: #E6ECF7; }
         .oree-mode-nuit .pika-legende { color: #C3CFE2 !important; }
+
+        /* Silhouette de la ville choisie, en filigrane dans un coin */
+        .oree-lieu-motif {
+          position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+          width: min(420px, 90vw); pointer-events: none; z-index: 0;
+          opacity: 0.07;
+        }
+        .oree-mode-nuit .oree-lieu-motif { opacity: 0.13; }
+        @media (max-width: 700px) {
+          .oree-lieu-motif { width: 70vw; opacity: 0.06; }
+        }
 
         /* Ciel de nuit : un voile sombre par-dessus le décor de saison,
            avec des étoiles qui scintillent et une lune. */
