@@ -6378,14 +6378,13 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
           }}>
             {spaceLabel ? displayDate(item) : (item.time ? item.time : displayDate(item))}
           </span>
-          <span style={{ fontFamily: "Nunito, sans-serif", color: "#8A8399", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>
-            {item.lieu}
-          </span>
+          {/* Seule la ville est affichée ici : l'adresse exacte, souvent longue,
+              était tronquée et illisible. Elle reste sur la fiche détaillée. */}
           {villeName(item.ville) && (
             <span style={{
-              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 10.5, flexShrink: 0,
-              background: "#EDEAF4", color: COLORS.grape, padding: "2px 7px", borderRadius: 8,
-              maxWidth: 110, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 10.5,
+              background: "#EDEAF4", color: COLORS.grape, padding: "2px 8px", borderRadius: 8,
+              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0,
             }}>
               {villeName(item.ville)}
             </span>
