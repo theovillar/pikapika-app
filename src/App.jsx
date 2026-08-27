@@ -6377,6 +6377,7 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
         color: isPast ? "#8A8399" : COLORS.ink,
         display: "flex", alignItems: "center", gap: 6,
       }}>
+        <PriceBadge payant={item.payant} size={11} />
         <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {item.title}
         </span>
@@ -6415,7 +6416,6 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
               {villeName(item.ville)}
             </span>
           )}
-          <PriceBadge payant={item.payant} size={12} />
         </div>
 
         <div className="pika-annonce-droite">
