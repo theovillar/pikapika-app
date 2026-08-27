@@ -6289,7 +6289,7 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
 // tout en restant immédiatement compréhensible.
 function PriceBadge({ payant, size = 11 }) {
   if (!payant) return null;
-  const d = size + 8;
+  const d = size + 11;
   return (
     <span
       title={t("badge_payant")}
@@ -6297,11 +6297,14 @@ function PriceBadge({ payant, size = 11 }) {
       style={{
         display: "inline-flex", alignItems: "center", justifyContent: "center",
         width: d, height: d, borderRadius: "50%", flexShrink: 0,
-        // Dégradé doré avec un reflet en haut à gauche, pour l'effet métallique
-        background: "radial-gradient(circle at 34% 30%, #FDE9A8 0 18%, #F2C245 45%, #D19A20 100%)",
-        boxShadow: "inset 0 -1px 2px rgba(120,80,10,0.35), 0 1px 2px rgba(43,37,96,0.2)",
-        color: "#7A5310", fontFamily: "Nunito, sans-serif", fontWeight: 800,
-        fontSize: size * 0.86, lineHeight: 1, paddingBottom: 1,
+        // Dégradé doré avec un reflet en haut à gauche, pour l'effet métallique.
+        // Le liseré foncé détache la pièce du fond blanc de la carte.
+        background: "radial-gradient(circle at 34% 28%, #FFF0B8 0 16%, #F6C63A 46%, #C98D10 100%)",
+        border: "1.5px solid #A97608",
+        boxShadow: "inset 0 -1.5px 2px rgba(120,80,10,0.4), 0 1px 3px rgba(43,37,96,0.25)",
+        color: "#5E3F05", fontFamily: "Nunito, sans-serif", fontWeight: 800,
+        fontSize: size, lineHeight: 1, paddingBottom: 1,
+        textShadow: "0 1px 0 rgba(255,255,255,0.45)",
       }}
     >
       €
