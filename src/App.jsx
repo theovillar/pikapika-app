@@ -6404,7 +6404,7 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
         <div className="pika-annonce-meta" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, minWidth: 0 }}>
           <span style={{
             fontFamily: "Nunito, sans-serif", fontWeight: 800, color: COLORS.ink, flexShrink: 0,
-            background: isPast ? "#E8E4DA" : COLORS.sun, padding: "2px 7px", borderRadius: 8, fontSize: 11.5,
+            background: isPast ? "#E8E4DA" : COLORS.sun, padding: "3px 10px", borderRadius: 9, fontSize: 13.5,
           }}>
             {spaceLabel ? displayDate(item) : (item.time ? item.time : displayDate(item))}
           </span>
@@ -6412,8 +6412,9 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
               était tronquée et illisible. Elle reste sur la fiche détaillée. */}
           {villeName(item.ville) && (
             <span style={{
-              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 10.5,
-              background: "#EDEAF4", color: COLORS.grape, padding: "2px 8px", borderRadius: 8,
+              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12.5,
+              background: "#E4DEF2", color: shade(COLORS.grape, -25),
+              padding: "3px 10px", borderRadius: 9,
               overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0,
             }}>
               {villeName(item.ville)}
