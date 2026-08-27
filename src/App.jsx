@@ -860,6 +860,15 @@ function locationLabel(location) {
   return `${location.nom} · ${location.radius ?? 0} km`;
 }
 
+// Le département n'est affiché que lorsqu'il est fiable. Les villes importées
+// depuis GeoNames portent un code de région (84 = Auvergne-Rhône-Alpes) et non
+// de département : mieux vaut ne rien afficher qu'une information fausse.
+function deptFiable(nom, dept) {
+  if (!dept) return null;
+  const connu = KNOWN_BY_NAME[normalize(nom || "")];
+  return connu && connu.dept === dept ? dept : null;
+}
+
 // Retourne le nom affichable d'une ville : soit depuis la liste intégrée (anciens
 // identifiants type "grenoble"), soit le nom tel quel pour les villes européennes.
 const villeName = (id) => {
@@ -4636,7 +4645,7 @@ function LocationFilter({ location, onChange }) {
             {location && (query.trim().length === 0 || query.trim() === location.nom) && (
               <CityOption
                 label={location.type === "departement" ? `${location.nom} (${location.code})` : location.nom}
-                sub={location.type === "departement" ? t("loc_dept") : (location.dept ? t("loc_ville_dept", { d: location.dept }) : t("loc_ville"))}
+                sub={location.type === "departement" ? t("loc_dept") : (deptFiable(location.nom, location.dept) ? t("loc_ville_dept", { d: location.dept }) : t("loc_ville"))}
                 active
                 onClick={() => {}}
               />
@@ -4650,7 +4659,7 @@ function LocationFilter({ location, onChange }) {
                     onClick={() => pickDept(d)} />
                 ))}
                 {communeSuggestions.map((p, i) => (
-                  <CityOption key={p.nom + i} label={p.nom} sub={p.dept ? t("loc_ville_dept", { d: p.dept }) : t("loc_ville")}
+                  <CityOption key={p.nom + i} label={p.nom} sub={deptFiable(p.nom, p.dept) ? t("loc_ville_dept", { d: p.dept }) : t("loc_ville")}
                     active={location?.type === "commune" && location.nom === p.nom}
                     onClick={() => pickCommune(p)} />
                 ))}
@@ -10026,6 +10035,14 @@ export default function RecreApp() {
         input:focus, textarea:focus { border-color: ${COLORS.sky} !important; }
         ::placeholder { color: #C7C0AE; }
 
+        /* En-tête sur une seule ligne, y compris sur ordinateur : quand la place
+           manque, c'est le nom de ville qui se tronque, jamais la mise en page. */
+        .pika-header-row { min-width: 0; }
+        .pika-header-right { min-width: 0; }
+        .pika-location-btn { min-width: 0; }
+        .desktop-nav { flex-shrink: 0; }
+        .pika-location-label { max-width: 180px; }
+
         /* Rangées de filtres : elles défilent horizontalement. Sur mobile, elles
            s'étendent jusqu'aux bords de l'écran, ce qui évite l'effet de coupure
            au milieu d'une pastille. La barre de défilement reste masquée. */
@@ -10081,7 +10098,9 @@ export default function RecreApp() {
       }}>
       <div className="pika-header-row" style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "14px 20px", maxWidth: 960, margin: "0 auto", flexWrap: "wrap", gap: 10,
+        padding: "14px 20px", maxWidth: 960, margin: "0 auto", gap: 10,
+        // Une seule ligne : le nom de ville se tronque si la place manque
+        flexWrap: "nowrap", minWidth: 0,
       }}>
         <button
           onClick={() => {
