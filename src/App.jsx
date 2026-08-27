@@ -6307,20 +6307,20 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
   const structure = structureDe(item);
   return (
     <div
+      className="pika-annonce"
       onClick={() => onOpen(item)}
       style={{
-        display: "flex", alignItems: "center", gap: 10,
         background: isPast ? "#F7F5F0" : (isCreator ? "#FFF9EC" : "#fff"),
         border: `2px solid ${isPast ? "#E8E4DA" : (isCreator ? COLORS.sun : "#F0EADB")}`,
         borderRadius: 14, padding: "9px 12px", cursor: "pointer", opacity: isPast ? 0.65 : 1,
       }}
     >
-      <div style={{
+      {/* Pastille de catégorie : masquée sur mobile, où la place est comptée */}
+      <div className="pika-annonce-icone" style={{
         width: 34, height: 34, borderRadius: "50%", border: `2px dashed ${iconColor}`,
         background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
         position: "relative",
       }}>
-        {/* L'emoji choisi par l'organisateur prime sur l'icône de catégorie */}
         <Icon size={15} color={iconColor} strokeWidth={2.4} />
         {item.intergen && (
           <span
@@ -6335,7 +6335,7 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
         )}
       </div>
 
-      <div style={{ flex: 1, minWidth: "15ch" }}>
+      <div className="pika-annonce-corps">
         {(spaceLabel || isCreator || isPast) && (
           <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap", marginBottom: 2 }}>
             {spaceLabel && (
@@ -6366,21 +6366,23 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
             )}
           </div>
         )}
-        <div style={{ fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5, color: isPast ? "#8A8399" : COLORS.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+
+        {/* Le titre occupe toute la largeur : c'est l'information principale */}
+        <div className="pika-annonce-titre" style={{
+          fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 14.5,
+          color: isPast ? "#8A8399" : COLORS.ink,
+        }}>
           {item.title}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, whiteSpace: "nowrap", overflow: "hidden", marginTop: 3 }}>
+
+        <div className="pika-annonce-meta" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11.5, marginTop: 3 }}>
           <span style={{
             fontFamily: "Nunito, sans-serif", fontWeight: 800, color: COLORS.ink, flexShrink: 0,
             background: isPast ? "#E8E4DA" : COLORS.sun, padding: "2px 7px", borderRadius: 8, fontSize: 11.5,
           }}>
-            {/* Dans "Mes sorties" (repérable au libellé de catégorie), les jours se mélangent :
-                on affiche la date en plus de l'heure pour s'y retrouver. */}
             {spaceLabel ? displayDate(item) : (item.time ? item.time : displayDate(item))}
           </span>
-          {/* L'adresse peut être tronquée, mais la ville reste toujours lisible :
-              c'est l'information la plus utile pour savoir si la sortie est proche. */}
-          <span style={{ fontFamily: "Nunito, sans-serif", color: "#8A8399", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>
+          <span style={{ fontFamily: "Nunito, sans-serif", color: "#8A8399", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>
             {item.lieu}
           </span>
           {villeName(item.ville) && (
@@ -6394,61 +6396,65 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
           )}
           <PriceBadge payant={item.payant} size={12} />
         </div>
+
         {item.organisateur && (
-          <div style={{ marginTop: 3, display: "flex", alignItems: "center", gap: 6 }}>
+          <div style={{ marginTop: 3, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
             <OrganiserBadge couleurStructure={structure?.couleur} name={item.organisateur} genre={item.organisateurGenre} size={15} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
             <AvgAgeBadge avg={item.participantsAvgAge} size={10.5} />
           </div>
         )}
       </div>
 
-      <PlainParticipantsRow names={item.participants} color={meta.color} max={8} genderMode={genderMode} onViewProfile={onViewProfile} />
+      {/* Participants, compteur et favori : à droite sur ordinateur,
+          sur une ligne propre en bas de la carte sur mobile. */}
+      <div className="pika-annonce-droite">
+        <PlainParticipantsRow names={item.participants} color={meta.color} max={8} genderMode={genderMode} onViewProfile={onViewProfile} />
 
-      {/* Type de structure : placé à droite, il n'allonge pas la carte */}
-      {structure && !isPast && (
-        <span
-          className="pika-badge-structure"
-          title={structure.label()}
-          style={{
-            fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9,
-            padding: "2px 8px", borderRadius: 999, flexShrink: 0,
-            background: `${structure.couleur}1F`, color: structure.couleur,
-            textTransform: "uppercase", letterSpacing: 0.4, whiteSpace: "nowrap",
-          }}
-        >
-          {structure.label()}
-        </span>
-      )}
-
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 1, flexShrink: 0 }}>
-        <span style={{
-          fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12,
-          color: full ? COLORS.coral : COLORS.grass,
-        }}>
-          {item.inscrits}/{item.places}
-        </span>
-        {/* Places enfants : n'apparaît que sur les sorties Famille, qui sont les seules à en définir */}
-        {item.placesEnfants != null && item.placesEnfants > 0 && (
-          <span style={{
-            display: "inline-flex", alignItems: "center", gap: 3,
-            fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12,
-            color: (item.inscritsEnfants || 0) >= item.placesEnfants ? COLORS.coral : shade(COLORS.grape, -22),
-          }}>
-            <Baby size={13} /> {item.inscritsEnfants || 0}/{item.placesEnfants}
+        {structure && !isPast && (
+          <span
+            className="pika-badge-structure"
+            title={structure.label()}
+            style={{
+              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9,
+              padding: "2px 8px", borderRadius: 999, flexShrink: 0,
+              background: `${structure.couleur}1F`, color: structure.couleur,
+              textTransform: "uppercase", letterSpacing: 0.4, whiteSpace: "nowrap",
+            }}
+          >
+            {structure.label()}
           </span>
         )}
-      </div>
 
-      <button
-        onClick={(e) => { e.stopPropagation(); onToggleFav(item.id); }}
-        style={{ background: "transparent", border: "none", cursor: "pointer", padding: 2, flexShrink: 0 }}
-        aria-label={t("fav_aria")}
-      >
-        <Heart size={16} color={favorite ? COLORS.coral : "#D8D2C2"} fill={favorite ? COLORS.coral : "none"} strokeWidth={2.2} />
-      </button>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 1, flexShrink: 0 }}>
+          <span style={{
+            fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12,
+            color: full ? COLORS.coral : COLORS.grass,
+          }}>
+            {item.inscrits}/{item.places}
+          </span>
+          {item.placesEnfants != null && item.placesEnfants > 0 && (
+            <span style={{
+              display: "inline-flex", alignItems: "center", gap: 3,
+              fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 12,
+              color: (item.inscritsEnfants || 0) >= item.placesEnfants ? COLORS.coral : shade(COLORS.grape, -22),
+            }}>
+              <Baby size={13} /> {item.inscritsEnfants || 0}/{item.placesEnfants}
+            </span>
+          )}
+        </div>
+
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggleFav(item.id); }}
+          style={{ background: "transparent", border: "none", cursor: "pointer", padding: 2, flexShrink: 0 }}
+          aria-label={t("fav_aria")}
+        >
+          <Heart size={16} color={favorite ? COLORS.coral : "#D8D2C2"} fill={favorite ? COLORS.coral : "none"} strokeWidth={2.2} />
+        </button>
+      </div>
     </div>
   );
 }
+
 
 // Regroupe les rencontres par jour (Aujourd'hui, Demain, Après-demain, puis "jeudi 6 septembre"…)
 // et les affiche comme une liste de sections dépliables.
@@ -10043,6 +10049,32 @@ export default function RecreApp() {
         .desktop-nav { flex-shrink: 0; }
         .pika-location-label { max-width: 180px; }
 
+        /* Carte d'annonce — sur ordinateur : pastille, contenu, puis participants
+           et favori alignés à droite sur une seule ligne. */
+        .pika-annonce { display: flex; align-items: center; gap: 10px; }
+        .pika-annonce-corps { flex: 1; min-width: 0; }
+        .pika-annonce-droite { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .pika-annonce-titre {
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .pika-annonce-meta { white-space: nowrap; overflow: hidden; }
+
+        /* Sur téléphone : la pastille disparaît, le titre occupe toute la largeur
+           et peut passer sur deux lignes, le reste descend sur sa propre ligne. */
+        @media (max-width: 700px) {
+          .pika-annonce { flex-direction: column; align-items: stretch; gap: 7px; }
+          .pika-annonce-icone { display: none; }
+          .pika-annonce-titre {
+            white-space: normal; overflow: visible; text-overflow: clip;
+            font-size: 15.5px; line-height: 1.25;
+          }
+          .pika-annonce-meta { flex-wrap: wrap; white-space: normal; overflow: visible; }
+          .pika-annonce-droite {
+            justify-content: space-between; width: 100%;
+            border-top: 1px solid #F0EADB; padding-top: 7px;
+          }
+        }
+
         /* Rangées de filtres : elles défilent horizontalement. Sur mobile, elles
            s'étendent jusqu'aux bords de l'écran, ce qui évite l'effet de coupure
            au milieu d'une pastille. La barre de défilement reste masquée. */
@@ -10202,7 +10234,7 @@ export default function RecreApp() {
       </div>
 
       <div style={{
-        maxWidth: 960, margin: "0 auto", padding: "18px 20px 110px",
+        maxWidth: 960, margin: "0 auto", padding: "18px 20px 124px",
         position: "relative", zIndex: 1,
       }}>
         {tab === "explorer" && parentValidated && (
@@ -10417,7 +10449,7 @@ export default function RecreApp() {
           aria-label={t("mairie_sub_stats")}
           title={t("mairie_sub_stats")}
           style={{
-            position: "fixed", right: 18, bottom: "calc(146px + env(safe-area-inset-bottom))",
+            position: "fixed", right: 18, bottom: "calc(158px + env(safe-area-inset-bottom))",
             zIndex: 900, width: 46, height: 46, borderRadius: "50%",
             display: "flex", alignItems: "center", justifyContent: "center",
             background: "#fff", border: `2px solid ${COLORS.ink}`, cursor: "pointer",
@@ -10435,7 +10467,7 @@ export default function RecreApp() {
           aria-label={t("tab_creer")}
           className="pika-fab"
           style={{
-            position: "fixed", right: 18, bottom: "calc(84px + env(safe-area-inset-bottom))",
+            position: "fixed", right: 18, bottom: "calc(96px + env(safe-area-inset-bottom))",
             zIndex: 900, display: "flex", alignItems: "center", gap: 8,
             background: COLORS.coral, color: "#fff", border: "none",
             borderRadius: 999, padding: "14px 20px", cursor: "pointer",
@@ -10452,9 +10484,17 @@ export default function RecreApp() {
       <div
         className="mobile-nav"
         style={{
-          position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff",
-          borderTop: "2px solid #F0EADB", display: "flex", justifyContent: "space-around",
-          padding: "10px 6px 14px", zIndex: 40, overflowX: "auto", gap: 2,
+          // Barre flottante : détachée des bords, elle donne l'impression de
+          // léviter au-dessus du contenu.
+          position: "fixed",
+          bottom: "calc(10px + env(safe-area-inset-bottom))",
+          left: 10, right: 10,
+          background: "rgba(255,255,255,0.92)",
+          backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)",
+          border: "1px solid rgba(43,37,96,0.07)", borderRadius: 22,
+          boxShadow: "0 8px 24px rgba(43,37,96,0.16), 0 2px 6px rgba(43,37,96,0.08)",
+          display: "flex", justifyContent: "space-around",
+          padding: "9px 6px", zIndex: 40, overflowX: "auto", gap: 2,
         }}
       >
         {TABS.map((t) => {
