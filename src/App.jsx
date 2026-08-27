@@ -6285,15 +6285,26 @@ function CommunityCard({ item, categories, onOpen, favorite, onToggleFav, gender
 // Ligne fine (quasi une seule ligne) pour une rencontre, utilisée dans l'affichage groupé par jour.
 // Petit badge "Payant" (avec le prix si connu) — rien n'est affiché si la sortie est gratuite,
 // pour ne pas surcharger visuellement la majorité des annonces (qui restent gratuites).
+// Sortie payante : une petite pièce d'or, plus discrète qu'un badge texte
+// tout en restant immédiatement compréhensible.
 function PriceBadge({ payant, size = 11 }) {
   if (!payant) return null;
+  const d = size + 8;
   return (
-    <span style={{
-      display: "inline-flex", alignItems: "center", gap: 3, background: COLORS.coral,
-      color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: size,
-      padding: "3px 9px", borderRadius: 999, whiteSpace: "nowrap", flexShrink: 0, letterSpacing: 0.3,
-    }}>
-      <Tag size={size} /> {t("badge_payant")}
+    <span
+      title={t("badge_payant")}
+      aria-label={t("badge_payant")}
+      style={{
+        display: "inline-flex", alignItems: "center", justifyContent: "center",
+        width: d, height: d, borderRadius: "50%", flexShrink: 0,
+        // Dégradé doré avec un reflet en haut à gauche, pour l'effet métallique
+        background: "radial-gradient(circle at 34% 30%, #FDE9A8 0 18%, #F2C245 45%, #D19A20 100%)",
+        boxShadow: "inset 0 -1px 2px rgba(120,80,10,0.35), 0 1px 2px rgba(43,37,96,0.2)",
+        color: "#7A5310", fontFamily: "Nunito, sans-serif", fontWeight: 800,
+        fontSize: size * 0.86, lineHeight: 1, paddingBottom: 1,
+      }}
+    >
+      €
     </span>
   );
 }
