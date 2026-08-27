@@ -6375,10 +6375,13 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
       )}
 
       {/* Rangée 1 — le titre occupe toute la largeur de la carte */}
+      {/* Hauteur de ligne fixée à 24px : le titre peut grossir sans que la
+          carte ne s'allonge, quels que soient les badges affichés à côté. */}
       <div className="pika-annonce-titre" style={{
-        fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 15,
+        fontFamily: "Fredoka, sans-serif", fontWeight: 600, fontSize: 17,
         color: isPast ? "#8A8399" : COLORS.ink,
         display: "flex", alignItems: "center", gap: 6,
+        height: 24, lineHeight: "24px",
       }}>
         <PriceBadge payant={item.payant} size={11} />
         <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
