@@ -10059,20 +10059,14 @@ export default function RecreApp() {
         }
         .pika-annonce-meta { white-space: nowrap; overflow: hidden; }
 
-        /* Sur téléphone : la pastille disparaît, le titre occupe toute la largeur
-           et peut passer sur deux lignes, le reste descend sur sa propre ligne. */
+        /* Sur téléphone : on garde la ligne unique et la hauteur d'origine.
+           La pastille de catégorie disparaît pour libérer sa largeur au titre,
+           et tout reste bien à l'intérieur de la carte. */
         @media (max-width: 700px) {
-          .pika-annonce { flex-direction: column; align-items: stretch; gap: 7px; }
+          .pika-annonce { gap: 8px; padding: 9px 10px !important; }
           .pika-annonce-icone { display: none; }
-          .pika-annonce-titre {
-            white-space: normal; overflow: visible; text-overflow: clip;
-            font-size: 15.5px; line-height: 1.25;
-          }
-          .pika-annonce-meta { flex-wrap: wrap; white-space: normal; overflow: visible; }
-          .pika-annonce-droite {
-            justify-content: space-between; width: 100%;
-            border-top: 1px solid #F0EADB; padding-top: 7px;
-          }
+          .pika-annonce-droite { gap: 7px; }
+          .pika-badge-structure { display: none !important; }
         }
 
         /* Rangées de filtres : elles défilent horizontalement. Sur mobile, elles
@@ -11099,7 +11093,6 @@ export default function RecreApp() {
            Le compteur "+N" reste toujours visible, lui. */
         @media (max-width: 560px) {
           /* Sur écran étroit, le badge cède la place aux informations essentielles */
-          .pika-badge-structure { display: none !important; }
         }
         @media (max-width: 460px) {
           /* Sur petit écran : le bouton flottant devient rond (icône seule) et les
