@@ -46,7 +46,7 @@ const TRANSLATIONS = {
     cat_cafe: "Café / Brunch", cat_culture: "Sorties culture", cat_bienetre: "Bien-être", cat_jeuxsociete: "Jeux de société",
     cat_jeuxvideo: "Jeux vidéo", cat_cinema: "Ciné / Sorties",
     cat_marche: "Marche santé", cat_ateliers: "Ateliers", cat_jardinage: "Jardinage",
-    cat_mairie: "Mairie", cat_solidaire: "Solidaire", cat_fete: "Fête de quartier", cat_commerce: "Commerce", badge_mairie: "Mairie", badge_association: "Association", badge_commerce: "Commerce",
+    cat_mairie: "Mairie", cat_solidaire: "Solidaire", cat_fete: "Fête de quartier", cat_commerce: "Commerce", badge_mairie: "Mairie", badge_association: "Association", badge_commerce: "Commerce", tag_mairie: "Mairie", tag_asso: "Asso", tag_pro: "Pro", tag_ado: "Ado", tag_famille: "Famille", tag_adulte: "Adulte", tag_aine: "Retraité",
     create_title: "Proposer une sortie",
     create_subtitle: "Partagez une activité, d'autres parents pourront rejoindre avec leurs enfants.",
     label_titre: "Titre de la sortie", placeholder_titre: "Ex. Balade contée au parc", placeholder_kid_name: "Prénom de l'enfant", btn_ajouter: "Ajouter",
@@ -6309,11 +6309,27 @@ function PriceBadge({ payant, size = 11 }) {
   );
 }
 
+// Petite étiquette affichée à droite du titre : elle dit d'un coup d'œil à qui
+// s'adresse la sortie, ou quelle structure l'organise pour l'onglet Commune.
+function etiquetteAnnonce(item, categories, structure) {
+  if (structure) {
+    if (structure === STRUCTURE_META.mairie) return { texte: t("tag_mairie"), couleur: structure.couleur };
+    if (structure === STRUCTURE_META.commercant) return { texte: t("tag_pro"), couleur: structure.couleur };
+    return { texte: t("tag_asso"), couleur: structure.couleur };
+  }
+  // Hors Commune, on se fie au jeu de catégories de l'espace affiché
+  if (categories === TEEN_CATEGORIES) return { texte: t("tag_ado"), couleur: COLORS.sky };
+  if (categories === SENIOR_CATEGORIES) return { texte: t("tag_aine"), couleur: COLORS.grape };
+  if (categories === ADULT_CATEGORIES) return { texte: t("tag_adulte"), couleur: COLORS.grass };
+  return { texte: t("tag_famille"), couleur: COLORS.coral };
+}
+
 // `isCreator` et `isPast` ne servent que dans "Mes sorties" : ailleurs, la ligne s'affiche normalement.
 function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, genderMode, onViewProfile, isCreator = false, isPast = false, spaceLabel }) {
   const meta = metaFrom(categories, item.category);
   const full = item.inscrits >= item.places;
   const structure = structureDe(item);
+  const etiquette = etiquetteAnnonce(item, categories, structure);
   return (
     <div
       className="pika-annonce"
@@ -6366,6 +6382,16 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
         </span>
         {item.intergen && (
           <span title={t("intergen_badge")} style={{ fontSize: 12, flexShrink: 0 }}>🤝</span>
+        )}
+        {!isPast && etiquette && (
+          <span style={{
+            fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9,
+            padding: "2px 7px", borderRadius: 999, flexShrink: 0,
+            background: `${etiquette.couleur}1F`, color: etiquette.couleur,
+            textTransform: "uppercase", letterSpacing: 0.4, whiteSpace: "nowrap",
+          }}>
+            {etiquette.texte}
+          </span>
         )}
       </div>
 
@@ -6428,19 +6454,6 @@ function NarrowMeetupRow({ item, categories, onOpen, favorite, onToggleFav, gend
         <div style={{ marginTop: 3, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
           <OrganiserBadge couleurStructure={structure?.couleur} name={item.organisateur} genre={item.organisateurGenre} size={15} userId={item.createdBy} onClick={onViewProfile} age={item.organiserAge} />
           <AvgAgeBadge avg={item.participantsAvgAge} size={10.5} />
-          {structure && !isPast && (
-            <span
-              className="pika-badge-structure"
-              style={{
-                fontFamily: "Nunito, sans-serif", fontWeight: 800, fontSize: 9,
-                padding: "2px 8px", borderRadius: 999, flexShrink: 0,
-                background: `${structure.couleur}1F`, color: structure.couleur,
-                textTransform: "uppercase", letterSpacing: 0.4, whiteSpace: "nowrap",
-              }}
-            >
-              {structure.label()}
-            </span>
-          )}
         </div>
       )}
     </div>
